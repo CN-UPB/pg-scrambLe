@@ -1,0 +1,82 @@
+%
+% Copyright (C) 2001 by Holger Karl,
+% karl@ft.ee.tu-berlin.de
+%
+% file: template.tex
+%
+% Time-stamp: Sat Oct 06 08:29:52 2001
+%
+% Template fuer die Ausarbeitungen zu TKN-Seminaren
+%
+\documentclass[12pt,twoside,doublepage]{article}
+
+
+% Hier den Namen des Teilnehmers und den Titel  der Ausarbeitung eintragen:
+\newcommand{\teilnehmer}{Holger Karl}
+\newcommand{\ausarbeitung}{IP over Avian Carriers --- A Brief
+  Overview}
+
+
+% Falls die Ausarbeitung in Deutsch erfolgt,
+% die folgenden Kommentar-Zeichen '%' entfernen, andernfalls diese
+ % Kommandos auskommentiert lassen:
+% Languages:
+% \usepackage[german]{babel}
+% \usepackage[T1]{fontenc}
+% \usepackage[latin1]{inputenc}
+% \selectlanguage{german}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Im restlichen Vorspann KEINE Aenderungen machen!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{times}
+\usepackage{url}
+
+\usepackage{geometry}
+\geometry{a4paper,body={5.8in,9in}}
+
+% Graphics:
+\usepackage{graphicx}
+% aller Bilder werden im Unterverzeichnis figures gesucht:
+\graphicspath{{figures/}}
+
+% Headers:
+\usepackage{fancyhdr}
+% \pagestyle{fancy}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[LE]{ \slshape \teilnehmer}
+\fancyhead[LO]{}
+\fancyhead[RE]{}
+\fancyhead[RO]{ \slshape \ausarbeitung}
+\fancyfoot[C]{}
+
+\begin{document}
+
+\title{\ausarbeitung}
+\author{\teilnehmer}
+\maketitle
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ab hier steht der eigentliche Text:
+
+% Abstract gives a brief summary of the main points of a paper:
+\begin{abstract}
+
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% hier werden - zum Ende des Textes - die bibliographischen Referenzen
+% eingebunden
+%
+% Insbesondere stehen die eigentlichen Informationen in der Datei
+% ``bib.bib''
+%
+
+\bibliography{bib}
+\bibliographystyle{plain}
+
+\end{document}
+
+
