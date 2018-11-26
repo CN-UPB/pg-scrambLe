@@ -3,4 +3,12 @@
 
 \section{Motivation}
 
-\section{Problem Definition}
+The rapid growth of mobile data services driven by mobile internet has led to a substantial challenge of high availability , low latency, high bit rate and performances in networks. The recent development of NFV and SDN has emerged as a key enabler for 5g networks. 
+There has been a paradigm shift in networking with the recent developments in Network Virtualization technology. Network Function Virtualization (NFV) involves decoupling of the hardware components from the software components of a network function. These NFVs require some central management and orchestrations framework (MANO) in order to fully deliver end to end services of an application. There are multiple open source as well as industrial implementation of a  MANO framework in the market. 
+
+End to end network service delivery with high avaliability , scalability and low latency requires chaining of the Network Functions across different Internet Service Providers (ISPs) which in turn have their own MANO frameworks. In order to seamlessly create a Network Sevice by utilizing the Virtual Network Funtions within each of the MANO frameworks, a common ground needs to be setup based on which the VNFs could be optimally linked to create a virtual network service.
+
+
+\subsection{Problem Description}
+
+European Telecommunicaitons Standards Institute (ETSI) defines the reference architecture for a MANO framework. Each network service is composed of multiple network funtions virtually linked and orchestrated by a MANO framework. The network services require a descriptor which contains the details of all the VNFs , virtual Links , Forwarding Graph of VNFs are defined. Each of the Virtual Network Funtions contain its own descriptors namely the number of virtual machine it needs etc. Different MANO frameworks have its own Descriptor Schemas pertaining to the standard defined by ETSI. This framework specific Network Service Descriptor hinders the orchestration and management of NFVs between different MANO frameworks. Our project aims at tackling this problem by implementing a method to translate and split the NFVs from different MANO frameworks in order to create a framework independent Network Service chain.
