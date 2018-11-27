@@ -1,6 +1,30 @@
 \chapter{Related Work}
 \label{ch:Related Work}
 
+\paragraph{}
+In this chapter we discuss the relevant research efforts that can be used to achieve our goals. First we discuss the standards and specifications for orchestration and management of NFV in the section \ref{standSpecs}. The fundamental aspect of a service deployment is the Network Service Descriptor (NSD), in the section \ref{serviceDescription} we discuss the trends and options of NSDs. In section \ref{interopmano}, we discuss research papers that try to mitigate the interoperability challanges between different MANO frameworks. Section \ref{manoscale} will be a brief account on the MANO scalability problem.\\
+
+As this is our initial project proposal, the state-of-the-art could change as we progress and we will update our approach accordingly.
 
 
+\section{Standards and Specifications}
+\label{standSpecs}
 
+\cite{rotsos_network_2017}
+\cite{de_sousa_network_2018}
+\cite{yong_li_software-defined_2015}
+
+\section{Service Description}
+\label{serviceDescription}
+
+\cite{garay_service_2016}
+
+\section{MANO Interoperability}
+\label{interopmano}
+
+
+\section{Hierarchical Orchestration }
+\label{manoscale}
+
+\paragraph{}
+MANO framework face significant scalability challenges in large scale deployments, the amount of infrastructure a single instance of MANO framework can manage is limited. Abu-Lebdeh et al. \cite{abu-lebdeh_nfv_2017} explores the effects of placement of MANO on the system performance and scalability and conclude by suggesting hierarchical orchestration architecture to optimize them, they formally define the scalability problem as an integer linear programming and propose a two-step placement algorithm. We also intend to answer the MANO scalability challenges, by exploring the optimal number of MANO deployments in a system, the optimal hierarchical level and how to manage the state of such a system dynamically.
