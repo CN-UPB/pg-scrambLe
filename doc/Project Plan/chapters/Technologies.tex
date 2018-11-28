@@ -3,10 +3,180 @@
 
 \section{Orchestrator}
 
-\subsection{}
-\subsection{}
-\subsection{}
-\subsection{}
+\paragraph{}
+In the following section, we have listed out a few NFV Orchestrators and there NSD schemas (list of few parameters and there description), amongst several others, which we are planning to setup locally and deploy Network Service. This list is subject to future additions or removals.
+
+\subsection{OpenBaton}
+\paragraph{}
+Open Baton is an open source implementation of ETSI MANO specification. Its main objective is to develop an extensible and customizable framework capable of orchestrating network services from deferent domains\cite{openBaton}. Following table lists out the important parameters of the Network Service Descriptor\cite{openBatonSchemaDocumentation}. 
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{ |p{4cm}|p{10cm}|}
+            \hline
+            \textbf{Parameter} & \textbf{Description} \\
+            \hline
+             
+             Name & The name of the Network Service \\
+             \hline
+             Vendor & The vendor or provider of the Network Service \\
+             \hline
+             Version & The version of the Network Service (can be any string) \\
+             \hline
+             vnfd & The list of Virtual Network Functions composing the Network Service (see Virtual Network Function Descriptor for more details) \\
+             \hline
+             Vld & The list of Virtual Links that are referenced by the VNF Descriptors in order to define network connectivity \\
+             \hline
+             Vnf\_dependency & The list of dependencies between Virtual Network Functions (Not mandatory, please check the VNF Descriptor page in order to understand more about this topic, as you may not need to specifiy dependencies here if those are already provided in terms of requirements at the VNFD level) \\
+             \hline
+        \end{tabular}
+        \caption{Open Baton NSD parameters}
+        \label{tab:OpenBatonSchema}
+    \end{table}
+
+\subsection{SONATA}
+\paragraph{}
+SONATA is one of the NSO research projects which targets two crucial technological challenges in the foreseeable future of 5G networks\cite{SONATA}.
+
+\begin{itemize}
+    \item Flexible programmability and 
+    \item Deployment optimization of software networks for complex services /applications.
+\end{itemize}
+
+SONATA complies with the ETSI NFV-MANO reference architecture. Following tables lists out the important parameters of the Network Service Descriptor \cite{SONATASchemaDocumentation}.
+\subsubsection{General Network Service Descriptor Section}
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         Vendor & Identifies the NS uniquely across all NS vendors. \\
+         \hline
+         Name & Name of the NS without its version. \\
+         \hline
+         Version & Names the version of the NS descriptor. \\
+         \hline
+         Author & It’s an optional parameter. It describes the author of the network service descriptor \\
+         \hline
+         Description & It’s an optional parameter. provides an arbitrary description of the network service. \\
+         \hline
+    \end{tabular}
+    \caption{SONATA: General Network Service Descriptor Section}
+    \label{tab:SONATA_general_section}
+\end{table}
+
+\subsubsection{Network Functions Section}
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         network\_functions & contains all the VNFs that are handled by the network service. \\
+         \hline
+         Vnf\_id & represents a unique identifer within the scope of the NSD \\
+         \hline
+         Vnf\_vendor & as part of the primary key, the vendor parameter identifies the VNFD \\
+         \hline
+         Vnf\_name & as part of the primary key, the name parameter identifies the VNFD \\
+         \hline
+         Vnf\_version & as part of the primary key, the version parameter identifies the VNFD.\\
+         \hline
+         Vnf\_description & It’s an optional parameter. a human-readable description of the VNF.\\
+         \hline
+    \end{tabular}
+    \caption{SONATA: Network Functions Section}
+    \label{tab:SONATA_NF_section}
+ \end{table}
+
+
+\subsection{TeNOR}
+Developed by T-NOVA project, it’s the NFV Orchestrator platform which is not only responsible for entire lifecycle service management of entire Network Function Virtualization but also optimizing the networking and IT resources usage. NS and VNF descriptors follow the TeNORs data model specifications that are a derived and extended version of the ETSI NSD and VNFD data model \cite{de2018network}. Following table lists out some of the parameters of the descriptors \cite{TeNorSchemaDocumentation}:
+
+    \begin{table}[h]
+        \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         Id	& Unique ID of the Network Service. \\
+         \hline
+         Name &	Name of the NS. \\
+         \hline
+         Vendor	& Identifies the NS uniquely across all NS vendors. \\
+         \hline
+         Version &	Names the version of the NS descriptor \\
+         \hline
+         Manifest\_file\_md5 & Exposes MD5 check-sums of the meta-data that the manifest file contains. \\
+         \hline
+         vnfds & Array of virtual network function descriptors. \\
+         \hline
+    \end{tabular}
+        \caption{TeNOR: Network Service Descriptor}
+    \label{tab:TeNOR_NSD_section}
+ \end{table}
+
+\subsection{Cloudify}
+\paragraph{}
+Cloudify is an open source cloud orchestration framework mainly focused on optimization of NFV Orchestration and management. It provides a TOSCA based blueprint which felicitates end to end lifecycle of NFV Orchestration. Cloudify follows MANO reference architecture but not entirely compliant to it\cite{de2018network}. Following are some high-level sections of the Blueprint which describes the network services are installed and configured \cite{CloudifySchemaDocumentation}:
+
+
+    \begin{table}[h]
+        \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         type &	The node-type of this node template. \\
+         \hline
+         properties &	The properties of the node template, matching its node type properties schema. \\
+         \hline
+         instances &	Instances configuration. (Deprecated. Replaced with capabilities.scalable) \\
+         \hline
+         interfaces	 & Used for a mapping plugins to interfaces operation, or for specifying inputs for already-mapped node type operations. \\
+         \hline
+         relationships &	Used for specifying the relationships that this node template has with other node templates. \\
+         \hline
+         capabilities &	Used for specifying the node template capabilities (Supported since: cloudify\_dsl\_1\_3.) Only the scalable capability is supported. \\
+         \hline
+    \end{tabular}
+    \caption{Cloudify: Node Template}
+    \label{tab:Cloudify_node_template}
+ \end{table}
+
+\subsection{Open Source MANO}
+\paragraph{}
+OSM is an open source management and orchestration stack in compliant with ETSI NFV information models. OSM architecture splits between resource orchestrator and service orchestrators \cite{de2018network}. Table \ref{tab:OSM_nsd} lists the parameters of NSD schema. \cite{OSMSchemaDocumentation}
+    \begin{table}[h]
+        \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         id &	Identifier for the NSD. \\
+         \hline
+         name &	NSD Name \\
+         \hline
+         Short-name &	Short name which appears on the UI \\
+         \hline
+         vendor &	Vendor of the NSD \\
+         \hline
+         logo &	File path for the vendor specific logo. For example, icons/mylogo.png. The logo should be part of the network service. \\
+         \hline
+         description &	Description of the NSD \\
+         \hline
+         version &	Version of the NSD. \\
+         \hline
+    \end{tabular}
+        \caption{OSM: Network Service Descriptor}
+    \label{tab:OSM_nsd}
+ \end{table}
+
 
 \section{Virtualized Infrastructure Manager (VIM)}
 
