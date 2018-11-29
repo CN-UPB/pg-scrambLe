@@ -3,26 +3,23 @@
 
 
 \section{Goals}
+\paragraph{}
 In this section, we describe the goals of the project.
-
-
-
-
 
 
 \paragraph{}
 The structure of the project consists of a component that manages and orchestrates the network (Management and orchestration,MANO) and Network Service Descriptor (NSD) that specify the network service to be created and it is a collection of configuration documents which determines how the network service is comprised in terms of Virtual Network Functions (VNFs).
- 
-
 
 
 \paragraph{}
 The main goal of the project is to build three work packages:
 
 \begin{enumerate}
-	\item Service Descriptor Translator(SDT) : SDT  translates Network Service descriptor (NSD) of one MANO framework (mano1) to another MANO framework (mano2). In the structure given, translator is required if  mano2 needs to deploy the services described by NSD of mano1.
-	\item Service Descriptor Splitter(SDS) : In order to deploy VNFs over different Point of presence (POPs), splitter is required.
-	\item MANO scalability support : Adaptor is necessary if more than one instance of MANO framework is needed, i.e,  adaptor allows interaction between different instances of MANO frameworks. It also exposes the underlying MANOs service instantiation interfaces and retrieves monitoring information about the service status.
+	\item \textbf{Service Descriptor Translator (SDT):} SDT translates Network Service descriptors (NSD) between schema of different MANO frameworks. The translator is required if we need to deploy the services across different MANO frameworks.
+	
+	\item \textbf{Service Descriptor Splitter (SDS):} In order to deploy a NS over different MANO instances, splitter is required to split the NSD into relevant MANO framework specific NSDs.
+	
+	\item \textbf{MANO Scalability Support:} Adaptor is necessary if more than one instance of MANO framework is needed, i.e,  adaptor allows interaction between different instances of MANO frameworks. It also exposes the underlying MANOs service instantiation interfaces and retrieves monitoring information about the service status.
 \end{enumerate}
 
 \begin{figure}
