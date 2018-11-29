@@ -1,14 +1,11 @@
 \chapter{Technologies}
 \label{ch:Technologies}
-
 \section{MANO Frameworks}
-
 \paragraph{}
-In this section, we have listed a few MANO frameworks and their NSD schemata (list of a few parameters and their description). Among several others, the plan is to set them up locally, deploy network services and support them in the project. This list is subjected to future additions or removals.
-
+In this section, we have listed a few MANO frameworks and their NSD schemata (list of a few parameters and their description). Among several frameworks, the plan is to select a few and set them up locally, deploy network services and support them in the project. This list is subjected to future additions or removals.
 \subsection{OpenBaton}
 \paragraph{}
-Open Baton is an open source implementation of ETSI MANO specification. Its main objective is to develop an extensible and customizable framework capable of orchestrating network services from deferent domains\cite{openBaton}. Following table lists out the important parameters of the Network Service Descriptor\cite{openBatonSchemaDocumentation}. 
+Open Baton is an open source implementation of ETSI MANO specification. It's main objective is to develop an extensible and customizable framework capable of orchestrating network services from different domains\cite{openBaton}. Following table lists the important parameters of NSD\cite{openBatonSchemaDocumentation}. 
     \begin{table}[h]
         \centering
         \begin{tabular}{ |p{4cm}|p{10cm}|}
@@ -16,34 +13,31 @@ Open Baton is an open source implementation of ETSI MANO specification. Its main
             \textbf{Parameter} & \textbf{Description} \\
             \hline
              
-             Name & The name of the Network Service \\
+             Name & The name of the network service \\
              \hline
-             Vendor & The vendor or provider of the Network Service \\
+             Vendor & The vendor or provider of the network service \\
              \hline
-             Version & The version of the Network Service (can be any string) \\
+             Version & The version of the network service (can be any string) \\
              \hline
-             vnfd & The list of Virtual Network Functions composing the Network Service (see Virtual Network Function Descriptor for more details) \\
+             vnfd & The list of VNFs composing the network service (see Virtual Network Function Descriptor for more details) \\
              \hline
              Vld & The list of Virtual Links that are referenced by the VNF Descriptors in order to define network connectivity \\
              \hline
-             Vnf\_dependency & The list of dependencies between Virtual Network Functions (Not mandatory, please check the VNF Descriptor page in order to understand more about this topic, as you may not need to specifiy dependencies here if those are already provided in terms of requirements at the VNFD level) \\
+             Vnf\_dependency & The list of dependencies between VNFs\\
              \hline
         \end{tabular}
         \caption{Open Baton NSD parameters}
         \label{tab:OpenBatonSchema}
     \end{table}
-
 \subsection{SONATA}
 \paragraph{}
-SONATA is one of the NSO research projects which targets two crucial technological challenges in the foreseeable future of 5G networks\cite{SONATA}.
-
+SONATA is one of the NSO research projects which targets two crucial technological challenges in the foreseeable future of 5G networks as follows\cite{SONATA}.
 \begin{itemize}
-    \item Flexible programmability and 
+    \item Flexible programmability
     \item Deployment optimization of software networks for complex services /applications.
 \end{itemize}
-
-SONATA complies with the ETSI NFV-MANO reference architecture. Following tables lists out the important parameters of the Network Service Descriptor \cite{SONATASchemaDocumentation}.
-\subsubsection{General Network Service Descriptor Section}
+SONATA complies with the ETSI NFV-MANO reference architecture. Following tables lists the important parameters of NSD \cite{SONATASchemaDocumentation}.
+\subsubsection{Network Service Descriptor Section}
     \begin{table}[h]
     \centering
     \begin{tabular}{ |p{4cm}|p{10cm}|}
@@ -51,21 +45,20 @@ SONATA complies with the ETSI NFV-MANO reference architecture. Following tables 
         \textbf{Parameter} & \textbf{Description} \\
         \hline
          
-         Vendor & Identifies the NS uniquely across all NS vendors. \\
+         Vendor & Identifies the network service uniquely across all network service vendors. \\
          \hline
-         Name & Name of the NS without its version. \\
+         Name & Name of the network service without its version. \\
          \hline
-         Version & Names the version of the NS descriptor. \\
+         Version & Names the version of the NSD. \\
          \hline
-         Author & It’s an optional parameter. It describes the author of the network service descriptor \\
+         Author & It's an optional parameter. It describes the author of NSD \\
          \hline
-         Description & It’s an optional parameter. provides an arbitrary description of the network service. \\
+         Description & It's an optional parameter, provides an arbitrary description of the network service. \\
          \hline
     \end{tabular}
-    \caption{SONATA: General Network Service Descriptor Section}
+    \caption{SONATA: Network Service Descriptor Section}
     \label{tab:SONATA_general_section}
 \end{table}
-
 \subsubsection{Network Functions Section}
     \begin{table}[h]
     \centering
@@ -74,27 +67,24 @@ SONATA complies with the ETSI NFV-MANO reference architecture. Following tables 
         \textbf{Parameter} & \textbf{Description} \\
         \hline
          
-         network\_functions & contains all the VNFs that are handled by the network service. \\
+         network\_functions & Contains all the VNFs that are handled by the network service. \\
          \hline
-         Vnf\_id & represents a unique identifer within the scope of the NSD \\
+         Vnf\_id & Represents a unique identifier within the scope of the NSD \\
          \hline
-         Vnf\_vendor & as part of the primary key, the vendor parameter identifies the VNFD \\
+         Vnf\_vendor & As part of the primary key, the vendor parameter identifies the VNF Descriptor \\
          \hline
-         Vnf\_name & as part of the primary key, the name parameter identifies the VNFD \\
+         Vnf\_name & As part of the primary key, the name parameter identifies the VNF Descriptor \\
          \hline
-         Vnf\_version & as part of the primary key, the version parameter identifies the VNFD.\\
+         Vnf\_version & As part of the primary key, the version parameter identifies the VNF Descriptor\\
          \hline
-         Vnf\_description & It’s an optional parameter. a human-readable description of the VNF.\\
+         Vnf\_description & It's an optional parameter, a human-readable description of the VNF\\
          \hline
     \end{tabular}
     \caption{SONATA: Network Functions Section}
     \label{tab:SONATA_NF_section}
  \end{table}
-
-
 \subsection{TeNOR}
-Developed by T-NOVA project, it’s the NFV Orchestrator platform which is not only responsible for entire lifecycle service management of entire Network Function Virtualization but also optimizing the networking and IT resources usage. NS and VNF descriptors follow the TeNORs data model specifications that are a derived and extended version of the ETSI NSD and VNFD data model \cite{de2018network}. Following table lists out some of the parameters of the descriptors \cite{TeNorSchemaDocumentation}:
-
+Developed by T-NOVA project, it's the NFV Orchestrator platform which is not only responsible for the entire lifecycle service management of NFV but also optimizing the networking and IT resources usage. Network service and VNF descriptors follow the TeNORs data model specifications that are a derived and an extended version of the ETSI NSD and VNF Descriptor data model \cite{de2018network}. Following table lists some of the parameters of the descriptors \cite{TeNorSchemaDocumentation}.
     \begin{table}[h]
         \centering
     \begin{tabular}{ |p{4cm}|p{10cm}|}
@@ -102,28 +92,26 @@ Developed by T-NOVA project, it’s the NFV Orchestrator platform which is not o
         \textbf{Parameter} & \textbf{Description} \\
         \hline
          
-         Id	& Unique ID of the Network Service. \\
+         Id & Unique ID of the network service \\
          \hline
-         Name &	Name of the NS. \\
+         Name & Name of the network service \\
          \hline
-         Vendor	& Identifies the NS uniquely across all NS vendors. \\
+         Vendor & Identifies the network service uniquely across all network service vendors \\
          \hline
-         Version &	Names the version of the NS descriptor \\
+         Version &  Names the version of the NSD \\
          \hline
-         Manifest\_file\_md5 & Exposes MD5 check-sums of the meta-data that the manifest file contains. \\
+         Manifest\_file\_md5 & Exposes MD5 check-sums of the meta-data that the manifest file contains \\
          \hline
-         vnfds & Array of virtual network function descriptors. \\
+         vnfds & Array of VNF Descriptors \\
          \hline
     \end{tabular}
         \caption{TeNOR: Network Service Descriptor}
     \label{tab:TeNOR_NSD_section}
  \end{table}
-
+\newpage
 \subsection{Cloudify}
 \paragraph{}
-Cloudify is an open source cloud orchestration framework mainly focused on optimization of NFV Orchestration and management. It provides a TOSCA based blueprint which felicitates end to end lifecycle of NFV Orchestration. Cloudify follows MANO reference architecture but not entirely compliant to it\cite{de2018network}. Following are some high-level sections of the Blueprint which describes the network services are installed and configured \cite{CloudifySchemaDocumentation}:
-
-
+Cloudify is an open source cloud orchestration framework mainly focused on optimization of NFV Orchestration and management. It provides a TOSCA based blueprint which facilitates end-to-end lifecycle of NFV Orchestration. Cloudify follows MANO reference architecture but not entirely compliant to it\cite{de2018network}. Following are some high-level sections of the blueprint which describes the network services that are installed and configured \cite{CloudifySchemaDocumentation}.
     \begin{table}[h]
         \centering
     \begin{tabular}{ |p{4cm}|p{10cm}|}
@@ -131,26 +119,25 @@ Cloudify is an open source cloud orchestration framework mainly focused on optim
         \textbf{Parameter} & \textbf{Description} \\
         \hline
          
-         type &	The node-type of this node template. \\
+         type & The node-type of this node template \\
          \hline
-         properties &	The properties of the node template, matching its node type properties schema. \\
+         properties &   The properties of the node template, matching its node type properties schema \\
          \hline
-         instances &	Instances configuration. (Deprecated. Replaced with capabilities.scalable) \\
+         instances &    Instances configuration(deprecated replaced with capabilities and scalable) \\
          \hline
-         interfaces	 & Used for a mapping plugins to interfaces operation, or for specifying inputs for already-mapped node type operations. \\
+         interfaces  & Used for mapping plugins to interface operation, or for specifying inputs for already-mapped node type operations \\
          \hline
-         relationships &	Used for specifying the relationships that this node template has with other node templates. \\
+         relationships &    Used for specifying the relationships that this node template has with other node templates \\
          \hline
-         capabilities &	Used for specifying the node template capabilities (Supported since: cloudify\_dsl\_1\_3.) Only the scalable capability is supported. \\
+         capabilities & Used for specifying the node template capabilities. (Supported since: cloudify\_dsl\_1\_3) Only the scalable capability is supported\\
          \hline
     \end{tabular}
     \caption{Cloudify: Node Template}
     \label{tab:Cloudify_node_template}
  \end{table}
-
-\subsection{Open Source MANO}
+\subsection{Open Source MANO(OSM)}
 \paragraph{}
-OSM is an open source management and orchestration stack in compliant with ETSI NFV information models. OSM architecture splits between resource orchestrator and service orchestrators \cite{de2018network}. Table \ref{tab:OSM_nsd} lists the parameters of NSD schema. \cite{OSMSchemaDocumentation}
+OSM is an open source management and orchestration stack in compliant with ETSI NFV information models. OSM architecture splits between resource orchestrators and service orchestrators \cite{de2018network}. Table \ref{tab:OSM_nsd} lists the parameters of NSD schema. \cite{OSMSchemaDocumentation}
     \begin{table}[h]
         \centering
     \begin{tabular}{ |p{4cm}|p{10cm}|}
@@ -158,45 +145,41 @@ OSM is an open source management and orchestration stack in compliant with ETSI 
         \textbf{Parameter} & \textbf{Description} \\
         \hline
          
-         id &	Identifier for the NSD. \\
+         id &   Identifier for the NSD \\
          \hline
-         name &	NSD Name \\
+         name & NSD name \\
          \hline
-         Short-name &	Short name which appears on the UI \\
+         Short-name &   Short name which appears on the UI \\
          \hline
-         vendor &	Vendor of the NSD \\
+         vendor &   Vendor of the NSD \\
          \hline
-         logo &	File path for the vendor specific logo. For example, icons/mylogo.png. The logo should be part of the network service. \\
+         logo & File path for the vendor specific logo. For example, icons/mylogo.png. The logo should be a part of the network service. \\
          \hline
-         description &	Description of the NSD \\
+         description &  Description of the NSD \\
          \hline
-         version &	Version of the NSD. \\
+         version &  Version of the NSD \\
          \hline
     \end{tabular}
         \caption{OSM: Network Service Descriptor}
     \label{tab:OSM_nsd}
  \end{table}
 
+\todo[inline]{Should we include other MANO frameworks as well like tacker, XOS, XMANO and ONOS?? }
 
+\newpage
 \section{Virtualized Infrastructure Manager (VIM)}
-
-VIM is one of the three functional blocks specified in the Network Functions Virtualization Management and Orchestration (NFV-MANO) architecture. VIM is responsible for controlling and managing the NFV infrastructure (NFVI), by provisioning and optimizing the allocation of physical resources to the virtual resources in the NFVI. Performance and error monitoring is also a key role of the VIM. Popular VIMs are discussed in the following sections.
-
-
+VIM is one of the three functional blocks specified in the Network Functions Virtualization Management and Orchestration (NFV-MANO) architecture. VIM is responsible for controlling and managing the NFV Infrastructure (NFVI), by provisioning and optimizing the allocation of physical resources to the virtual resources in the NFVI. Performance and error monitoring is also a key role of the VIM. Popular VIMs are discussed in the following sections.
 \subsection{OpenStack}
-
-
 \paragraph{}
-OpenStack\footnote{https://www.openstack.org/} is a community-driven open source cloud resource management platform. Compute, storage, and networking resources in a datacenter can be provisioned using application program interfaces (APIs) or web dashboard provided by OpenStack component, for instance, NOVA is a component which can provide access to compute resources, such as virtual machines and containers. Network management is enabled by NEUTRON component which handles the creation and management of a virtual networking infrastructure like switches and routers. SWIFT component provides a storage system. By making use of many such components, OpenStack can deliver complex services by utilizing an underlying pool of resources.
-
+OpenStack\footnote{https://www.openstack.org/} is a community-driven open source cloud resource management platform. Compute, storage, and networking resources in a data center can be provisioned using Application Program Interfaces (APIs) or web dashboard provided by OpenStack component, for instance, NOVA is a component which can provide access to compute resources, such as virtual machines and containers. Network management is enabled by NEUTRON component which handles the creation and management of a virtual networking infrastructure like switches and routers. SWIFT component provides a storage system. By making use of many such components, OpenStack can deliver complex services by utilizing an underlying pool of resources.
 \subsection{Amazon Web Services (AWS)}
-
 \paragraph{}
-AWS\footnote{https://aws.amazon.com/} is a cloud computing platform, It offers (1) Infrastructure as a Service (IaaS) -- provides resources that can be utilized for custom applications (2) Platform as a Service (PaaS) -- provides services such as database and email which can be used as individual components for building complex applications (3) Software as a Service (SaaS) -- provides user applications with customization and administrative capabilities that are ready to use. AWS is specially preferred by small companies for the flexibility and ease of use of its cloud infrastructure.
-
+AWS\footnote{https://aws.amazon.com/} is a cloud computing platform, It offers (1) Infrastructure as a Service (IaaS) -- provides resources that can be utilized for custom applications (2) Platform as a Service (PaaS) -- provides services such as database and email which can be used as individual components for building complex applications (3) Software as a Service (SaaS) -- provides user applications with customization and administrative capabilities that are ready to use. AWS is specially preferred by small companies for the flexibility and ease of use of it's cloud infrastructure.
 \subsection{Kubernetes}
-
 \paragraph{}
-Kubernetes\footnote{https://kubernetes.io/} (K8s) is an open-source platform for automation and management of containerized services, it manages computing, networking, and storage infrastructure. Kubernetes was initially developed by Google and now under Cloud Native Computing Foundation. Kubernetes Architecture consists of (1) Master server components -- it is the control plane of the cluster and act as the gateway for  administrators (2) Node Server Components -- servers which are performing work by using containers are called nodes, they communicate with the master component for instructions to run the workload assigned to them. Kubernetes provides comprehensive APIs which are used to communicate between the components and with the external user.
+Kubernetes\footnote{https://kubernetes.io/} (K8s) is an open-source platform for automation and management of containerized services, it manages computing, networking, and storage infrastructure. Kubernetes was initially developed by Google and now under Cloud Native Computing Foundation. Kubernetes Architecture consists of (1) Master server components -- it is the control plane of the cluster and act as the gateway for  administrators (2) Node Server Components -- servers which are performing work by using containers that are called nodes, they communicate with the master component for instructions to run the workload assigned to them. Kubernetes provides comprehensive APIs which are used to communicate between the components and with the external user.
 
 
+
+\todo[inline]{Should we include some projects like UNIFY(multiple
+	technology domains orchestrator) , SONATA and VITAL??  }
