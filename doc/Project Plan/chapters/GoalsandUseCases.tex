@@ -40,34 +40,20 @@ The goal of the project is to develop a software suite which facilitates interop
 
 The MANO frameworks used by every network service provider varies from one another. NSD translation enables the deployment of network services that is in accordance with the intended framework.
 
-For instance : If an operator uses Sonata framework and another operator uses OSM framework, the NSD schemas for both the frameworks will be different. Using the solutions of translation and splitting, network services can be deployed and orchestrated across different MANO implementations.
+For instance: Consider two Network Service Operators using different MANO frameworks. One of them uses Sonata framework \cite{draxler2017sonata} and another operator uses OSM framework \cite{ersue2013etsi}. These frameworks have different NSD schemata(refer \ref{SecSONATA} and \ref{SecOSM}). NSD schemata contains VNFs, virtual links, and VNF forwarding graphs and also describes the deployment of a Network Service. By using a translator, these NSD schemata can be translated to framework-specific schema. With this, operators can deploy and manage Network Services across different MANO implementations.
 
 \subsection{Hierarchical Orchestration}
 \paragraph{}
-By implementing MANO adaptor, dynamic instantiation and inter-operability between different MANO frameworks can be achieved. As a result, operators will be able to scale up and scale down the resources as and when required.
+By using the MANO adapter, dynamic instantiation of multiple MANO instances and inter-operability between different MANO frameworks can be achieved. The operator will be able to handle the resources in an efficient manner, as one MANO framework can manage a limited number of service requests, operators can explore options to include additional MANO instances under the existing MANO instance to mitigate the traffic load on a single instance. The resources can be provisioned based on the number of requests. This helps the operator in extending their profitability.
+\newpage
+\textbf{Actors} : The Network Service Providers who would use features of SCrAMbLE.
 
- Also, the operator will be able to handle the resources in an efficient manner. 
-When there is a high demand for network service, the operator can explore options to include additional MANO instances to mitigate the traffic load on a single MANO instance. The resources can be provisioned based on the number of requests. This helps the operator in extending their profitability. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{figure} [h]
+	\centering
+	\includegraphics[width=1.0\linewidth]{figures/use-case}
+	\caption{Use Case Diagram}
+	\label{fig:use-case}
+\end{figure}
 
 
 
