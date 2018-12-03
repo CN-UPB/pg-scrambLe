@@ -6,25 +6,32 @@ In this chapter, we discuss the intended goals of the project and list some use 
 \section{Goals}
 
 \paragraph{}
-The goal of the project is to develop a software suite which facilitates interoperability between MANO frameworks, thereby enabling management of a network service across multi-vendor environments. To achieve this, we're dividing the software suite into 3 individual work packages (WP), which are developed in parallel initially and finally be merged. In the following sections, we discuss the individual goals of these work packages in detail.
+The goal of the project is to develop a software suite which facilitates interoperability between MANO frameworks, thereby enabling management of a network service across multi-vendor environments. To achieve this, we're dividing the software suite into 3 individual modules, which are developed in parallel initially and finally be merged. In the following sections, we discuss the individual goals of these modules in detail.
 
-\subsection{WP1: Service Descriptor Translator (SDT)}
+\subsection{Service Descriptor Translator (SDT)}
 \paragraph{}
 
-
-\subsection{WP2: Service Descriptor Splitter (SDS)}
+\subsection{Service Descriptor Splitter (SDS)}
 \paragraph{}
 
-
-\subsection{WP3: MANO Scalability Support}
+\subsection{MANO Adaptor (MA)}
 \paragraph{}
+
+A key component of a MANO framework is Virtualized Interface Manager (VIM),  which helps in assigning the hardware resources to virtual resources. The MANO framework uses specific adaptors to communicate with their respective VIMs. For instance, Sonata \ref{SecSONATA} MANO framework has adaptors for OpenStack \ref{label} and Kubernetes\ref{label}. However, when there is a spike in the service request beyond the capabilities of a single MANO instance, multiple MANO instances should be instantiated to balance the load. The goal of this module is to build an adaptor that facilitates interaction between different instances of MANO frameworks, thereby exposing the underlying MANO framework's interfaces and enabling monitoring of the underlying service states.
+
+\paragraph{}
+Apart from the implementation of MA, we are planning to investigate MANO scalability challenges by answering research questions such as the ones listed below but not limited to.
+\begin{itemize}
+	\item What is the optimal number of MANO instances in a system?
+	\item What is the optimal hierarchical level in a system?
+\end{itemize}
 
 
 \subsection{Integration Of Work Packages}
 \paragraph{}
 
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{figures/Structure_Updated1}
 	\caption{This figure visualizes the structure of the project. }
