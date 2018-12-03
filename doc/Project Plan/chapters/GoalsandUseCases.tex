@@ -1,27 +1,28 @@
 \chapter{Goals and Use Cases}
 \label{ch:Goals and Use Cases}
 
+In this chapter, we discuss the intended goals of the project and list some use cases.
 
 \section{Goals}
-\paragraph{}
-In this section, we describe the goals of the project.
-
 
 \paragraph{}
-The structure of the project consists of a component that manages and orchestrates the network (MANO) and NSD that specify the network service to be created and it is a collection of configuration documents which determines how the network service is comprised in terms of VNFs.
+The goal of the project is to develop a software suite which facilitates interoperability between MANO frameworks, thereby enabling management of a network service across multi-vendor environments. To achieve this, we're dividing the software suite into 3 individual work packages (WP), which are developed in parallel initially and finally be merged. In the following sections, we discuss the individual goals of these work packages in detail.
 
-
+\subsection{WP1: Service Descriptor Translator (SDT)}
 \paragraph{}
-The main goal of the project is to build three work packages:
 
-\begin{enumerate}
-	\item \textbf{Service Descriptor Translator (SDT):} SDT translates NSDs between schema of different MANO frameworks. The translator is required when there is a need to deploy the services across different MANO frameworks.
-	
-	\item \textbf{Service Descriptor Splitter (SDS):} In order to deploy a network service over different MANO instances, splitter is required to split the NSD into relevant MANO framework specific NSDs.
-	
-	
-	\item \textbf{MANO Scalability Support:} Adaptor is necessary if more than one instance of MANO framework is needed, i.e,  adaptor allows interaction between different instances of MANO frameworks. It also exposes the underlying MANO service instantiation interfaces and retrieves monitoring information about the service status.
-\end{enumerate}
+
+\subsection{WP2: Service Descriptor Splitter (SDS)}
+\paragraph{}
+
+
+\subsection{WP3: MANO Scalability Support}
+\paragraph{}
+
+
+\subsection{Integration Of Work Packages}
+\paragraph{}
+
 
 \begin{figure}
 	\centering
