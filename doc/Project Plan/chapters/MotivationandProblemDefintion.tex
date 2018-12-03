@@ -1,9 +1,8 @@
 \chapter{Motivation}
 \label{ch:Motivation}
 
-\section{Motivation}
 
-The rapid growth of mobile data services driven by mobile internet has led to a substantial challenge of high availability , low latency, high bit rate and performances in networks. The recent development of Network Function Virtualization (NFV) and Software Defined Networks (SDN) has emerged as a key enabler for 5g networks. 
+The rapid growth of mobile data services driven by mobile internet has led to a substantial challenge of high availability, low latency, high bit rate and performances in networks. The recent development of Network Function Virtualization (NFV) and Software-Defined Networks (SDN) has emerged as a key enabler for 5G networks. 
 There has been a paradigm shift in networking with the recent developments in Network Virtualization technology. NFV involves decoupling of the hardware components from the software components of a network function. NFVs require a central management and orchestrations (MANO) framework  in order to fully deliver end to end services of an application. There are multiple open source as well as industrial implementation of a  MANO framework in the market. 
 
 End-to-end network service delivery with high availability, scalability and low latency requires chaining of the Network Functions across different Internet Service Providers (ISPs) which in turn have their own MANO frameworks. In order to seamlessly create a network service by utilizing the Virtual Network Funtions (VNF) within each of the MANO frameworks, a common ground needs to be setup based on which the VNFs could be optimally linked to create a virtual network service.
@@ -11,6 +10,6 @@ End-to-end network service delivery with high availability, scalability and low 
 
 \section{Problem Description}
 
-European Telecommunications Standards Institute (ETSI) defines the reference architecture for a MANO framework. Each network service is composed of multiple network functions virtually linked and orchestrated by a MANO framework. The network services require a descriptor which contains the details of all the VNFs, virtual links, forwarding graph of VNFs. Each of the VNFs contain its own descriptors and the number of virtual machines it requires. Different MANO frameworks have its own descriptor schemata pertaining to the standard defined by ETSI. This framework specific Network Service Descriptor (NSD) hinders the orchestration and management of NFVs between different MANO frameworks. Our project aims at tackling this problem by implementing a method to translate and split the NFVs from different MANO frameworks in order to create a framework independent network service chain.
-\todo[inline]{Should the list of abbreviations be included?}
+European Telecommunications Standards Institute (ETSI) defines the reference architecture for a MANO framework. Each network service is composed of multiple network functions virtually linked and orchestrated by a MANO framework. The network services require a descriptor which contains the details of all the VNFs, virtual links, forwarding graph of VNFs. Each of the VNFs contain its own descriptors and the number of virtual machines it requires. Different MANO frameworks have their own descriptor schemata pertaining to the standard defined by ETSI. This framework-specific Network Service Descriptor (NSD) hinders the orchestration and management of NFVs between different MANO frameworks. Our project aims at tackling this problem by implementing a method to translate and split the NFVs from different MANO frameworks in order to create a framework independent network service chain.
+
 
