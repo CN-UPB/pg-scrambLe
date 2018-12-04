@@ -11,6 +11,10 @@ The goal of the project is to develop a software suite which facilitates interop
 \subsection{Service Descriptor Translator (SDT)}
 \paragraph{}
 
+In this work package we implement a translator engine for a Network Service Descriptor (NSD). The Network Function Virtualization Orchestrator (NFVO) is the main orchestration unit of a MANO framework that manages the lifecycle of a network service (NS). One of the main functions of a NFVO is registering a network service in the NS catalog by onboarding the NSD. In a scenario where a network service needs to be deployed and registered among two different MANO
+frameworks having their own NSD schema, our translator engine would help translate the NSD schema from one MANO framework to the other.
+We will have mechanisms to extract the NSD schema from the NS catalog of the two different MANO frameworks and pass it to SDT engine which will consume the NSD schemas and translate one NSD schema to the other MANO framework's NSD schema. REST interfaces will be made available for other services to interface with the SDT.
+
 \subsection{Service Descriptor Splitter (SDS)}
 \paragraph{}
 
