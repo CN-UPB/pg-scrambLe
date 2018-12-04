@@ -6,13 +6,22 @@ In this chapter, we discuss the intended goals of the project and list some use 
 \section{Goals}
 
 \paragraph{}
-The goal of the project is to develop a software suite which facilitates interoperability between MANO frameworks, thereby enabling management of a network service across multi-vendor environments. To achieve this, we're dividing the software suite into 3 individual modules, which are developed in parallel initially and finally be merged. In the following sections, we discuss the individual goals of these modules in detail.
+The goal of the project is to develop a software suite which facilitates interoperability between MANO frameworks, thereby enabling management of a network service across multi-vendor environments. To achieve this, we're dividing the software suite into 3 individual work packages (WP), which are developed in parallel initially and finally be merged. In the following sections, we discuss the individual goals of these modules in detail.
 
 \subsection{Service Descriptor Translator (SDT)}
 \paragraph{}
 
 \subsection{Service Descriptor Splitter (SDS)}
 \paragraph{}
+
+In production environment, a Network Service will be deployed over a vast geographical region and will span multiple domains, in such scenarios there is a need to split a Network Service into smaller network services and deploy it over multiple domains. In this work package we are implementing a Service Descriptor Splitter (SDS) which will be splitting the NSD of NS. SDS will be taking NSD as an input which will have all the information elements which can be extracted to generate separate NSDs. In our approach, the Service Graph is extracted from the input NSD and is split into subgraphs which will result in a separate set of elements such as Virtual Network Functions, Virtual Links, Virtual Network Function Forwarding Graphs etc. We will be evaluating different network graph splitting algorithms to split the Service graph. We will take these sets and generate NSDs according to the domain specific orchestrators.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/splitter_diagram}
+	\caption{This figure visualizes the structure of SDS work package. }
+	\label{fig:splitterDiagram}
+\end{figure}
 
 \subsection{MANO Adaptor (MA)}
 \paragraph{}
