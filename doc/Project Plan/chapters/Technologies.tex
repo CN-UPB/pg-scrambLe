@@ -1,10 +1,8 @@
 \chapter{Technologies}
 \label{ch:Technologies}
 \section{MANO Frameworks}
-\paragraph{}
 In this section, a few MANO frameworks and their NSD schemata are listed(list of a few parameters and their description). Among several frameworks, the plan is to select a few and set them up locally, deploy network services and support them in the project. This list is subjected to future additions or removals.
 \subsection{OpenBaton}
-\paragraph{}
 Open Baton is an open source implementation of ETSI MANO specification. It's main objective is to develop an extensible and customizable framework capable of orchestrating network services from different domains\cite{openBaton}. Following table lists the important parameters of NSD\cite{openBatonSchemaDocumentation}. 
     \begin{table}[h]
         \centering
@@ -31,7 +29,6 @@ Open Baton is an open source implementation of ETSI MANO specification. It's mai
     \end{table}
 \subsection{SONATA}
 \label{SecSONATA}
-\paragraph{}
 SONATA is one of the NSO research projects which targets two crucial technological challenges in the foreseeable future of 5G networks as follows\cite{SONATA}.
 \begin{itemize}
     \item Flexible programmability
@@ -111,7 +108,6 @@ Developed by T-NOVA project, it's the NFV Orchestrator platform which is not onl
  \end{table}
 \newpage
 \subsection{Cloudify}
-\paragraph{}
 Cloudify is an open source cloud orchestration framework mainly focused on optimization of NFV Orchestration and management. It provides a TOSCA based blueprint which facilitates end-to-end lifecycle of NFV Orchestration. Cloudify follows MANO reference architecture but not entirely compliant to it\cite{de2018network}. Following are some high-level sections of the blueprint which describes the network services that are installed and configured \cite{CloudifySchemaDocumentation}.
     \begin{table}[h]
         \centering
@@ -138,7 +134,6 @@ Cloudify is an open source cloud orchestration framework mainly focused on optim
  \end{table}
 \subsection{Open Source MANO(OSM)}
 \label{SecOSM}
-\paragraph{}
 OSM is an open source management and orchestration stack in compliant with ETSI NFV information models. OSM architecture splits between resource orchestrators and service orchestrators \cite{de2018network}. Table \ref{tab:OSM_nsd} lists the parameters of NSD schema. \cite{OSMSchemaDocumentation}
     \begin{table}[h]
         \centering
@@ -173,12 +168,9 @@ OSM is an open source management and orchestration stack in compliant with ETSI 
 VIM is one of the three functional blocks specified in the Network Functions Virtualization Management and Orchestration (NFV-MANO) architecture. VIM is responsible for controlling and managing the NFV Infrastructure (NFVI), by provisioning and optimizing the allocation of physical resources to the virtual resources in the NFVI. Performance and error monitoring is also a key role of the VIM. Popular VIMs are discussed in the following sections.
 \subsection{OpenStack}
 \label{SecOpenStack}
-\paragraph{}
 OpenStack\footnote{https://www.openstack.org/} is a community-driven open source cloud resource management platform. Compute, storage, and networking resources in a data center can be provisioned using Application Program Interfaces (APIs) or web dashboard provided by OpenStack component, for instance, NOVA is a component which can provide access to compute resources, such as virtual machines and containers. Network management is enabled by NEUTRON component which handles the creation and management of a virtual networking infrastructure like switches and routers. SWIFT component provides a storage system. By making use of many such components, OpenStack can deliver complex services by utilizing an underlying pool of resources.
 \subsection{Amazon Web Services (AWS)}
-\paragraph{}
 AWS\footnote{https://aws.amazon.com/} is a cloud computing platform, It offers (1) Infrastructure as a Service (IaaS) -- provides resources that can be utilized for custom applications (2) Platform as a Service (PaaS) -- provides services such as database and email which can be used as individual components for building complex applications (3) Software as a Service (SaaS) -- provides user applications with customization and administrative capabilities that are ready to use. AWS is specially preferred by small companies for the flexibility and ease of use of it's cloud infrastructure.
 \subsection{Kubernetes}
 \label{SecKubernetes}
-\paragraph{}
 Kubernetes\footnote{https://kubernetes.io/} (K8s) is an open-source platform for automation and management of containerized services, it manages computing, networking, and storage infrastructure. Kubernetes was initially developed by Google and now under Cloud Native Computing Foundation. Kubernetes Architecture consists of (1) Master server components -- it is the control plane of the cluster and act as the gateway for  administrators (2) Node Server Components -- servers which are performing work by using containers that are called nodes, they communicate with the master component for instructions to run the workload assigned to them. Kubernetes provides comprehensive APIs which are used to communicate between the components and with the external user.
