@@ -16,12 +16,6 @@ frameworks, having their own NSD schema respectively, our SDT engine would help 
 
 In the production environment, a network service is deployed over a vast geographical region spanning multiple domains. In such scenarios, there is a need to split a network service into smaller network services and deploy it over multiple domains. In this work package, a Service Descriptor Splitter (SDS) is implemented which splits the NSD of a network service. SDS takes NSD as an input that contains all the information elements which can be extracted to generate separate NSDs. In the proposed approach, the Service Graph is extracted from the input NSD and is split into subgraphs that result in a separate set of elements such as VNFs, virtual links, forwarding graphs of VNFs etc. Different network graph splitting algorithms are then evaluated to split the service graph. These sets are considered to generate NSDs according to the domain-specific orchestrators.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/Splitter_Diagram}
-	\caption{This figure visualizes the structure of SDT.}
-	\label{fig:splitter_Diagram}
-\end{figure}
 
 \subsection{MANO Adaptor (MA)}
 
