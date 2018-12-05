@@ -9,9 +9,8 @@ The goal of the project is to develop a software suite which facilitates interop
 
 \subsection{Service Descriptor Translator (SDT)}
 
-In this work package, a translator engine for a NSD is implemented. The Network Function Virtualization Orchestrator (NFVO) is the main orchestration unit of a MANO framework that manages the lifecycle of a network service. One of the main functions of a NFVO is registering a network service, by onboarding it's NSD to the network service catalog . In a scenario, where a network service is deployed and registered with two different MANO
-frameworks, having their own NSD schema respectively, the translator engine helps in translating the NSD schema from one MANO framework to the other.
-The mechanisms to extract the NSD schema from the network service catalog of the two different MANO frameworks, are used . It is later passed on to SDT engine that consumes the NSD schemas and translates one NSD schema to the other MANO framework's NSD schema. REST interfaces are made available for other services to interface with the SDT.
+In this work package, a translator engine for a NSD is implemented. The Network Function Virtualization Orchestrator (NFVO) is the main orchestration unit of a MANO framework that manages the lifecycle of a network service. One of the main functions of a NFVO is registering a network service, by onboarding it's NSD to the network service catalog . In a scenario, where a network service is to be deployed and registered among two different MANO
+frameworks, having their own NSD schema respectively, our SDT engine would help in translating a NSD schema from one MANO framework to the other framework. To accomplish this, the NSD schema from the network service catalog of the two different MANO frameworks needs to be extracted and passed on to SDT engine. SDT engine consumes the NSD schemas and translates one NSD schema to the other MANO framework's NSD schema. REST interfaces are made available for other services to interface with the SDT.
 
 \subsection{Service Descriptor Splitter (SDS)}
 
@@ -45,7 +44,7 @@ Apart from the implementation of MA we plan to investigate MANO scalability chal
 \end{figure}
 
 \subsection{Integration Of Work Packages}
-In this work package, the SDT, SDS and MA are integrated. This integration will augment the functionality of the MA in terms of addressing the scalability challenges between different MANO frameworks. It also extends the capabilities of both the SDS and SDT to split a NSD and then deploy a part of it to a different MANO framework. All these individual modules are planned to be implemented as microservices and integrated keeping their individual autonomy intact. 
+In this work package, the SDT, SDS and MA are integrated. This integration will augment the functionality of the MA in terms of addressing the scalability challenges between instances of different MANO frameworks. It also extends the capabilities of both the SDS and SDT to split a NSD and then deploy a part of it to a different MANO framework. All these individual modules are planned to be implemented as microservices and integrated keeping their individual autonomy intact. 
 
 The project group will be initially divided into 3 subgroups. Each subgroup works on a single work package. However, update on work in progress and knowledge transfer will continuously take place between the subgroups. In the final development phase, the entire team will work towards integrating the individual modules of the work packages into a single software suite.
 
