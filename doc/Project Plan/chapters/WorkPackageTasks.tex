@@ -6,7 +6,7 @@ In this chapter, the high level tasks in each WP is discussed briefly. A referen
 \section{WP1: Service Descriptor Translator}
 
 \subsection{Requirements definitions and architecture design}
-\paragraph{}
+
 The development of the SDT engine follows a microservice architecture. The architecture inludes a message broker with a publish/subcribe model. The NSDs(yaml files) corresponding to the communicating MANO are published to the broker. Our SDT engine, subscribed to the broker, consumes the yaml files and translate one MANO NSD to the other template and publish them back to the broker. These translated NSDs could be accessed by any other services through a REST API.
 \begin{figure}[h]
 	\centering
@@ -16,16 +16,16 @@ The development of the SDT engine follows a microservice architecture. The archi
 \end{figure}
 
 \subsection{Prototype implementation of SDT components}
-\paragraph{}
+
 After the concrete architecture is planned, a working prototype of the SDT engine including all the requisite components is modeled. This prototype is built as a standalone autonomous microservice.
 \subsection{Proof of concept demonstration}
-\paragraph{}
+
 The functionality of the SDT engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP2: Service Descriptor Splitter}
 
 \subsection{Requirements definition and architecture design}
-\paragraph{}
+
   A publish/subscribe message broker model will be once again followed for the SDS engine implementation. The NSD(yaml file) is published to the message broker. A service graph splitter and a NSD splitter consumes the NSD from the broker and splits the NSD into two. The two seperate NSDs are published back to the broker from where other services can consume those through REST API.
 \begin{figure}[h]
 	\centering
@@ -35,19 +35,19 @@ The functionality of the SDT engine will be demonstrated on virtual machines con
 \end{figure}
 
 \subsection{Investigation of service graph partitioning algorithms and libraries}
-\paragraph{}
-The service graph needs to be split optimally based on the loads and resource allocation on each VNF. To accomplish this a graph partitioning algorithm such as \textit{Mixed Integer Program for Partitioning Graphs} \ref{MIPPG} will be used. However the exact choice of algorithm suitable for the project will be decided going forward.
+
+The service graph needs to be split optimally based on the loads and resource allocation on each VNF. To accomplish this a graph partitioning algorithm such as \textit{Mixed Integer Program for Partitioning Graphs} \cite{MIPPG} will be used. However the exact choice of algorithm suitable for the project will be decided going forward.
 \subsection{Prototype implementation of SDS components}
-\paragraph{}
+
 After the concrete architecture is planned, a working prototype of the SDS engine including all the requisite internal components is coded and modeled. This prototype is also built as a standalone autonomous microservice.
 \subsection{Proof of concept demonstration}
-\paragraph{}
+
 The functionality of the SDS engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP3: MANO Adaptor}
 
 \subsection{Requirements definition and architecture design}
-\paragraph{}
+In similarity with the above work packages, the adaptor also follows the microservice architecture. The main component in the proposed adaptor structure is the MA engine,  it communicates via a message bus with the wrappers of different MANO frameworks. Wrappers help in communicating with the underlying MANO framework's interfaces, thus enabling hierarchical orchestration. Functionalities of the adaptor can be accessed by other components through REST APIs.
 
 \begin{figure}[h]
 	\centering
@@ -57,7 +57,7 @@ The functionality of the SDS engine will be demonstrated on virtual machines con
 \end{figure}
 
 \subsection{Prototype implementation of adaptor components}
-\paragraph{}
+
 As a starting point of the prototype, the plan is to choose one of the MANO frameworks listed in the section \ref{manoframeworks} and implement the wrapper for the interfaces provided by it, with focus on modularity and portability. Thereby, making it easy to add support for interfaces provided by other MANO frameworks. Further, we will add the southbound interfaces required to communicate with the MA.
 
 \subsection{Investigation of MANO scalability challenges}
@@ -78,3 +78,15 @@ The plan is to investigate MANO scalability challenges by answering research que
 
 \subsection{Proof of concept demonstration}
 MA is demonstrated by having two/three virtual machines with MANO frameworks installed, a scenario where a huge number of service requests on one of the MANOs is created. In order to balance the load, the MANO experiencing the service request spike splits the load with another MANO instance. The capability of the MANO to communicate between other MANO instances with the help of MA is thus demonstrated.
+
+\section{Cross-WPs tasks}
+\subsection{Requirements definition of WPs integration}
+The requirements for this task is to include the functionalities of SDT, SDS and MA to extend the capabilities of a MANO framework.
+
+\subsection{Integration implementation of WPs}
+The REST interfaces required for the cross-WP communication are implemented.
+The exact idea is unclear at this point in time. 
+
+
+\subsection{Proof of concept demonstration}
+The end-to-end workflow of the software suite is demonstrated. 
