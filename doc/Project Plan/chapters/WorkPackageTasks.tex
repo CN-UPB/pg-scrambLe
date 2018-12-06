@@ -7,7 +7,7 @@ In this chapter, the high level tasks in each WP is discussed briefly. A referen
 
 \subsection{Requirements definitions and architecture design}
 \paragraph{}
-The development of the SDT engine follows a microservice architecture. The architecture inludes a message broker with a subcriber/publisher model. The NSDs(yaml) corresponding to the communicating MANO are published to the broker. Our SDT engine, subscribed to the broker, consumes the yaml files and translate one MANO NSD to the other template and publish them back to the broker. These translated NSDs could be accessed by any other services through a REST API.
+The development of the SDT engine follows a microservice architecture. The architecture inludes a message broker with a publish/subcribe model. The NSDs(yaml files) corresponding to the communicating MANO are published to the broker. Our SDT engine, subscribed to the broker, consumes the yaml files and translate one MANO NSD to the other template and publish them back to the broker. These translated NSDs could be accessed by any other services through a REST API.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/wp1Arch}
@@ -20,13 +20,13 @@ The development of the SDT engine follows a microservice architecture. The archi
 After the concrete architecture is planned, a working prototype of the SDT engine including all the requisite components is modeled. This prototype is built as a standalone autonomous microservice.
 \subsection{Proof of concept demonstration}
 \paragraph{}
-The functionality of the SDT engine on a virtual machine will be demonstrated where atleast two different MANO frameworks are installed and deployed. 
+The functionality of the SDT engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP2: Service Descriptor Splitter}
 
 \subsection{Requirements definition and architecture design}
 \paragraph{}
-  A publish/subscribe message broker model will be once again followed for the SDS engine implementation. The NSD(yaml) is published to the message broker. A service graph splitter and a NSD splitter consumes the NSD from the broker and splits the NSD into two. The two seperate NSDs are published back to the broker from where other services can consume those through REST API.
+  A publish/subscribe message broker model will be once again followed for the SDS engine implementation. The NSD(yaml file) is published to the message broker. A service graph splitter and a NSD splitter consumes the NSD from the broker and splits the NSD into two. The two seperate NSDs are published back to the broker from where other services can consume those through REST API.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/wp2Arch}
@@ -35,14 +35,14 @@ The functionality of the SDT engine on a virtual machine will be demonstrated wh
 \end{figure}
 
 \subsection{Investigation of service graph partitioning algorithms and libraries}
-\paragraph{}We demonstrate t
-The service graph needs to be split optimally based on the loads and resource allocation on each VNFs. To accomplish this a graph partitioning algorithm such as Mixed Integer Program for PartitioniWe demonstrate tng Graphs will be used. However the exact choice of algorithm suitable for the project will be decided going forward.
+\paragraph{}
+The service graph needs to be split optimally based on the loads and resource allocation on each VNF. To accomplish this a graph partitioning algorithm such as \textit{Mixed Integer Program for Partitioning Graphs} \ref{MIPPG} will be used. However the exact choice of algorithm suitable for the project will be decided going forward.
 \subsection{Prototype implementation of SDS components}
 \paragraph{}
 After the concrete architecture is planned, a working prototype of the SDS engine including all the requisite internal components is coded and modeled. This prototype is also built as a standalone autonomous microservice.
 \subsection{Proof of concept demonstration}
 \paragraph{}
-The functionality of the SDS engine on a virtual machine will be demonstrated where atleast two different MANO frameworks are installed and deployed.
+The functionality of the SDS engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP3: MANO Adaptor}
 
