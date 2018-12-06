@@ -1,13 +1,13 @@
 \chapter{Work Package Tasks}
 \label{ch:wptasks}
 
-In this chapter, the high level tasks in each WP is discussed briefly. A reference architecture diagram is also given for each WP, this is meant to be seen as an early proposal and it is subjected to change in future documents.
+In this chapter, the high level tasks in each WP is discussed briefly. A reference architecture diagram is also given for each WP, this is meant to be seen as an early proposal and it is subjected to change.
 
 \section{WP1: Service Descriptor Translator}
 
 \subsection{Requirements definitions and architecture design}
 
-The development of the SDT engine follows a microservice architecture. The architecture inludes a message broker with a publish/subcribe model. The NSDs(yaml files) corresponding to the communicating MANO are published to the broker. Our SDT engine, subscribed to the broker, consumes the yaml files and translate one MANO NSD to the other template and publish them back to the broker. These translated NSDs could be accessed by any other services through a REST API.
+The development of the SDT follows a microservice architecture. The architecture includes a message broker with a publish/subscribe model. The NSDs(yaml/JSON files) corresponding to the communicating MANO are published to the broker. The SDT subscribed to the broker, consumes the yaml/JSON files and translate one MANO NSD to the other schema and publish them back to the broker. These translated NSDs could be accessed by any other services through a REST API.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/wp1Arch}
@@ -17,16 +17,16 @@ The development of the SDT engine follows a microservice architecture. The archi
 
 \subsection{Prototype implementation of SDT components}
 
-After the concrete architecture is planned, a working prototype of the SDT engine including all the requisite components is modeled. This prototype is built as a standalone autonomous microservice.
+After the concrete architecture is planned, a working prototype of the SDT including all the requisite components are modeled. This prototype is built as a standalone microservice.
 \subsection{Proof of concept demonstration}
 
-The functionality of the SDT engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
+The functionality of the SDT will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP2: Service Descriptor Splitter}
 
 \subsection{Requirements definition and architecture design}
 
-  A publish/subscribe message broker model will be once again followed for the SDS engine implementation. The NSD(yaml file) is published to the message broker. A service graph splitter and a NSD splitter consumes the NSD from the broker and splits the NSD into two. The two seperate NSDs are published back to the broker from where other services can consume those through REST API.
+  A publish/subscribe message broker model will be once again followed for the SDS implementation. The NSD(yaml/JSON file) is published to the message broker. A service graph splitter and a NSD splitter consumes the NSD from the broker and splits the NSD. The seperated NSDs are published back to the broker from where other services can consume those through REST API.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/wp2Arch}
@@ -39,15 +39,15 @@ The functionality of the SDT engine will be demonstrated on virtual machines con
 The service graph needs to be split optimally based on the loads and resource allocation on each VNF. To accomplish this a graph partitioning algorithm such as \textit{Mixed Integer Program for Partitioning Graphs} \cite{MIPPG} will be used. However the exact choice of algorithm suitable for the project will be decided going forward.
 \subsection{Prototype implementation of SDS components}
 
-After the concrete architecture is planned, a working prototype of the SDS engine including all the requisite internal components is coded and modeled. This prototype is also built as a standalone autonomous microservice.
+After the concrete architecture is planned, a working prototype of the SDS including all the requisite internal components is coded and modeled. This prototype is also built as a standalone microservice.
 \subsection{Proof of concept demonstration}
 
-The functionality of the SDS engine will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
+The functionality of the SDS will be demonstrated on virtual machines containing atleast two different MANO frameworks installed and deployed. 
 
 \section{WP3: MANO Adaptor}
 
 \subsection{Requirements definition and architecture design}
-In similarity with the above work packages, the adaptor also follows the microservice architecture. The main component in the proposed adaptor structure is the MA engine,  it communicates via a message bus with the wrappers of different MANO frameworks. Wrappers help in communicating with the underlying MANO framework's interfaces, thus enabling hierarchical orchestration. Functionalities of the adaptor can be accessed by other components through REST APIs.
+In similarity to the above work packages, the adaptor also follows the microservice architecture. The main component in the proposed adaptor structure is the Adaptor engine,  it communicates via message bus with the wrappers of different MANO frameworks. Wrappers help in communicating with the underlying MANO framework's interfaces, thus enabling hierarchical orchestration. Functionalities of the adaptor can be accessed by other components through REST APIs.
 
 \begin{figure}[h]
 	\centering
@@ -58,7 +58,7 @@ In similarity with the above work packages, the adaptor also follows the microse
 
 \subsection{Prototype implementation of adaptor components}
 
-As a starting point of the prototype, the plan is to choose one of the MANO frameworks listed in the section \ref{manoframeworks} and implement the wrapper for the interfaces provided by it, with focus on modularity and portability. Thereby, making it easy to add support for interfaces provided by other MANO frameworks. Further, we will add the southbound interfaces required to communicate with the MA.
+As a starting point of the prototype, the plan is to choose one of the MANO frameworks listed in the section \ref{manoframeworks} and implement the wrapper for the interfaces provided by it, with focus on modularity and portability. Thereby, making it easy to add support for interfaces provided by other MANO frameworks.
 
 \subsection{Investigation of MANO scalability challenges}
 \label{wp3manoresearch}
