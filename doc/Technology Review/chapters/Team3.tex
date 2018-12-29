@@ -9,7 +9,7 @@
 	\end{itemize}
 	
 	
-	\section{OpenStack Installation}
+	\section{OpenStack Installation (Ocata)}
 	\label{OpenStack Installation}
 	\paragraph{}
 	We set up an OpenStack environment using DevStack, which is installed via a configuration file named local.conf. The installation guide can also be found at\\ \hyperlink{name}{https://docs.openstack.org/devstack/latest/} 
@@ -20,7 +20,7 @@
 		\footnote{Refer DevStack networking-sfc documentation for service chaining}
 	\end{itemize}
 	
-	\subsection{Steps of installation:}
+	\subsection*{Steps of installation:}
 	\begin{itemize}
 		\item Create a user “stack”
 		\begin{lstlisting}
@@ -31,8 +31,8 @@
 		
 		\item Clone the devstack repository
 		\begin{lstlisting}
-		git clone \ https://git.openstack.org/openstack-dev/devstack
-		cd devstack
+		 git clone https://git.openstack.org/openstack-dev/devstack -b stable/ocata
+		 cd devstack
 		\end{lstlisting}
 		\newpage
 		\item Create and configure the local.conf file\\
@@ -123,7 +123,7 @@
 			\item Confirm by clicking "SAVE"
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.6\linewidth]{figures/LinkingStep3}
+				\includegraphics[width=0.7\linewidth]{figures/LinkingStep3}
 				\caption{Add WIM}
 				\label{fig:linkingstep3}
 			\end{figure}
@@ -145,13 +145,13 @@
 			
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.7\linewidth]{figures/LinkingStep9}
+				\includegraphics[width=0.8\linewidth]{figures/LinkingStep9}
 				\caption{Select Router}
 				\label{fig:linkingstep9}
 			\end{figure}
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.6\linewidth]{figures/LinkingStep10}
+				\includegraphics[width=0.9\linewidth]{figures/LinkingStep10}
 				\caption{Select IDs}
 				\label{fig:linkingstep10}
 			\end{figure}
@@ -161,7 +161,7 @@
 			\item Click on "Save"
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.5\linewidth]{figures/LinkingStep11}
+				\includegraphics[width=0.7\linewidth]{figures/LinkingStep11}
 				\caption{VIM Details}
 				\label{fig:linkingstep11}
 			\end{figure}
@@ -199,7 +199,7 @@
 			\item Give the admin role to the new user
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.6\linewidth]{figures/CreatingUser}
+				\includegraphics[width=0.7\linewidth]{figures/CreatingUser}
 				\caption{Create user}
 				\label{fig:creatinguser}
 			\end{figure}
@@ -211,7 +211,7 @@
 			\item Allocate maximum number of resources for that project under Quotas tab
 			\begin{figure} [h]
 				\centering
-				\includegraphics[width=0.5\linewidth]{figures/ProjectQuotas}
+				\includegraphics[width=0.7\linewidth]{figures/ProjectQuotas}
 				\caption{Edit project quotas}
 				\label{fig:projectquotas}
 			\end{figure}
@@ -226,7 +226,7 @@
 			\item Use any private network address, for example 192.168.x.0/24. While creating the router select the External Network as public (Error: Reference source not found). Add the sonata-priv-sub as the interface to the router
 			\begin{figure}[h]
 				\centering
-				\includegraphics[width=0.6\linewidth]{figures/CreateRouter}
+				\includegraphics[width=0.7\linewidth]{figures/CreateRouter}
 				\caption{Create router}
 				\label{fig:createrouter}
 			\end{figure}		
