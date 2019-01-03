@@ -24,30 +24,30 @@
 	\begin{itemize}
 		\item Create a user “stack”
 		\begin{lstlisting}
-		sudo useradd -s /bin/bash -d /opt/stack -m stack
-		echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee \ /etc/sudoers.d/stack
-		sudo su - stack
+sudo useradd -s /bin/bash -d /opt/stack -m stack
+echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
+sudo su - stack
 		\end{lstlisting}
 		
 		\item Clone the devstack repository
 		\begin{lstlisting}
-		 git clone https://git.openstack.org/openstack-dev/devstack -b stable/ocata
-		 cd devstack
+git clone https://git.openstack.org/openstack-dev/devstack -b stable/ocata
+cd devstack
 		\end{lstlisting}
 		\newpage
 		\item Create and configure the local.conf file\\
 		\begin{lstlisting}
-		[[local|localrc]]
-		ADMIN\_PASSWORD=password
-		DATABASE\_PASSWORD=$ADMIN_PASSWORD
-		RABBIT_PASSWORD=$ADMIN\_PASSWORD
-		SERVICE\_PASSWORD=$ADMIN_PASSWORD 	
+[[local|localrc]]
+ADMIN\_PASSWORD=password
+DATABASE\_PASSWORD=$ADMIN_PASSWORD
+RABBIT_PASSWORD=$ADMIN\_PASSWORD
+SERVICE\_PASSWORD=$ADMIN_PASSWORD 	
 		\end{lstlisting}
 		
 		
 		\item Execute the command
 		\begin{lstlisting}
-		./stack.sh
+./stack.sh
 		\end{lstlisting}
 		
 		\item After installation check and verify from openstack horizon GUI
@@ -63,39 +63,42 @@
 	\begin{itemize}
 		\item Installing packages
 		\begin{lstlisting}
-		sudo apt-get install -y software-properties-common
-		sudo apt-add-repository -y ppa:ansible/ansible
-		sudo apt-get update
-		sudo apt-get install -y git ansible
+sudo apt-get install -y software-properties-common
+sudo apt-add-repository -y ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install -y git ansible
 		\end{lstlisting}
 		\item Clone repository
 		\begin{lstlisting}
-		git clone https://github.com/CN-UPB/Pishahang.git
-		cd Pishahang/son-install
-		echo sonata | tee ~/.ssh/.vault_pass
+git clone https://github.com/CN-UPB/Pishahang.git cd Pishahang/son-install
+echo sonata | tee ~/.ssh/.vault_pass
 		\end{lstlisting}
-		\item Start Installation 
-		Replace "<your\_ip4\_address>" with the IP address SONATA should be available at , also check the command
+		\item Start Installation,
+		replace "<your\_ip4\_address>" with the IP address where SONATA should be available.
 		\begin{lstlisting}
-		ansible-playbook utils/deploy/sp.yml -e \ "target=localhost public_ip=<your_ip4_address>" -v 
+ansible-playbook utils/deploy/sp.yml -e "target=localhost \ public_ip=<your_ip4_address>" -v 
 		\end{lstlisting} 
 		\item Verify Installation
-		Open your browser and navigate to http://public\_ip. Login using the username sonata and password 1234. If the installation was successful, you should now see the dashboard of the service platform
+
+Open your browser and navigate to http://public\_ip. Login using the username 
+sonata and password 1234. If the installation was successful, you should now see 
+the dashboard of the service platform
+
 		\item Installation of son-cli
 		The SONATA CLI toolset can also be installed via the Python setup script
 		\begin{lstlisting}
-		git clone https://github.com/sonata-nfv/son-cli.git
-		cd son-cli
-		python3 setup.py install
+git clone https://github.com/sonata-nfv/son-cli.git
+cd son-cli
+python3 setup.py install
 		\end{lstlisting}
 		
 		\item Test if its working by invoking
 		\begin{lstlisting}
-		son-workspace -h
-		son-package -h
-		son-publish -h
-		son-push -h
-		son-monitor -h
+son-workspace -h
+son-package -h
+son-publish -h
+son-push -h
+son-monitor -h
 		\end{lstlisting}
 		Reference Link - \hyperlink{name}{https://github.com/sonata-nfv/son-cli\#all-dists-using-setuptools}
 	\end{itemize}
@@ -168,19 +171,13 @@
 			\newpage	
 			\item On-boarding Service Package
 			\begin{lstlisting}
-			git clone \ https://github.com/sonata-nfv/son-examples.git
-			
-			son-workspace --init
-			
-			son-validate --project \ son-examples/service-projects/sonata-demo
-			
-			son-package --project \ son-examples/service-projects/sonata-demo -n \ service_package
-			
-			son-access config --platform_id ServicePlatform \ --new --url http://131.234.29.102 --default 
-			
-			son-access auth -u sonata -p 1234
-			
-			son-access push --upload service_package.son
+git clone  https://github.com/sonata-nfv/son-examples.git
+son-workspace --init
+son-validate --project  son-examples/service-projects/sonata-demo
+son-package --project  son-examples/service-projects/sonata-demo -n \ service_package
+son-access config --platform_id ServicePlatform --new --url \ http://131.234.29.102 --default 
+son-access auth -u sonata -p 1234
+son-access push --upload service_package.son
 			\end{lstlisting}
 			Reference video - \hyperlink{name}{https://www.youtube.com/watch?v=RsXUIt4rzF0}
 		\end{itemize}
@@ -235,6 +232,35 @@
 	
 	\newpage
 	
+	\section{Onboarding Descriptors}
+
+	NSD can be pushed to the server by using REST API provided by pishahang.
+	\begin{itemize}
+		\item For CSDs: \hyperlink{name}{http://public\_ip:4002/catalogues/api/v2/csds}
+		\item For COSDs: \hyperlink{name}{http://public\_ip:4002/catalogues/api/v2/complex-services}
+		\item Dummy NSD that has been uploaded can be seen in the appendix \ref{Appendix}
+	\end{itemize}
+
+
+	Postman could be used to make the REST calls
+	
+	1. NSD
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/CSD}
+		\caption{REST call for NSD}
+		\label{fig:csd}
+	\end{figure}
+		
+	2. VNFD
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{figures/COSD}
+		\caption{REST call for VNFD}
+		\label{fig:cosd}
+	\end{figure}
+
 	\section{Network Service Instantiation}
 	\label{sec:Network Service Instantiation}
 	\begin{itemize}
@@ -245,6 +271,6 @@
 		
 	\end{itemize}
 	
-\end{document}
+
 
 
