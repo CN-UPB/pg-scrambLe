@@ -1,6 +1,22 @@
 \chapter{Conclusion}
 \label{ch:Conclusion}
 
-The main goal of this phase was to acquire practical experience on MANO frameworks and its workflow. All the steps required to instantiate a network service has been completed and verified. Currently, there are no means to add a MANO adopter to a main MANO instance which can communicate with other MANO frameworks to instantiate and monitor services running on them. The ability to do inter framework hierarchical orchestration is missing. Adding such an adopter will enable the MANO instances to scale according to the number of service requests. Therefore, implementing a MANO adaptor to tackle this issue is one of the milestones during the course of this project. MANO adopters for SONATA and OSM will be implemented first and OpenBaton would be considered in the next phase.
+The main goal of this phase was to acquire practical experience on MANO frameworks and its workflow. All the steps required to instantiate a network service has been completed and verified.\\
+
+Below we define the findings from the technology review phase.
+
+\begin{itemize}
+	
+	\item When we consider an environment with single domain, all of the network resources and services are managed by a single MANO orchestrator. However considering a multi-domain
+	environment, where network services need to be deployed across multiple and different orchestrators, there is a need for a seamless communication between different orchestrators in order to deploy the end-to-end service successfully. Currently a major hindrance in the communication roots from the fact that each MANO framework uses different descriptor formats for describing the network service and virtual network function. One of our goal in this project is to overcome this shortcoming and  implement a translator engine to translate the NSD and VNFD and facilitate communication between different orchestrators in a multi-domain environment.
+	
+	\item 
+	 
+	\item Currently, there are no means to add a MANO adopter to a main MANO instance which can communicate with other MANO frameworks to instantiate and monitor services running on them. The ability to do inter framework hierarchical orchestration is missing. Adding such an adopter will enable the MANO instances to scale according to the number of service requests. Therefore, implementing a MANO adaptor to tackle this issue is one of the milestones during the course of this project. MANO adopters for SONATA and OSM will be implemented first and OpenBaton would be considered in the next phase.
+	 
+\end{itemize}
+
+
+
 
 

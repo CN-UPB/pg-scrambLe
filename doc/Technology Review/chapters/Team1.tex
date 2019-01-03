@@ -36,13 +36,18 @@ Login using Userid : admin , password : admin
 \end{figure}
 
 \item Verify 10 docker containers were created:
+
 \begin{lstlisting} 
 docker stack ps osm |grep -i running
 docker service ls
 \end{lstlisting}
+
 \end{itemize}
+
 \section{VIM Installation}
+
 \subsection{Steps to install openstack using devstack are as follows:}
+
 \begin{itemize}
 \item Create a user “stack”
 \begin{lstlisting}
@@ -51,10 +56,12 @@ echo "stack ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/stack
 sudo su -stack
 \end{lstlisting}
 \item Clone the devstack repository
+
 \begin{lstlisting}
 git clone https://git.openstack.org/openstack-dev/devstack
 cd devstack
 \end{lstlisting}
+
 \item Create and configure the local.conf file
 \begin{lstlisting}
 [[local|localrc]]
@@ -63,10 +70,12 @@ DATABASE_PASSWORD=$ADMIN_PASSWORD
 RABBIT_PASSWORD=$ADMIN_PASSWORD
 SERVICE_PASSWORD=$ADMIN_PASSWORD
 \end{lstlisting}
+
 \item Execute the command
 \begin{lstlisting}
 ./stack.sh
 \end{lstlisting}
+
 \item After installation check and verify from openstack horizon GUI:
 \begin{lstlisting}
 Access http://1.2.3.4, replacing 1.2.3.4 with the IP address of your host.
@@ -80,6 +89,7 @@ Login using Userid : admin , password : admin
 \end{itemize}
 \section{Configure openstack for OSM}
 \begin{itemize}
+
 \item Guarantee that Openstack API endpoints are reachable from OSM (particularly from RO container):
 \begin{lstlisting}
 Login to openstack api access from the horizon gui.
@@ -87,6 +97,7 @@ Click on DOWNLOAD OPENSTACK RC FILE (api version 3).
 Copy the OS_AUTH_URL variable value.
 Paste in the browser or do a curl from the VM where OSM is installed to check its reachability. 
 \end{lstlisting}
+
 \item Create a management network, with DHCP enabled, reachable from OSM (particularly from VCA container)
 \begin{lstlisting}
 Login to openstack horizon gui.
@@ -99,11 +110,12 @@ Keep Gateway IP blank.
 In Allocation Pools, give the IPs:  start=10.208.0.2,end=10.208.0.254.
 Leave DNS Name servers and Host Routes blank and click create.
 \end{lstlisting}
-\begin{figure}[H]
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.5\linewidth]{figures/sh11}
 	\caption{Creating a Network in Openstack}
-\end{figure}
+\end{figure} 
+
 \item creating a valid tenant/user
 \begin{lstlisting}
 Login to openstack horizon gui.
@@ -130,7 +142,7 @@ Upload the downloaded image file in step 1.
 Choose the image format as QCOW2 : QEMU Emulator
 Click on create image.
 \end{lstlisting}
-\begin{figure} [H]
+\begin{figure} [h]
 	\centering
 	\includegraphics[width=0.5\linewidth]{figures/sh8}
 	\caption{Uploading VM image to VIM in openstack}
@@ -144,7 +156,7 @@ Enter the VIM userid and password as the login userid and password for openstack
 Give the tenant name as admin/tenant.
 Click on create.
 \end{lstlisting}
-\begin{figure} [H]
+\begin{figure} [h]
 	\centering
 	\includegraphics[width=0.5\linewidth]{figures/sh6}
 	\caption{Adding VIMs to OSM}
