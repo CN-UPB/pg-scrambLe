@@ -1,7 +1,8 @@
 \chapter{Open Source MANO}
 \label{ch:osm}
-\section{Configuration requirements needed to run Open Source MANO (OSM) Release FOUR is a single server or VM:}
-		\begin{itemize}
+\section{Configuration requirements}
+Open Source MANO (OSM) Release FOUR:
+		\begin{itemize}		
 	\item MINIMUM: 2 CPUs, 4 GB RAM, 20GB disk and a single interface with internet access
 	\item RECOMMENDED: 2 CPUs, 8 GB RAM, 40GB disk and a single interface with internet access
 	\item Ubuntu16.04 (64-bit variant required) as base image 
@@ -12,22 +13,21 @@
 \begin{itemize}
 	\item Downloading latest version of OSM
 	\begin{lstlisting} 
-	wget https://osm-download.etsi.org/ftp/osm-4.0-four/install_osm.sh
+wget https://osm-download.etsi.org/ftp/osm-4.0-four/install_osm.sh
 	\end{lstlisting}
 	
 	\item Installing OSM
 	\begin{lstlisting} 
-	chmod +x install_osm.sh
-	$ ./install_osm.sh 2>&1 | tee osm_install_log.txt
+chmod +x install_osm.sh
+$ ./install_osm.sh 2>&1 | tee osm_install_log.txt
 \end{lstlisting}
 \end{itemize}
-\subsection{verifying installation from the OSM GUI:}
+\subsection{Verifying installation from the OSM GUI:}
 \begin{itemize}
-\item Accessing GUI:
-\begin{lstlisting} 
-Access http://1.2.3.4, replacing 1.2.3.4 with the IP address of your host.
+\item Accessing GUI:\\
+Access http://1.2.3.4, replacing 1.2.3.4 with the IP address of your host.\\
 Login using Userid : admin , password : admin
-\end{lstlisting}
+
 
 \begin{figure} [H]
 	\centering
