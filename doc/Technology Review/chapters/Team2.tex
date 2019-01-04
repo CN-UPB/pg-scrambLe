@@ -13,7 +13,7 @@
 	\section{Open Baton Installation}
 	\label{Open Baton Installation}
 		\paragraph{}
-		We have installed a minimal version of Open Baton. Please note that Open Baton can only be installed on Ubuntu version 16.04 or older. Open Baton does not provide software package for Ubuntu’s xenial (18.04) version yet. The installation guide can also be found at \hyperlink{name}{https://openbaton.github.io/documentation/nfvo-installation-deb/}. A minimal version comprises of following components.
+		A minimal version of Open Baton is installed. Please note that Open Baton can only be installed on Ubuntu version 16.04 or older. Open Baton does not provide software package for Ubuntu’s xenial (18.04) version yet. The installation guide can also be found at \hyperlink{name}{https://openbaton.github.io/documentation/nfvo-installation-deb/}. A minimal version comprises of following components.
 		\begin{itemize}
 			\item Network Function Virtualization Orchestrator (NFVO)
 			\item Test Virtual Infrastructure Manager (VIM)
@@ -42,7 +42,7 @@
 			curl -o docker-compose.yml https://raw.githubusercontent.com/openbaton/bootstrap/master/docker-compose.yml | env HOST_IP=$YOUR_LOCAL_IP docker-compose up -d
 			\end{lstlisting}
 			
-			\item Replace YOUR_LOCAL_IP with the IP address of your machine. After few seconds check if the OpenBaton dashboard is up and running on https://localhost:8080.
+			\item Replace YOUR\_LOCAL\_IP with the IP address of your machine. After few seconds check if the OpenBaton dashboard is up and running on https://localhost:8080.
 			You can login using following credentials:
 			\begin{itemize}
 				\item Username: admin
@@ -88,7 +88,7 @@
 				\end{lstlisting}
 				
 				\item Open your browser and navigate to http://localhost:8080 and login to the dashboard
-				\item Verify the VNFM of type Dummy is listed under Catalog > VNF Managers
+				\item Verify the VNFM of type Dummy is listed under Catalog -> VNF Managers
 				\begin{figure} [h]
 					\centering
 					\includegraphics[width=0.7\linewidth]{figures/VNFMList}
@@ -98,14 +98,14 @@
 			\end{itemize}
 			
 			\subsection*{Deployment of NS using Open Baton dashboard}
-			\paragraph{}\begin{itemize}
+			\paragraph{}
 			After installing dummy VNFM the next step is to create a new VIM instance by registering a new Point of Presence using Open Baton dashboard.
 			\begin{itemize}
 				\item Register a new PoP
 				\begin{itemize}
 					\item Open your browser and navigate to http://localhost:8080 and login to the dashboard
 					\item Go to Manage PoPs -> PoP Instances -> Register new PoP -> File Input
-					\item Upload a VIM instance of type test to the NFVO. You can copy paste the JSON content of the link 	\hyperlink{name}{https://openbaton.github.io/documentation/descriptors/vim-instance/test-vim-instance.json}. 
+					\item Upload a VIM instance of type test to the NFVO. Copy paste the JSON content of the link 	\hyperlink{name}{https://openbaton.github.io/documentation/descriptors/vim-instance/test-vim-instance.json}. 
 					\begin{figure} [h]
 						\centering
 						\includegraphics[width=0.7\linewidth]{figures/registerPoP}

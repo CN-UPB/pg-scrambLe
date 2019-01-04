@@ -2,8 +2,8 @@
 \label{ch:osm}
 \section{Configuration requirements needed to run Open Source MANO (OSM) Release FOUR is a single server or VM:}
 		\begin{itemize}
-	\item MINIMUM: 2 CPUs, 4 GB RAM, 20GB disk and a single interface with Internet access
-	\item RECOMMENDED: 2 CPUs, 8 GB RAM, 40GB disk and a single interface with Internet access
+	\item MINIMUM: 2 CPUs, 4 GB RAM, 20GB disk and a single interface with internet access
+	\item RECOMMENDED: 2 CPUs, 8 GB RAM, 40GB disk and a single interface with internet access
 	\item Ubuntu16.04 (64-bit variant required) as base image 
 	(\hyperlink{name}{http://releases.ubuntu.com/16.04/})
 		\end{itemize}
@@ -31,7 +31,7 @@ Login using Userid : admin , password : admin
 
 \begin{figure} [H]
 	\centering
-	\includegraphics[width=0.5\linewidth]{figures/Sh1}
+	\includegraphics[width=0.6\linewidth]{figures/Sh1}
 	\caption{OSM GUI}
 \end{figure}
 
@@ -75,7 +75,7 @@ SERVICE_PASSWORD=$ADMIN_PASSWORD
 \begin{lstlisting}
 ./stack.sh
 \end{lstlisting}
-
+\pagebreak
 \item After installation check and verify from openstack horizon GUI:
 \begin{itemize}
 \item Access http://1.2.3.4, replacing 1.2.3.4 with the IP address of your host.
@@ -90,17 +90,17 @@ Login using Userid : admin , password : admin
 \section{Configure openstack for OSM}
 \begin{itemize}
 
-\item Guarantee that Openstack API endpoints are reachable from OSM (particularly from RO container):
+\item Verify that Openstack API endpoints are reachable from OSM (particularly from RO container):
 \begin{itemize}
-\item Login to openstack api access from the horizon gui.
-\item Click on DOWNLOAD OPENSTACK RC FILE (api version 3).
-\item Copy the OS_AUTH_URL variable value.
+\item Login to openstack  API access from the horizon GUI.
+\item Click on DOWNLOAD OPENSTACK RC FILE (API version 3).
+\item Copy the OS\_AUTH\_URL variable value.
 \item Paste in the browser or do a curl from the VM where OSM is installed to check its reachability. 
 \end{itemize}
 
 \item Create a management network, with DHCP enabled, reachable from OSM (particularly from VCA container)
 \begin{itemize}
-\item Login to openstack horizon gui.
+\item Login to openstack horizon GUI.
 \item Go to admin-> create network.
 \item Give the project name as your project ( default:admin)
 \item Give a network name -> mgmt.
@@ -112,7 +112,7 @@ Login using Userid : admin , password : admin
 \end{itemize}
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.5\linewidth]{figures/sh11}
+	\includegraphics[width=0.4\linewidth]{figures/sh11}
 	\caption{Creating a Network in Openstack}
 \end{figure} 
 
@@ -124,17 +124,17 @@ Login using Userid : admin , password : admin
 \item Give a user name -> tenant.
 \item Give the role also as admin and click create.
 \end{itemize}
-\begin{figure} [H]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.5\linewidth]{figures/sh9}
 	\caption{creating a valid tenant/user in openstack}
 		\includegraphics[width=0.5\linewidth]{figures/sh10}
 	\caption{creating a valid tenant/user in openstack}
 \end{figure}
-
+\pagebreak
 \item Uploading VM image(s) to the VIM(s)
 \begin{itemize}
-\item Download the image from the following link: (\hyperlink{name}{http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img})
+\item Download the image from the following link: (\hyperlink{name}{http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86\_64-disk.img})
 \item Login to openstack horizon gui.
 \item Go to admin -> Compute -> Images and click on create image.
 \item Give the image name 'cirros034'
@@ -172,7 +172,7 @@ First download the required VNF and NS packages from this URL: \hyperlink{name}{
 \begin{itemize}
 \item From the UI , Go to Projects --> Admin --> VNF Packages (Open List)
 \item Click on the Onboard VNFD button
-\item Drag and drop the VNF package file cirros_vnf.tar.gz in the importing area.
+\item Drag and drop the VNF package file cirros\_vnf.tar.gz in the importing area.
 \end{itemize}
 \begin{figure} [H]
 	\centering
@@ -184,7 +184,7 @@ First download the required VNF and NS packages from this URL: \hyperlink{name}{
 \begin{itemize}
 \item From the UI, Go to Projects --> Admin --> NS Packages (Open List)
 \item Click on the Onboard NSD button
-\item Drag and drop the NS package file cirros_2vnf_ns.tar.gz in the importing area.
+\item Drag and drop the NS package file cirros\_2vnf\_ns.tar.gz in the importing area.
 \end{itemize}
 \begin{figure} [H]
 	\centering

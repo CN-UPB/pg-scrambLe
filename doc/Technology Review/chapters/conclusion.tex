@@ -1,16 +1,16 @@
 \chapter{Conclusion}
 \label{ch:Conclusion}
 
-The main goal of this phase was to acquire practical experience on MANO frameworks and its workflow. All the steps required to instantiate a network service has been completed and verified.\\
+The main goal of this phase is to acquire practical knowledge on MANO frameworks and its workflow. All the steps required to instantiate a network service are completed and verified.\\
 
-Below we define the findings from the technology review phase.
+Below defined are the findings from the technology review phase.
 
 \begin{itemize}
 	
-	\item When we consider an environment with single domain, all of the network resources and services are managed by a single MANO orchestrator. However considering a multi-domain
-	environment, where network services need to be deployed across multiple and different orchestrators, there is a need for a seamless communication between different orchestrators in order to deploy the end-to-end service successfully. Currently a major hindrance in the communication roots from the fact that each MANO framework uses different descriptor formats for describing the network service and virtual network function. One of our goal in this project is to overcome this shortcoming and  implement a translator engine to translate the NSD and VNFD and facilitate communication between different orchestrators in a multi-domain environment.
+	\item Considering an environment with single domain, all of the network resources and services are managed by a single MANO orchestrator. However considering a multi-domain
+	environment, where network services need to be deployed across multiple and different orchestrators, there is a need for a seamless communication between different orchestrators in order to deploy the end-to-end service successfully. Currently a major hindrance in the communication roots from the fact that each MANO framework uses different descriptor formats for describing the network service and virtual network function. One of the goals of this project is to overcome this shortcoming and  implement a translator engine to translate the NSD and VNFD and facilitate communication between different orchestrators in a multi-domain environment.
 	
-	\item When a Network Service is required to be deployed over many parts of the world spanning multiple domains, we will need a splitter which splits a Network Service in smaller Network Services. Then these smaller Network Services are deployed over different domains. In this phase we installed minimal version of Open Baton orchestrator on our personal machine and on the Virtual Machine provided. We got familiar with the dashboard of Open Baton. Using the dashboard we were able to register PoP and upload NSD and then launching it. The deployment process of dummy NS did not actually create any virtual machines and no real network service was deployed. 
+	\item When a Network Service is required to be deployed over many parts of the world spanning multiple domains, a splitter is needed which splits a Network Service in smaller Network Services. Then these smaller Network Services are deployed over different domains. In this phase, minimal version of Open Baton orchestrator is installed on our personal machine and on the Virtual Machine provided. Dashboard of Open Baton is familiarised. Using the dashboard we were able to register PoP and upload NSD and then launch it. The deployment process of dummy NS did not actually create any virtual machines and no real network service is deployed. 
 	 
 	\item Currently, there are no means to add a MANO adopter to a main MANO instance which can communicate with other MANO frameworks to instantiate and monitor services running on them. The ability to do inter framework hierarchical orchestration is missing. Adding such an adopter will enable the MANO instances to scale according to the number of service requests. Therefore, implementing a MANO adaptor to tackle this issue is one of the milestones during the course of this project. MANO adopters for SONATA and OSM will be implemented first and OpenBaton would be considered in the next phase.
 	 
