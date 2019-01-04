@@ -1,0 +1,22 @@
+\chapter{Conclusion}
+\label{ch:Conclusion}
+
+The main goal of this phase is to acquire practical knowledge on MANO frameworks and its workflow. All the steps required to instantiate a network service are completed and verified.\\
+
+Listed below are the findings from the technology review phase.
+
+\begin{itemize}
+	
+	\item Considering an environment with single domain, all of the network resources and services are managed by a single MANO orchestrator. However considering a multi-domain
+	environment, where network services need to be deployed across multiple and different orchestrators, there is a need for a seamless communication between different orchestrators in order to deploy the end-to-end service successfully. Currently, a hindrance in the communication is the fact that each MANO framework uses different descriptor formats for describing the network service and virtual network function. One of the goals of this project is to overcome this and  implement a translator engine to translate the NSD and VNFD thus facilitating communication between different orchestrators in a multi-domain environment.
+	
+	\item When a Network Service is required to be deployed over many parts of the world spanning multiple domains, a splitter is needed which splits a Network Service into smaller Network Services, these smaller Network Services are deployed over different domains. Automated splitting of Network Services is not available. Hence this is also one of the goals of this project. 
+	 
+	\item Currently, there are no means to add a MANO adopter to a main MANO instance which can communicate with other MANO frameworks to instantiate and monitor services running on them. The ability to do inter framework hierarchical orchestration is missing. Adding such an adopter will enable the MANO instances to scale according to the number of service requests. Therefore, implementing a MANO adaptor to tackle this issue is one of the milestones during the course of this project. MANO adopters for SONATA and OSM will be implemented first and OpenBaton would be considered in the next phase.
+	 
+\end{itemize}
+
+
+
+
+
