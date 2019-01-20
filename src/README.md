@@ -1,1 +1,20 @@
-Project source code
+# Project source code
+
+## Initial setup
+
+1. Install docker
+    + https://docs.docker.com/install/
+
+2. Install Docker Compose
+    + https://docs.docker.com/compose/install/
+
+3. Run Docker Image to start services
+    + cd into `src` folder
+    + run `docker-compose up`
+    + rerun after making changes `docker-compose up --build`
+
+4. Test if the services are running
+    + Open
+        + `http://localhost:8000/translator/hello/myname`
+        + `http://localhost:8000/splitter/hello/myname`
+        + `http://localhost:8000/adoptor/hello/myname`
