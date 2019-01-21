@@ -28,9 +28,9 @@ services:
         RABBIT_HOST: "rabbit"
         RABBIT_PORT: "5672"        
         
-  adoptor:
+  adaptor:
     build:
-      context: adoptor
+      context: adaptor
     depends_on:
       - rabbit
     environment:

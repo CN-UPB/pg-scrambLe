@@ -19,7 +19,7 @@ class GatewayService:
         message = self.mainengine_rpc.hello_splitter(name)
         return json.dumps({'message': message})
 
-    @http('GET', '/adoptor/hello/<string:name>')
-    def get_hello_adoptor(self, request, name):
-        message = self.mainengine_rpc.hello_adoptor(name)
+    @http('GET', '/adaptor/hello/<string:name>')
+    def get_hello_adaptor(self, request, name):
+        message = self.mainengine_rpc.hello_adaptor(name)
         return json.dumps({'message': message})

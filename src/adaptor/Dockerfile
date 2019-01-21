@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config.yml ./
 COPY start.sh ./
-COPY adoptor.py ./
+COPY adaptor.py ./
 
 RUN chmod +x ./start.sh
 

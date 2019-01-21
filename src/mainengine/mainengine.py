@@ -7,7 +7,7 @@ class MainEngineService:
 
     translator_rpc = RpcProxy('translator_service')
     splitter_rpc = RpcProxy('splitter_service')
-    adoptor_rpc = RpcProxy('adoptor_service')
+    adaptor_rpc = RpcProxy('adaptor_service')
 
     @rpc
     def hello_translator(self, name):
@@ -20,6 +20,6 @@ class MainEngineService:
         return message
 
     @rpc
-    def hello_adoptor(self, name):
-        message = self.adoptor_rpc.hello(name)
+    def hello_adaptor(self, name):
+        message = self.adaptor_rpc.hello(name)
         return message

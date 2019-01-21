@@ -19,4 +19,4 @@ Clone this repository and checkout to `develop` branch
     + Open
         + `http://localhost:8000/translator/hello/myname`
         + `http://localhost:8000/splitter/hello/myname`
-        + `http://localhost:8000/adoptor/hello/myname`
+        + `http://localhost:8000/adaptor/hello/myname`
