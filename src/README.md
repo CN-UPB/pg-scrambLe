@@ -2,6 +2,8 @@
 
 ## Initial setup
 
+Clone this repository and checkout to `develop` branch
+
 1. Install docker
     + https://docs.docker.com/install/
 
@@ -9,9 +11,9 @@
     + https://docs.docker.com/compose/install/
 
 3. Run Docker Image to start services
-    + cd into `src` folder
+    + cd into `src` folder from terminal
     + run `docker-compose up`
-    + rerun after making changes `docker-compose up --build`
+        + rerun after making changes `docker-compose up --build`
 
 4. Test if the services are running
     + Open

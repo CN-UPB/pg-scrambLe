@@ -39,6 +39,17 @@ services:
         RABBIT_HOST: "rabbit"
         RABBIT_PORT: "5672"
 
+  mainengine:
+    build:
+      context: mainengine
+    depends_on:
+      - rabbit
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+
   gateway:
     build:
       context: gateway
