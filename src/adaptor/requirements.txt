@@ -1,1 +1,5 @@
 nameko
+requests
+vcrpy
+pytest
+watchdog

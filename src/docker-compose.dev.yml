@@ -1,0 +1,79 @@
+version: "2"
+
+services:
+  rabbit:
+    image: rabbitmq:3.6-management
+    ports:
+        - "15672:15672"
+
+  translator:
+    build:
+      context: translator
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - rabbit
+    volumes:
+      - ./translator:/app
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+
+  splitter:
+    build:
+      context: splitter
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - rabbit
+    volumes:
+      - ./splitter:/app
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"        
+        
+  adaptor:
+    build:
+      context: adaptor
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - rabbit
+    volumes:
+      - ./adaptor:/app
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+
+  mainengine:
+    build:
+      context: mainengine
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - rabbit
+    volumes:
+      - ./mainengine:/app
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
+
+  gateway:
+    build:
+      context: gateway
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - rabbit
+    ports:
+        - "8000:8000"
+    volumes:
+      - ./gateway:/app
+    environment:
+        RABBIT_PASSWORD: "guest"
+        RABBIT_USER: "guest"
+        RABBIT_HOST: "rabbit"
+        RABBIT_PORT: "5672"
