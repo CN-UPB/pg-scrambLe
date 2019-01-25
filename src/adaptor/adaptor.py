@@ -1,3 +1,4 @@
+import wrappers
 from nameko.rpc import rpc
 
 class AdaptorService:
