@@ -41,19 +41,21 @@ The workflow of the individual service modules is explained in the sections belo
 \end{figure}
 
 \subsection{Adaptor Workflow}
+When there is a service request from any MANO to the adaptor, the request first flows to the adaptor engine (adaptor.py). Depending on the service request the adaptor engine makes a decision about the appropriate python wrapper to choose to complete the request. The adaptor engine uses the right wrapper (OSM or SONATA wrapper) to make a REST call to the target MANO. The required information is  retrieved and is finally delivered to the MANO that requests the service.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/MA_Workflow}
+	\caption{MANO Adaptor Workflow}
+	\label{fig:maworkflow}
+\end{figure}
 
 \subsection{Service Descriptor Splitter Workflow}
 
 \subsection{Service Descriptor Translator Workflow}
 In a scenario where a network service is to be deployed among different MANO frameworks, having their own respective schema, SDT translates a NSD schema of one MANO framework to that of other MANO framework.
-
 On receiving a service request to translate a NSD and/or VNFD to schema of a different MANO, the main engine stores the file(s) into the MongoDB as a document and sends a request in the form of a message to SDT usinfg Nameko services. The message contains the information of DB document name and document id, source type and destination type. 
-
 SDT comprises of two main services, namely, a Reader and a Writer. On receiving the message from main engine, the Reader fetches the file/document from DB and validates it. After validating the file will be converted to intermediate format, which will be sent to Writer. The Writer converts the file from intermediate format to the destination file format mentioned in the request. On completion of translation, the translated file will be stored into MongoDB and the reference to the same will be passed to main engine with the service completion message.
-
 This is an overview of the workflow for Service Descriptor Translator. The details of the message parameters communication between the components are subjected to changes in development phase.
-
-
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.5\linewidth]{figures/SDT_Workflow}
