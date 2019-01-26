@@ -51,6 +51,13 @@ When there is a service request from any MANO to the adaptor, the request first 
 
 \subsection{Service Descriptor Splitter Workflow}
 In situations when a Network Service is to be deployed over two different MANO frameworks, splitter helps in splitting the NS into two parts. Splitter collects the reference information and fetches the NSD from the database. We will have two functional units defined, one will be file processing which basically per-processes and post-processes the file. The other functional unit is Graph splitter which actually splits the NS into two parts. Once the File processor receives the NSD file it pulls all the information related to Forwarding Graph of the NS and sends it to the graph processor. Graph processor then splits the graph into two part which results in generation of new set of nodes and sub graphs. Graph processor then forwards these two sets to file processor which creates two separate NSDs out of the two sub graphs. Splitter then either calls Translator to translate the NSDs to respective schema or it sends a reference of the two NSDs created. During the development of Splitter we might add other functional units in order to make it as modular as possible.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/SDS_Workflow}
+	\caption{Service Descriptor Splitter Workflow}
+	\label{fig:sdsworkflow}
+\end{figure}
+
 
 \subsection{Service Descriptor Translator Workflow}
 In a scenario where a network service is to be deployed among different MANO frameworks, having their own respective schema, SDT translates a NSD schema of one MANO framework to that of other MANO framework.
