@@ -9,7 +9,8 @@ by the wrappers.
 """
 
 from abc import ABC, abstractmethod
- 
+
+
 class CommonInterface(ABC):
 
     @abstractmethod
@@ -18,6 +19,22 @@ class CommonInterface(ABC):
 
         Implement a POST method which returns an 
         authorization token to be used by other calls. 
+        """
+        pass
+
+    @abstractmethod
+    def get_ns_descriptors(self):
+        """ NSD Management Interface - Get NSD List
+
+        Query information about multiple NS descriptor resources.
+        """
+        pass
+
+    @abstractmethod
+    def post_ns_descriptors(self):
+        """ NSD Management Interface - Create NSD
+
+        Create a new NS descriptor resource.
         """
         pass
 
@@ -34,5 +51,13 @@ class CommonInterface(ABC):
         """ NSD Management Interface - Upload NSD
         
         Upload the content of NSD
+        """
+        pass
+
+    @abstractmethod
+    def delete_ns_descriptors(self):
+        """ NSD Management Interface - Delete NSD
+
+        Delete the content of NSD
         """
         pass
