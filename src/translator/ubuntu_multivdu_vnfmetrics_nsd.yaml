@@ -1,0 +1,20 @@
+nsd:nsd-catalog:
+  nsd:
+  - constituent-vnfd:
+    - member-vnf-index: '1'
+      start-by-default: 'true'
+      vnfd-id-ref: ubuntu_multivdu_vnfmetrics
+    id: ubuntu_multivdu_nsd
+    name: ubuntu_multivdu_nsd
+    short-name: ubuntu_multivdu_nsd
+    vendor: Whitestack
+    vld:
+    - id: mgmt
+      mgmt-network: 'true'
+      vim-network-name: 'vnf-mgmt'
+      name: vnfs
+      type: ELAN
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: vdu1_mgmt
+        vnfd-id-ref: ubuntu_multivdu_vnfmetrics

@@ -1,0 +1,24 @@
+nsd:nsd-catalog:
+  nsd:
+  - constituent-vnfd:
+    - member-vnf-index: '1'
+      start-by-default: 'true'
+      vnfd-id-ref: ubuntuvm_vnfvdumetric_autoscale_vnf
+    id: ubuntuvm_vnfvdumetric_autoscale_ns
+    name: ubuntuvm_vnfvdumetric_autoscale_ns
+    short-name: ubuntuvm_vnfvdumetric_autoscale_ns
+    description: Ubuntu VM with metrics and load-based autoscaling NS
+    vendor: Whitestack
+    vld:
+    - id: mgmt
+      mgmt-network: 'true'
+      name: vnfs
+      type: ELAN
+      vim-network-name: vnf-mgmt
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: vdu1_mgmt
+        vnfd-id-ref: ubuntuvm_vnfvdumetric_autoscale_vnf
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: vdu2_mgmt
+        vnfd-id-ref: ubuntuvm_vnfvdumetric_autoscale_vnf

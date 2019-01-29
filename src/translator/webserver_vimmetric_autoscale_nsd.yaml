@@ -1,0 +1,33 @@
+nsd:nsd-catalog:
+    nsd:
+    -   id: webserver_vimmetric_autoscale_ns
+        name: webserver_vimmetric_autoscale_ns
+        short-name: webserver_vimmetric_autoscale_ns
+        description: Scaling web server with load balancer NS
+        vendor: Whitestack
+        version: '1.0'
+        constituent-vnfd:
+        -   member-vnf-index: '1'
+            vnfd-id-ref: webserver_vimmetric_autoscale_vnf
+        vld:
+            -   id: mgmt_vld
+                name: mgmt_vld
+                type: ELAN
+                mgmt-network: 'true'
+                vim-network-name: vnf-mgmt
+                vnfd-connection-point-ref:
+                -   member-vnf-index-ref: 1
+                    vnfd-id-ref: webserver_vimmetric_autoscale_vnf
+                    vnfd-connection-point-ref: haproxy_mgmt
+                -   member-vnf-index-ref: 1
+                    vnfd-id-ref: webserver_vimmetric_autoscale_vnf
+                    vnfd-connection-point-ref: apache_mgmt
+            -   id: public_vld
+                name: public_vld
+                type: ELAN
+                mgmt-network: 'true'
+                vim-network-name: PUBLIC
+                vnfd-connection-point-ref:
+                -   member-vnf-index-ref: 1
+                    vnfd-id-ref: webserver_vimmetric_autoscale_vnf
+                    vnfd-connection-point-ref: haproxy_public                                         

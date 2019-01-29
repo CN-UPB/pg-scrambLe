@@ -11,6 +11,9 @@ COPY config.yml ./
 COPY start.sh ./
 COPY translator.py ./
 
+COPY hackfest_multivdu_nsd.yaml ./
+COPY sonata-demo.yml ./
+
 RUN chmod +x ./start.sh
 
 CMD ["./start.sh"]

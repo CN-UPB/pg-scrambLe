@@ -1,1 +1,3 @@
 nameko
+pandas
+numpy
