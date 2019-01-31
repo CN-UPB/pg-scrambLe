@@ -1,3 +1,17 @@
+list_nf = []
+
+def sonata_network_function():
+    network_functions_data = source['network_functions']
+    for data in network_functions_data:
+        vnf_id = data['vnf_id']
+        vnf_vendor = data['vnf_vendor']
+        vnf_name = data['vnf_name']
+        vnf_version = data['vnf_version']
+        nsd = NetworkFunction(vnf_id, vnf_vendor, vnf_name, vnf_version)
+        list_nf.append(nsd)
+        #print(list_nf)
+
+
 class GeneralInformation:
     descriptor_version = ""
     vendor = ""
@@ -77,3 +91,6 @@ class ConnectionPointsGraph:
         self.connection_point_ref = connection_point_ref
         self.position = position
 
+#with open("D:\Paderborn\project\Implementation\sonata-demo.yml", "r") as incoming_file:
+    #source = yaml.load(incoming_file)
+    sonata_network_function()
