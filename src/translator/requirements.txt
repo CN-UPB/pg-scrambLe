@@ -1,3 +1,4 @@
 nameko
 pandas
 numpy
+pymongo

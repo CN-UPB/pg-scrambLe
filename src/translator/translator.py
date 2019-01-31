@@ -2,6 +2,8 @@ from nameko.rpc import rpc
 import pandas as pd
 import numpy as np
 import yaml
+import pymongo
+from bson.objectid import ObjectId
 
 class read_dict():
 
@@ -81,13 +83,13 @@ class write_dict():
         lvl_dict = {}
 
         for parent, ele in s['key'].items():
-		
+        
             lvl = list(
                 dataset[(dataset['level'] == level) & (dataset['value'] != 'NULL') & (dataset['parent_key'] == parent)][
                     ['id', 'key', 'value']].apply(lambda x: (x.id, x.key + ' : ' + str(x.value)), axis=1).values)
-					
+                    
             lvl_dict.update(self.append_dict(parent, sorted(lvl, key=self.getKey), {}))
-			
+            
             parent_key.append(np.unique(
                     dataset[(dataset['key'] == parent) & (dataset['level'] == parent_level[0])]['parent_key'].values))
 
@@ -129,31 +131,12 @@ class write_dict():
 
     def translate_nsd(self,ds):
         return self.write(ds, ['level= 1', 'level= 2', 'level= 3', 'level= 4', 'level= 5', 'level= 6'])
-    
-class TranslatorService():
-    name = "translator_service"
-        
-    @rpc
-    def hello(self, name):
 
 
-        osm=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
-        
-        sonata=yaml.load(open(r"sonata-demo.yml"), Loader=yaml.Loader)
-        
-        reader = read_dict()
-        osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, 1),
-                                   columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
 
-        osm_dataset.sort_values(by=['level', 'parent_key'], ascending=True)
-        
-        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, 1),
-                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+class insert_into_db():
 
-        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
-
-        sonata_dataset.fillna('NULL', inplace=True)
-        osm_dataset.fillna('NULL', inplace=True)
+    def insert_mapping(self, record):
 
         osm_sonata_nsd_mapping = [
             ['level= 2', 'level= 3', 'nsd', 'description', 'level= 0', 'level= 1', 'root', 'description'],
@@ -183,22 +166,102 @@ class TranslatorService():
              'metric'],
         ]
 
-        osm_sonata = pd.DataFrame(osm_sonata_nsd_mapping,
+        mapping = pd.DataFrame(osm_sonata_nsd_mapping,
                                   columns=["osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
                                            "son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
             by=['son_level', 'osm_level'], ascending=True)
 
-        dataset = pd.merge(sonata_dataset, osm_sonata, left_on=['key', 'level'], right_on=['son_key', 'son_level'],
-                           how='right')
-        dataset.fillna('NULL', inplace=True)
-        dataset = dataset[dataset['value'] != 'NULL'][
-            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'id']]
-        dataset.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'id']
-        dataset = dataset.append(osm_dataset[osm_dataset['value'] == 'NULL'])
 
-        writer = write_dict()
+        mapping.index = [str(i) for i in mapping.index]
+        temp = mapping.to_dict()
+        id = record.insert(temp)
+
+        return id
+
+
+    def insert_nsd(self, record):
+
+        pass
         
-        message = str(writer.translate_nsd(dataset))
+
+class TranslatorService():
+    name = "translator_service"
+        
+    @rpc
+    def hello(self, name):
+
+        client = pymongo.MongoClient('mongodb://mongo:27017/')
+        db = client.mapping_nsd
+        record = db.nsd_collection
+        
+        
+        osm=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
+        
+        sonata=yaml.load(open(r"sonata-demo.yml"), Loader=yaml.Loader)
+        
+        reader = read_dict()
+        osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, 1),
+                                   columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+
+        osm_dataset.sort_values(by=['level', 'parent_key'], ascending=True)
+        
+        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, 1),
+                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+
+        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+
+        sonata_dataset.fillna('NULL', inplace=True)
+        osm_dataset.fillna('NULL', inplace=True)
+
+        
+        res = record.find()
+        
+        t = [i for i in res]
+        
+        if(len(t) ==0):
+            insert = insert_into_db()
+            id = insert.insert_mapping(record)
+            
+            res = record.find({'_id' : id })
+            t = [i for i in res]
+        
+        else:
+            pass        
+        
+        if name =='son_to_osm':
+                
+            osm_sonata = pd.DataFrame.from_dict(t[0])
+            
+            dataset = pd.merge(sonata_dataset, osm_sonata, left_on=['key', 'level'], right_on=['son_key', 'son_level'],
+                               how='right')
+            dataset.fillna('NULL', inplace=True)
+            dataset = dataset[dataset['value'] != 'NULL'][
+                ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'id']]
+            dataset.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'id']
+            dataset = dataset.append(osm_dataset[osm_dataset['value'] == 'NULL'])
+
+            writer = write_dict()
+            
+            message = str(writer.translate_nsd(dataset))
+
+        elif name =='osm_to_son':
+            
+            osm_sonata = pd.DataFrame.from_dict(t[0])
+            
+            dataset = pd.merge(osm_dataset, osm_sonata, left_on=['key', 'level'], right_on=['osm_key', 'osm_level'],
+                               how='right')
+            dataset.fillna('NULL', inplace=True)
+            dataset = dataset[dataset['value'] != 'NULL'][
+                ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'id']]
+            dataset.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'id']
+            dataset = dataset.append(sonata_dataset[sonata_dataset['value'] == 'NULL'])
+
+            writer = write_dict()
+            
+            message = str(writer.translate_nsd(dataset))
+            
+        else:
+            message='Sorry still working on that!!!! '
 
         return message
 

@@ -1,16 +1,27 @@
-version: "2"
+version: "3.2"
 
 services:
   rabbit:
     image: rabbitmq:3.6-management
     ports:
         - "15672:15672"
-
+        
+  mongo:
+    image: mongo
+    command: --smallfiles
+    ports:
+        - "27017:27017"
+    # volumes:
+        # - type: "volume"
+          # source: "mongodb_data_volume"
+          # target: "/data/db"
+       
   translator:
     build:
       context: translator
     depends_on:
       - rabbit
+      - mongo
     environment:
         RABBIT_PASSWORD: "guest"
         RABBIT_USER: "guest"
@@ -62,3 +73,7 @@ services:
         RABBIT_USER: "guest"
         RABBIT_HOST: "rabbit"
         RABBIT_PORT: "5672"
+          
+# volumes:
+  # mongodb_data_volume:
+        # external: true   
