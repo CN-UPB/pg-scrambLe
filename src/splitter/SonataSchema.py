@@ -7,7 +7,7 @@ class GeneralInformation:
     description = ""
 
 
-class VirtualFunction:
+class NetworkFunction:
     vnf_id = ""
     vnf_name = ""
     vnf_vendor = ""
@@ -46,7 +46,7 @@ class ForwardingGraphs:
     fg_id = ""
     number_of_endpoints = 0
     number_of_virtual_links = 0
-    constituent_virtual_links= []
+    constituent_virtual_links = []
     constituent_vnfs = []
     network_forwarding_path = []
 
@@ -56,6 +56,7 @@ class ForwardingGraphs:
         self.number_of_virtual_links = number_of_virtual_links
         self.constituent_vnfs = constituent_vnfs
         self.network_forwarding_path = network_forwarding_path
+
 
 class NetworkForwardingPaths:
     fp_id = ""
@@ -67,6 +68,7 @@ class NetworkForwardingPaths:
         self.policy = policy
         self.connection_points = connection_points
 
+
 class ConnectionPointsGraph:
     connection_point_ref = ""
     position = 0
@@ -74,3 +76,4 @@ class ConnectionPointsGraph:
     def __init__(self, connection_point_ref, position):
         self.connection_point_ref = connection_point_ref
         self.position = position
+
