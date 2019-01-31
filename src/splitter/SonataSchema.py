@@ -40,3 +40,37 @@ class VirtualLink:
         self.id = id
         self.connectivity_type = connectivity_type
         self.connection_points_reference = connection_points_reference
+
+
+class ForwardingGraphs:
+    fg_id = ""
+    number_of_endpoints = 0
+    number_of_virtual_links = 0
+    constituent_virtual_links= []
+    constituent_vnfs = []
+    network_forwarding_path = []
+
+    def __init__(self, fg_id, number_of_endpoints, number_of_virtual_links, constituent_vnfs, network_forwarding_path):
+        self.fg_id = fg_id
+        self.number_of_endpoints = number_of_endpoints
+        self.number_of_virtual_links = number_of_virtual_links
+        self.constituent_vnfs = constituent_vnfs
+        self.network_forwarding_path = network_forwarding_path
+
+class NetworkForwardingPaths:
+    fp_id = ""
+    policy = ""
+    connection_points = []
+
+    def __init__(self, fp_id, policy, connection_points):
+        self.fp_id = fp_id
+        self.policy = policy
+        self.connection_points = connection_points
+
+class ConnectionPointsGraph:
+    connection_point_ref = ""
+    position = 0
+
+    def __init__(self, connection_point_ref, position):
+        self.connection_point_ref = connection_point_ref
+        self.position = position
