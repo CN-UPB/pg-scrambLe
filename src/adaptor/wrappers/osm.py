@@ -1,5 +1,3 @@
-# Implement common_interfaces here
-
 import hashlib
 import logging
 from abc import abstractmethod
@@ -7,15 +5,14 @@ import json
 import time
 
 import requests
-
-import common_interface
+from . import CommonInterface
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('helper.py')
 logging.getLogger("urllib3").setLevel(logging.INFO)
 
 
-class OSMClient(common_interface.CommonInterface):
+class OSMClient(CommonInterface):
     def __init__(self, host, port=9999):
         self._host = host
         self._port = port
@@ -145,17 +142,17 @@ class OSMClient(common_interface.CommonInterface):
         return hash_md5.hexdigest()
 
 
-if __name__ == "__main__":
-    osm_c = OSMClient("vm-hadik3r-05.cs.uni-paderborn.de")
-    _token = json.loads(osm_c.auth(username="admin", password="admin"))
-    _token = json.loads(_token["data"])
-    print(_token["id"])
-    print(osm_c.get_ns_descriptors(token=_token["id"]))
-    _nid = json.loads(osm_c.post_ns_descriptors(token=_token["id"], package_path="../samples/cirros_2vnf_ns.tar.gz"))
-    _nid = json.loads(_nid["data"])
-    print(_nid["id"])
-    time.sleep(10)
-    print(osm_c.delete_ns_descriptors(token=_token["id"], id=_nid["id"]))
+# if __name__ == "__main__":
+#     osm_c = OSMClient("vm-hadik3r-05.cs.uni-paderborn.de")
+#     _token = json.loads(osm_c.auth(username="admin", password="admin"))
+#     _token = json.loads(_token["data"])
+#     print(_token["id"])
+#     print(osm_c.get_ns_descriptors(token=_token["id"]))
+#     _nid = json.loads(osm_c.post_ns_descriptors(token=_token["id"], package_path="../samples/cirros_2vnf_ns.tar.gz"))
+#     _nid = json.loads(_nid["data"])
+#     print(_nid["id"])
+    # time.sleep(10)
+    # print(osm_c.delete_ns_descriptors(token=_token["id"], id=_nid["id"]))
 
     # cd adaptor/wrappers
     # python3 osm.py

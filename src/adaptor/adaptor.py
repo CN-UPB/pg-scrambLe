@@ -1,4 +1,4 @@
-from . import wrappers
+import wrappers
 from nameko.rpc import rpc
 
 
