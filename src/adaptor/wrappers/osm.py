@@ -128,7 +128,7 @@ class OSMClient(CommonInterface):
             log.exception(e)
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.ok:
+        if r.status_code == requests.codes.no_content:
             result['error'] = False
 
         result['data'] = r.text

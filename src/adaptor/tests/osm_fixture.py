@@ -14,7 +14,7 @@ def get_ns_descriptors_keys():
 
 @fixture
 def delete_ns_descriptors_keys():
-    return []
+    return ['']
 
 @fixture
 def post_ns_descriptors_keys():
