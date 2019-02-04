@@ -19,3 +19,21 @@ def delete_ns_descriptors_keys():
 @fixture
 def post_ns_descriptors_keys():
     return ['id']
+
+@fixture
+def get_vnf_packages_keys():
+    return ['logo', 'connection-point', 'name', 'mgmt-interface', 
+                'short-name', 'vendor', 'id', '_id', '_admin', 
+                'description', 'vdu', 'version']
+
+@fixture
+def post_vnf_packages_keys():
+    return ['detail', 'status', 'code']
+
+@fixture
+def get_vnf_packages_vnfpkgid_keys():
+    return ['id']
+
+@fixture
+def delete_vnf_packages_vnfpkgid_keys():
+    return ['']
