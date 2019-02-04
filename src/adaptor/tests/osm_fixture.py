@@ -8,7 +8,7 @@ def auth_keys():
 
 @fixture
 def get_ns_descriptors_keys():
-    return ['_id', 'logo', 'vld', 'short-name', 'constituent-vnfd',
+    return ['id', 'logo', 'vld', 'short-name', 'constituent-vnfd',
                 '_admin', 'description', 'name', 
                 'vendor', 'id', 'version']
 
@@ -28,7 +28,7 @@ def get_vnf_packages_keys():
 
 @fixture
 def post_vnf_packages_keys():
-    return ['detail', 'status', 'code']
+    return ['id']
 
 @fixture
 def get_vnf_packages_vnfpkgid_keys():
