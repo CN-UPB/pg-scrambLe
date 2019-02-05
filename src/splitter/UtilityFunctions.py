@@ -19,7 +19,7 @@ def sonata_network_function():
         vnf_version = data['vnf_version']
         nsd = sonataSchema.NetworkFunction(vnf_id, vnf_vendor, vnf_name, vnf_version, [])
         list_nf.append(nsd)
-        return list_nf
+        #print(list_nf)
 
 
 # Function to extract the values "id, interface, type" from Connection points
@@ -31,6 +31,7 @@ def sonata_connection_points():
         type = data['type']
         connection_points_instance = sonataSchema.ConnectionPoint(id, interface, type)
         list_connection_points.append(connection_points_instance)
+        #print(list_connection_points)
 
 
 # Function to extract the values "id, connectivity type and connection points reference" from Virtual links
@@ -42,6 +43,7 @@ def virtual_links():
         connection_points_reference = data['connection_points_reference']
         virtual_links_instance = sonataSchema.VirtualLink(id, connectivity_type, connection_points_reference)
         list_virtual_links.append(virtual_links_instance)
+        #print(connection_points_reference)
 
 
 # Function to extract the information from "forwarding graph"
@@ -60,19 +62,29 @@ def forwarding_graphs():
                                 position = connection_points_data['position']
                                 connection_points_instance = sonataSchema.ConnectionPointsGraph(connection_point_ref,position)
                                 list_connection_points_graph.append(connection_points_instance)
-                                print(connection_point_ref)
+                                #print(connection_point_ref)
                     fp_id = network_forwarding_paths_data['fp_id']
                     policy = network_forwarding_paths_data['policy']
                     network_forwarding_paths_instance = sonataSchema.NetworkForwardingPaths(fp_id, policy, list_connection_points_graph)
                     list_network_forwarding_paths.append(network_forwarding_paths_instance)
-                    print(policy)
+                    #print(policy)
             fg_id = data['fg_id']
             number_of_endpoints = data['number_of_endpoints']
             number_of_virtual_links = data['number_of_virtual_links']
             constituent_virtual_links = data['constituent_virtual_links']
             constituent_vnfs = data['constituent_vnfs']
-            forwarding_graphs_instance = sonataSchema.ForwardingGraph(fg_id, number_of_endpoints, number_of_virtual_links, constituent_virtual_links, list_network_forwarding_paths)
-            list_forwarding_graphs.append(forwarding_graphs_instance)
+            forwarding_graphs_instance = sonataSchema.ForwardingGraphs(fg_id, number_of_endpoints, number_of_virtual_links, constituent_vnfs, constituent_virtual_links, list_network_forwarding_paths)
+        list_forwarding_graphs.append(forwarding_graphs_instance)
+
+
+def set_general_information(nsd):
+    nsd.descriptor_version = source['descriptor_version']
+    nsd.vendor = source['vendor']
+    nsd.name = source['name']
+    nsd.version = source['version']
+    nsd.author = source['author']
+    nsd.description = source['description']
+    return nsd
 
 
 def get_data():
