@@ -10,9 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY config.yml ./
 COPY start.sh ./
 COPY translator.py ./
+COPY Translator_main.py ./
 
 COPY hackfest_multivdu_nsd.yaml ./
-COPY sonata-demo.yml ./
+COPY recursive-example.yml ./
 
 RUN chmod +x ./start.sh
 

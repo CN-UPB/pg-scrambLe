@@ -4,6 +4,8 @@ import numpy as np
 import yaml
 import pymongo
 from bson.objectid import ObjectId
+#from Translator_main import test
+
 
 class read_dict():
 
@@ -15,7 +17,7 @@ class read_dict():
 
         Params
         ------
-        dictionary : python dict
+        dictionary : dict
             dictionary containing the descriptor details
         key : str
             the name of the root node/key (while calling this function for the first time this variable can be any string).
@@ -58,6 +60,8 @@ class read_dict():
             pass
 
             
+            
+
 class write_dict():
 
     def append_dict(self,parent_key, lvl, dictionary):
@@ -232,6 +236,9 @@ class write_dict():
         '''
         return self.write(ds,range(8))
 
+
+
+
 class transformation():
 
     def sub_ds(self,df,parent,level) :   
@@ -392,8 +399,8 @@ class transformation():
 
 
 
-    def son_fwdg(self,df, column1,column2, sep=':', keep=False):
-        """
+    def son_fwdg(self,df, column1,column2, sep=':'):
+        '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
 
@@ -412,21 +419,21 @@ class transformation():
         -------
         pandas.DataFrame
             Returns a dataframe with the same columns as `df`.
-        """
-        indexes = list()
-        new_values = list()
-        new_values2 = list()
+        '''
+        indexes = []
+        new_values = []
+        new_values2 = []
         df = df.dropna(subset=[column1])
+        
         for i, presplit in enumerate(df[[column1,column2]].itertuples()):
             #print str(presplit[1]),str(presplit[2])
             values = str(presplit[1]).split(sep)
             #print values ,len(values) 
-            if keep and len(values) > 1:
-                indexes.append(i)
-                new_values.append(str(presplit[1]))
+            
             for j in range(len(values)):
                 indexes.append(i)
                 new_values.append(values[j])
+                
                 if len(values) > 1:
                     if (j == 0 and str(presplit[2]) == 'connection_point_ref'):
                         new_values2.append('member-vnf-index-ref')
@@ -436,21 +443,24 @@ class transformation():
                         new_values2.append('fg_id')
                     elif (j > 0 and str(presplit[2]) == 'fp_id'):
                         new_values2.append('fp_id')
+                        
                 else:
                     if str(presplit[2]) == 'connection_point_ref':
                         new_values2.append('vnfd-connection-point-ref')
+                        
                     else:
                         new_values2.append(str(presplit[2]))
         
         new_df = df.iloc[indexes, :].copy()
         new_df[column1] = new_values
         new_df[column2] = new_values2
+        
         return new_df.drop_duplicates()
 
 
 
-    def son_vld(self,df, column1,column2, sep=':', keep=False):
-        """
+    def son_vld(self,df, column1,column2, sep=':'):
+        '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
 
@@ -469,17 +479,20 @@ class transformation():
         -------
         pandas.DataFrame
             Returns a dataframe with the same columns as `df`.
-        """
-        indexes = list()
-        new_values = list()
-        new_values2 = list()
+        '''
+        indexes = []
+        new_values = []
+        new_values2 = []
         df = df.dropna(subset=[column1])
+        
         for i, presplit in enumerate(df[[column1,column2]].itertuples()):
             #print type(presplit[1]),str(presplit[1])
             if(isinstance(presplit[1],list)):
+            
                 for item in presplit[1]:
                     values = str(item).split(sep)
                     #print values ,len(values) 
+                    
                     for j in range(len(values)):
                         indexes.append(i)
                         new_values.append(values[j])
@@ -490,6 +503,7 @@ class transformation():
                                 new_values2.append('vnfd-connection-point-ref')
                         else:
                             new_values2.append('vnfd-connection-point-ref')
+                            
             else:
                 indexes.append(i)
                 new_values.append(presplit[1])
@@ -498,6 +512,7 @@ class transformation():
         new_df = df.iloc[indexes, :].copy()
         new_df[column1] = new_values
         new_df[column2] = new_values2
+        
         return new_df.drop_duplicates()
 
 
@@ -580,62 +595,89 @@ class insert_into_db():
         
         temp = osm_son_vnffgd.to_dict()
         id = record.insert(temp)
-        #return id
 
 
     def insert_nsd(self, record):
+        
+        #osm=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
+        sonata=yaml.load(open(r"recursive-example.yml"), Loader=yaml.Loader)
+        
+        id = record.insert(sonata)
+        return id
+    
 
-        pass
-        
 
-class TranslatorService():
-    name = "translator_service"
-        
-    @rpc
-    def hello(self, name):
 
-        client = pymongo.MongoClient('mongodb://mongo:27017/')
-        db = client.mapping_nsd
-        record = db.nsd_test2
-        
-        
-        osm=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
-        
-        sonata=yaml.load(open(r"sonata-demo.yml"), Loader=yaml.Loader)
-        
-        reader = read_dict()
-        osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, 1),
-                                   columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+class setup():
 
-        osm_dataset.sort_values(by=['level', 'parent_key'], ascending=True)
-        
-        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, 1),
-                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+    def test(self,received_ref, received_param):
 
-        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+        client = pymongo.MongoClient("mongodb://mongo:27017")
+        db = client["descriptors"]
+        cursor = db.list_collection_names()
+        for ref in cursor:
+            doc = db.get_collection(ref)
+            received_file = [ns for ns in doc.find({'_id': ObjectId(received_ref)})]
+            if len(received_file)>0:
+                break
+        var = self.check_parameters(received_param, received_file[0])
+        return var
 
-        sonata_dataset.fillna('NULL', inplace=True)
-        osm_dataset.fillna('NULL', inplace=True)
 
+    def check_parameters(self,received_param, received_file):
+
+        if received_param == "sonata_to_osm":
+            ret_translated = self.sonata(received_file)
+            return ret_translated
+        elif received_param == "osm_to_sonata":
+            ret_translated = self.osm(received_file)
+            return ret_translated
+
+
+    def sonata(self,received_file):
+
+        client = pymongo.MongoClient("mongodb://mongo:27017")
+        db = client["descriptors"]
+        db2 = client.mapping_nsd
+        record = db2.nsd_test2
+                
+        if 'eu.5gtango' and 'virtual_deployment_units' in received_file:
         
-        res = record.find()
-        
-        t = [i for i in res]
-        
-        if(len(t) ==0):
-            insert = insert_into_db()
-            insert.insert_mapping(record)
+            doc = db["osm_vnfd"]
+            translated = check1()
+            temp = doc.insert_one(translated)
+            translated_ref = temp.inserted_id
+            return translated_ref
+            
+        elif 'connection_points' in received_file:
+            doc = db["translated_nsd"]
+            
+            sonata = received_file
+            
+            reader = read_dict()
+
+            sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, 1), columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+
+            sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+
+            sonata_dataset.fillna('NULL', inplace=True)
             
             res = record.find()
+            
             t = [i for i in res]
-        
-        else:
-            pass        
-        
-        map= transformation()
-        
-        if name =='son_to_osm':
+            
+            if(len(t) ==0):
+                insert = insert_into_db()
+                insert.insert_mapping(record)
                 
+                res = record.find()
+                t = [i for i in res]
+            
+            else:
+                pass        
+            
+            map= transformation()
+                                      
             osm_sonata = pd.DataFrame.from_dict(t[0])
             osm_son_vld = pd.DataFrame.from_dict(t[1])
             osm_son_vnffgd = pd.DataFrame.from_dict(t[2])
@@ -643,9 +685,13 @@ class TranslatorService():
             dataset=pd.merge(sonata_dataset,osm_sonata,
                              left_on=['key','parent_key','level','parent_level'],
                              right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+                             
             dataset.fillna('NULL',inplace=True)
+            
             dataset = dataset[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','id']]
+            
             dataset.columns = ['parent_level','level','parent_key','key','value','id']
+            
             dataset=dataset.append(pd.DataFrame([[2,'nsd',3,'vnffgd','NULL','NULL'],
                                                 [2,'nsd',3,'constituent-vnfd','NULL','NULL'],
                                                 [2,'nsd',3,'vld','NULL','NULL'],
@@ -653,9 +699,9 @@ class TranslatorService():
                                                 [0,'root',1,'nsd:nsd-catalog','NULL','NULL'],
                                                 [1,'nsd:nsd-catalog',2,'nsd','NULL','NULL']],
                                                columns = ['parent_level','parent_key','level','key','value','id']))
-
-
+                                               
             df = map.ret_ds(sonata_dataset,'virtual_links',2)
+            
             df2_son = map.son_vld(df,'value','key',':')
 
             df_son_vld = pd.merge(df2_son,osm_son_vld,
@@ -663,37 +709,81 @@ class TranslatorService():
                              right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
 
             df_son_vld =  df_son_vld[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','id']]
+            
             df_son_vld.columns = ['parent_level','level','parent_key','key','value','id']
-            df_son_vld = df_son_vld.append(pd.DataFrame([[3,'vld',4,'vnfd-connection-point-ref','NULL','NULL'],
-                                                        ],
+            
+            df_son_vld = df_son_vld.append(pd.DataFrame([[3,'vld',4,'vnfd-connection-point-ref','NULL','NULL']],
                                       columns = ['parent_level','parent_key','level','key','value','id']))
 
             dataset = dataset.append(df_son_vld)
 
-
-
-
-
             df=map.ret_ds(sonata_dataset,'forwarding_graphs',2)
+            
             df2_son=map.son_fwdg(df,'value','key',':')
+            
             df_son_vnffgd = pd.merge(df2_son,osm_son_vnffgd,
                              left_on=['key','parent_key','level','parent_level'],
                              right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+                             
             df_son_vnffgd =  df_son_vnffgd[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','id']]
+            
             df_son_vnffgd.columns = ['parent_level','level','parent_key','key','value','id']
+            
             df_son_vnffgd = df_son_vnffgd.append(pd.DataFrame([[3,'vnffgd',4,'rsp','NULL','NULL'],
                                                               [4,'rsp',5,'vnfd-connection-point-ref','NULL','NULL']],
                                       columns = ['parent_level','parent_key','level','key','value','id']))
 
-
             dataset = dataset.append(df_son_vnffgd)
+            
             dataset.drop_duplicates(inplace=True)
 
             writer = write_dict()
             
-            message = str(writer.translate_nsd(dataset))
+            message = writer.translate_nsd(dataset)
+            
+            temp = doc.insert(message)
+            
+            translate_ref = str(temp)
+            
+            return translate_ref
 
-        elif name =='osm_to_son':
+
+    def osm(self,file):
+    
+        received_file = file
+        client = pymongo.MongoClient("mongodb://mongo:27017")
+        db = client["descriptors"]
+        
+        if 'constituent-vnfd' in received_file:
+            doc = db["translated_nsd"]
+                
+            osm = received_file
+            
+            reader = read_dict()
+
+            osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, 1),
+                                          columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'id'])
+
+            osm_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+
+            osm_dataset.fillna('NULL', inplace=True)
+            
+            res = record.find()
+            
+            t = [i for i in res]
+            
+            if(len(t) ==0):
+                insert = insert_into_db()
+                insert.insert_mapping(record)
+                
+                res = record.find()
+                t = [i for i in res]
+            
+            else:
+                pass        
+            
+            map= transformation()
+            
             
             osm_sonata = pd.DataFrame.from_dict(t[0])
             osm_son_vld = pd.DataFrame.from_dict(t[1])
@@ -755,11 +845,46 @@ class TranslatorService():
 
             writer = write_dict()
             
-            message = str(writer.translate_nsd(dataset))
-            
-        else:
-            message='Sorry still working on that!!!! '
+            message = writer.translate_nsd(dataset)
 
-        return message
+            temp = doc.insert(message)
+            translated_ref = str(temp)
+            
+            return translated_ref
+            
+        elif 'osm' and 'management interface' in received_file:
+        
+            doc = db["sonata_vnfd"]
+            
+            translated = check1()
+            temp = doc.insert_one(translated)
+            translated_ref = temp.inserted_id
+            return translated_ref
+    
+class TranslatorService():
+    name = "translator_service"
+        
+    @rpc
+    def hello(self, name):
+    
+        
+        client = pymongo.MongoClient("mongodb://mongo:27017/")
+        db = client["descriptors"]
+        param = name#"sonata_to_osm"
+    
+        check = db["source_nsd"]
+        ref = [i.get('_id') for i in check.find()]
+        
+        set = setup()
+        
+        if len(ref) == 0:
+            insert = insert_into_db()
+            ref= insert.insert_nsd(check)
+            var = set.test(ref, param)
+            
+        else:      
+            var = set.test(ref[0], param)
+
+        return str(var)
 
     

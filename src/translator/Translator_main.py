@@ -1,5 +1,5 @@
 import pymongo
-from test import check1
+#from test import check1
 from pprint import pprint
 from bson.objectid import ObjectId
 
@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 def test(reference, parameters):
     received_ref = reference
     received_param = parameters
-    client = pymongo.MongoClient("mongodb://localhost:27017")
+    client = pymongo.MongoClient("mongodb://mongo:27017")
     db = client["test"]
     cursor = db.list_collection_names()
     for ref in cursor:
