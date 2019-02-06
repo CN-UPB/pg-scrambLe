@@ -1,0 +1,71 @@
+import json
+from wrappers import OSMClient 
+from pytest import fixture
+from .osm_fixture import * 
+from .config import *
+
+def test_post_vnf_packages(post_vnf_packages_keys):
+	"""Tests API call to onboard VNF descriptor resources"""
+	osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
+	osm_auth = OSMClient.Auth(HOST_URL)
+	_token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+	_token = json.loads(_token["data"])
+
+	response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
+						package_path="samples/test_osm_cirros_vnfd.tar.gz"))
+	response = json.loads(response["data"])
+
+	assert isinstance(response, dict)
+	assert set(post_vnf_packages_keys).issubset(
+					response.keys()), "All keys should be in the response"
+
+def test_get_vnf_packages(get_vnf_packages_keys):
+	"""Tests API call to fetch multiple NS descriptor resources"""
+	osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
+	osm_auth = OSMClient.Auth(HOST_URL)
+	_token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+	_token = json.loads(_token["data"])
+
+	response = json.loads(osm_vnfpkgm.get_vnf_packages(token=_token["id"]))
+	response = json.loads(response["data"])
+	assert isinstance(response, list)
+	if len(response) > 0:
+		assert set(get_vnf_packages_keys).issubset(
+					response[0].keys()), "All keys should be in the response"
+
+def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
+    """Tests API call to onboard VNF descriptor resources"""
+    osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _vnfd_list = json.loads(osm_vnfpkgm.get_vnf_packages(token=_token["id"]))
+    _vnfd_list = json.loads(_vnfd_list["data"])
+
+    for _v in _vnfd_list:
+        if "test_osm_cirros_vnfd" == _v['id']:            
+            _vnfd = _v['_id']
+
+        response = json.loads(osm_vnfpkgm.get_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+
+def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
+    """Tests API call to delete NS descriptor resources"""
+    osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _vnfd_list = json.loads(osm_vnfpkgm.get_vnf_packages(token=_token["id"]))
+    _vnfd_list = json.loads(_vnfd_list["data"])
+
+    _vnfd = None
+    for _v in _vnfd_list:
+        if "test_osm_cirros_vnfd" == _v['id']:            
+            _vnfd = _v['_id']
+
+    response = None
+    if _vnfd:
+        response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+        assert isinstance(response, dict)
+        assert response["data"] == ""

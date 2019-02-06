@@ -5,21 +5,21 @@ from wrappers import SONATAClient
 from pytest import fixture
 from tests.sonata_fixture import * 
 
-HOST_URL = "vm-hadik3r-05.cs.uni-paderborn.de"
-USERNAME = "admin"
-PASSWORD = "admin"
+HOST_URL = "vm-hadik3r-08.cs.uni-paderborn.de"
+USERNAME = "sonata"
+PASSWORD = "1234"
 
 # @vcr.use_cassette('tests/vcr_cassettes/osm/auth.yml')
 def test_auth(auth_keys):
-    """Tests API call to fetch Auth token"""
-#     osm_c = OSMClient(HOST_URL)
-#     response = json.loads(osm_c.auth(username=USERNAME, password=PASSWORD))
-#     response = json.loads(response["data"])
+	"""Tests API call to fetch Auth token"""
+	sonata_c = SONATAClient(HOST_URL)
+	response = json.loads(sonata_c.auth(username=USERNAME, password=PASSWORD))
+	
+	response = json.loads(response["data"])
 
-    assert isinstance(response, dict)
-    assert set(auth_keys).issubset(
-                response.keys()), "All keys should be in the response"
-
+	assert isinstance(response, dict)
+	assert set(auth_keys).issubset(
+				response.keys()), "All keys should be in the response"
 
 # @vcr.use_cassette('tests/vcr_cassettes/osm/post_ns_descriptors.yml')
 def test_post_ns_descriptors(post_ns_descriptors_keys):
