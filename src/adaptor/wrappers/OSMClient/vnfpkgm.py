@@ -2,6 +2,7 @@ from ..CommonInterface import CommonInterfaceVnfPkgm
 from .helpers import Helpers
 import json
 import requests
+import tarfile
 
 
 class VnfPkgm(CommonInterfaceVnfPkgm):
@@ -123,39 +124,99 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
        
 
  
-    def get_vnf_packages_vnfpkgid_vnfd(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNFD of an individual VNF package
+    def get_vnf_packages_vnfpkgid_vnfd(self, token, id , _filter=None, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
 
-        /vnf_packages/{vnfPkgId}/vnfd
-            GET - Read VNFD of an on-boarded VNF package
-   
-        """
-        pass
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(base_path, id)
+        result = {'error': True, 'data': ''}
+        headers = {'Content-Type': 'application/yaml',
+                        'Authorization': 'Bearer {}'.format(token)}
+                
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+                
+        result['data'] = r.text
+        return json.dumps(result)
 
-   
-    def get_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNF package content
+    def get_vnf_packages_vnfpkgid_package_content(self, token, id , _filter=None, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
 
-        /vnf_packages/{vnfPkgId}/package_content
-            GET - Fetch an on-boarded VNF package
-   
-        """
-        pass
+        result = {'error': True, 'data': ''}
+        headers = {"accept": "application/zip",
+                'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(base_path, id)
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
 
+        result['data'] = r.text
+        return json.dumps(result)
     
-    def put_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNF package content
+    def put_vnf_packages_vnfpkgid_package_content(self, token, data_path, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
 
-        /vnf_packages/{vnfPkgId}/package_content
-            PUT - Upload a VNF package by providing 
-                    the content of the VNF package
-   
-        """
-        pass
+        result = {'error': True, 'data': ''}
+        
+        # get the package onboarded
+        tar_pkg = self.get_vnfd_pkg(token, id)
+        tarf = tarfile.open(fileobj=tar_pkg)
 
+        tarf = self._descriptor_update(tarf, data_path)
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token),
+                    'Content-File-MD5': Helpers.md5(open(tarf.getnames()[0] + ".tar.gz", 'rb'))}
+
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(base_path, id)
+
+        try:
+            r = requests.put(_endpoint, data=open(tarf.getnames()[0] + ".tar.gz", 'rb'), verify=False,
+                            headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+
+    def _descriptor_update(self, tarf, data_path):
+        # extract the package on a tmp directory
+        tarf.extractall('/tmp')
+        with open(data_path, 'r') as dfile:
+            _data=dfile.read()
+        for name in tarf.getnames():
+            if name.endswith(".yaml") or name.endswith(".yml"):
+                with open('/tmp/' + name, 'w') as outfile:
+                    json.safe_dumps(_data, outfile, default_flow_style=False)
+            break
+
+        tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + ".tar.gz", "w:gz")
+
+        for tarinfo in tarf:
+            tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
+        tarf_temp.close()
+        return tarf
+    
     
     def post_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
         """ VNF Package Management Interface - 
@@ -169,16 +230,26 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         pass
 
     
-    def get_vnf_packages_vnfpkgid_artifacts_artifactpath(self, 
-            vnfPkgId, artifactPath):
-        """ VNF Package Management Interface - 
-                Individual VNF package artifact
+    def get_vnf_packages_vnfpkgid_artifacts_artifactpath(self, token, id , host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
 
-        /vnf_packages/{vnfPkgId}/artifacts/{artifactPath}
-            GET - Fetch individual VNF package artifact
-   
-        """
-        pass
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/artifacts".format(base_path, id)
+        result = {'error': True, 'data': ''}
+        headers = {'Content-Type': 'application/yaml', 'accept': 'text/plain',
+                'Authorization': 'Bearer {}'.format(token)}
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
 
     
     def get_vnf_packages_subscriptions(self):
