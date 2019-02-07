@@ -176,18 +176,22 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result = {'error': True, 'data': ''}
         
         # get the package onboarded
-        tar_pkg = self.get_vnfd_pkg(token, id)
-        tarf = tarfile.open(fileobj=tar_pkg)
+        # tar_pkg = json.loads(self.get_vnf_packages_vnfpkgid_package_content(token, id))
+        # with open("/tmp/{0}.tar.gz".format("test"), "w") as tar_file:
+            # tar_file.write(tar_pkg["data"])
+        
+        
+        # tarf = tarfile.open("/tmp/{0}.tar.gz".format("test"), "w:gz")
 
-        tarf = self._descriptor_update(tarf, data_path)
+        # tarf = Helpers._descriptor_update(tarf, data_path)
         headers = {"Content-Type": "application/gzip", "accept": "application/json",
                     'Authorization': 'Bearer {}'.format(token),
-                    'Content-File-MD5': Helpers.md5(open(tarf.getnames()[0] + ".tar.gz", 'rb'))}
+                    'Content-File-MD5': Helpers.md5(open(data_path, 'rb'))}
 
         _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/package_content".format(base_path, id)
-
+        
         try:
-            r = requests.put(_endpoint, data=open(tarf.getnames()[0] + ".tar.gz", 'rb'), verify=False,
+            r = requests.put(_endpoint, data=open(data_path, 'rb'), verify=False,
                             headers=headers)
         except Exception as e:
             result['data'] = str(e)
@@ -197,25 +201,6 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result['data'] = r.text
         return json.dumps(result)
-
-
-    def _descriptor_update(self, tarf, data_path):
-        # extract the package on a tmp directory
-        tarf.extractall('/tmp')
-        with open(data_path, 'r') as dfile:
-            _data=dfile.read()
-        for name in tarf.getnames():
-            if name.endswith(".yaml") or name.endswith(".yml"):
-                with open('/tmp/' + name, 'w') as outfile:
-                    json.safe_dumps(_data, outfile, default_flow_style=False)
-            break
-
-        tarf_temp = tarfile.open('/tmp/' + tarf.getnames()[0] + ".tar.gz", "w:gz")
-
-        for tarinfo in tarf:
-            tarf_temp.add('/tmp/' + tarinfo.name, tarinfo.name, recursive=False)
-        tarf_temp.close()
-        return tarf
     
     
     def post_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):

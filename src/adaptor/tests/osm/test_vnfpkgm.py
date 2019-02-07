@@ -136,23 +136,35 @@ def test_get_vnf_packages_vnfpkgid_artifacts_artifactpath():
     else:
             return False
 
-# def test_put_vnf_packages_vnfpkgid_package_content():
-#     """Tests API call to Upload a VNF package by
-#         providing the content of the VNF
-#         package"""
-#     osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
-#     osm_auth = OSMClient.Auth(HOST_URL)
-#     _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
-#     _token = json.loads(_token["data"])
-   
+def test_put_vnf_packages_vnfpkgid_package_content():
+    """Tests API call to Upload a VNF package by
+    providing the content of the VNF
+    package"""
+    osm_vnfpkgm_vnfd = OSMClient.VnfPkgm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    Helpers._upload_test_vnf()
+    _vnfd_list = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages(token=_token["id"]))
+    _vnfd_list = json.loads(_vnfd_list["data"])
+    
+    _vnfd = None
+    for _v in _vnfd_list: 
+        if "test_osm_cirros_vnfd" == _v['id']:            
+            _vnfd = _v['_id']
+           
+    response = json.loads(osm_vnfpkgm_vnfd.put_vnf_packages_vnfpkgid_package_content(token=_token["id"], id=_vnfd,
+                            data_path="samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
+    Helpers._delete_test_vnf("hackfest1alt-vnf")
+    if response["error"]:
+            return True
+    else:
+            return False
 
-#     response = json.loads(osm_vnfpkgm.put_vnf_packages_vnfpkgid_package_content(token=_token["id"], id="eb48af8a-25aa-476c-b89b-2ff4ff50acdc",
-#                         data_path="samples/test_osm_cirros_vnfd.yaml"))
-#     response = json.loads(response["data"])
-#     print(response[data].keys())
-#     # assert isinstance(response, dict)
-#     # assert set(post_vnf_packages_keys).issubset(
-#     #                 response.keys()), "All keys should be in the response"
+
+    
+   
+   
 
 
 
