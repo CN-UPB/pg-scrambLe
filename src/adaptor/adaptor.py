@@ -1,5 +1,6 @@
 import wrappers
 from nameko.rpc import rpc
+from nameko.web.handlers import http
 
 
 class AdaptorService:
@@ -11,8 +12,16 @@ class AdaptorService:
         return message
 
     @rpc
-    def auth(self, username, password, host):
-        _client = wrappers.osm.OSMClient(username, password, host)
-        message = "Adaptor: Auth Token " + _client.auth_token
-        return message
+    def auth(self, username, password, host, mano):
+
+        if mano == "osm":
+            _client = wrappers.OSMClient.Auth(host)
+        elif mano == "sonata":
+            _client = wrappers.SONATAClient.Auth(host)
+        else:
+            return "Error"
+
+        response = _client.auth(username=username, password=password)
+        return response
+
 

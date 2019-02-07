@@ -5,9 +5,9 @@
 + `adaptor.py` - Entry point for utilizing the underlying wrappers
 
 + `wrappers` - Contains REST wrappers for MANO frameworks 
-    - `common_interface.py` - Starting point for implementation that defines an abstract base class according to the ETSI standard
-    - `osm.py` - REST wrapper for OpenSource Mano based
-    - `sonata.py` - REST wrapper for Sonata based
+    - `CommonInterfaces` - Starting point Python Module for implementation that defines an abstract base class according to the ETSI standard
+    - `OSMClient` - REST wrapper for OpenSource Mano based
+    - `SONATAClient` - REST wrapper for Sonata based
 
 + `tests` - Contains test cases for individual wrappers
 
@@ -26,4 +26,5 @@
 
 3. Run test cases from the container
     + Run `py.test` to execute all test cases
-    + Run `clear && py.test -s tests/test_osm.py::test_delete_ns_descriptors` to run specific test cases, in this case osm - test_delete_ns_descriptors
+    + Run `clear && py.test -s tests/osm/test_auth.py` to run all test cases in a file, in this case osm - test_auth.py
+    + Run `clear && py.test -s tests/osm/test_auth.py::test_auth` to run one specific test case in a file, in this case osm - test_auth
