@@ -13,7 +13,7 @@ COPY translator.py ./
 COPY Translator_main.py ./
 
 COPY hackfest_multivdu_nsd.yaml ./
-COPY recursive-example.yml ./
+COPY sonata-demo.yml ./
 
 RUN chmod +x ./start.sh
 

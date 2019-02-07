@@ -548,6 +548,7 @@ class insert_into_db():
                         [3,4,'monitoring-param','value-integer',1,2,'monitoring_parameters','metric'],
 
                             ]
+                            
         osm_sonata_vld_mapping= [
     
                         [3,4,'vld','id',1,2,'virtual_links','id'],
@@ -597,12 +598,16 @@ class insert_into_db():
         id = record.insert(temp)
 
 
-    def insert_nsd(self, record):
+    def insert_nsd(self, record,framework):
         
-        #osm=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
-        sonata=yaml.load(open(r"recursive-example.yml"), Loader=yaml.Loader)
+        if framework == 'osm':
+            nsd=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
         
-        id = record.insert(sonata)
+        elif framework == 'sonata':
+            nsd=yaml.load(open(r"sonata-demo.yml"), Loader=yaml.Loader)
+        
+        id = record.insert(nsd)
+        
         return id
     
 
@@ -610,10 +615,8 @@ class insert_into_db():
 
 class setup():
 
-    def test(self,received_ref, received_param):
+    def get_source_nsd(self,received_ref, received_param,db):
 
-        client = pymongo.MongoClient("mongodb://mongo:27017")
-        db = client["descriptors"]
         cursor = db.list_collection_names()
         for ref in cursor:
             doc = db.get_collection(ref)
@@ -649,7 +652,8 @@ class setup():
             translated_ref = temp.inserted_id
             return translated_ref
             
-        elif 'connection_points' in received_file:
+        elif 'descriptor_schema' and 'network_functions' in received_file:
+        
             doc = db["translated_nsd"]
             
             sonata = received_file
@@ -748,13 +752,16 @@ class setup():
             return translate_ref
 
 
-    def osm(self,file):
+    def osm(self,received_file):
     
-        received_file = file
         client = pymongo.MongoClient("mongodb://mongo:27017")
         db = client["descriptors"]
+        db2 = client.mapping_nsd
+        record = db2.nsd_test2
         
-        if 'constituent-vnfd' in received_file:
+        
+        if 'nsd:nsd-catalog' in received_file:
+        
             doc = db["translated_nsd"]
                 
             osm = received_file
@@ -783,8 +790,7 @@ class setup():
                 pass        
             
             map= transformation()
-            
-            
+           
             osm_sonata = pd.DataFrame.from_dict(t[0])
             osm_son_vld = pd.DataFrame.from_dict(t[1])
             osm_son_vnffgd = pd.DataFrame.from_dict(t[2])
@@ -818,29 +824,31 @@ class setup():
 
 
             df =map.ret_ds(osm_dataset,'vnffgd',4)
-            if not df.empty:
-                df_osm= map.osm_fwdg(df)
-                df_osm_vnffgd = pd.merge(df_osm,osm_son_vnffgd,
-                                 left_on=['key','parent_key','level','parent_level'],
-                                 right_on=['osm_key','osm_parent_key','osm_level','osm_parent_level'],how='inner')
-                df_osm_vnffgd =  df_osm_vnffgd[['son_parent_level','son_level','son_parent_key','son_key','value','id']]
-                df_osm_vnffgd.columns = ['parent_level','level','parent_key','key','value','id']
-                df_osm_vnffgd = df_osm_vnffgd.append(pd.DataFrame([[2,'network_forwarding_paths',3,'connection_points','NULL','NULL'],
-                                                                  [1,'forwarding_graphs',2,'network_forwarding_paths','NULL','NULL']],
-                                           columns = ['parent_level','parent_key','level','key','value','id']))
+            
+            #if not df.empty:
+            
+            df_osm= map.osm_fwdg(df)
+            df_osm_vnffgd = pd.merge(df_osm,osm_son_vnffgd,
+                             left_on=['key','parent_key','level','parent_level'],
+                             right_on=['osm_key','osm_parent_key','osm_level','osm_parent_level'],how='inner')
+            df_osm_vnffgd =  df_osm_vnffgd[['son_parent_level','son_level','son_parent_key','son_key','value','id']]
+            df_osm_vnffgd.columns = ['parent_level','level','parent_key','key','value','id']
+            df_osm_vnffgd = df_osm_vnffgd.append(pd.DataFrame([[2,'network_forwarding_paths',3,'connection_points','NULL','NULL'],
+                                                              [1,'forwarding_graphs',2,'network_forwarding_paths','NULL','NULL']],
+                                       columns = ['parent_level','parent_key','level','key','value','id']))
 
 
-                dataset = dataset.append(df_osm_vnffgd)
-                vl_val = dataset[(dataset['parent_key'] == 'virtual_links') & 
-                        (dataset['key'] == 'id')].groupby(['key']).agg({'value' : lambda x : list(x)})['value'][0]
-                nf_val = dataset[(dataset['parent_key'] == 'network_functions') & 
-                        (dataset['key'] == 'vnf_id')].groupby(['key']).agg({'value' : lambda x : list(x)})['value'][0]
+            dataset = dataset.append(df_osm_vnffgd)
+            vl_val = dataset[(dataset['parent_key'] == 'virtual_links') & 
+                    (dataset['key'] == 'id')].groupby(['key']).agg({'value' : lambda x : list(x)})['value'][0]
+            nf_val = dataset[(dataset['parent_key'] == 'network_functions') & 
+                    (dataset['key'] == 'vnf_id')].groupby(['key']).agg({'value' : lambda x : list(x)})['value'][0]
 
-                dataset = dataset.append(pd.DataFrame([[1,'forwarding_graphs',2,'constituent_virtual_links',vl_val,1],
-                                                       [1,'forwarding_graphs',2,'constituent_vnfs',nf_val,1],
-                                                        [1,'forwarding_graphs',2,'number_of_virtual_links',len(vl_val),1],
-                                            ],
-                                           columns = ['parent_level','parent_key','level','key','value','id']))
+            dataset = dataset.append(pd.DataFrame([[1,'forwarding_graphs',2,'constituent_virtual_links',vl_val,1],
+                                                   [1,'forwarding_graphs',2,'constituent_vnfs',nf_val,1],
+                                                    [1,'forwarding_graphs',2,'number_of_virtual_links',len(vl_val),1],
+                                        ],
+                                       columns = ['parent_level','parent_key','level','key','value','id']))
 
 
             writer = write_dict()
@@ -859,6 +867,7 @@ class setup():
             translated = check1()
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
+            
             return translated_ref
     
 class TranslatorService():
@@ -870,20 +879,35 @@ class TranslatorService():
         
         client = pymongo.MongoClient("mongodb://mongo:27017/")
         db = client["descriptors"]
-        param = name#"sonata_to_osm"
-    
+            
         check = db["source_nsd"]
         ref = [i.get('_id') for i in check.find()]
         
         set = setup()
         
-        if len(ref) == 0:
-            insert = insert_into_db()
-            ref= insert.insert_nsd(check)
-            var = set.test(ref, param)
+        if name == 'sonata_to_osm':
             
-        else:      
-            var = set.test(ref[0], param)
+            if len(ref) == 0:
+
+                insert = insert_into_db()
+                ref= insert.insert_nsd(check,'sonata')
+                var = set.get_source_nsd(ref, name,db)
+                
+            else:      
+            
+                var = set.get_source_nsd(ref[0], name,db)
+                
+        elif name == 'osm_to_sonata':
+            
+            if len(ref) == 0:
+            
+                insert = insert_into_db()
+                ref= insert.insert_nsd(check,'osm')
+                var = set.get_source_nsd(ref, name,db)
+            
+            else:      
+            
+                var = set.get_source_nsd(ref[0], name,db)
 
         return str(var)
 
