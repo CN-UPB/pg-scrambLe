@@ -1,21 +1,26 @@
-#from nameko.rpc import rpc
+from nameko.rpc import rpc
 import SonataSchema as SS
 import UtilityFunctions as utilityFunctions
 import yaml
 
 
+NSDs = []
+network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
+old_new_link_mapping = []
+
+
 class SplitterService:
     name = "splitter_service"
 
+    @rpc
     def hello(self, name):
-        message = "Splitter: Hello " + name
-        return message
-
-
-NSDs = []
-
-network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
-old_new_link_mapping = []
+        set_connection_point_refs_for_virtual_functions()
+        split_network_function()
+        set_connection_points()
+        split_virtual_links()
+        split_forwarding_path()
+        create_files()
+        return "Success"
 
 
 def get_network_function_object(vnf_name):
@@ -186,13 +191,6 @@ def split_forwarding_path():
         NSDs[i] = nsd_fg
 
 
-set_connection_point_refs_for_virtual_functions()
-split_network_function()
-set_connection_points()
-split_virtual_links()
-split_forwarding_path()
-
-
 def create_files():
     for i in range(len(NSDs)):
         data = {}
@@ -262,5 +260,3 @@ def create_files():
             yaml.dump(data, outfile, default_flow_style=False)
             print("Created NSD_" + str(i))
 
-
-create_files()
