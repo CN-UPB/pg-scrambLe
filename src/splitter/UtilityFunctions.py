@@ -1,4 +1,4 @@
-import src.splitter.SonataSchema as sonataSchema
+import SonataSchema as sonataSchema
 import yaml
 
 list_nf = []
