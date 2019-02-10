@@ -38,16 +38,16 @@ class CommonInterfaceNsd(ABC):
         pass
 
     @abstractmethod
-    def get_ns_descriptors_nsd_content(self, nsdInfoId):
-        """ NSD Management Interface - Individual NS Descriptor
+    def get_ns_descriptors_nsdinfoid(self):
+        """ NSD Management Interface -  Individual NS Descriptor
 
-        /ns_descriptors/{nsdInfoId}
-            GET - Fetch the content of NSD
-        """
+              Read information about an individual NS
+                descriptor resource.
+              """
         pass
 
     @abstractmethod
-    def patch_ns_descriptors_nsd_content(self):
+    def patch_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface - Individual NS Descriptor
 
         /ns_descriptors/{nsdInfoId}
@@ -57,12 +57,20 @@ class CommonInterfaceNsd(ABC):
         """
         pass
 
-    @abstractmethod
-    def delete_ns_descriptors(self):
+    def delete_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface - Individual NS Descriptor
 
         /ns_descriptors/{nsdInfoId}
             DELETE - Delete the content of NSD
+        """
+        pass
+
+    @abstractmethod
+    def get_ns_descriptors_nsd_content(self):
+        """ NSD Management Interface - NSD Content
+        
+        /ns_descriptors/{nsdInfoId}/nsd_c
+            GET - Fetch the content of a NSD.
         """
         pass
 

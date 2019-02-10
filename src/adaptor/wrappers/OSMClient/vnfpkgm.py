@@ -23,7 +23,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         if _filter:
             query_path = '?_admin.type='+_filter
 
-        _endpoint = "{0}/vnfpkgm/v1/vnf_packages_content{1}".format(base_path, query_path)
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages_content".format(base_path, query_path)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                     'Authorization': 'Bearer {}'.format(token)}
@@ -74,7 +74,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result = {'error': True, 'data': ''}
         headers = {'Content-Type': 'application/yaml',
                         'Authorization': 'Bearer {}'.format(token)}
-        _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(base_path, id)
+        _endpoint = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(base_path, id)
         try:
             r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
@@ -124,7 +124,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
        
 
  
-    def get_vnf_packages_vnfpkgid_vnfd(self, token, id , _filter=None, host=None, port=None):
+    def get_vnf_packages_vnfpkgid_vnfd(self, token, id , host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -146,7 +146,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result['data'] = r.text
         return json.dumps(result)
 
-    def get_vnf_packages_vnfpkgid_package_content(self, token, id , _filter=None, host=None, port=None):
+    def get_vnf_packages_vnfpkgid_package_content(self, token, id ,host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -175,15 +175,6 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result = {'error': True, 'data': ''}
         
-        # get the package onboarded
-        # tar_pkg = json.loads(self.get_vnf_packages_vnfpkgid_package_content(token, id))
-        # with open("/tmp/{0}.tar.gz".format("test"), "w") as tar_file:
-            # tar_file.write(tar_pkg["data"])
-        
-        
-        # tarf = tarfile.open("/tmp/{0}.tar.gz".format("test"), "w:gz")
-
-        # tarf = Helpers._descriptor_update(tarf, data_path)
         headers = {"Content-Type": "application/gzip", "accept": "application/json",
                     'Authorization': 'Bearer {}'.format(token),
                     'Content-File-MD5': Helpers.md5(open(data_path, 'rb'))}

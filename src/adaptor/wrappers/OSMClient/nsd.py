@@ -61,16 +61,28 @@ class Nsd(CommonInterfaceNsd):
 
         result['data'] = r.text
         return json.dumps(result)
-        pass
 
-    def get_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
+    def get_ns_descriptors_nsdinfoid(self, token, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd".format(base_path, id)
+        result = {'error': True, 'data': ''}
+        headers = {'Content-Type': 'application/yaml',
+                    'Authorization': 'Bearer {}'.format(token)}  
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+            
+        result['data'] = r.text
+        return json.dumps(result)
 
-              Upload the content of NSD
-              """
-        pass
-
-    def patch_ns_descriptors_nsd_content(self):
+    def patch_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface - Individual NS Descriptor
 
         /ns_descriptors/{nsdInfoId}
@@ -80,14 +92,7 @@ class Nsd(CommonInterfaceNsd):
         """
         pass
 
-    def put_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
-
-        Upload the content of NSD
-        """
-        pass
-
-    def delete_ns_descriptors(self, token, id, host=None, port=None):
+    def delete_ns_descriptors_nsdinfoid(self, token, id, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -109,6 +114,56 @@ class Nsd(CommonInterfaceNsd):
 
         result['data'] = r.text
         return json.dumps(result)
+    
+
+    def get_ns_descriptors_nsd_content(self, token, id ,host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"accept": "application/zip",
+                    'Authorization': 'Bearer {}'.format(token)}
+
+        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(base_path, id)
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+    def put_ns_descriptors_nsd_content(self, token, data_path, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/gzip", "accept": "application/json",
+                        'Authorization': 'Bearer {}'.format(token),
+                        'Content-File-MD5': Helpers.md5(open(data_path, 'rb'))}
+
+        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(base_path, id)
+
+        try:
+            r = requests.put(_endpoint, data=open(data_path, 'rb'), verify=False,
+                                headers=headers)
+        except Exception as e:
+                result['data'] = str(e)
+                return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+
+    
 
         ###################################
         # VNF Package Management Interfaces

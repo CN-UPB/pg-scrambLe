@@ -23,18 +23,18 @@ def test_post_vnf_packages(post_vnf_packages_keys):
     
 
 def test_get_vnf_packages(get_vnf_packages_keys):
-	"""Tests API call to fetch multiple NS descriptor resources"""
-	osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
-	osm_auth = OSMClient.Auth(HOST_URL)
-	_token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
-	_token = json.loads(_token["data"])
+    """Tests API call to fetch multiple NS descriptor resources"""
+    osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
 
-	response = json.loads(osm_vnfpkgm.get_vnf_packages(token=_token["id"]))
-	response = json.loads(response["data"])
-	assert isinstance(response, list)
-	if len(response) > 0:
-		assert set(get_vnf_packages_keys).issubset(
-					response[0].keys()), "All keys should be in the response"
+    response = json.loads(osm_vnfpkgm.get_vnf_packages(token=_token["id"]))
+    response = json.loads(response["data"])
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_vnf_packages_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
 
 def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
     """Tests API call to onboard VNF descriptor resources"""

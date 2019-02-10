@@ -13,7 +13,7 @@ def get_ns_descriptors_keys():
                 'vendor', 'id', 'version']
 
 @fixture
-def delete_ns_descriptors_keys():
+def delete_ns_descriptors_nsdinfoid_keys():
     return ['']
 
 @fixture
@@ -22,9 +22,7 @@ def post_ns_descriptors_keys():
 
 @fixture
 def get_vnf_packages_keys():
-    return ['logo', 'connection-point', 'name', 'mgmt-interface', 
-                'short-name', 'vendor', 'id', '_id', '_admin', 
-                'description', 'vdu', 'version']
+    return ['name', 'id', '_id', 'description']
 
 @fixture
 def post_vnf_packages_keys():
