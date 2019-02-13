@@ -31,6 +31,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         except Exception as e:
             result['data'] = str(e)
             return result
+
         if r.status_code == requests.codes.ok:
             result['error'] = False
         
@@ -45,7 +46,8 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
             base_path = self._base_path.format(host, port)
 
         result = {'error': True, 'data': ''}
-        headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
+        headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token)}
         _endpoint = "{0}/catalogues/api/v2/vnfs".format(base_path)
         try:
             r = requests.post(_endpoint, data=open(package_path, 'rb'), verify=False, headers=headers)
@@ -56,28 +58,31 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
             result['error'] = False
 
         result['data'] = r.text
-        return yaml.dump(result)
+        print(r.text)
+        return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid(self, token, id, host=None, port=None):
-        pass
-        # if host is None:
-        #     base_path = self._base_path.format(self._host, self._port)
-        # else:
-        #     base_path = self._base_path.format(host, port)
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+       
+        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path,query_path)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
-        # result = {'error': True, 'data': ''}
-        # headers = {'Content-Type': 'application/x-yaml', 'Authorization': 'Bearer {}'.format(token)}
-        # _endpoint = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(base_path, id)
-        # try:
-        #     r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
-        # except Exception as e:
-        #     result['data'] = str(e)
-        #     return result
-        # if r.status_code == requests.codes.ok:
-        #     result['error'] = False
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
 
-        # result['data'] = r.text
-        # return json.dumps(result)
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+        
+        result['data'] = r.text
+        return json.dumps(result)
+        
 
     def patch_vnf_packages_vnfpkgid(self, vnfPkgId):
         """ VNF Package Management Interface - 
@@ -110,7 +115,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
             result['error'] = False
 
         result['data'] = r.text
-        return yaml.dump(result)
+        return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid_vnfd(self, vnfPkgId):
         """ VNF Package Management Interface - 

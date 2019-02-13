@@ -5,23 +5,22 @@ from wrappers import SONATAClient
 from pytest import fixture
 from .sonata_fixture import * 
 from .config import *
+from wrappers.SONATAClient.helpers import Helpers
 
 
 def test_post_vnf_packages(post_vnf_packages_keys):
 	"""Tests API call to onboard VNF descriptor resources"""
+	Helpers._delete_test_vnf()
 	sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
 	sonata_auth = SONATAClient.Auth(HOST_URL)
 
 	_token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
 	_token = json.loads(_token["data"])
-	import pdb; pdb.set_trace()
 	response = json.loads(sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
 						package_path="samples/vnfd_example.yml"))
-	response = json.loads(response["data"])
-	print(response)
-	assert isinstance(response, dict)
-	assert set(post_vnf_packages_keys).issubset(
-					response.keys()), "All keys should be in the response"
+	
+	assert response['error'] == True
+	assert response['data'] != ''
     
 
 def test_get_vnf_packages(get_vnf_packages_keys):
@@ -52,11 +51,13 @@ def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
 
     _vnfd = None
     for _v in _vnfd_list:
-        if "test_osm_cirros_vnfd" == _v['uuid']:            
+        if "vnfd_example" == _v['uuid']:            
             _vnfd = _v['uuid']
 
     response = None
     if _vnfd:
-        response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+        response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
+
+	

@@ -26,11 +26,15 @@ def post_vnf_packages_keys():
     return ['id']
 
 @fixture
-def get_vnf_packages_vnfpkgid_keys():
-    return ['id']
+def delete_ns_descriptors_nsdinfoid_keys():
+    return ['']
 
 @fixture
 def delete_vnf_packages_vnfpkgid_keys():
     return ['']
+
+@fixture
+def get_vnf_packages_vnfpkgid_keys():
+    return ['id']
 
                 
