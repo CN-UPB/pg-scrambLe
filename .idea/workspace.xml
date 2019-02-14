@@ -13,10 +13,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/splitter/splitter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
+            <state relative-caret-position="-905">
               <caret line="196" column="27" selection-start-line="196" selection-start-column="27" selection-end-line="196" selection-end-column="27" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
@@ -25,7 +25,23 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/splitter/OsmNsdSchema.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="302">
+              <caret line="58" selection-start-line="58" selection-end-line="58" />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="UPDATE_TYPE" value="REBASE" />
@@ -38,6 +54,8 @@
         <option value="$PROJECT_DIR$/src/splitter/UtilityFunctions.py" />
         <option value="$PROJECT_DIR$/src/translator/Dockerfile" />
         <option value="$PROJECT_DIR$/src/splitter/splitter.py" />
+        <option value="$PROJECT_DIR$/src/splitter/NSDs/OsmNSDSchema.py" />
+        <option value="$PROJECT_DIR$/src/splitter/OsmNSDSchema.py" />
       </list>
     </option>
   </component>
@@ -70,6 +88,13 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="splitter" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="pg-scrambLe.git" type="b2602c69:ProjectViewProjectNode" />
+              <item name="pg-scrambLe.git" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="splitter" type="462c0819:PsiDirectoryNode" />
+              <item name="NSDs" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -82,6 +107,9 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Paderborn\project\Implementation\pg-scrambLe\pg-scrambLe.git\src\splitter" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/splitter/NSDs" />
       <recent name="$PROJECT_DIR$/src/splitter" />
@@ -179,7 +207,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15848215" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -309,7 +336,7 @@
     <entry file="file://$PROJECT_DIR$/src/splitter/NSD_0.yml" />
     <entry file="file://$PROJECT_DIR$/src/splitter/splitter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
+        <state relative-caret-position="-905">
           <caret line="196" column="27" selection-start-line="196" selection-start-column="27" selection-end-line="196" selection-end-column="27" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
@@ -346,6 +373,13 @@
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/OsmNsdSchema.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="58" selection-start-line="58" selection-end-line="58" />
         </state>
       </provider>
     </entry>
