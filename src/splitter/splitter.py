@@ -1,6 +1,7 @@
 from nameko.rpc import rpc
 import SonataSchema as SS
 import UtilityFunctions as utilityFunctions
+from collections import OrderedDict
 import yaml
 
 
@@ -193,7 +194,7 @@ def split_forwarding_path():
 
 def create_files():
     for i in range(len(NSDs)):
-        data = {}
+        data = OrderedDict()
         data['descriptor_version'] = NSDs[i].descriptor_version
         data['vendor'] = NSDs[i].vendor
         data['name'] = NSDs[i].name
@@ -205,7 +206,7 @@ def create_files():
         for network_function in NSDs[i].networkFunctions:
             data['network_functions'].append({
                 "vnf_id": network_function.vnf_id,
-                "vnf__name": network_function.vnf_name,
+                "vnf_name": network_function.vnf_name,
                 "vnf_vendor": network_function.vnf_vendor,
                 "vnf_version": network_function.vnf_version
             })
