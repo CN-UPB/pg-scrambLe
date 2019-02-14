@@ -4,7 +4,6 @@ import json
 import requests
 import tarfile
 
-
 class VnfPkgm(CommonInterfaceVnfPkgm):
     
     def __init__(self, host, port=9999):
@@ -38,8 +37,6 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         
         result['data'] = r.text
         return json.dumps(result)
-
-
   
     def post_vnf_packages(self, token, package_path, host=None, port=None):
         if host is None:
@@ -62,8 +59,6 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result['data'] = r.text
         return json.dumps(result)
-        
-
 
     def get_vnf_packages_vnfpkgid(self, token, id, host=None, port=None):
         if host is None:
@@ -85,7 +80,6 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result['data'] = r.text
         return json.dumps(result)
-
     
     def patch_vnf_packages_vnfpkgid(self, vnfPkgId):
         """ VNF Package Management Interface - 
@@ -96,8 +90,8 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
                     individual VNF package
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
     
     def delete_vnf_packages_vnfpkgid(self, token, id, host=None, port=None):
         if host is None:
@@ -120,9 +114,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
             result['error'] = False
 
         result['data'] = r.text
-        return json.dumps(result)
-       
-
+        return json.dumps(result)       
  
     def get_vnf_packages_vnfpkgid_vnfd(self, token, id , host=None, port=None):
         if host is None:
@@ -192,8 +184,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result['data'] = r.text
         return json.dumps(result)
-    
-    
+        
     def post_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
         """ VNF Package Management Interface - 
                 Upload VNF package from URI task
@@ -203,8 +194,8 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
                     the address information of the VNF package
    
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
     
     def get_vnf_packages_vnfpkgid_artifacts_artifactpath(self, token, id , host=None, port=None):
         if host is None:
@@ -236,8 +227,8 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
             GET - Query multiple subscriptions
    
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
   
     def post_vnf_packages_subscriptions(self):
         """ VNF Package Management Interface - 
@@ -248,5 +239,5 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
                 to on-boarding and/or changes of VNF packages
    
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)

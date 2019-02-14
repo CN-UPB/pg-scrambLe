@@ -11,7 +11,6 @@ class Auth(CommonInterfaceAuth):
         self._base_path = 'https://{0}:{1}/osm'
         self._user_endpoint = '{0}/admin/v1/users'
 
-
     def auth(self, username, password, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)

@@ -5,8 +5,7 @@ from wrappers import SONATAClient
 from pytest import fixture
 from .sonata_fixture import * 
 from .config import *
-from wrappers.SONATAClient.helpers import Helpers
-
+from .helpers import Helpers
 
 def test_post_vnf_packages(post_vnf_packages_keys):
 	"""Tests API call to onboard VNF descriptor resources"""

@@ -1,8 +1,8 @@
 import json
 from wrappers import SONATAClient 
-from wrappers.SONATAClient.nsd import Nsd
 from wrappers.SONATAClient.auth import Auth
 from wrappers.SONATAClient.vnfpkgm import VnfPkgm
+from wrappers.SONATAClient.nsd import Nsd
 from tests.sonata.config import *
 import time
 class Helpers():
@@ -15,13 +15,13 @@ class Helpers():
 
         response = json.loads(sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
                             package_path="samples/vnfd_example.yml"))
-        #print(response)
+        
         if response["error"]:
             return True
         else:
             return False
 
-    def _delete_test_vnf():
+    def _delete_test_vnf(vnfname="vnfd_example"):
         sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
         sonata_auth = SONATAClient.Auth(HOST_URL)
         _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -55,8 +55,6 @@ class Helpers():
             return True
         else:
             return False
-
-
 
     def _delete_test_nsd(nsdname="sonata-demo"):
         sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)

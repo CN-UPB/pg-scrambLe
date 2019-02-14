@@ -3,7 +3,6 @@ from .helpers import Helpers
 import json
 import requests
 
-
 class Nsd(CommonInterfaceNsd):
 
     def __init__(self, host, port=9999):
@@ -11,7 +10,6 @@ class Nsd(CommonInterfaceNsd):
         self._port = port
         self._base_path = 'https://{0}:{1}/osm'
         self._user_endpoint = '{0}/admin/v1/users'
-
 
     def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
             if host is None:
@@ -90,7 +88,8 @@ class Nsd(CommonInterfaceNsd):
                 the user defined data of an individual
                 NS descriptor resource.
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def delete_ns_descriptors_nsdinfoid(self, token, id, host=None, port=None):
         if host is None:
@@ -115,7 +114,6 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text
         return json.dumps(result)
     
-
     def get_ns_descriptors_nsd_content(self, token, id ,host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
@@ -162,16 +160,6 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text
         return json.dumps(result)
 
-
-    
-
-        ###################################
-        # VNF Package Management Interfaces
-
-        # Base: {apiRoot}/vnfpkgm/v1
-        ###################################
-
-
     def get_pnf_descriptors(self):
         """ NSD Management interface -
                 PNF Descriptors
@@ -181,9 +169,9 @@ class Nsd(CommonInterfaceNsd):
                 PNF descriptor resources.
 
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
-   
     def post_pnf_descriptors(self):
         """ NSD Management interface -
                 PNF Descriptors
@@ -192,8 +180,8 @@ class Nsd(CommonInterfaceNsd):
             POST - Create a new PNF descriptor resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
  
     def get_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
@@ -203,8 +191,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Read an individual PNFD resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
  
     def patch_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
@@ -215,8 +203,8 @@ class Nsd(CommonInterfaceNsd):
                         individual PNF descriptor resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
     
     def delete_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
@@ -226,8 +214,8 @@ class Nsd(CommonInterfaceNsd):
             DELETE - Delete an individual PNF descriptor resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def get_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
@@ -237,8 +225,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Fetch the content of a PNFD.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def put_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
@@ -248,8 +236,8 @@ class Nsd(CommonInterfaceNsd):
             PUT - Upload the content of a PNFD.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def post_subscriptions(self, pnfdInfoId):
         """ NSD Management interface -
@@ -259,8 +247,8 @@ class Nsd(CommonInterfaceNsd):
             POST - Subscribe to NSD and PNFD change notifications.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def get_subscriptions(self, subscriptionId):
         """ NSD Management interface -
@@ -270,8 +258,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Query multiple subscriptions.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
   
     def get_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
@@ -281,8 +269,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Read an individual subscription resource
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def delete_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
@@ -292,4 +280,5 @@ class Nsd(CommonInterfaceNsd):
             DELETE - Terminate a subscription.
 
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)

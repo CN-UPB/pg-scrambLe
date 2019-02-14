@@ -1,6 +1,4 @@
-from wrappers.SONATAClient.nsd import Nsd
-from wrappers.SONATAClient.auth import Auth
-from wrappers.SONATAClient.vnfpkgm import VnfPkgm
+from wrappers import SONATAClient 
 from pytest import fixture
 from .sonata_fixture import * 
 from .config import *
@@ -11,10 +9,10 @@ from .helpers import Helpers
 
 def test_post_ns_descriptors(post_ns_descriptors_keys):
     """Tests API call to onboard NS descriptor resources"""
-    sonata_vnfpkgm = VnfPkgm(HOST_URL)
+    sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
     Helpers._delete_test_nsd()
-    sonata_nsd = Nsd(HOST_URL)
-    sonata_auth = Auth(HOST_URL)
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
 
@@ -23,16 +21,15 @@ def test_post_ns_descriptors(post_ns_descriptors_keys):
 
     response = json.loads(sonata_nsd.post_ns_descriptors(token=_token["token"]["access_token"],
                         package_path="samples/nsd_example.yml"))
-    #print(response)
+
     assert response['error'] == False
     assert response['data'] != ''
 
 def test_get_ns_descriptors(get_ns_descriptors_keys):
     """Tests API call to fetch multiple NS descriptor resources"""
-    sonata_nsd = Nsd(HOST_URL)
-    sonata_auth = Auth(HOST_URL)
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-    # print(_token)
     _token = json.loads(_token["data"])
 
     response = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
@@ -45,26 +42,20 @@ def test_get_ns_descriptors(get_ns_descriptors_keys):
 
 def test_delete_ns_descriptors(delete_ns_descriptors_keys):
     """Tests API call to delete NS descriptor resources"""
-    sonata_vnfpkgm = VnfPkgm(HOST_URL)
-    sonata_nsd = Nsd(HOST_URL)
-    sonata_auth = Auth(HOST_URL)
+    sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     
     _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
     _nsd_list = json.loads(_nsd_list["data"])
-    #print(_nsd_list)
-    
     _nsd = None
+
     for _n in _nsd_list:
-        # print(_n) 
-        # print("\n\n\n\n")
-        # print(_n['nsd']['name'])    
         if "sonata-demo" == _n['nsd']['name']:
-            
             _nsd = _n['uuid']
                    
-    #print(_nsd)
     time.sleep(10) # Wait for NSD onboarding
     response = json.loads(sonata_nsd.delete_ns_descriptors(token=_token["token"]["access_token"], id=_nsd))
     assert isinstance(response, dict)
@@ -89,8 +80,8 @@ def test_delete_ns_descriptors(delete_ns_descriptors_keys):
 
 def test_get_ns_descriptors_nsdinfoid():
     """Tests API call to read information about an  NS descriptor resources"""
-    sonata_nsd = Nsd(HOST_URL)
-    sonata_auth = Auth(HOST_URL)
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     Helpers._upload_test_nsd()
@@ -110,9 +101,9 @@ def test_get_ns_descriptors_nsdinfoid():
 
 def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
     """Tests API call to delete NS descriptor resources"""
-    sonata_vnfpkgm = VnfPkgm(HOST_URL)
-    sonata_nsd = Nsd(HOST_URL)
-    sonata_auth = Auth(HOST_URL)
+    sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     

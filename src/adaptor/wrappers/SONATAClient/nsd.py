@@ -3,7 +3,6 @@ import json
 import yaml
 import requests
 
-
 class Nsd(CommonInterfaceNsd):
 
     def __init__(self, host, port=4002):
@@ -12,32 +11,31 @@ class Nsd(CommonInterfaceNsd):
         self._base_path = 'http://{0}:{1}'
         self._user_endpoint = '{0}'
 
-
     def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
-            if host is None:
-                base_path = "http://{0}:{1}".format(self._host, self._port)
-            else:
-                base_path = "http://{0}:{1}".format(host, port)
+        if host is None:
+            base_path = "http://{0}:{1}".format(self._host, self._port)
+        else:
+            base_path = "http://{0}:{1}".format(host, port)
 
-            query_path = ''
-            if _filter:
-                query_path = '?_admin.type=' + _filter
+        query_path = ''
+        if _filter:
+            query_path = '?_admin.type=' + _filter
 
-            _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, query_path)
-            result = {'error': True, 'data': ''}
-            headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, query_path)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
-            try:
-                r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
-            except Exception as e:
-                result['data'] = str(e)
-                return result
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
 
-            if r.status_code == requests.codes.ok:
-                result['error'] = False
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
 
-            result['data'] = r.text
-            return json.dumps(result)
+        result['data'] = r.text
+        return json.dumps(result)
 
     def post_ns_descriptors(self, token, package_path, host=None, port=None):
         if host is None:
@@ -60,13 +58,13 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text
         return json.dumps(result)
         
-
     def get_ns_descriptors_nsd_content(self):
         """ NSD Management Interface - Upload NSD
 
               Upload the content of NSD
               """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def patch_ns_descriptors_nsd_content(self):
         """ NSD Management Interface - Individual NS Descriptor
@@ -76,14 +74,16 @@ class Nsd(CommonInterfaceNsd):
                 the user defined data of an individual
                 NS descriptor resource.
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def put_ns_descriptors_nsd_content(self):
         """ NSD Management Interface - Upload NSD
 
         Upload the content of NSD
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def delete_ns_descriptors(self, token, id, host=None, port=None):
         if host is None:
@@ -104,12 +104,8 @@ class Nsd(CommonInterfaceNsd):
         if r.status_code == requests.codes.no_content:
             result['error'] = False
 
-        result['data'] = r.text
-        print(r.text)
-        
-        return json.dumps(result)
-
-        
+        result['data'] = r.text        
+        return json.dumps(result)        
 
     def get_ns_descriptors_nsdinfoid(self, token, _filter=None, host=None, port=None):
         if host is None:
@@ -132,11 +128,10 @@ class Nsd(CommonInterfaceNsd):
 
         result['data'] = r.text
         return json.dumps(result)
-
         
     def patch_ns_descriptors_nsdinfoid(self):
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def get_pnf_descriptors(self):
         """ NSD Management interface -
@@ -147,8 +142,8 @@ class Nsd(CommonInterfaceNsd):
                 PNF descriptor resources.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
    
     def post_pnf_descriptors(self):
         """ NSD Management interface -
@@ -158,8 +153,8 @@ class Nsd(CommonInterfaceNsd):
             POST - Create a new PNF descriptor resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
  
     def get_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
@@ -169,9 +164,9 @@ class Nsd(CommonInterfaceNsd):
             GET - Read an individual PNFD resource.
 
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
- 
     def patch_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
                 Individual PNF Descriptor
@@ -181,8 +176,8 @@ class Nsd(CommonInterfaceNsd):
                         individual PNF descriptor resource.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
     
     def delete_pnf_descriptors_pnfdinfoid(self, token, id, host=None, port=None):
         if host is None:
@@ -206,7 +201,6 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text
         return json.dumps(result)
 
-
     def get_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
                 PNFD Content
@@ -215,8 +209,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Fetch the content of a PNFD.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def put_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
@@ -226,8 +220,8 @@ class Nsd(CommonInterfaceNsd):
             PUT - Upload the content of a PNFD.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def post_subscriptions(self, pnfdInfoId):
         """ NSD Management interface -
@@ -237,8 +231,8 @@ class Nsd(CommonInterfaceNsd):
             POST - Subscribe to NSD and PNFD change notifications.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def get_subscriptions(self, subscriptionId):
         """ NSD Management interface -
@@ -248,8 +242,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Query multiple subscriptions.
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
   
     def get_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
@@ -259,8 +253,8 @@ class Nsd(CommonInterfaceNsd):
             GET - Read an individual subscription resource
 
         """
-        pass
-
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
     def delete_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
@@ -270,4 +264,5 @@ class Nsd(CommonInterfaceNsd):
             DELETE - Terminate a subscription.
 
         """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
