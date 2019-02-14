@@ -1,14 +1,16 @@
 class Vld:
     id = ""
     name = ""
+    short_name = ""   #optional
     type = ""
     mgmt_network = ""
-    vim_network_name = ""
+    vim_network_name = ""  #optional
     vnfd_connection_point_ref = []
 
-    def __init__(self, id, name, type, mgmt_network, vim_network_name, vnfd_connection_point_ref):
+    def __init__(self, id, name, short_name, type, mgmt_network, vim_network_name, vnfd_connection_point_ref):
         self.id = id
         self.name = name
+        self.short_name = short_name
         self.type = type
         self.mgmt_network = mgmt_network
         self.vim_network_name = vim_network_name
@@ -40,19 +42,23 @@ class ConstituentVnfd:
 
 
 class Nsd:
-    ConstituentVnfd = []
     id = ""
     name = ""
     short_name = ""
     description = ""
     vendor = ""
+    version = "" #optional
+    logo = "" #optional
+    ConstituentVnfd = []
     vld = []
 
-    def __init__(self,ConstituentVnfd,id, name, short_name, description, vendor, vld):
+    def __init__(self,id, name, short_name, description, vendor, version, logo, ConstituentVnfd, vld):
         self.id = id
-        self.ConstituentVnfd = ConstituentVnfd
         self.name = name
         self.short_name = short_name
         self.description = description
         self.vendor = vendor
+        self.version = version
+        self.logo = logo
+        self.ConstituentVnfd = ConstituentVnfd
         self.vld = vld
