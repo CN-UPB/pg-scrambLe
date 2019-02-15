@@ -1,149 +1,212 @@
+class MainVnfd:
+    vnfd = []
+    def __init__(self,vnfd):
+        self.vnfd = vnfd
+
 class Vnfd:
-    descriptor_version = ""
+    id = ""
+    name = ""
+    short_name = ""
+    description = ""
     vendor = ""
-    name = ""
+    logo = ""
     version = ""
-    author = ""
-    description = ""
-    function_specific_managers = []
-    virtual_deployment_units = []
-    virtual_links = []
-    connection_points = []
-    monitoring_rules = []
+    connection_point = []
+    internal_vld = [] #optional
+    mgmt_interface = []
+    vdu = []
+    vnf_configuration = []
 
-
-    def __init__(self, descriptor_version, vendor, name, version, author, description, function_specific_managers, virtual_deployment_units, virtual_links, connection_points, monitoring_rules):
-        self.descriptor_version = descriptor_version
+    def __init__(self, id, name, short_name, description, vendor, logo, version, connection_point, internal_vld , mgmt_interface,  vdu, vnf_configuration):
+        self.id = id
+        self.name = name
+        self.short_name = short_name
+        self.description = description
         self.vendor = vendor
-        self.name = name
+        self.logo = logo
         self.version = version
-        self.author = author
-        self.description = description
-        self.function_specific_managers = function_specific_managers
-        self.virtual_deployment_units = virtual_deployment_units
-        self.virtual_links = virtual_links
-        self.connection_points = connection_points
-        self.monitoring_rules = monitoring_rules
+        self.connection_point = connection_point
+        self.internal_vld = internal_vld
+        self.mgmt_interface = mgmt_interface
+        self.vdu = vdu
+        self.vnf_configuration = vnf_configuration
 
+class ConnectionPoint:
+    id = ""  #optional
+    name = ""
+    short_name = ""
+    type = ""
+    def __init__(self, name, type, id,  short_name):
+        self.name = name
+        self.type = type
+        self.id = id
+        self.short_name = short_name
 
-class function_specific_managers:
+class InternalVld:
     id = ""
-    description = ""
+    name = ""
+    short_name = ""
+    type = ""
+    internal_connection_point = []
+    def __init__(self, id, name, short_name, type, internal_connection_point):
+        self.id = id
+        self.name = name
+        self.short_name = short_name
+        self.type = type
+        self.internal_connection_point = internal_connection_point
+class InternalConnectionPoint:
+    id_ref = ""
+    id_ref1 = ""
+    def __init__(self, id_ref, id_ref1):
+        self.id_ref = id_ref
+        self.id_ref1 = id_ref
+
+
+
+
+class MgmtInterface:
+    cp = ""
+    def __init__(self, cp):
+        self.cp = cp
+
+class Vdu:
+    id = ""
+    name = ""
+    description = "" #optional
+    count = 0
+    vm_flavor = []
+    guest_epa = []
     image = ""
-    options = []
-    resource_requirements = []
-
-    def __init__(self, id, description, image, options, resource_requirements):
+    interface = []
+    internal_connection_point = []
+    cloud_init_file = ""
+    def __init__(self, id, name, description, count, vm_flavor, guest_epa, image, interface, cloud_init_file):
         self.id = id
+        self.name = name
         self.description = description
+        self.count = count
+        self.vm_flavor = vm_flavor
+        self.guest_epa = guest_epa
         self.image = image
-        self.options = options
-        self.resource_requirements = resource_requirements
-
-
-class virtual_deployment_units:
-    id = ""
-    vm_image = ""
-    vm_image_format = ""
-    resource_requirements = []
-    memory = []
-    storage = []
-    monitoring_parameters = []
-    connection_points = []
-
-    def __init__(self, id, vm_image, vm_image_format, resource_requirements, memory, storage, monitoring_parameters, connection_points):
-        self.id = id
-        self.vm_image = vm_image
-        self.vm_image_format = vm_image_format
-        self.resource_requirements = resource_requirements
-        self.memory = memory
-        self.storage = storage
-        self.monitoring_parameters = monitoring_parameters
-        self.connection_points = connection_points
-
-
-
-class ResourceRequirements:
-    cpu = []
-    def __init__(self, cpu):
-        self.cpu = cpu
-
-class memory:
-    size = 0
-    size_unit = ""
-    def __init__(self, size, size_unit):
-        self.size = size_unit
-        self.size_unit = size_unit
-
-class Storage:
-    size = 0
-    size_unit = ""
-    def __init__(self, size, size_unit):
-        self.seze = size
-        self.size_unit = size_unit
-
-class MonitoringParameters:
-    name = ""
-    unit = ""
-    def __init__(self, name):
-        self.name = name
-        self.unit = unit
-
-class ConnectionPoints:
-    id = ""
-    interface = ""
-    type = ""
-    def __init__(self, interface, type):
         self.interface = interface
+        self.cloud_init_file = cloud_init_file
+
+
+class Vmflavor:
+    vcpu_count = 0
+    memory_mb = 0
+    storage_gb = 0
+    def __init__(self, vcpu_count, memory_mb, storage_gb):
+        self.vcpu_count = vcpu_count
+        self.memory_mb = memory_mb
+        self.storage_gb = storage_gb
+
+class GuestEpa:
+    cpu_pinning_policy = ""
+    cpu_thread_pinning_policy = ""
+    mempage_size = ""
+    numa_node_policy = []
+    def __init__(self, cpu_pinning_policy, cpu_thread_pinning_policy, mempage_size, numa_node_policy):
+        self.cpu_pinning_policy = cpu_pinning_policy
+        self.cpu_thread_pinning_policy = cpu_thread_pinning_policy
+        self.mempage_size = mempage_size
+        self.numa_node_policy = numa_node_policy
+
+class Numa_node_policy:
+    mem_policy = ""
+    node_cnt = ""
+    node = []
+    def __init__(self, mem_policy, node_cnt, node):
+        self.mem_policy = mem_policy
+        self.node_cnt = node_cnt
+        self.node = node
+
+class node:
+    id = ""
+    def __init__(self, id):
+        self.id = id
+
+
+class Interface:
+    name = ""
+    position = ""
+    type = ""
+    virtual_interface = []
+    external_connection_point_ref = ""
+
+    def __init__(self, name, position,  type, virtual_interface, external_connection_point_ref):
+        self.name = name
+        self.position = position
         self.type = type
+        self.virtual_interface = virtual_interface
+        self.external_connection_point_ref = external_connection_point_ref
 
-#The VNF connection points to the outside world.
-class VnfConnectionPoints:
+class InternalConnectionPoint:
     id = ""
-    interface = ""
-    type = ""
-    def __init__(self, id, interface, type):
-        self.id = id
-        self.interface = interface
-        self.type = interface
-
-class VirtualLinks:
-    id = ""
-    connectivity_type = ""
-    connection_points_reference = ""
-    dhcp = ""
-    def __init__(self, id, connectivity_type, connection_points_reference, dhcp):
-        self.id = id
-        self.connectivity_type = connectivity_type
-        self.connection_points_reference = connection_points_reference
-        self.dhcp = dhcp
-
-class MonitoringRules:
     name = ""
-    description = ""
-    duration = ""
-    duration_unit = ""
-    condition = ""
-    notification = []
-
-    def __init__(self, name, description, duration, duration_unit, condition, notification):
+    short_name = ""
+    type = ""
+    def __init__(self, id, name, short_name):
+        self.id = id
         self.name = name
-        self.description = description
-        self.duration = duration
-        self.duration_unit = duration_unit
-        self.condition = condition
-        self.notification = notification
-
-class Notification:
-    name =""
-    type =""
-    def __init__(self, name, type):
-        self.name = name
+        self.short_name = short_name
         self.type = type
 
 
+class Virtualnterface:
+    type = ""
+    bandwidth = "" #optional
+    vpci = "" #optional
+    def __init__(self, type, bandwidth, vpci):
+        self.type = type
+        self.bandwidth = bandwidth
+        self.vpci = vpci
 
 
+class VnfConfiguration:
+    juju = []
+    initial_config_primitive = []
+    config_primitive = []
+    def __init__(self, juju, initial_config_primitive, config_primitive):
+        self.juju = juju
+        self.initial_config_primitive = initial_config_primitive
+        self.config_primitive = config_primitive
+
+class Juju:
+    charm = ""
+    def __init__(self, charm):
+        self.charm = charm
+
+class InitialConfigPrimitive:
+    seq = 0
+    name = ""
+    parameter = []
+    def __init__(self, seq, name, parameter):
+        self.seq = seq
+        self.name = name
+        self.parameter = parameter
+
+class Parameter:
+    name = ""
+    value = ""
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+class ConfigPrimitive:
+    name = ""
+    parameter = []
+    def __init__(self, name, parameter):
+        self.name = name
+        self.parameter = parameter
+class Parameter:
+    name = ""
+    data_type = ""
+    mandatory = ""
+    def __init__(self, name, data_type, mandatory):
+        self.name = name
+        self.data_type = data_type
+        self.mandatory = mandatory
 
 
 

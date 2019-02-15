@@ -28,17 +28,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/splitter/OsmNsdSchema.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="66" lean-forward="true" selection-start-line="16" selection-start-column="66" selection-end-line="16" selection-end-column="66" />
+            <state relative-caret-position="-599">
+              <caret line="15" column="48" lean-forward="true" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/splitter/NSDs/OsmVnfdSchema.py">
+        <entry file="file://$PROJECT_DIR$/src/splitter/OsmVnfdSchema.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="16" lean-forward="true" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+            <state relative-caret-position="3689">
+              <caret line="217" lean-forward="true" selection-start-line="217" selection-end-line="217" />
             </state>
           </provider>
         </entry>
@@ -77,8 +77,9 @@
         <option value="$PROJECT_DIR$/src/splitter/splitter.py" />
         <option value="$PROJECT_DIR$/src/splitter/NSDs/OsmNSDSchema.py" />
         <option value="$PROJECT_DIR$/src/splitter/OsmNSDSchema.py" />
-        <option value="$PROJECT_DIR$/src/splitter/OsmNsdSchema.py" />
         <option value="$PROJECT_DIR$/src/splitter/NSDs/OsmVnfdSchema.py" />
+        <option value="$PROJECT_DIR$/src/splitter/OsmNsdSchema.py" />
+        <option value="$PROJECT_DIR$/src/splitter/OsmVnfdSchema.py" />
       </list>
     </option>
   </component>
@@ -412,15 +413,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/splitter/OsmNsdSchema.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="66" lean-forward="true" selection-start-line="16" selection-start-column="66" selection-end-line="16" selection-end-column="66" />
+        <state relative-caret-position="-599">
+          <caret line="15" column="48" lean-forward="true" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/NSDs/OsmVnfdSchema.py">
+    <entry file="file://$PROJECT_DIR$/src/splitter/OsmVnfdSchema.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="16" lean-forward="true" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+        <state relative-caret-position="3689">
+          <caret line="217" lean-forward="true" selection-start-line="217" selection-end-line="217" />
         </state>
       </provider>
     </entry>
