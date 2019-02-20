@@ -14,7 +14,6 @@ class read_dict():
         reads a dictionary and iterate over its items in a heirarchy and returns all 
         information (parent key, parent level, current key, current level, current value, primary key) 
         at each level.
-
         Params
         ------
         dictionary : dict
@@ -25,7 +24,6 @@ class read_dict():
             the level of the root node/key (default : 1)
         pk : int
             variable to maintain and determine the item index in an array of items 
-
         Returns
         -------
         python.iterator
@@ -237,8 +235,6 @@ class write_dict():
         return self.write(ds,range(8))
 
 
-
-
 class transformation():
 
     def sub_ds(self,df,parent,level) :   
@@ -383,7 +379,7 @@ class transformation():
                df['key'].isin(['vnfd-connection-point-ref','member-vnf-index-ref'])].groupby(
                    ['parent_key','parent_level','level','id']).agg({'value':lambda x : ':'.join(x.values.astype('str')) }).reset_index()
 
-        temp['id'] = temp.apply(lambda x : int(x['id'])/10,axis=1 )
+        temp['id'] = temp.apply(lambda x : int(x['id']/10),axis=1 )
         temp = temp.groupby(['parent_key','parent_level','level','id']).agg({'value': 
                                                                              lambda x : 
                                                                              [','.join(x.values.astype('str'))] }).reset_index()
@@ -528,12 +524,10 @@ class insert_into_db():
     def insert_mapping(self):
         '''
             creates 3 mongoDB documents to store the mapping Virtual Functions , Forwarding Graphs and the rest parameters
-
             Params
             ------
             record: pymongo.collection.Collection
                 cursor to the MongoDb collection where mappings are stored
-
         '''
         osm_sonata_nsd_mapping= [
                         [2,3,'nsd','description',0,1,'root','description'],
@@ -854,7 +848,6 @@ class setup():
             
             return translated_ref
     
-    
 class TranslatorService():
     name = "translator_service"
         
@@ -871,7 +864,7 @@ class TranslatorService():
             ref= insert.insert_nsd('sonata')
             rcvd_file = set.get_source_nsd(ref)
             var = set.translate_to_osm(rcvd_file)
-            #trnsltd_file = set.get_source_nsd(var)
+            trnsltd_file = set.get_source_nsd(var)
 
         elif name == 'osm_to_sonata':
             
@@ -879,11 +872,12 @@ class TranslatorService():
             ref= insert.insert_nsd('osm')
             rcvd_file = set.get_source_nsd(ref)
             var = set.translate_to_sonata(rcvd_file)
-            #trnsltd_file = set.get_source_nsd(var)
+            trnsltd_file = set.get_source_nsd(var)
             
         else :
             var = 'wrong choice!!!'
             
-        return str(var)#str(str(rcvd_file)+'\n\n\n has been converted to \n\n\n' +str(trnsltd_file))
+        return str(str(rcvd_file)+'\n\n\n has been converted to \n\n\n' +str(trnsltd_file))#str(var)#
 
     
+
