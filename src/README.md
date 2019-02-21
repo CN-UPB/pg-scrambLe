@@ -12,7 +12,7 @@ Clone this repository and checkout to `develop` branch
 
 3. Run Docker Image to start services
     + cd into `src` folder from terminal
-    + While developing run `docker-compose f docker-compose.dev.yml up --build`
+    + While developing run `docker-compose -f docker-compose.dev.yml up --build`
         + Running this will restart the service on change
     + run `docker-compose up`
         + rerun after making changes `docker-compose up --build`
