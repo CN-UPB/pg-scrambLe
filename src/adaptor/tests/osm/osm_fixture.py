@@ -35,3 +35,32 @@ def get_vnf_packages_vnfpkgid_keys():
 @fixture
 def delete_vnf_packages_vnfpkgid_keys():
     return ['']
+
+@fixture
+def get_ns_instances_keys():
+    return ['vld', 'short-name', 'ssh-authorized-key', 'admin', 
+        'constituent-vnfr-ref', 'name', '_id', 'admin-status', 
+            'nsd-name-ref', 'description', 'instantiate_params', 
+                'config-status', 'operational-events', 'datacenter',
+                     'orchestration-progress', 'id', 'name-ref', 
+                     'resource-orchestrator', 'nsd-ref',
+                      'detailed-status', 'crete-time', 
+                        'ns-instance-config-ref', 'nsd', 'operational-status', '_admin']
+
+@fixture
+def delete_ns_instances_nsinstanceid_keys():
+    return['_id']
+
+@fixture
+def get_ns_lcm_op_ops_keys():
+    return['operationParams', 'isAutomaticInvocation', 'links', 'operationState', 
+            'id', '_id', 'isCancelPending', 'startTime', 'nsInstanceId', '_admin', 
+              'statusEnteredTime', 'lcmOperationType', 'detailed-status']
+
+@fixture
+def get_ns_lcm_op_ops_nslcmopoccid_keys():
+    return['operationState', 'id']
+
+@fixture
+def post_ns_instances_keys():
+    return['id']

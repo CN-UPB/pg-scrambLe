@@ -12,31 +12,31 @@ class Nsd(CommonInterfaceNsd):
         self._user_endpoint = '{0}/admin/v1/users'
 
     def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
-            if host is None:
-                base_path = self._base_path.format(self._host, self._port)
-            else:
-                base_path = self._base_path.format(host, port)
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
 
-            query_path = ''
-            if _filter:
-                query_path = '?_admin.type=' + _filter
+        query_path = ''
+        if _filter:
+            query_path = '?_admin.type=' + _filter
 
-            _endpoint = "{0}/nsd/v1/ns_descriptors_content{1}".format(base_path, query_path)
-            result = {'error': True, 'data': ''}
-            headers = {"Content-Type": "application/yaml", "accept": "application/json",
-                       'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/nsd/v1/ns_descriptors_content{1}".format(base_path, query_path)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token)}
 
-            try:
-                r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
-            except Exception as e:
-                result['data'] = str(e)
-                return result
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
 
-            if r.status_code == requests.codes.ok:
-                result['error'] = False
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
 
-            result['data'] = r.text
-            return json.dumps(result)
+        result['data'] = r.text
+        return json.dumps(result)
 
     def post_ns_descriptors(self, token, package_path, host=None, port=None):
         if host is None:
