@@ -30,31 +30,27 @@ class write_dict():
         inner_dict = {}
         list_dict = []
 
-        k, v = lvl[0][1].split(' : ')
+        k = list(lvl[0][1].keys())[0]
+        v = list(lvl[0][1].values())[0]
         inner_dict.update({k: v})
 
         for i in range(1, len(lvl)):
 
-            if (lvl[i - 1][0] == lvl[i][0]):
-                k, v = lvl[i][1].split(' : ')
-                inner_dict.update({k: v})
-
-            elif (lvl[i - 1][0] != lvl[i][0]):
+            k = list(lvl[i][1].keys())[0]
+            v = list(lvl[i][1].values())[0]
+            
+            if k in inner_dict.keys():
                 list_dict.append(inner_dict)
                 inner_dict = {}
-                k, v = lvl[i][1].split(' : ')
+                inner_dict.update({k: v})
+                
+            else:
                 inner_dict.update({k: v})
 
         list_dict.append(inner_dict)
         dictionary[parent_key] = list_dict
 
         return dictionary
-
-    def getKey(self,item):
-        '''
-        used to sort items in a list
-        '''
-        return item[0]
 
     def make_json(self,dataset, level):
         '''
@@ -70,32 +66,53 @@ class write_dict():
 
         Returns
         -------
-        list , dict
+        list , dict , pos
             returns an iterator containing both a list of parent key values and a current level dictionary 
         
         '''
-    
-        parent_level = dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL')]['parent_level'].unique()  # getting the parent level from the dataframe
-        s=dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL')].groupby(by=['parent_key']).agg({'key':lambda x: x.nunique() })  # getting the unique set of keys whose values are at higher levels 
-                                                                                                                                                                                                # along with the number of items
-                                                                                                                                                                                                # (in case the values at the higher levels are repeated in an array)
-        s=s.to_dict()  # converting the set of keys 
+
+        s = dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL')].groupby(by=['parent_key']).agg(
+            {'key':lambda x: x.nunique() })  # getting the unique set of keys whose values are at higher levels 
+                                            # along with the number of items
+                                            # (in case the values at the higher levels are repeated in an array)
+        s = s.to_dict()   # converting the set of keys 
             
-        for parent,ele in s['key'].items():             #iterating over each keys found in previous step
-            lvl_dict={}
+        for parent, _ in s['key'].items():  #iterating over each keys found in previous step
+            lvl_dict=[]
             parent_key=[]
+            parent_pos=[]
             
-            lvl=list(dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL') & (dataset['parent_key']== parent )][['id','key','value']].apply(lambda x : (x.id,x.key+' : '+str(x.value)), axis=1).values)
-            # list containing the id ( which is used to maintain an enumeration of arrays ) and a concatenation of key,value 
+            lvl = pd.DataFrame(list(dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL') & 
+                                  (dataset['parent_key']== parent )][['lineage','key','value']].apply(
+                                                    lambda x : [x.lineage[:-2],{x.key : x.value}] 
+                                                    if (x.lineage[-2] == '|' )  
+                                                    else [x.lineage,{x.key : x.value}], axis=1).values))
             
-            lvl_dict.update(self.append_dict(parent,sorted(lvl,key=self.getKey),{})) # calling append function to tidy up the dictionary 
+            val = [x.values for _,x in lvl.groupby(lvl[0])]
             
-            parent_key.append(np.unique(dataset[(dataset['key'] == parent) & (dataset['level'] == parent_level[0])  & (dataset['value']== 'NULL')]['parent_key'].values)) # creating a list of parents at this level
+            length=2
+            for i in range(2,dataset['level'].max(),2):
+                if len(np.unique(lvl[0].apply(lambda x : x.split("|")[:-i]).values)) == 1:
+                    length = i
+                    break
             
-            yield parent_key, lvl_dict
+            for g,l in enumerate(val):
+                
+                lvl_dict.append(self.append_dict(parent,l,{})) # calling append function to tidy up the dictionary
+                parent_temp =[]
+                parent_pos_temp =[]
+                
+                for j in range(0,length,2):
+                    parent_temp.append(val[g][0][0].split('|')[-j-1])
+                    parent_pos_temp.append(val[g][0][0].split('|')[-j-2])
+                
+                parent_key.append(parent_temp)
+                parent_pos.append(parent_pos_temp)
+                
+            yield parent_key, lvl_dict ,parent_pos
         
         
-    def reverse_loop(self,dictionary, key, value):
+    def reverse_loop(self,dictionary, key, value,pos):
         '''
         takes a dictionary and a key value pair. The key is searched in the dictionary, 
         when found the value is mapped to the key.
@@ -104,28 +121,46 @@ class write_dict():
         ------
         dictionary : python dict / python list
             variable containing the values at a particular level
-        key : str
-            contains the key to which the value is to be assigned
+        key : list
+            contains the lineage of parent keys
         value : int / list / str
             contains the item/s which is mapped to the key
+        pos : list
+            contains the positions of the lineage of parent keys
+        
         Returns
         -------
         dict
             returns a complete dictionary/list of a particular level
         '''
         if (isinstance(dictionary, dict)):
+            
             for k, v in dictionary.items():
-                if (k == key):
-                    if (isinstance(v, dict)):
-                        dictionary[k].update(value)
-                    elif (isinstance(v, list)):
-                        for val in dictionary[k]:
-                            val.update(value)
+                if len(key) == 0:
+                    return dictionary
+                
+                if (k == key[-1]):
+                    key.pop()
+                    
+                    if len(key) == 0:    
+                        if (isinstance(v, dict)):
+                            dictionary[k].update(value)
+                            
+                        elif (isinstance(v, list)):
+                            dictionary[k][int(pos[-1])].update(value)
+                    
+                        return dictionary
+                    
+                    else:
+                        p = int(pos.pop())
+                        self.reverse_loop(dictionary[k][p], key, value,pos)
                 else:
-                    self.reverse_loop(dictionary[k], key, value)
+                    self.reverse_loop(dictionary[k], key, value,pos)
+                    
         elif (isinstance(dictionary, list)):
+            
             for d in dictionary:
-                self.reverse_loop(d, key, value)
+                self.reverse_loop(d, key, value,pos)
                 
         return dictionary
 
@@ -149,15 +184,18 @@ class write_dict():
         
         '''
         full_dict = {}
+        
         for level in levels:   # iterating at each level and creating a dictionary and mapping it further down with higher levels
-            for key,val in self.make_json(dataset, level):
-                if len(key[0]) >= 1:
-                    if not full_dict: # check to ensure this the first iteration and full_dict is empty
-                        full_dict[key[0][0]] = val
-                    else:               # for iterations when full_dict already been populated with values
-                        full_dict = self.reverse_loop(full_dict, key[0][0], val)
-                elif len(key[0])==0 and level == 1:
-                    full_dict = val
+            for key,val,pos in self.make_json(dataset.sort_values(by='lineage'), level):
+
+                if not full_dict: # check to ensure this the first iteration and full_dict is empty
+                    for i in range(len(key)):
+                        full_dict[key[i][0]]= val[i]
+
+                else:               # for iterations when full_dict already been populated with values
+                    for i in range(len(key)):
+                        pos[i] = [int(p) for p in pos[i]]
+                        full_dict = self.reverse_loop(full_dict, key[i], val[i],pos[i])
 
         return full_dict
 
@@ -177,6 +215,6 @@ class write_dict():
             returns a dictionary of the translated descriptor
         
         '''
-        return self.write(ds,range(8))
+        return self.write(ds.sort_values(by='lineage'),range(8))
 
 
