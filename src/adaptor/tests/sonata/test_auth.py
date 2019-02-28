@@ -15,3 +15,6 @@ def test_auth(auth_keys):
 	assert isinstance(response, dict)
 	assert set(auth_keys).issubset(
 				response.keys()), "All keys should be in the response"
+
+def __init__(self):
+	pass

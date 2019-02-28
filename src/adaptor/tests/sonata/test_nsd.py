@@ -136,6 +136,3 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
         response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
-    
-
-    
