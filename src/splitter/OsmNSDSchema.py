@@ -1,4 +1,5 @@
 import yaml
+from Fetchfile import Fetchfile
 
 list_vnfd_connection_point_ref = []
 list_vld = []
@@ -20,17 +21,24 @@ list_vnffgd = []
 list_vnf_dependency = []
 list_ip_profiles = []
 
-def osm_nsd():
-    nsd = source['nsd:nsd-catalog']
+def osm_nsd(source):
+    print("source is  ")
+
+    #print (source['nsd:nsd-catalog'])
+    nsd = source[0]
     #print (nsd)
     for k in nsd.keys():
-        if k == "nsd":
-            nsd_data = nsd[k]
-            print(nsd_data)
-            for nsd_data1 in nsd_data:
-                for k1 in nsd_data1.keys():
+        if k == "nsd:nsd-catalog":
+            nsd_data1 = nsd[k]
+            #print(nsd_data1)
+            for keyss in nsd_data1.keys():
+                #if k == "nsd":
+                nsd_data2 = nsd_data1[keyss]
+                #print(nsd_data2)
+                nsd_data = nsd_data2[0]
+                for k1 in nsd_data.keys():
                     if k1 == "connection-point":
-                        connection_point = nsd_data1[k1]
+                        connection_point = nsd_data[k1]
                         for connection_point_data in connection_point:
                             name = connection_point_data.get('name')
                             floating_ip_required = connection_point_data.get('floating-ip-required')
@@ -38,7 +46,7 @@ def osm_nsd():
                             connection_point_instance = ConnectionPoint(name, floating_ip_required, type)
                             list_connection_point.append(connection_point_instance)
                     elif k1 == "scaling-group-descriptor":
-                        scaling_group_descriptor = nsd_data1[k1]
+                        scaling_group_descriptor = nsd_data[k1]
                         for scaling_group_descriptor_data in scaling_group_descriptor:
                             for k2 in scaling_group_descriptor_data.keys():
                                 if k2 == "scaling-policy":
@@ -85,7 +93,7 @@ def osm_nsd():
                             scaling_group_descriptor_instance = ScalingGroupDescriptor(name, list_scaling_policy, list_vnfd_member, min_instance_count, max_instance_count, list_scaling_config_action)
                             list_scaling_group_descriptor.append(scaling_group_descriptor_instance)
                     elif k1 == "vnffgd":
-                        vnffgd = nsd_data1[k1]
+                        vnffgd = nsd_data[k1]
                         for vnffgd_data in vnffgd:
                             for k2 in vnffgd_data.keys():
                                 if k2 == "rsp":
@@ -140,17 +148,17 @@ def osm_nsd():
 
 
                     elif k1 == "constituent-vnfd":
-                        constituent_vnfd = nsd_data1[k1]
+                        constituent_vnfd = nsd_data[k1]
                         for constituent_vnfd_data in constituent_vnfd:
                             member_vnf_index = constituent_vnfd_data.get('member-vnf-index')
                             vnfd_id_ref = constituent_vnfd_data.get('vnfd-id-ref')
                             start_by_default =constituent_vnfd_data.get('start-by-default')
-                           # print(vnfd_id_ref)
+                            #print(vnfd_id_ref)
                             constituent_vnfd_instance = ConstituentVnfd(member_vnf_index, start_by_default, vnfd_id_ref)
                             list_constituent_vnfd.append(constituent_vnfd_instance)
-                            print(list_constituent_vnfd)
+                            #print(list_constituent_vnfd)
                     elif k1 == "ip-profiles":
-                        ip_profiles = nsd_data1[k1]
+                        ip_profiles = nsd_data[k1]
                         for ip_profiles_data in ip_profiles:
                             for k2 in ip_profiles_data.keys():
                                 if k2 == "ip-profile-params":
@@ -158,7 +166,7 @@ def osm_nsd():
                                     for ip_profile_params_data in ip_profile_params:
 
                                         print(ip_profile_params_data)
-                                        for k3 in ip_profile_params_data.key():
+                                        for k3 in ip_profile_params_data.keys():
                                             if k3 == "dns-server":
                                                 dns_server = ip_profile_params_data[k3]
                                                 for dns_server_data in dns_server:
@@ -187,7 +195,7 @@ def osm_nsd():
                             list_ip_profiles.append(ip_profiles_instance)
 
                     elif k1 =="vnf-dependency":
-                        vnf_dependency = nsd_data1[k1]
+                        vnf_dependency = nsd_data[k1]
                         for vnf_dependency_data in vnf_dependency:
                             vnf_source_ref = vnf_dependency_data.get('vnf_source_ref')
                             vnf_depends_on_ref = vnf_dependency_data.get('vnf_depends_on_ref')
@@ -197,7 +205,8 @@ def osm_nsd():
 
 
                     elif k1 == "vld":
-                        vld = nsd_data1[k1]
+                        vld = nsd_data[k1]
+                        #print(vld)
                         for vld_data in vld:
                             for k2 in vld_data.keys():
                                 if k2 == "vnfd-connection-point-ref":
@@ -210,7 +219,7 @@ def osm_nsd():
                                         #print(vnfd_connection_point_ref)
                                         vnfd_connection_point_ref_instance = VnfdConnectionPointRef(member_vnf_index_ref, order, vnfd_id_ref, vnfd_connection_point_ref)
                                         list_vnfd_connection_point_ref.append(vnfd_connection_point_ref_instance)
-                                       # print(list_vnfd_connection_point_ref)
+                                        #print(list_vnfd_connection_point_ref)
                             id = vld_data.get('id')
                             name = vld_data.get('name')
                             short_name = vld_data.get('short-name')
@@ -223,20 +232,21 @@ def osm_nsd():
                             mgmt_network = vld_data.get('mgmt-network')
                             vim_network_name = vld_data.get('vim-network-name')
                             ip_profile_ref = vld_data.get('ip_profile_ref')
-                            #print(mgmt_network)
+                            print(vim_network_name
+                                  )
                             vld_instance = Vld(id, name, short_name, vendor, description, version, type, root_bandwidth, leaf_bandwidth, mgmt_network, vim_network_name, ip_profile_ref, list_vnfd_connection_point_ref)
                             list_vld.append(vld_instance)
                             #print(list_vld)
-                id = nsd_data1.get('id')
-                name = nsd_data1.get('name')
-                short_name = nsd_data1.get('short-name')
-                description = nsd_data1.get('description')
-                vendor = nsd_data1.get('vendor')
-                logo = nsd_data1.get('logo')
-                version = nsd_data1.get('version')
-                nsd_data_instance = Nsd(id, name, short_name, description, vendor, version, logo, list_constituent_vnfd, list_vld)
+                id = nsd_data.get('id')
+                name = nsd_data.get('name')
+                short_name = nsd_data.get('short-name')
+                description = nsd_data.get('description')
+                vendor = nsd_data.get('vendor')
+                logo = nsd_data.get('logo')
+                version = nsd_data.get('version')
+                nsd_data_instance = Nsd(id, name, short_name, description, vendor, version, logo, list_constituent_vnfd, list_vld, list_connection_point, list_scaling_group_descriptor, list_vnffgd)
                 list_nsd.append(nsd_data_instance)
-                print(list_nsd)
+            #print(list_nsd)
 
 
 class NsdNsdCatalog:
@@ -535,11 +545,12 @@ class VnfDependency:
 
 
 
-def get_data():
-    with open('D:\Paderborn\project\Implementation\OsmVnfd\hackfest_sfc_ns\hackfest_sfc_nsd.yaml', "r") as incoming_file:
-        data = yaml.load(incoming_file)
+def get_data(file):
+    #with open('D:\Paderborn\project\Implementation\OsmVnfd\hackfest_sfc_ns\hackfest_sfc_nsd.yaml', "r") as incoming_file:
+        #data = yaml.load(incoming_file)
         #print(data)
+    data = file
     return data
 
-source = get_data()
-osm_nsd()
+#source = get_data()
+#osm_nsd()
