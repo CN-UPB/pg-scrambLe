@@ -58,34 +58,8 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text
         return json.dumps(result)
         
-    def get_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
-
-              Upload the content of NSD
-              """
-        result = {'error': True, 'data': 'Method not implemented in target MANO'}
-        return json.dumps(result)
-
-    def patch_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Individual NS Descriptor
-
-        /ns_descriptors/{nsdInfoId}
-            PATCH - Modify the operational state and/or 
-                the user defined data of an individual
-                NS descriptor resource.
-        """
-        result = {'error': True, 'data': 'Method not implemented in target MANO'}
-        return json.dumps(result)
-
-    def put_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
-
-        Upload the content of NSD
-        """
-        result = {'error': True, 'data': 'Method not implemented in target MANO'}
-        return json.dumps(result)
-
-    def delete_ns_descriptors(self, token, id, host=None, port=None):
+    
+    def delete_ns_descriptors_nsdinfoid(self, token, id, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -113,7 +87,7 @@ class Nsd(CommonInterfaceNsd):
         else:
                 base_path = "http://{0}:{1}".format(host, port)
            
-        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, query_path)
+        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, id)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
@@ -132,6 +106,34 @@ class Nsd(CommonInterfaceNsd):
     def patch_ns_descriptors_nsdinfoid(self):
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
+
+    def get_ns_descriptors_nsd_content(self):
+        """ NSD Management Interface - Upload NSD
+
+              Upload the content of NSD
+              """
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
+
+    def patch_ns_descriptors_nsd_content(self):
+        """ NSD Management Interface - Individual NS Descriptor
+
+        /ns_descriptors/{nsdInfoId}
+            PATCH - Modify the operational state and/or 
+                the user defined data of an individual
+                NS descriptor resource.
+        """
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
+
+    def put_ns_descriptors_nsd_content(self):
+        """ NSD Management Interface - Upload NSD
+
+        Upload the content of NSD
+        """
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
+
 
     def get_pnf_descriptors(self):
         """ NSD Management interface -
@@ -179,26 +181,16 @@ class Nsd(CommonInterfaceNsd):
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
     
-    def delete_pnf_descriptors_pnfdinfoid(self, token, id, host=None, port=None):
-        if host is None:
-            base_path = self._base_path.format(self._host, self._port)
-        else:
-            base_path = self._base_path.format(host, port)
+    def delete_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
+        """ NSD Management interface -
+                Individual PNF Descriptor
 
-        result = {'error': True, 'data': ''}
-        headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
-                    'Authorization': 'Bearer {}'.format(token)}
-        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, id)
-        
-        try:
-            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
-        except Exception as e:
-            result['data'] = str(e)
-            return result
-        if r.status_code == requests.codes.no_content:
-            result['error'] = False
+        /pnf_descriptors/pnfdinfoid
+            DELETE - Delete the user defined data of an 
+                        individual PNF descriptor resource.
 
-        result['data'] = r.text
+        """
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_pnf_descriptors_pnfd_content(self, pnfdInfoId):

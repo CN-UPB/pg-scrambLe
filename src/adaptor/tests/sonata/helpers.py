@@ -72,7 +72,7 @@ class Helpers():
             _nsd = _n['uuid']
 
         time.sleep(10)
-        response = json.loads(sonata_nsd.delete_ns_descriptors(token=_token["token"]["access_token"], id=_nsd))
+        response = json.loads(sonata_nsd.delete_ns_descriptors_nsdinfoid(token=_token["token"]["access_token"], id=_nsd))
 
         time.sleep(2)
 

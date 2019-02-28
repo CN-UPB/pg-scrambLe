@@ -58,3 +58,20 @@ def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
         response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
+
+def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
+    """Tests API call to onboard VNF descriptor resources"""
+    sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _vnfd_list = json.loads(sonata_vnfpkgm.get_vnf_packages(token=_token["token"]["access_token"]))
+    _vnfd_list = json.loads(_vnfd_list["data"])
+
+    _vnfd = None
+    for _v in _vnfd_list:
+        if "vnfd_example" == _v['uuid']:            
+            _vnfd = _v['uuid']
+
+    response = json.loads(sonata_vnfpkgm.get_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))

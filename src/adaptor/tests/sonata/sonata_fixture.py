@@ -37,4 +37,8 @@ def delete_vnf_packages_vnfpkgid_keys():
 def get_vnf_packages_vnfpkgid_keys():
     return ['id']
 
+@fixture
+def get_ns_instances_keys():
+    return ['id','created_at','updated_at','service_uuid','status','request_type','service_instance_uuid','began_at','callback']
+
                 

@@ -64,7 +64,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         else:
             base_path = self._base_path.format(host, port)
        
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path,query_path)
+        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, id)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
