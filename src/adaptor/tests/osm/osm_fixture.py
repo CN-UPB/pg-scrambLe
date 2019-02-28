@@ -61,3 +61,21 @@ def get_ns_lcm_op_ops_nslcmopoccid_keys():
 @fixture
 def post_ns_instances_keys():
     return['id']
+
+@fixture
+def get_user_list_keys():
+  return ['_id', 'password', 'username', '_admin', 'projects']
+
+@fixture()
+def get_user_info_keys():
+  return['_id', 'password', 'username', '_admin', 'projects']
+
+@fixture()
+def get_project_list_keys():
+  return['_id', 'name', '_admin']
+
+@fixture()
+def get_project_info_keys():
+  return['_id', 'name', '_admin']
+
+    
