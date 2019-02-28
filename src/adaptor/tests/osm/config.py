@@ -1,7 +1,7 @@
 HOST_URL = "vm-hadik3r-05.cs.uni-paderborn.de"
 USERNAME = "admin"
 PASSWORD = "admin"
-VIMACCOUNTID = "afaf5a60-4dad-45f7-9353-696d91804816"
+VIMACCOUNTID = "d3534a40-b0e9-4893-b1c3-baf175418772"
 NSDESCRIPTION = "testing"
 NSNAME = "test"
 NSDID = "afd30adf-494a-44e6-a6fe-440a2ba2d20d"

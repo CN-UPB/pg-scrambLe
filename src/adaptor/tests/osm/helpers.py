@@ -97,6 +97,36 @@ class Helpers():
             return True
         else:
             return False
+    
+    def _upload_test_ns_instance():
+        osm_nslcm = OSMClient.Nslcm(HOST_URL)
+        osm_auth = OSMClient.Auth(HOST_URL)
+        _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+        _token = json.loads(_token["data"])
+
+        response = json.loads(osm_nslcm.post_ns_instances(token=_token["id"],
+                        nsDescription=NSDESCRIPTION,nsName= NSNAME ,nsdId= NSDID, vimAccountId= VIMACCOUNTID))
+        response = json.loads(response["data"])
+        
+        
+    def _delete_test_ns_instance():
+        osm_nslcm = OSMClient.Nslcm(HOST_URL)
+        osm_auth = OSMClient.Auth(HOST_URL)
+        _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+        _token = json.loads(_token["data"])
+        _ns_list = json.loads(osm_nslcm.get_ns_instances(token=_token["id"]))
+        _ns_list = json.loads(_ns_list["data"])
+
+        _ns = None
+        for _n in _ns_list:
+            if "test" == _n['short-name']:            
+                _ns = _n['_id']
+        # time.sleep(5) #wait for NS Creation
+        response = None
+        if _ns:
+            response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(token=_token["id"], id=_ns))
+            _rid = response["data"]
+        
 
         
 
