@@ -78,4 +78,15 @@ def get_project_list_keys():
 def get_project_info_keys():
   return['_id', 'name', '_admin']
 
+@fixture()
+def get_vim_list_keys():
+  return ['_id', 'vim_user', 'name', '_admin', 'vim_password', 'vim_url', 
+            'vim_type', 'vim_tenant_name', 'schema_version', 'config']
+  
+@fixture
+def get_vim_info_keys():
+  return ['_id', 'vim_user', 'name', '_admin', 'vim_password', 'vim_url', 
+            'vim_type', 'vim_tenant_name', 'schema_version', 'config']
+
+
     
