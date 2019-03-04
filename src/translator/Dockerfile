@@ -1,6 +1,10 @@
 FROM python:3
 
 RUN apt-get update && apt-get -y install netcat && apt-get clean
+RUN sudo apt update && add-apt-repository -y "deb [arch=amd64]
+ http://osm-download.etsi.org/repository/osm/debian/ReleaseFIVE stable IM osmclient devops"
+RUN sudo apt update
+RUN sudo apt install python-osm-im
 
 WORKDIR /app
 
