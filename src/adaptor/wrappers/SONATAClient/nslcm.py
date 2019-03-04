@@ -11,8 +11,6 @@ class Nslcm(CommonInterfaceNslcm):
         self._port = port
         self._base_path = 'http://{0}:{1}/api/v2'
         
-
-
     def get_ns_instances(self, token, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
@@ -20,11 +18,14 @@ class Nslcm(CommonInterfaceNslcm):
             base_path = self._base_path.format(host, port)
         
         result = {'error': True, 'data': ''}
-        headers = {"Content-Type": "application/yaml", "accept": "application/json" ,'Authorization': 'Bearer {}'.format(token)}
-        _endpoint = "{0}/requests".format(base_path)
+        headers = {"Content-Type": "application/yaml", 
+                    "accept": "application/json" ,
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/services".format(base_path)
         
         try:
-            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_endpoint, params=None, verify=False, 
+                                headers=headers)
         except Exception as e:
             result['data'] = str(e)
             return result
@@ -33,22 +34,22 @@ class Nslcm(CommonInterfaceNslcm):
             result['error'] = False
 
         result['data'] = r.text
-        return json.dumps(result)
-       
-    
+        return json.dumps(result)   
 
-    def get_ns_instances_nsinstanceid(self, token, id ,host=None, port=None):
+    def get_ns_instances_nsinstanceid(self, token, nsInstanceId ,host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
             base_path = self._base_path.format(host, port)
         result = {'error': True, 'data': ''}
-        headers = {"Content-Type": "application/json", "accept": "application/json",
-                    'Authorization': 'Bearer {}'.format(token)}
-        _endpoint = "{0}/nslcm/v1/ns_instances_content/{1}".format(base_path, id)
+        headers = {"Content-Type": "application/json",
+                    "accept": "application/json",
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/services/{1}".format(base_path, nsInstanceId)
 
         try:
-            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+            r = requests.get(_endpoint, params=None, verify=False,
+                                headers=headers)
         except Exception as e:
             result['data'] = str(e)
             return result
@@ -59,18 +60,65 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)
 
    
-    def post_ns_instances_nsinstanceid_instantiate(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Instantiate NS task
+    def post_ns_instances_nsinstanceid_instantiate(self, token, nsInstanceId, egresses=[], ingresses=[], host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {
+                "Content-Type": "application/json",
+                "accept": "application/json",
+                "Authorization": 'Bearer {}'.format(token)}
+        data = {
+                "service_uuid": nsInstanceId,
+                "egresses" : egresses,
+                "ingresses" : ingresses
+        }
+        _endpoint = "{0}/requests".format(base_path)
 
-        /ns_instances_nsinstanceid_instantiate
-            GET - Read an individual NS instance resource.
+        try:
+            r = requests.post(_endpoint, params=None, verify=False,
+                                headers=headers, json=data)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
 
-        """
-        pass
+        result['data'] = r.text
+        return json.dumps(result)
 
+    def post_ns_instances_nsinstanceid_terminate(self, token, nsInstanceId, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {
+                "Content-Type": "application/json",
+                "accept": "application/json",
+                "Authorization": 'Bearer {}'.format(token)}
 
-    
+        data = {
+                "service_instance_uuid": nsInstanceId,
+                "request_type": "TERMINATE"
+        }
+
+        _endpoint = "{0}/requests".format(base_path)
+
+        try:
+            r = requests.post(_endpoint, params=None, verify=False,
+                                headers=headers, json=data)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
     def post_ns_instances_nsinstanceid_scale(self, nsInstanceId):
         """  NS Lifecycle Management interface - 
                 Scale NS task
@@ -80,8 +128,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
    
     def post_ns_instances_nsinstanceid_update(self, nsInstanceId):
         """  NS Lifecycle Management interface - 
@@ -92,20 +138,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
-   
-    def post_ns_instances_nsinstanceid_terminate(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Terminate NS task
-
-        /ns_instances_nsinstanceid_terminate
-            POST - Terminate a NS instance.
-
-        """
-        pass
-
-
     
     def post_ns_instances_nsinstanceid_heal(self, nsInstanceId):
         """  NS Lifecycle Management interface - 
@@ -116,7 +148,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
         
     def post_ns_lcm_op_occs_nslcmopoccid_retry(self, nsLcmOpOccId):
         """  NS Lifecycle Management interface - 
@@ -127,8 +158,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
     
     def post_ns_lcm_op_occs_nslcmopoccid_rollback(self, nsLcmOpOccId):
         """  NS Lifecycle Management interface - 
@@ -139,8 +168,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
   
     def post_ns_lcm_op_occs_nslcmopoccid_continue(self, nsLcmOpOccId):
         """  NS Lifecycle Management interface - 
@@ -151,8 +178,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
    
     def post_ns_lcm_op_occs_nslcmopoccid_fail(self, nsLcmOpOccId):
         """  NS Lifecycle Management interface - 
@@ -163,8 +188,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
    
     def post_ns_lcm_op_occs_nslcmopoccid_cancel(self, nsLcmOpOccId):
         """  NS Lifecycle Management interface - 
@@ -175,8 +198,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
  
     def post_ns_lcm_subscriptions(self):
         """  NS Lifecycle Management interface - 
@@ -187,8 +208,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
     
     def get_ns_lcm_subscriptions(self):
         """  NS Lifecycle Management interface - 
@@ -221,8 +240,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
    
     def delete_ns_lcm_subscriptions_subscriptionid(self, subscriptionId):
         """  NS Lifecycle Management interface - 
