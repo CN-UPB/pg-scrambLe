@@ -13,7 +13,8 @@ def test_get_ns_instances(get_ns_instances_keys):
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
-    response = json.loads(sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
+    response = json.loads(sonata_nslcm.get_ns_instances(
+                            token=_token["token"]["access_token"]))
     response = json.loads(response["data"])
 
     assert isinstance(response, list)
@@ -29,10 +30,12 @@ def test_get_ns_instances_nsinstanceid(test_get_ns_instances_nsinstanceid_keys):
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
 
-    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
+    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                            token=_token["token"]["access_token"]))
     _nsd_list = json.loads(_nsd_list["data"])
 
-    _ns_list = json.loads(sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
+    _ns_list = json.loads(sonata_nslcm.get_ns_instances(
+                            token=_token["token"]["access_token"]))
     _ns_list = json.loads(_ns_list["data"])
 
     _ns = None
@@ -42,7 +45,8 @@ def test_get_ns_instances_nsinstanceid(test_get_ns_instances_nsinstanceid_keys):
                 if _n['uuid'] == _n2['descriptor_reference']:
                     _ns = _n2['uuid']
 
-    response = json.loads(sonata_nslcm.get_ns_instances_nsinstanceid(token=_token["token"]["access_token"], nsInstanceId=_ns))
+    response = json.loads(sonata_nslcm.get_ns_instances_nsinstanceid(
+                            token=_token["token"]["access_token"], nsInstanceId=_ns))
 
     assert response['error'] == False
     response = json.loads(response["data"])
@@ -88,10 +92,12 @@ def test_post_ns_instances_nsinstanceid_terminate(post_ns_instances_nsinstanceid
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
 
-    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
+    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                            token=_token["token"]["access_token"]))
     _nsd_list = json.loads(_nsd_list["data"])
 
-    _ns_list = json.loads(sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
+    _ns_list = json.loads(sonata_nslcm.get_ns_instances(
+                            token=_token["token"]["access_token"]))
     _ns_list = json.loads(_ns_list["data"])
 
     _ns = None

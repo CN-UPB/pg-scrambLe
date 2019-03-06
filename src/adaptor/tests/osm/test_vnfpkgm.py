@@ -14,7 +14,7 @@ def test_post_vnf_packages(post_vnf_packages_keys):
     _token = json.loads(_token["data"])
 
     response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
-                        package_path="samples/test_osm_cirros_vnfd.tar.gz"))
+                        package_path="tests/samples/test_osm_cirros_vnfd.tar.gz"))
     response = json.loads(response["data"])
     
     assert isinstance(response, dict)
@@ -50,7 +50,9 @@ def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
         if "test_osm_cirros_vnfd" == _v['id']:            
             _vnfd = _v['_id']
 
-    response = json.loads(osm_vnfpkgm.get_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+    response = json.loads(osm_vnfpkgm.get_vnf_packages_vnfpkgid(
+                                token=_token["id"], 
+                                id=_vnfd))
 
 def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
     """Tests API call to delete NS descriptor resources"""
@@ -69,7 +71,9 @@ def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
 
     response = None
     if _vnfd:
-        response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+        response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
+                                token=_token["id"], 
+                                id=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
 
@@ -87,7 +91,9 @@ def test_get_vnf_packages_vnfpkgid_vnfd():
         if "test_osm_cirros_vnfd" == _v['id']:            
             _vnfd = _v['_id']
 
-    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_vnfd(token=_token["id"], id=_vnfd))
+    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_vnfd(
+                        token=_token["id"], 
+                        id=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -108,7 +114,9 @@ def test_get_vnf_packages_vnfpkgid_package_content():
         if "test_osm_cirros_vnfd" == _v['id']:            
             _vnfd = _v['_id']
 
-    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_package_content(token=_token["id"], id=_vnfd))
+    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_package_content(
+                                token=_token["id"], 
+                                id=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -129,7 +137,9 @@ def test_get_vnf_packages_vnfpkgid_artifacts_artifactpath():
         if "test_osm_cirros_vnfd" == _v['id']:            
             _vnfd = _v['_id']
 
-    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_artifacts_artifactpath(token=_token["id"], id=_vnfd))
+    response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_artifacts_artifactpath(
+                                token=_token["id"], 
+                                id=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -153,8 +163,9 @@ def test_put_vnf_packages_vnfpkgid_package_content():
         if "test_osm_cirros_vnfd" == _v['id']:            
             _vnfd = _v['_id']
            
-    response = json.loads(osm_vnfpkgm_vnfd.put_vnf_packages_vnfpkgid_package_content(token=_token["id"], id=_vnfd,
-                            data_path="samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
+    response = json.loads(osm_vnfpkgm_vnfd.put_vnf_packages_vnfpkgid_package_content(
+                                token=_token["id"], id=_vnfd,
+                                data_path="tests/samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
     Helpers._delete_test_vnf("hackfest1alt-vnf")
     if response["error"]:
             return True

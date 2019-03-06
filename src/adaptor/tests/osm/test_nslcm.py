@@ -18,7 +18,10 @@ def test_post_ns_instances(post_ns_instances_keys):
     _token = json.loads(_token["data"])
 
     response = json.loads(osm_nslcm.post_ns_instances(token=_token["id"],
-                    nsDescription=NSDESCRIPTION,nsName= NSNAME ,nsdId= NSDID, vimAccountId= VIMACCOUNTID))
+                        nsDescription=NSDESCRIPTION, 
+                        nsName=NSNAME, 
+                        nsdId=NSDID, 
+                        vimAccountId=VIMACCOUNTID))
     response = json.loads(response["data"])
 
     assert isinstance(response, dict)
@@ -60,7 +63,9 @@ def test_get_ns_instances_nsinstanceid():
         if "test" == _n['id']:            
             _ns = _n['_id']
 
-    response = json.loads(osm_nslcm.get_ns_instances_nsinstanceid(token=_token["id"], id=_ns))
+    response = json.loads(osm_nslcm.get_ns_instances_nsinstanceid(
+                        token=_token["id"], 
+                        id=_ns))
     if response["error"]:
         return True
     else:
@@ -83,7 +88,9 @@ def test_delete_ns_instances_nsinstanceid(delete_ns_instances_nsinstanceid_keys)
     
     response = None
     if _ns:
-        response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(token=_token["id"], id=_ns))
+        response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(
+                                token=_token["id"], 
+                                id=_ns))
         _rid = response["data"]
         assert isinstance(response, dict)
         assert response["data"] == _rid
@@ -138,7 +145,9 @@ def test_get_ns_lcm_op_ops_nslcmopoccid(get_ns_lcm_op_ops_nslcmopoccid_keys):
         if "COMPLETED" or "FAILED"  == _nslcmopocc['operationState']:
              _nslcmopoccid = _nslcmopocc['id']
 
-    response = json.loads(osm_nslcm.get_ns_lcm_op_ops_nslcmopoccid(token=_token["id"], id=_nslcmopoccid))
+    response = json.loads(osm_nslcm.get_ns_lcm_op_ops_nslcmopoccid(
+                            token=_token["id"], 
+                            id=_nslcmopoccid))
     response = json.loads(response["data"])
     assert isinstance(response, dict)
     if len(response) > 0:

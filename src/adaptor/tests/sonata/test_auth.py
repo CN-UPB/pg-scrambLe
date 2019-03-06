@@ -9,7 +9,9 @@ from .config import *
 def test_auth(auth_keys):
 	"""Tests API call to fetch Auth token"""
 	sonata_auth = SONATAClient.Auth(HOST_URL)
-	response = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+	response = json.loads(sonata_auth.auth(
+							username=USERNAME,
+							password=PASSWORD))
 	response = json.loads(response["data"])
 
 	assert isinstance(response, dict)

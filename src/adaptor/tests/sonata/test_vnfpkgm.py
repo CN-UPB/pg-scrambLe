@@ -9,15 +9,17 @@ from .helpers import Helpers
 
 def test_post_vnf_packages(post_vnf_packages_keys):
 	"""Tests API call to onboard VNF descriptor resources"""
-	Helpers._delete_test_vnf()
 	sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
 	sonata_auth = SONATAClient.Auth(HOST_URL)
 
 	_token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
 	_token = json.loads(_token["data"])
-	response = json.loads(sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
-						package_path="samples/vnfd_example.yml"))
-	
+	Helpers._delete_test_vnf(_token=_token["token"]["access_token"])
+
+	response = json.loads(sonata_vnfpkgm.post_vnf_packages(
+                                token=_token["token"]["access_token"],
+                                package_path="tests/samples/vnfd_example.yml"))
+
 	assert response['error'] == True
 	assert response['data'] != ''
     

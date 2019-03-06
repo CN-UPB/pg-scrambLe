@@ -11,7 +11,7 @@ class Helpers():
         _token = json.loads(_token["data"])
 
         response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
-                            package_path="samples/test_osm_cirros_vnfd.tar.gz"))
+                            package_path="tests/samples/test_osm_cirros_vnfd.tar.gz"))
         if response["error"]:
             return True
         else:
@@ -33,7 +33,9 @@ class Helpers():
 
         response = None
         if _vnfd:
-            response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+            response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
+                                    token=_token["id"], 
+                                    id=_vnfd))
 
     def _upload_test_nsd():
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
@@ -43,10 +45,10 @@ class Helpers():
         _token = json.loads(_token["data"])
 
         osm_vnfpkgm.post_vnf_packages(token=_token["id"],
-             package_path="samples/test_osm_cirros_vnfd.tar.gz")
+             package_path="tests/samples/test_osm_cirros_vnfd.tar.gz")
 
         response = json.loads(osm_nsd.post_ns_descriptors(token=_token["id"],
-                        package_path="samples/test_osm_cirros_nsd.tar.gz"))
+                        package_path="tests/samples/test_osm_cirros_nsd.tar.gz"))
         if response["error"]:
             return True
         else:
@@ -68,7 +70,9 @@ class Helpers():
                 _nsd = _n['_id']
 
         time.sleep(10) # Wait for NSD onboarding
-        response = json.loads(osm_nsd.delete_ns_descriptors_nsdinfoid(token=_token["id"], id=_nsd))
+        response = json.loads(osm_nsd.delete_ns_descriptors_nsdinfoid(
+                                token=_token["id"], 
+                                id=_nsd))
 
         time.sleep(2) # Wait for NSD onboarding
 
@@ -82,7 +86,9 @@ class Helpers():
 
         response = None
         if _vnfd:
-            response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], id=_vnfd))
+            response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
+                                    token=_token["id"], 
+                                    id=_vnfd))
 
     def _upload_reference_vnfd_for_nsd(_referencevnfdname="hackfest1alt-vnf"):
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
@@ -92,7 +98,7 @@ class Helpers():
 
         if _referencevnfdname:
             response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
-                            package_path="samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
+                            package_path="tests/samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
         if response["error"]:
             return True
         else:
@@ -105,7 +111,8 @@ class Helpers():
         _token = json.loads(_token["data"])
 
         response = json.loads(osm_nslcm.post_ns_instances(token=_token["id"],
-                        nsDescription=NSDESCRIPTION,nsName= NSNAME ,nsdId= NSDID, vimAccountId= VIMACCOUNTID))
+                        nsDescription = NSDESCRIPTION, nsName = NSNAME, 
+                        nsdId = NSDID, vimAccountId = VIMACCOUNTID))
         response = json.loads(response["data"])
         
         
@@ -124,7 +131,9 @@ class Helpers():
         # time.sleep(5) #wait for NS Creation
         response = None
         if _ns:
-            response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(token=_token["id"], id=_ns))
+            response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(
+                                    token=_token["id"], 
+                                    id=_ns))
             _rid = response["data"]
         
 

@@ -44,7 +44,8 @@ class Package(CommonInterfaceSonPackage):
             base_path = self._base_path.format(host, port)
 
         result = {'error': True, 'data': ''}
-        headers = {"Content-Type": "application/x-www-form-urlencoded", "Content-Disposition": "attachment; filename=sonata_example.son", 
+        headers = {"Content-Type": "application/x-www-form-urlencoded", 
+                    "Content-Disposition": "attachment; filename=sonata_example.son", 
                     'Authorization': 'Bearer {}'.format(token)}
         _endpoint = "{0}/catalogues/api/v2/son-packages".format(base_path)
         try:

@@ -15,7 +15,7 @@
 
 ## Development
 
-1. Docker compose up from the root folder (instructions in the root)
+1. Docker compose up from the `src` folder (Detailed instructions in the root README)
 
     + `docker-compose -f "docker-compose.dev.yml" up -d --build`
 
