@@ -54,4 +54,23 @@ def get_ns_instances_keys():
 def test_get_ns_instances_nsinstanceid_keys():
     return ['created_at', 'descriptor_reference', 'descriptor_version', 'network_functions', 'status', 'updated_at', 'version', 'uuid']
 
+@fixture
+def get_son_packages_keys():
+    return ['created_at', 'grid_fs_id', 'grid_fs_name', 'md5', 'signature', 'updated_at', 'username', 'uuid']
+
+@fixture
+def post_son_packages_keys():
+    return ['id']
+
+@fixture
+def delete_son_packages_PackageId_keys():
+    return ['']
+
+@fixture
+def get_son_packages_PackageId_keys():
+    return ['id']
+
+
+
+
 

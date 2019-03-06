@@ -87,3 +87,36 @@ class Helpers():
         response = None
         if _vnfd:
             response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
+
+    
+    def _upload_test_package():
+        sonata_package = SONATAClient.Package(HOST_URL)
+        sonata_auth = SONATAClient.Auth(HOST_URL)
+        _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+        _token = json.loads(_token["data"])
+
+        response = json.loads(sonata_package.post_son_packages(token=_token["token"]["access_token"],
+                        package_path="samples/sonata_example.son"))
+        
+        if response["error"]:
+            return True
+        else:
+            return False
+
+    def _delete_test_package():
+        sonata_package = SONATAClient.Package(HOST_URL)
+        sonata_auth = SONATAClient.Auth(HOST_URL)
+        _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+        _token = json.loads(_token["data"])
+
+        _package_list = json.loads(sonata_package.get_son_packages(token=_token["token"]["access_token"]))
+        _package_list = json.loads(_package_list["data"])
+
+        _package = None
+        for _p in _package_list:
+            if "sonata_example.son" == _p['grid_fs_name']:
+                _package = _p['uuid']
+
+        response = None
+        if _package:
+            response = json.loads(sonata_package.delete_son_packages_PackageId(token=_token["token"]["access_token"], id=_package))
