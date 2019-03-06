@@ -23,3 +23,8 @@ class MainEngineService:
     def hello_adaptor(self, name):
         message = self.adaptor_rpc.hello(name)
         return message
+
+    @rpc
+    def adaptor_auth(self, username, password, mano):
+        message = self.adaptor_rpc.hello(name)
+        return message
