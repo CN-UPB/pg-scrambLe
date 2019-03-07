@@ -25,7 +25,7 @@ class TranslatorService():
             ref= insert.insert_nsd('sonata')
             rcvd_file = set.get_source_nsd(ref)
             var = set.translate_to_osm(rcvd_file)
-            trnsltd_file = set.get_source_nsd(var)
+            #trnsltd_file = set.get_source_nsd(var)
 
         elif name == 'osm_to_sonata':
             
@@ -33,12 +33,12 @@ class TranslatorService():
             ref= insert.insert_nsd('osm')
             rcvd_file = set.get_source_nsd(ref)
             var = set.translate_to_sonata(rcvd_file)
-            trnsltd_file = set.get_source_nsd(var)
+            #trnsltd_file = set.get_source_nsd(var)
             
         else :
             var = 'wrong choice!!!'
             
-        return str(str(rcvd_file)+'\n\n\n has been converted to \n\n\n' +str(trnsltd_file))#str(var)#
+        return str(str(rcvd_file)+'\n\n\n has been converted to \n\n\n' +str(var)#str(trnsltd_file))#
 
     
 
