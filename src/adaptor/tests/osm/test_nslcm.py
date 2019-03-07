@@ -5,20 +5,29 @@ from .config import *
 import json
 import time
 from .helpers import Helpers
+from .test_nsd import *
 
 def test_post_ns_instances(post_ns_instances_keys):
     """Tests API call to create a NS instance resource"""
     Helpers._delete_test_ns_instance()
     time.sleep(5) # Wait 
-    osm_nslcm = OSMClient.Nslcm(HOST_URL)
+    osm_nsd = OSMClient.Nsd(HOST_URL)
+    osm_nslcm = OSMClient.Nslcm(HOST_URL) 
     osm_auth = OSMClient.Auth(HOST_URL)
     _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
+    _nsd_list = json.loads(osm_nsd.get_ns_descriptors(token=_token["id"]))
+    _nsd_list = json.loads(_nsd_list["data"])
+    for _n in _nsd_list:
+        if "test_osm_cirros_2vnf_nsd" == _n['id']:            
+            _nsd = _n['_id']
+            print(_nsd)
+
 
     response = json.loads(osm_nslcm.post_ns_instances(token=_token["id"],
                         nsDescription=NSDESCRIPTION, 
                         nsName=NSNAME, 
-                        nsdId=NSDID, 
+                        nsdId=_nsd, 
                         vimAccountId=VIMACCOUNTID))
     response = json.loads(response["data"])
 
