@@ -125,8 +125,8 @@ def test_put_ns_descriptors_nsd_content():
     response = json.loads(osm_nsd.put_ns_descriptors_nsd_content(
                         token=_token["id"], 
                         id=_nsd, 
-                        data_path="tests/samples/test_osm_hackfest_1alt_nsd.tar.gz" ))
-    Helpers._delete_test_nsd("hackfest1alt-ns")
+                        data_path="tests/samples/test_osm_cirros_nsd.tar.gz" ))
+    Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
     if response["error"]:
             return True
     else:

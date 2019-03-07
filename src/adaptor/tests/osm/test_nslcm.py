@@ -6,8 +6,6 @@ import json
 import time
 from .helpers import Helpers
 
-
-
 def test_post_ns_instances(post_ns_instances_keys):
     """Tests API call to create a NS instance resource"""
     Helpers._delete_test_ns_instance()
@@ -28,9 +26,6 @@ def test_post_ns_instances(post_ns_instances_keys):
     assert set(post_ns_instances_keys).issubset(
                     response.keys()), "All keys should be in the response"
     time.sleep(5) # Wait for NS instantiation
-   
-                    
-    
 
 def test_get_ns_instances(get_ns_instances_keys):
     """Tests API call query multiple NS instances"""

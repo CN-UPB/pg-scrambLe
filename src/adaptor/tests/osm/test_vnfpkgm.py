@@ -165,8 +165,8 @@ def test_put_vnf_packages_vnfpkgid_package_content():
            
     response = json.loads(osm_vnfpkgm_vnfd.put_vnf_packages_vnfpkgid_package_content(
                                 token=_token["id"], id=_vnfd,
-                                data_path="tests/samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
-    Helpers._delete_test_vnf("hackfest1alt-vnf")
+                                data_path="tests/samples/test_osm_cirros_vnfd.tar.gz"))
+    Helpers._delete_test_vnf("test_osm_cirros_2vnf_nsd")
     if response["error"]:
             return True
     else:

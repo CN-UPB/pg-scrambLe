@@ -90,7 +90,7 @@ class Helpers():
                                     token=_token["id"], 
                                     id=_vnfd))
 
-    def _upload_reference_vnfd_for_nsd(_referencevnfdname="hackfest1alt-vnf"):
+    def _upload_reference_vnfd_for_nsd(_referencevnfdname="test_osm_cirros_vnfd"):
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -98,7 +98,7 @@ class Helpers():
 
         if _referencevnfdname:
             response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
-                            package_path="tests/samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
+                            package_path="tests/samples/test_osm_cirros_vnfd.tar.gz"))
         if response["error"]:
             return True
         else:
