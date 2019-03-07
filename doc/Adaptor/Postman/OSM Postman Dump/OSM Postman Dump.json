@@ -1,0 +1,1505 @@
+{
+	"info": {
+		"_postman_id": "c9124e17-c0dc-44fe-94f7-4a036c828197",
+		"name": "OSM POSTMAN DUMP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "NBI Auth",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/tokens",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD List",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "9MVxK2Mycx6vIdUt1W2yZuIvQPv5vi1A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/nsd/v1/ns_descriptors_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"nsd",
+						"v1",
+						"ns_descriptors_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI User List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "DDZUxVSlhCwhkC3XlMKdl3MUFtf648EM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/users",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI Get User Info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "JDpk868XIZXj8lLw2WmoQkjdLUv82WG3",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "Password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//admin/v1/users/admin",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"admin",
+						"v1",
+						"users",
+						"admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI Project List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "JDpk868XIZXj8lLw2WmoQkjdLUv82WG3",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "Password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//admin/v1/projects",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"admin",
+						"v1",
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI Create Project",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "JDpk868XIZXj8lLw2WmoQkjdLUv82WG3",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test Project",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//admin/v1/projects",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"admin",
+						"v1",
+						"projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NS List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Test Project",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/nslcm/v1/ns_instances_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"nslcm",
+						"v1",
+						"ns_instances_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//nsd/v1/ns_descriptors_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"nsd",
+						"v1",
+						"ns_descriptors_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//nsd/v1/ns_descriptors/6447e7e1-4af7-4733-90fd-89cb7b6b759c/nsd",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"nsd",
+						"v1",
+						"ns_descriptors",
+						"6447e7e1-4af7-4733-90fd-89cb7b6b759c",
+						"nsd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD Onboarding",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/gzip",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-File-MD5",
+						"value": "e171e83b13387447b3d2f42673155e9d ",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//nsd/v1/ns_descriptors_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"nsd",
+						"v1",
+						"ns_descriptors_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD Update",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/gzip"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-File-MD5",
+						"type": "text",
+						"value": "3146a8c68c786a2db37ef3550096578b"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/nsd/v1/ns_descriptors/6447e7e1-4af7-4733-90fd-89cb7b6b759c/nsd_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"nsd",
+						"v1",
+						"ns_descriptors",
+						"6447e7e1-4af7-4733-90fd-89cb7b6b759c",
+						"nsd_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI NSD Delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "EPOwBq7OLBF5zrD0MVgr7QCbuupzByTq",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/gzip"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//nsd/v1/ns_descriptors_content/e02ddd9f-a839-4944-bb7b-0854d511bdd3",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"nsd",
+						"v1",
+						"ns_descriptors_content",
+						"e02ddd9f-a839-4944-bb7b-0854d511bdd3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNFD List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/vnfpkgm/v1/vnf_packages_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNFD Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "7X5eDqoFWIZ3dHkiF7Hu3SpYMPRLfChp",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/zip"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//vnfpkgm/v1/vnf_packages/804741eb-bc96-4a3b-915f-5ed1281d4d23/vnfd",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages",
+						"804741eb-bc96-4a3b-915f-5ed1281d4d23",
+						"vnfd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNFD Onboarding",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/gzip"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-File-MD5",
+						"type": "text",
+						"value": "5c6c0711de5979ef1aeeb55ee0ab5141"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//vnfpkgm/v1/vnf_packages_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNFD Update",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lww0tIMcikZe5QwbW7i28QfZ0fWXccDQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/gzip"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-File-MD5",
+						"type": "text",
+						"value": "722bccd25d2876aaf4107ab993140dc1"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/vnfpkgm/v1/vnf_packages/e1b9d23f-8557-4ddf-bbf2-1b25672c7ec8/package_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages",
+						"e1b9d23f-8557-4ddf-bbf2-1b25672c7ec8",
+						"package_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNFD Delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "lHucrbEnRCf4TucrynUpidL39sSxBUcz",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-File-MD5",
+						"type": "text",
+						"value": "e7c9dec0efbab0986afe9e8d64c402f9"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//vnfpkgm/v1/vnf_packages_content/eb657095-e7a3-425b-bb58-aadde7c0d320",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages_content",
+						"eb657095-e7a3-425b-bb58-aadde7c0d320"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VIM List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1JrjlAnroAh4InKp18oLjCqMq6Zj1JVa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/yaml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//admin/v1/vims",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"admin",
+						"v1",
+						"vims"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VIM Delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b0Nd1njyQqdQPDYlPRV2WKSelV2aXwXG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm//admin/v1/vims/{1}",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"",
+						"admin",
+						"v1",
+						"vims",
+						"{1}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VIM Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b0Nd1njyQqdQPDYlPRV2WKSelV2aXwXG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/vims/{1}",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"vims",
+						"{1}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI SDN List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b0Nd1njyQqdQPDYlPRV2WKSelV2aXwXG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/vims/{1}",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"vims",
+						"{1}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI SDN Delete",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b0Nd1njyQqdQPDYlPRV2WKSelV2aXwXG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/sdns/{1}",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"sdns",
+						"{1}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI SDN Get",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "b0Nd1njyQqdQPDYlPRV2WKSelV2aXwXG",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/admin/v1/sdns/{1}",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"admin",
+						"v1",
+						"sdns",
+						"{1}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNF Packages",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "EnsWGNNAe5ZRkOIhCos3wsZW3mITZalB",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/zip"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/vnfpkgm/v1/vnf_packages/804741eb-bc96-4a3b-915f-5ed1281d4d23/package_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages",
+						"804741eb-bc96-4a3b-915f-5ed1281d4d23",
+						"package_content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "NBI VNF Package Artifacts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "EnsWGNNAe5ZRkOIhCos3wsZW3mITZalB",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/zip"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "https://vm-hadik3r-05.cs.uni-paderborn.de:9999/osm/vnfpkgm/v1/vnf_packages/804741eb-bc96-4a3b-915f-5ed1281d4d23/package_content",
+					"protocol": "https",
+					"host": [
+						"vm-hadik3r-05",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "9999",
+					"path": [
+						"osm",
+						"vnfpkgm",
+						"v1",
+						"vnf_packages",
+						"804741eb-bc96-4a3b-915f-5ed1281d4d23",
+						"package_content"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "admin",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b96e2932-fef7-4ceb-82e4-0fdb3914a23d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "55d54118-2ff4-4ba3-b181-1cf78edf6dba",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.6
 
 RUN apt-get update && apt-get -y install netcat && apt-get clean
 
@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY config.yml ./
 COPY start.sh ./
 COPY adaptor.py ./
+COPY tests ./tests
+COPY wrappers ./wrappers
 
 RUN chmod +x ./start.sh
 

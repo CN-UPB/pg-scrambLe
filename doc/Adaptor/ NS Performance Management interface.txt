@@ -1,0 +1,111 @@
+etsi = [    
+    {
+        "section": "NS Performance Management Interface",
+        "resourceName": "PM jobs",
+        "endpoint": "pm_jobs",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query PM jobs"
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Create a PM job"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Individual PM job",
+        "endpoint": "pm_jobs_pmjobid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read a single PM job"
+            },
+            {
+                "method": "delete",
+                "meaning": "DELETE - Delete a PM job"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Individual performance report",
+        "endpoint": "pm_jobs_pmjobid_reports_reportid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read an individual performance report"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Thresholds",
+        "endpoint": "pm_thresholds",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query thresholds"
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Create a threshold"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Individual threshold",
+        "endpoint": "pm_thresholds_thresholdid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query a single threshold"
+            },
+            {
+                "method": "delete",
+                "meaning": "DELETE - Delete a threshold"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Subscriptions",
+        "endpoint": "pm_subscriptions",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query PM related subscriptions"
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Subscribe to PM notifications"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Individual",
+        "endpoint": "pm_subscriptions_subscriptionid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query a single PM related subscription"
+            },
+            {
+                "method": "delete",
+                "meaning": "DELETE - Terminate a subscription"
+            }
+        ]
+    },{
+        "section": "NS Performance Management Interface",
+        "resourceName": "Notification endpoint",
+        "endpoint": "unknown",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Test the notification endpoint"
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Notify about PM related events"
+            }
+        ]
+    }
+]
