@@ -123,35 +123,55 @@ def osm_validator(descriptor):
 
 
 def sonata_nsd_validator(descriptor):
-    client = pymongo.MongoClient("mongodb://localhost:27017")
-    db = client["test"]
     descriptor_to_validate = descriptor
-    schema = db["sonata_nsd_schema"]
-    validator = Draft4Validator(schema, format_checker=FormatChecker())
-    lastidx = 0
-    for idx, err in enumerate(validator.iter_errors(descriptor_to_validate), 1):
-        lastidx = idx
-        if idx == 1:
-            print("\tSCHEMA ERRORS:")
-        print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
-    if lastidx == 0:
-        return True
+    if "descriptor_version" in descriptor_to_validate:
+        schema = yaml.load(open("tng-schema/Nsd/nsd-Pishahang.yml"))
+        validator = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+        if lastidx == 0:
+            return True
+    else:
+        schema = yaml.load(open("tng-schema/Nsd/nsd-schema.yml"))
+        validator = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+        if lastidx == 0:
+            return True
 
 
 def sonata_vnfd_validator(descriptor):
-    client = pymongo.MongoClient("mongodb://localhost:27017")
-    db = client["test"]
     descriptor_to_validate = descriptor
-    schema = db["sonata_vnfd_schema"]
-    validator = Draft4Validator(schema , format_checker=FormatChecker())
-    lastidx = 0
-    for idx, err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-        lastidx = idx
-        if idx == 1:
-            print("\tSCHEMA ERRORS:")
-        print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
-    if lastidx == 0:
-        return True
+    if "descriptor_version" in descriptor_to_validate:
+        schema = yaml.load(open("tng-schema/Vnfd/vnfd-Pishahang.yml"))
+        validator = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+        if lastidx == 0:
+            return True
+    else:
+        schema = yaml.load(open("tng-schema/Vnfd/vnfd-schema.yml"))
+        validator = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+        if lastidx == 0:
+            return True
 
 def validate(source, translated):
     received_file = source
