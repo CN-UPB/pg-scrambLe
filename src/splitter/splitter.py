@@ -6,7 +6,7 @@ import yaml
 
 
 NSDs = []
-network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
+network_function_sets = [["vnf_iperf"], ["vnf_tcpdump"], ["vnf_firewall"]]
 old_new_link_mapping = []
 
 
@@ -59,7 +59,7 @@ def set_connection_point_refs_for_virtual_functions():
         for connection_point_ref in virtual_link.connection_points_reference:
             split_string = connection_point_ref.split(':')
             if get_network_function_object(split_string[0]) is not None:
-                get_network_function_object(split_string[0]).connection_point_refs.append(connection_point_ref)
+                get_network_function_object(split_string[0]).connection_point_refs.append(str(connection_point_ref))
 
 
 def handle_elan_links(virtual_link_elan, nsd_vl):
@@ -67,12 +67,12 @@ def handle_elan_links(virtual_link_elan, nsd_vl):
     for nf in nsd_vl.networkFunctions:
         for connection_point_ref in virtual_link_elan.connection_points_reference:
             if connection_point_ref in nf.connection_point_refs:
-                virtual_link_inner.connection_points_reference.append(connection_point_ref)
+                virtual_link_inner.connection_points_reference.append(str(connection_point_ref))
             else:
                 if connection_point_ref not in virtual_link_inner.connection_points_reference:
                     for connection_point in nsd_vl.connectionPoints:
                         if connection_point_ref == connection_point.id:
-                            virtual_link_inner.connection_points_reference.append(connection_point_ref)
+                            virtual_link_inner.connection_points_reference.append(str(connection_point_ref))
     return virtual_link_inner
 
 
@@ -110,22 +110,22 @@ def split_virtual_links():
                         found_0 = 0
                         found_1 = 0
                         if cp_0 in get_connection_point_refs(nsd_vl.networkFunctions):
-                            virtual_link_inner.connection_points_reference.append(cp_0)
+                            virtual_link_inner.connection_points_reference.append(str(cp_0))
                             found_0 = 1
                         else:
                             for connection_point in nsd_vl.connectionPoints:
                                 if cp_0 == connection_point.id:
-                                    virtual_link_inner.connection_points_reference.append(cp_0)
+                                    virtual_link_inner.connection_points_reference.append(str(cp_0))
                                     found_0 = 1
                         if found_0 == 0:
                             print(cp_0)
                         if cp_1 in get_connection_point_refs(nsd_vl.networkFunctions):
-                            virtual_link_inner.connection_points_reference.append(cp_1)
+                            virtual_link_inner.connection_points_reference.append(str(cp_1))
                             found_1 = 1
                         else:
                             for connection_point in NSDs[i].connectionPoints:
                                 if cp_1 == connection_point.id:
-                                    virtual_link_inner.connection_points_reference.append(cp_1)
+                                    virtual_link_inner.connection_points_reference.append(str(cp_1))
                                     found_1 = 1
                         if found_1 == 0:
                             split_string = cp_1.split(':')
@@ -139,10 +139,10 @@ def split_virtual_links():
                                 if vnf_containing_vl_temp.id != virtual_link.id:
                                     if split_string[0] not in vnf_containing_vl_temp.connection_points_reference[0]:
                                         virtual_link_inner.connection_points_reference.append(
-                                            vnf_containing_vl_temp.connection_points_reference[0])
+                                            str(vnf_containing_vl_temp.connection_points_reference[0]))
                                     if split_string[0] not in vnf_containing_vl_temp.connection_points_reference[1]:
                                         virtual_link_inner.connection_points_reference.append(
-                                            vnf_containing_vl_temp.connection_points_reference[1])
+                                            str(vnf_containing_vl_temp.connection_points_reference[1]))
                     if len(virtual_link_inner.connection_points_reference) == 2:
                         str1 = virtual_link_inner.connection_points_reference[0].split(":")
                         str2 = virtual_link_inner.connection_points_reference[1].split(":")
@@ -161,12 +161,12 @@ def set_constituent_virtual_links(nsd, fg):
     for vl in nsd.virtualLinks:
         for virtual_links in fg.constituent_virtual_links:
             if vl.id == virtual_links:
-                constituent_vl.append(vl.id)
+                constituent_vl.append(str(vl.id))
                 break
             else:
                 for old_new_mapping in old_new_link_mapping:
                     if vl.id == old_new_mapping[0]:
-                        constituent_vl.append(old_new_mapping[1])
+                        constituent_vl.append(str(old_new_mapping[1]))
                         break
     return list(set(constituent_vl))
 
@@ -199,7 +199,7 @@ def split_forwarding_path():
 
 def create_files():
     for i in range(len(NSDs)):
-        data = OrderedDict()
+        data = {}
         data['descriptor_version'] = str(NSDs[i].descriptor_version)
         data['vendor'] = str(NSDs[i].vendor)
         data['name'] = str(NSDs[i].name)
@@ -219,16 +219,16 @@ def create_files():
         data['connection_points'] = []
         for connection_point in NSDs[i].connectionPoints:
             data['connection_points'].append({
-                "id": connection_point.id,
-                "interface": connection_point.interface,
-                "type": connection_point.type
+                "id": str(connection_point.id),
+                "interface": str(connection_point.interface),
+                "type": str(connection_point.type)
             })
 
         data['virtual_links'] = []
         for virtual_link in NSDs[i].virtualLinks:
             data['virtual_links'].append({
-                "id": virtual_link.id,
-                "connectivity_type": virtual_link.connectivity_type,
+                "id": str(virtual_link.id),
+                "connectivity_type": str(virtual_link.connectivity_type),
                 "connection_points_reference": virtual_link.connection_points_reference
             })
 
@@ -237,24 +237,24 @@ def create_files():
 
         for connection_point in NSDs[i].forwardingGraphs[0].network_forwarding_path[0].connection_points:
             sub_data['connection_points'].append({
-                "connection_point_ref": connection_point.connection_point_ref,
-                "position": connection_point.position
+                "connection_point_ref": str(connection_point.connection_point_ref),
+                "position": str(connection_point.position)
             })
 
         sub_data['network_forwarding_paths'] = []
         for network_forwarding_path in NSDs[i].forwardingGraphs[0].network_forwarding_path:
             sub_data['network_forwarding_paths'].append({
-                "fp_id": network_forwarding_path.fp_id,
-                "policy": network_forwarding_path.policy,
+                "fp_id": str(network_forwarding_path.fp_id),
+                "policy": str(network_forwarding_path.policy),
                 "connection_points": sub_data['connection_points']
             })
 
         data['forwarding_graphs'] = []
         for forwarding_graph in NSDs[i].forwardingGraphs:
             data['forwarding_graphs'].append({
-                "fg_id": forwarding_graph.fg_id,
-                "number_of_endpoints": forwarding_graph.number_of_endpoints,
-                "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+                "fg_id": str(forwarding_graph.fg_id),
+                "number_of_endpoints": str(forwarding_graph.number_of_endpoints),
+                "number_of_virtual_links": str(forwarding_graph.number_of_virtual_links),
                 "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
                 "constituent_vnfs": forwarding_graph.constituent_vnfs,
                 "network_forwarding_paths": sub_data['network_forwarding_paths']

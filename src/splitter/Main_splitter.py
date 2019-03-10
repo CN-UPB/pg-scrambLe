@@ -14,19 +14,19 @@ def main():
 
     #To fetch OSM file and to call osm splitter
 
-    received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
-    print("OSM NSD")
+    #received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
+    #print("OSM NSD")
     #print(received_file_osm)
-    osm_utility.osm_nsd(received_file_osm)
+    #osm_utility.osm_nsd(received_file_osm)
 
 
 
     #to fetch Sonata file and to call sonata splitter
 
-    #received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
-    #print("SONATA NSD")
-    #sonataUtilityFunctions.get_data_sonata(received_file_sonata)
-    #splitter.split_sonata()
+    received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
+    print("SONATA NSD")
+    sonataUtilityFunctions.get_data_sonata(received_file_sonata)
+    splitter.split_sonata()
     #print(received_file_sonata)
 
 
