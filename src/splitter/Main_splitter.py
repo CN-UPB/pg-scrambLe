@@ -1,28 +1,34 @@
 import pymongo
 from pprint import pprint
+import SonataUtilityFunctions as sonataUtilityFunctions
+import splitter as splitter
+import OsmUtilityFunctions as osm_utility
 from Fetchfile import Fetchfile
-from OsmNSDSchema import get_data
-from OsmNSDSchema import osm_nsd
-import UtilityFunctions as sonatafunctions
 
 parameters = "xyz"
-reference_osm = "5c72a863c1e01d191a6eeeb3"    #Example reference id
-reference_sonata = "5c59c83b29ab8c1f8c6deac7"
+reference_osm = "5c8339e70594c7824aba2704"    #Example reference id
+reference_sonata = "5c833a400594c7824aba2714"
 
 
 def main():
 
     #To fetch OSM file and to call osm splitter
 
-    received_file_osm = Fetchfile(reference_osm, parameters)
-    get_data(received_file_osm)
-    osm_nsd(received_file_osm)
+    received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
+    print("OSM NSD")
+    #print(received_file_osm)
+    osm_utility.osm_nsd(received_file_osm)
+
 
 
     #to fetch Sonata file and to call sonata splitter
 
-    received_file_sonata = Fetchfile(reference_sonata, parameters)
-    sonatafunctions.get_data_sonata(received_file_sonata)
+    #received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
+    #print("SONATA NSD")
+    #sonataUtilityFunctions.get_data_sonata(received_file_sonata)
+    #splitter.split_sonata()
+    #print(received_file_sonata)
+
 
 
 if __name__ == '__main__':

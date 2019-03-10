@@ -1,6 +1,6 @@
 from nameko.rpc import rpc
 import SonataSchema as SS
-import UtilityFunctions as utilityFunctions
+import SonataUtilityFunctions as utilityFunctions
 from collections import OrderedDict
 import yaml
 
@@ -15,12 +15,6 @@ class SplitterService:
 
     @rpc
     def hello(self, name):
-        set_connection_point_refs_for_virtual_functions()
-        split_network_function()
-        set_connection_points()
-        split_virtual_links()
-        split_forwarding_path()
-        create_files()
         return "Success"
 
 
@@ -34,7 +28,6 @@ def get_network_function_object(vnf_name):
 def split_network_function():
     for network_function_set in network_function_sets:
         sub_nsd = SS.NSD("", "", "", "", "", "", [], [], [], [])
-        sub_nsd = utilityFunctions.set_general_information(sub_nsd)
         network_function_list = []
         for network_function in network_function_set:
             network_function_list.append(get_network_function_object(network_function))
@@ -47,6 +40,18 @@ def set_connection_points():
         nsd_cp = NSDs[i]
         nsd_cp.connectionPoints = utilityFunctions.list_connection_points
         NSDs[i] = nsd_cp
+
+
+def set_general_information():
+    for i in range(len(network_function_sets)):
+        nsd_general_info = NSDs[i]
+        nsd_general_info.descriptor_version = utilityFunctions.descriptor_version
+        nsd_general_info.vendor = utilityFunctions.vendor
+        nsd_general_info.name = utilityFunctions.name
+        nsd_general_info.version = utilityFunctions.version
+        nsd_general_info.author = utilityFunctions.author
+        nsd_general_info.description = utilityFunctions.description
+        NSDs[i] = nsd_general_info
 
 
 def set_connection_point_refs_for_virtual_functions():
@@ -195,20 +200,20 @@ def split_forwarding_path():
 def create_files():
     for i in range(len(NSDs)):
         data = OrderedDict()
-        data['descriptor_version'] = NSDs[i].descriptor_version
-        data['vendor'] = NSDs[i].vendor
-        data['name'] = NSDs[i].name
-        data['version'] = NSDs[i].version
-        data['author'] = NSDs[i].author
-        data['description'] = NSDs[i].description
+        data['descriptor_version'] = str(NSDs[i].descriptor_version)
+        data['vendor'] = str(NSDs[i].vendor)
+        data['name'] = str(NSDs[i].name)
+        data['version'] = str(NSDs[i].version)
+        data['author'] = str(NSDs[i].author)
+        data['description'] = str(NSDs[i].description)
 
         data['network_functions'] = []
         for network_function in NSDs[i].networkFunctions:
             data['network_functions'].append({
-                "vnf_id": network_function.vnf_id,
-                "vnf_name": network_function.vnf_name,
-                "vnf_vendor": network_function.vnf_vendor,
-                "vnf_version": network_function.vnf_version
+                "vnf_id": str(network_function.vnf_id),
+                "vnf_name": str(network_function.vnf_name),
+                "vnf_vendor": str(network_function.vnf_vendor),
+                "vnf_version": str(network_function.vnf_version)
             })
 
         data['connection_points'] = []
@@ -261,3 +266,12 @@ def create_files():
             yaml.dump(data, outfile, default_flow_style=False)
             print("Created NSD_" + str(i))
 
+
+def split_sonata():
+    set_connection_point_refs_for_virtual_functions()
+    split_network_function()
+    set_connection_points()
+    split_virtual_links()
+    split_forwarding_path()
+    set_general_information()
+    create_files()
