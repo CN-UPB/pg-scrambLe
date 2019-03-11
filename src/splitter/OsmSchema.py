@@ -1,5 +1,6 @@
 import yaml
 from Fetchfile import Fetchfile
+import OsmSchema as osmSchema
 
 
 class NsdNsdCatalog:
@@ -18,6 +19,7 @@ class Nsd:
     connection_point = []
     logo = "" #optional
     ConstituentVnfd = []
+    ConstituentVnfdIndexes = []
     scaling_group_descriptor = []
     vnffgd = []
     vld = []
@@ -193,7 +195,6 @@ class MatchAttributes:
         self.destination_port = destination_port
 
 
-
 class ConstituentVnfd:  #complete
     member_vnf_index = ""
     start_by_default = ""
@@ -203,35 +204,6 @@ class ConstituentVnfd:  #complete
         self.member_vnf_index = member_vnf_index
         self.start_by_default = start_by_default
         self.vnfd_id_ref = vnfd_id_ref
-
-
-class IpProfiles:
-    name = ""
-    description = ""
-    ip_profile_params = []
-    def __init__(self, name, description, ip_profile_params):
-        self.name = name
-        self.description = description
-        self.ip_profile_params = ip_profile_params
-
-
-class IpProfileParams: #complete
-    gateway_address = 0
-    ip_version = ""
-    subnet_address = ""
-    security_group = ""
-    dns_server = []
-    dhcp_params = []
-    subnet_prefix_pool = ""
-
-    def __init__(self, ip_version, subnet_address, gateway_address, security_group, dns_server, dhcp_params, subnet_prefix_pool):
-        self.gateway_address = gateway_address
-        self.ip_version = ip_version
-        self.subnet_address = subnet_address
-        self.security_group = security_group
-        self.dns_server = dns_server
-        self.dhcp_params = dhcp_params
-        self.subnet_prefix_pool = subnet_prefix_pool
 
 
 class DnsServer:
@@ -248,6 +220,37 @@ class DhcpParams:
         self.enabled = enabled
         self.start_address = start_address
         self.count = count
+
+class IpProfileParams: #complete
+    gateway_address = 0
+    ip_version = ""
+    subnet_address = ""
+    security_group = ""
+    dns_server = DnsServer("")
+    dhcp_params = DhcpParams("", "", "")
+    subnet_prefix_pool = ""
+
+    def __init__(self, ip_version, subnet_address, gateway_address, security_group, dns_server, dhcp_params, subnet_prefix_pool):
+        self.gateway_address = gateway_address
+        self.ip_version = ip_version
+        self.subnet_address = subnet_address
+        self.security_group = security_group
+        self.dns_server = dns_server
+        self.dhcp_params = dhcp_params
+        self.subnet_prefix_pool = subnet_prefix_pool
+
+
+class IpProfiles:
+    name = ""
+    description = ""
+    dns_server = DnsServer("")
+    dhcp_params = DhcpParams("", "", "")
+    ip_profile_params = IpProfileParams("", "", "", "", dns_server, dhcp_params, "")
+
+    def __init__(self, name, description, ip_profile_params):
+        self.name = name
+        self.description = description
+        self.ip_profile_params = ip_profile_params
 
 
 class Vld:

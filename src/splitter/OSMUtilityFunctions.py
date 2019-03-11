@@ -38,24 +38,24 @@ def get_osm_nsd(received_file_sonata):
             for nsd_key in nsd.keys():
                 nsd_temp = nsd[nsd_key]
                 set_vnffg(nsd_temp[0])
-                return nsd_temp[0]
+                call_functions(nsd_temp[0])
 
 
 def set_general_informations(source):
     global id
-    id = source['descriptor_version']
+    id = source['id']
     global name
-    name = source['vendor']
+    name = source['name']
     global short_name
-    short_name = source['name']
+    short_name = source['short-name']
     global description
-    description = source['version']
+    description = source['description']
     global vendor
-    vendor = source['author']
+    vendor = source['vendor']
     global version
-    version = source['description']
+    version = source['version']
     global logo
-    logo = source['description']
+    logo = source['logo']
 
 
 def set_constituent_vnfd(source):
@@ -66,7 +66,6 @@ def set_constituent_vnfd(source):
         start_by_default = constituent_vnfd_data.get('start-by-default')
         constituent_vnfd_instance = osm_schema.ConstituentVnfd(member_vnf_index, start_by_default, vnfd_id_ref)
         list_constituent_vnfd.append(constituent_vnfd_instance)
-    print(list_constituent_vnfd)
 
 
 def set_ip_profiles(source):
@@ -82,7 +81,6 @@ def set_ip_profiles(source):
         security_group = ip_profile_params.get('security_group')
 
         dns_server_data = ip_profile_params.get('dns-server')
-        print(dns_server_data)
         for dns_server_address in dns_server_data:
             address = dns_server_address.get('address')
             dns_server_instance = osm_schema.DnsServer(address)
@@ -99,13 +97,11 @@ def set_ip_profiles(source):
                                                                 security_group, list_dns_server,
                                                                 list_dhcp_params, subnet_prefix_pool)
         ip_profiles_instance = osm_schema.IpProfiles(name, description, ip_profile_params_instance)
-        print(ip_profiles_instance)
         list_ip_profiles.append(ip_profiles_instance)
 
 
 def set_vld(source):
     vld = source['vld']
-    print(vld)
     for vld_data in vld:
         id = vld_data.get('id')
         name = vld_data.get('name')
@@ -135,7 +131,6 @@ def set_vld(source):
                                       leaf_bandwidth, mgmt_network, vim_network_name, ip_profile_ref,
                                       list_vnfd_connection_point_ref)
         list_vld.append(vld_instance)
-    print(list_vld)
 
 
 def set_vnffg(source):
@@ -185,5 +180,11 @@ def set_vnffg(source):
         vnffgd_instance = osm_schema.Vnffgd(id, name, short_name, vendor, description, version, list_rsp,
                                             list_classifier)
         list_vnffgd.append(vnffgd_instance)
-        print(list_vnffgd)
 
+
+def call_functions(source):
+    set_general_informations(source)
+    set_constituent_vnfd(source)
+    set_ip_profiles(source)
+    set_vld(source)
+    set_vnffg(source)

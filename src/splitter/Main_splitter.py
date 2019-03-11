@@ -2,6 +2,7 @@ import pymongo
 from pprint import pprint
 import SonataUtilityFunctions as sonataUtilityFunctions
 import splitter as splitter
+import OsmSplitter as osmSplitter
 import OsmUtilityFunctions as osm_utility
 import OSMUtilityFunctions as OSM_utility
 from Fetchfile import Fetchfile
@@ -17,16 +18,15 @@ def main():
 
     received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
     OSM_utility.get_osm_nsd(received_file_osm)
+    osmSplitter.split_osm()
 
 
 
     #to fetch Sonata file and to call sonata splitter
 
-    received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
-    print("SONATA NSD")
-    sonataUtilityFunctions.get_data_sonata(received_file_sonata)
-    splitter.split_sonata()
-    print(received_file_sonata)
+    #received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
+    #sonataUtilityFunctions.get_data_sonata(received_file_sonata)
+    #splitter.split_sonata()
 
 
 if __name__ == '__main__':

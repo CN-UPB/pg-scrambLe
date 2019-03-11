@@ -1,12 +1,11 @@
 from nameko.rpc import rpc
 import SonataSchema as SS
 import SonataUtilityFunctions as utilityFunctions
-from collections import OrderedDict
 import yaml
 
 
 NSDs = []
-network_function_sets = [["vnf_iperf"], ["vnf_tcpdump"], ["vnf_firewall"]]
+network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
 old_new_link_mapping = []
 
 
