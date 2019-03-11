@@ -133,11 +133,19 @@ class Vnffgd:
 class Rsp:
     id = ""
     name = ""
-    vnfd_connection_point_ref = []
-    def __init__(self, id, name, vnfd_connection_point_ref):
+    vnfd_connection_point_ref = ""
+    member_vnf_index_ref = ""
+    order = ""
+    vnf_id_ref = ""
+    vnfd_connection_point_ref = ""
+
+    def __init__(self, id, name, vnfd_connection_point_ref, member_vnf_index_ref, order, vnf_id_ref):
         self.id = id
         self.name = name
         self.vnfd_connection_point_ref = vnfd_connection_point_ref
+        self.member_vnf_index_ref = member_vnf_index_ref
+        self.order = order
+        self.vnf_id_ref = vnf_id_ref
 
 class VnfdConnectionPointRefVnffgd:
     member_vnf_index_ref = ""

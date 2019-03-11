@@ -19,5 +19,4 @@ def Fetchfile(ref, param):
         received_file = [ns for ns in doc.find({'_id': ObjectId(received_ref)})]
         if len(received_file) > 0:
             break
-    print(received_file)
     return received_file
