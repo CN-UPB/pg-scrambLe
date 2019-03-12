@@ -24,9 +24,9 @@ def main():
 
     #to fetch Sonata file and to call sonata splitter
 
-    #received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
-    #sonataUtilityFunctions.get_data_sonata(received_file_sonata)
-    #splitter.split_sonata()
+    received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
+    sonataUtilityFunctions.get_data_sonata(received_file_sonata)
+    splitter.split_sonata()
 
 
 if __name__ == '__main__':

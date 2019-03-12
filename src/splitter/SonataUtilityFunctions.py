@@ -30,8 +30,6 @@ def set_general_information(source):
     author = source['author']
     global description
     description = source['description']
-    print('########################################################################################################################################')
-    print(source)
 
 
 # Function to extract the values "vnf id, vnf vendor, vnf name and vnf version" from Network functions

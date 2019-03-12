@@ -188,7 +188,6 @@ def create_files():
 
         rsp = {}
         rsp['rsp'] = []
-        print(NSDs[0].vnffgd[0].rsp[0].id)
         for vnffgd_data in NSDs[i].vnffgd:
             for rsp_data in vnffgd_data.rsp:
                 if rsp_data.id is not None:
@@ -247,16 +246,16 @@ def create_files():
             "vnffgd": vnffgd['vnffgd']
         })
 
-        data['nsd:nsd-catalog'] = []
-        data['nsd:nsd-catalog'].append(
-            {"nsd": general_information['nsd']}
-        )
+        data['nsd:nsd-catalog'] = {
+            "nsd": general_information['nsd']
+        }
+
 
         file_name = "OSM_NSD_" + str(i)
         with open(file_name + '.yml', 'w') as outfile:
-            #print("Creating NSD_" + str(i))
+            print("Creating OSM NSD_" + str(i))
             yaml.dump(data, outfile, default_flow_style=False)
-            #print("Created NSD_" + str(i))
+            print("Created OSM NSD_" + str(i))
 
 
 def split_osm():
