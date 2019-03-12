@@ -176,83 +176,50 @@ def sonata_vnfd_validator(descriptor):
 def validate(source, translated):
     received_file = source
     translated_file = translated
-    if 'eu.5gtango' and 'virtual_deployment_units' in received_file:
+    if 'virtual_deployment_units' in received_file:
+        var = VNFD_Translator.translate_to_sonata_vnfd(translated_file)
+        file1 = yaml.load(open("received_file"))
+        file2 = yaml.load(open("var"))
+        words1 = set(file1.read().split())
+	words2 = set(file2.read().split())
+	duplicates  = words1.intersection(words2)
+	uniques = words1.difference(words2).union(words2.difference(words1))
+	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
+	print "\nUniques(%d):%s"%(len(uniques),uniques)
+	config_check = sonata_vnfd_validator(translated_file)
+
+    elif 'network_functions' in received_file:
         var = setup.translate_to_sonata(translated_file)
         file1 = yaml.load(open("received_file"))
         file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                    break
-        if value == "True":
-            format_check = sonata_vnfd_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
+        words1 = set(file1.read().split())
+	words2 = set(file2.read().split())
+	duplicates  = words1.intersection(words2)
+	uniques = words1.difference(words2).union(words2.difference(words1))
+	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
+	print "\nUniques(%d):%s"%(len(uniques),uniques)
+	config_check = sonata_nsd_validator(translated_file)
 
-    elif 'descriptor_schema' and 'network_functions' in received_file:
-        var = setup.translate_to_sonata(translated_file)
+    elif 'constituent-vnfd' in received_file:
+        var = VNFD_Translator.translate_to_osm_vnfd(translated_file)
         file1 = yaml.load(open("received_file"))
         file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = sonata_vnfd_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
+        words1 = set(file1.read().split())
+	words2 = set(file2.read().split())
+	duplicates  = words1.intersection(words2)
+	uniques = words1.difference(words2).union(words2.difference(words1))
+	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
+	print "\nUniques(%d):%s"%(len(uniques),uniques)
+	config_check = osm_validator(translated_file)
 
-    elif 'osm' and 'constituent-vnfd' in received_file:
+    elif 'management interface' in received_file:
         var = setup.translate_to_osm(translated_file)
         file1 = yaml.load(open("received_file"))
         file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = osm_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-    elif 'osm' and 'management interface' in received_file:
-        var = setup.translate_to_osm(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = osm_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-
-
-
-
-
-
-
-
-
-
+        words1 = set(file1.read().split())
+	words2 = set(file2.read().split())
+	duplicates  = words1.intersection(words2)
+	uniques = words1.difference(words2).union(words2.difference(words1))
+	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
+	print "\nUniques(%d):%s"%(len(uniques),uniques)
+	config_check = osm_validator(translated_file)

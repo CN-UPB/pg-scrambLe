@@ -29,19 +29,6 @@ class setup():
 
 
     def translate_to_osm(self,received_file):
-
-        record = self.db_mappings.nsd_mapping
-                
-        if 'eu.5gtango' and 'virtual_deployment_units' in received_file:
-        
-            doc = self.db_descriptors["translated_vnfd"]
-            
-            temp = doc.insert_one(translated)
-            translated_ref = temp.inserted_id
-            return translated_ref
-            
-        elif 'descriptor_schema' and 'network_functions' in received_file:
-        
             doc = self.db_descriptors["translated_nsd"]
             
             sonata = received_file
@@ -148,18 +135,15 @@ class setup():
             writer = write_dict()
             message = writer.translate_nsd(dataset)
             
-            temp = doc.insert_one(message).inserted_id
-            translate_ref = str(temp)
+            #temp = doc.insert_one(message).inserted_id
+            #translate_ref = str(temp)
             
-            return translate_ref
+            return message
 
 
     def translate_to_sonata(self,received_file):
 
         record = self.db_mappings.nsd_mapping
-    
-        if 'nsd:nsd-catalog' in received_file:
-        
             doc = self.db_descriptors["translated_nsd"]
             
             osm = received_file
@@ -283,19 +267,19 @@ class setup():
             message = writer.translate_nsd(dataset)
             message = message['preroot']["root"][0]
             
-            temp = doc.insert_one(message).inserted_id
-            translated_ref = str(temp)
+            #temp = doc.insert_one(message).inserted_id
+            #translated_ref = str(temp)
             
-            return translated_ref
+            return message
             
         elif 'osm' and 'management interface' in received_file:
         
             doc = self.db_descriptors["translated_nsd"]
             
-            temp = doc.insert_one(translated)
-            translated_ref = temp.inserted_id
+            #temp = doc.insert_one(translated)
+            #translated_ref = temp.inserted_id
             
-            return translated_ref
+            return translated
 
 class insert_into_db():
     

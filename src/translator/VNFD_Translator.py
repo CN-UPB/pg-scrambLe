@@ -507,7 +507,7 @@ class mapping():
 
         return id
 
-    def translate_to_osm(self, received_file):
+    def translate_to_osm_vnfd(self, received_file):
         client = pymongo.MongoClient("mongodb://localhost:27017")
         db = client.descriptors
         db2 = client.mapping_vnfd
@@ -607,7 +607,7 @@ class mapping():
 
 
 
-    def translate_to_sonata(self, received_file):
+    def translate_to_sonata_vnfd(self, received_file):
         client = pymongo.MongoClient("mongodb://localhost:27017")
         db = client.descriptors
         db2 = client.mapping_vnfd

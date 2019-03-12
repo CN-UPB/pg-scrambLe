@@ -46,7 +46,7 @@ def sonata(file):
     received_file = file
     client = pymongo.MongoClient("mongodb://localhost:27017")
     set = setup(client)
-    if 'eu.5gtango' and 'virtual_deployment_units' in received_file:
+    if 'virtual_deployment_units' in received_file:
         doc = set.db_descriptors["translated_vnfd"]
         translated = setup.translate_to_osm(received_file)
         check = validate(received_file, translated)
@@ -55,7 +55,7 @@ def sonata(file):
             translated_ref = temp.inserted_id
             return translated_ref
 
-    elif 'eu.5gtango' and 'connection_points' in received_file:
+    elif 'connection_points' in received_file:
         doc = set.db_descriptors["translated_nsd"]
         translated = setup.translate_to_osm(received_file)
         check = validate(received_file, translated)
@@ -69,7 +69,7 @@ def osm(file):
     client = pymongo.MongoClient("mongodb://localhost:27017")
     set = setup(client)
     received_file = file
-    if 'osm' and 'constituent-vnfd' in received_file:
+    if 'constituent-vnfd' in received_file:
         doc = set.db_descriptors["translated_nsd"]
         translated = setup.translate_to_sonata(received_file)
         check = validate(received_file , translated)
@@ -77,7 +77,7 @@ def osm(file):
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
             return translated_ref
-    elif 'osm' and 'management interface' in received_file:
+    elif 'management interface' in received_file:
         doc = set.db_descriptors["translated_vnfd"]
         translated = setup.translate_to_sonata(received_file)
         check = validate(received_file , translated)
