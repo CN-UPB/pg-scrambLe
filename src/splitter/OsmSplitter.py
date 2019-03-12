@@ -3,7 +3,7 @@ import OSMUtilityFunctions as utilityFunctions
 import yaml
 
 NSDs = []
-network_function_sets = [["1", "2"], ["3"]]
+network_function_sets = [["1"], ["2"]]
 
 
 def get_network_function_object(vnf_index):
@@ -68,24 +68,25 @@ def split_vld():
 
 
 def split_forwarding_path():
-    for i in range(len(NSDs)):
-        nsd_fg = NSDs[i]
-        for fg in utilityFunctions.list_vnffgd:
-            vnffgd_instance = OS.Vnffgd(fg.id, fg.name, fg.short_name, fg.vendor, fg.description, fg.version, [], [])
-            for classifier in fg.classifier:
-                for constituent_vnf in nsd_fg.ConstituentVnfd:
-                    if classifier is not None and constituent_vnf is not None:
-                        if str(classifier.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
-                            vnffgd_instance.classifier.append(classifier)
-            for rsp in fg.rsp:
-                if rsp.id is not None:
-                    vnffgd_instance.rsp.append(rsp)
-                for constituent_vnf in nsd_fg.ConstituentVnfd:
-                    if rsp.id is None:
-                        if str(rsp.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
-                            vnffgd_instance.rsp.append(rsp)
-        nsd_fg.vnffgd.append(vnffgd_instance)
-        NSDs[i] = nsd_fg
+    if len(utilityFunctions.list_vnffgd) is not 0:
+        for i in range(len(NSDs)):
+            nsd_fg = NSDs[i]
+            for fg in utilityFunctions.list_vnffgd:
+                vnffgd_instance = OS.Vnffgd(fg.id, fg.name, fg.short_name, fg.vendor, fg.description, fg.version, [], [])
+                for classifier in fg.classifier:
+                    for constituent_vnf in nsd_fg.ConstituentVnfd:
+                        if classifier is not None and constituent_vnf is not None:
+                            if str(classifier.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
+                                vnffgd_instance.classifier.append(classifier)
+                for rsp in fg.rsp:
+                    if rsp.id is not None:
+                        vnffgd_instance.rsp.append(rsp)
+                    for constituent_vnf in nsd_fg.ConstituentVnfd:
+                        if rsp.id is None:
+                            if str(rsp.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
+                                vnffgd_instance.rsp.append(rsp)
+            nsd_fg.vnffgd.append(vnffgd_instance)
+            NSDs[i] = nsd_fg
 
 
 def create_files():

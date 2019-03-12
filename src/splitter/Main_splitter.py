@@ -8,7 +8,7 @@ import OSMUtilityFunctions as OSM_utility
 from Fetchfile import Fetchfile
 
 parameters = "xyz"
-reference_osm = "5c8339e70594c7824aba2704"    #Example reference id
+reference_osm = "5c879408c957a9e5caf98170"    #Example reference id
 reference_sonata = "5c833a400594c7824aba2714"
 
 
