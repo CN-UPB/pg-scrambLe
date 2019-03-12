@@ -20,10 +20,10 @@ def handle_elan_links(virtual_link_elan, nsd_vl):
                           virtual_link_elan.mgmt_network, virtual_link_elan.vim_network_name,
                           virtual_link_elan.ip_profile_ref, [])
     for vnf in nsd_vl.ConstituentVnfd:
-        for vnfd_connection_point_ref_inner in virtual_link_elan.vnfd_connection_point_ref:
+        for vnfd_connection_point_ref_inner in virtual_link_elan.vnfd_connection_point_ref_vld:
             if vnfd_connection_point_ref_inner is not None and vnf is not None:
                 if vnfd_connection_point_ref_inner.member_vnf_index_ref == vnf.member_vnf_index:
-                    vld_instance.vnfd_connection_point_ref.append(str(vnfd_connection_point_ref_inner))
+                    vld_instance.vnfd_connection_point_ref_vld.append(vnfd_connection_point_ref_inner)
     return vld_instance
 
 
@@ -75,13 +75,16 @@ def split_forwarding_path():
             for classifier in fg.classifier:
                 for constituent_vnf in nsd_fg.ConstituentVnfd:
                     if classifier is not None and constituent_vnf is not None:
-                        if classifier.member_vnf_index_ref == constituent_vnf.member_vnf_index:
+                        if str(classifier.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
                             vnffgd_instance.classifier.append(classifier)
             for rsp in fg.rsp:
+                if rsp.id is not None:
+                    vnffgd_instance.rsp.append(rsp)
                 for constituent_vnf in nsd_fg.ConstituentVnfd:
-                    if rsp is not None and constituent_vnf is not None:
-                        if rsp.member_vnf_index_ref == constituent_vnf.member_vnf_index:
+                    if rsp.id is None:
+                        if str(rsp.member_vnf_index_ref) == str(constituent_vnf.member_vnf_index):
                             vnffgd_instance.rsp.append(rsp)
+        nsd_fg.vnffgd.append(vnffgd_instance)
         NSDs[i] = nsd_fg
 
 
@@ -134,6 +137,100 @@ def create_files():
                 "ip-profile-params": ip_profile_params['ip-profile-params']
             })
 
+        vnfd_connection_point_ref = {}
+        vnfd_connection_point_ref['vnfd-connection-point-ref'] = []
+        for vnfd_connection_point_ref_data in NSDs[i].vld[0].vnfd_connection_point_ref_vld:
+            vnfd_connection_point_ref['vnfd-connection-point-ref'].append({
+                "member-vnf-index-ref": str(vnfd_connection_point_ref_data.member_vnf_index_ref),
+                "vnfd-id-ref": str(vnfd_connection_point_ref_data.vnfd_id_ref),
+                "vnfd-connection-point-ref": str(vnfd_connection_point_ref_data.vnfd_connection_point_ref)
+            })
+
+        vld = {}
+        vld['vld'] = []
+        for vld_data in NSDs[i].vld:
+            vld['vld'].append({
+                "id": str(vld_data.id),
+                "name": str(vld_data.name),
+                "short-name": str(vld_data.short_name),
+                "type": str(vld_data.type),
+                "ip-profile-ref": str(vld_data.ip_profile_ref),
+                "vnfd-connection-point-ref": vnfd_connection_point_ref['vnfd-connection-point-ref']
+            })
+
+        match_attributes = {}
+        match_attributes['match-attributes'] = []
+        for vnffgd_data in NSDs[i].vnffgd:
+            for classifier_data in vnffgd_data.classifier:
+                for match_attribute in classifier_data.match_attributes:
+                    match_attributes['match-attributes'].append({
+                        "id": str(match_attribute.id),
+                        "ip-proto": str(match_attribute.ip_proto),
+                        "source-ip-address": str(match_attribute.source_ip_address),
+                        "destination-ip-address": str(match_attribute.destination_ip_address),
+                        "source-port": str(match_attribute.source_port),
+                        "destination-port": str(match_attribute.destination_port)
+                    })
+
+        classifier = {}
+        classifier['classifier'] = []
+        for vnffgd_data in NSDs[i].vnffgd:
+            for classifier_data in vnffgd_data.classifier:
+                classifier['classifier'].append({
+                    "id": str(classifier_data.id),
+                    "name": str(classifier_data.name),
+                    "rsp-id-ref": str(classifier_data.rsp_id_ref),
+                    "member-vnf-index-ref": str(classifier_data.member_vnf_index_ref),
+                    "vnfd-id-ref": str(classifier_data.vnfd_id_ref),
+                    "vnfd-connection-point-ref": str(classifier_data.vnfd_connection_point_ref),
+                    "match-attributes": match_attributes['match-attributes']
+                })
+
+        rsp = {}
+        rsp['rsp'] = []
+        print(NSDs[0].vnffgd[0].rsp[0].id)
+        for vnffgd_data in NSDs[i].vnffgd:
+            for rsp_data in vnffgd_data.rsp:
+                if rsp_data.id is not None:
+                    rsp['rsp'].append({
+                        "id": str(rsp_data.id),
+                        "name": str(rsp_data.name),
+                        "vnfd-connection-point-ref": ""
+                    })
+                else:
+                    rsp['rsp'].append({
+                        "member-vnf-index-ref": str(rsp_data.member_vnf_index_ref),
+                        "order": str(rsp_data.order),
+                        "vnfd-id-ref": str(rsp_data.vnf_id_ref),
+                        "vnfd-connection-point-ref": str(rsp_data.vnfd_connection_point_ref)
+                    })
+
+        vnffgd = {}
+        vnffgd['vnffgd'] = []
+        if bool(classifier):
+            for vnffgd_data in NSDs[i].vnffgd:
+                vnffgd['vnffgd'].append({
+                    "id": str(vnffgd_data.id),
+                    "name": str(vnffgd_data.name),
+                    "short-name": str(vnffgd_data.short_name),
+                    "description": str(vnffgd_data.description),
+                    "vendor": str(vnffgd_data.vendor),
+                    "version": str(vnffgd_data.version),
+                    "rsp": rsp['rsp'],
+                })
+        else:
+            for vnffgd_data in NSDs[i].vnffgd:
+                vnffgd['vnffgd'].append({
+                    "id": str(vnffgd_data.id),
+                    "name": str(vnffgd_data.name),
+                    "short-name": str(vnffgd_data.short_name),
+                    "description": str(vnffgd_data.description),
+                    "vendor": str(vnffgd_data.vendor),
+                    "version": str(vnffgd_data.version),
+                    "rsp": rsp['rsp'],
+                    "classifier": classifier['classifier']
+                })
+
         general_information = {}
         general_information['nsd'] = []
         general_information['nsd'].append({
@@ -145,7 +242,9 @@ def create_files():
             "version": str(NSDs[i].version),
             "logo": str(NSDs[i].logo),
             "constituent-vnfd": constituent_vnfds['constituent-vnfd'],
-            "ip-profiles": ip_profile['ip-profiles']
+            "ip-profiles": ip_profile['ip-profiles'],
+            "vld": vld['vld'],
+            "vnffgd": vnffgd['vnffgd']
         })
 
         data['nsd:nsd-catalog'] = []

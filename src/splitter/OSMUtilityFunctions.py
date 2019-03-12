@@ -37,7 +37,6 @@ def get_osm_nsd(received_file_sonata):
             nsd = source[key]
             for nsd_key in nsd.keys():
                 nsd_temp = nsd[nsd_key]
-                set_vnffg(nsd_temp[0])
                 call_functions(nsd_temp[0])
 
 
@@ -115,8 +114,8 @@ def set_vld(source):
         mgmt_network = vld_data.get('mgmt-network')
         vim_network_name = vld_data.get('vim-network-name')
         ip_profile_ref = vld_data.get('ip-profile-ref')
-        vnfd_connection_point_ref = vld_data.get('vnfd-connection-point-ref')
-        for vnfd_connection_point_ref_data in vnfd_connection_point_ref:
+        vnfd_connection_point_ref_vld = vld_data.get('vnfd-connection-point-ref')
+        for vnfd_connection_point_ref_data in vnfd_connection_point_ref_vld:
             member_vnf_index_ref = vnfd_connection_point_ref_data.get('member-vnf-index-ref')
             order = vnfd_connection_point_ref_data.get('order')
             vnfd_id_ref = vnfd_connection_point_ref_data.get('vnfd-id-ref')
@@ -136,50 +135,51 @@ def set_vld(source):
 def set_vnffg(source):
     vnffgd = source['vnffgd']
     for vnffgd_data in vnffgd:
-        id = vnffgd_data.get('id')
-        name = vnffgd_data.get('name')
-        short_name = vnffgd_data.get('short_name')
-        vendor = vnffgd_data.get('vendor')
-        description = vnffgd_data.get('description')
-        version = vnffgd_data.get('id')
+        vnffgd_id = vnffgd_data.get('id')
+        vnffgd_name = vnffgd_data.get('name')
+        vnffgd_short_name = vnffgd_data.get('short-name')
+        vnffgd_vendor = vnffgd_data.get('vendor')
+        vnffgd_description = vnffgd_data.get('description')
+        vnffgd_version = vnffgd_data.get('version')
         rsp = vnffgd_data['rsp']
         for rsp_data in rsp:
-            id = rsp_data.get('id')
-            name = rsp_data.get('name')
-            member_vnf_index_ref = rsp_data.get('member_vnf_index_ref')
-            order = rsp_data.get('order')
-            vnfd_id_ref = rsp_data.get('vnfd_id_ref')
-            vnfd_connection_point_ref = rsp_data.get('vnfd-connection-point-ref')
-            rsp_instance = osm_schema.Rsp(id, name, vnfd_connection_point_ref, member_vnf_index_ref, order, vnfd_id_ref)
+            rsp_id = rsp_data.get('id')
+            rsp_name = rsp_data.get('name')
+            rsp_vnfd_connection_point_ref = rsp_data.get('vnfd-connection-point-ref')
+            rsp_member_vnf_index_ref = rsp_data.get('member-vnf-index-ref')
+            rsp_order = rsp_data.get('order')
+            rsp_vnfd_id_ref = rsp_data.get('vnfd-id-ref')
+            rsp_instance = osm_schema.Rsp(rsp_id, rsp_name, rsp_vnfd_connection_point_ref, rsp_member_vnf_index_ref, rsp_order, rsp_vnfd_id_ref)
             list_rsp.append(rsp_instance)
-            classifier = vnffgd_data['classifier']
-            for classifier_data in classifier:
-                id = classifier_data.get('id')
-                name = classifier_data.get('name')
-                rsp_id_ref = classifier_data.get('rsp_id_ref')
-                member_vnf_index_ref = classifier_data.get('member_vnf_index_ref')
-                vnfd_id_ref = classifier_data.get('vnfd_id_ref')
-                vnfd_connection_point_ref = classifier_data.get('vnfd_connection_point_ref')
-                match_attributes = classifier_data['match-attributes']
-                for match_attributes_data in match_attributes:
-                    id = match_attributes_data.get('id')
-                    ip_proto = match_attributes_data.get('ip_proto')
-                    source_ip_address = match_attributes_data.get('source_ip_address')
-                    destination_ip_address = match_attributes_data.get('destination_ip_address')
-                    source_port = match_attributes_data.get('source_port')
-                    destination_port = match_attributes_data.get('destination_port')
-                    match_attributes_instance = osm_schema.MatchAttributes(id, ip_proto, source_ip_address,
-                                                                                       destination_ip_address,
-                                                                                       source_port, destination_port)
-                    list_match_attributes.append(match_attributes_instance)
+        classifier = vnffgd_data['classifier']
+        for classifier_data in classifier:
+            classifier_id = classifier_data.get('id')
+            classifier_name = classifier_data.get('name')
+            classifier_rsp_id_ref = classifier_data.get('rsp-id-ref')
+            classifier_member_vnf_index_ref = classifier_data.get('member-vnf-index-ref')
+            classifier_vnfd_id_ref = classifier_data.get('vnfd-id-ref')
+            classifier_vnfd_connection_point_ref = classifier_data.get('vnfd-connection-point-ref')
+            match_attributes = classifier_data['match-attributes']
+            for match_attributes_data in match_attributes:
+                match_attributes_id = match_attributes_data.get('id')
+                match_attributes_ip_proto = match_attributes_data.get('ip-proto')
+                match_attributes_source_ip_address = match_attributes_data.get('source-ip-address')
+                match_attributes_destination_ip_address = match_attributes_data.get('destination-ip-address')
+                match_attributes_source_port = match_attributes_data.get('source-port')
+                match_attributes_destination_port = match_attributes_data.get('destination-port')
+                match_attributes_instance = osm_schema.MatchAttributes(match_attributes_id, match_attributes_ip_proto, match_attributes_source_ip_address,
+                                                                                   match_attributes_destination_ip_address,
+                                                                                   match_attributes_source_port, match_attributes_destination_port)
+                list_match_attributes.append(match_attributes_instance)
 
-                classifier_instance = osm_schema.Classifier(id, name, rsp_id_ref, list_match_attributes,
-                                                                member_vnf_index_ref, vnfd_id_ref,
-                                                                vnfd_connection_point_ref)
-                list_classifier.append(classifier_instance)
-        vnffgd_instance = osm_schema.Vnffgd(id, name, short_name, vendor, description, version, list_rsp,
+            classifier_instance = osm_schema.Classifier(classifier_id, classifier_name, classifier_rsp_id_ref, list_match_attributes,
+                                                            classifier_member_vnf_index_ref, classifier_vnfd_id_ref,
+                                                            classifier_vnfd_connection_point_ref)
+            list_classifier.append(classifier_instance)
+        vnffgd_instance = osm_schema.Vnffgd(vnffgd_id, vnffgd_name, vnffgd_short_name, vnffgd_vendor, vnffgd_description, vnffgd_version, list_rsp,
                                             list_classifier)
         list_vnffgd.append(vnffgd_instance)
+
 
 
 def call_functions(source):

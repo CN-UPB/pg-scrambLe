@@ -266,9 +266,9 @@ class Vld:
     mgmt_network = ""
     vim_network_name = ""  #optional
     ip_profile_ref = ""
-    vnfd_connection_point_ref = []
+    vnfd_connection_point_ref_vld = []
 
-    def __init__(self, id, name, short_name, vendor, description, version, type, root_bandwidth, leaf_bandwidth, mgmt_network, vim_network_name, ip_profile_ref, vnfd_connection_point_ref):
+    def __init__(self, id, name, short_name, vendor, description, version, type, root_bandwidth, leaf_bandwidth, mgmt_network, vim_network_name, ip_profile_ref, vnfd_connection_point_ref_vld):
         self.id = id
         self.name = name
         self.short_name = short_name
@@ -281,7 +281,7 @@ class Vld:
         self.mgmt_network = mgmt_network
         self.vim_network_name = vim_network_name
         self.ip_profile_ref = ip_profile_ref
-        self.vnfd_connection_point_ref = vnfd_connection_point_ref
+        self.vnfd_connection_point_ref_vld = vnfd_connection_point_ref_vld
 
 
 class VnfdConnectionPointRef:   #complete --- vnfd_connection_point_ref is in 2 names :vnfd_ingress_connection_point_ref and vnfd_egress_connection_point_ref
