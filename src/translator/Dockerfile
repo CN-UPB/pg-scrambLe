@@ -25,6 +25,9 @@ COPY descriptorWriter.py ./
 COPY hackfest_multivdu_nsd.yaml ./
 COPY sonata-demo.yml ./
 
+COPY nsd-schema.yml ./
+COPY vnfd-schema.yml ./
+
 RUN chmod +x ./start.sh
 
 CMD ["./start.sh"]

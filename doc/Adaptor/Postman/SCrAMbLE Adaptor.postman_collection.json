@@ -1,0 +1,126 @@
+{
+	"info": {
+		"_postman_id": "cbd86912-1fbe-4010-900c-bf74a81fd379",
+		"name": "SCrAMbLE Adaptor",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "OSM",
+			"item": [
+				{
+					"name": "auth",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "host",
+									"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+									"description": "\n\n",
+									"type": "text"
+								},
+								{
+									"key": "mano",
+									"value": "osm",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/adaptor/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"adaptor",
+								"auth"
+							]
+						},
+						"description": "Get auth token"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sonata",
+			"item": [
+				{
+					"name": "auth",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "sonata",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "host",
+									"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+									"type": "text"
+								},
+								{
+									"key": "mano",
+									"value": "sonata",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8003/adaptor/auth",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"adaptor",
+								"auth"
+							]
+						},
+						"description": "Get auth token"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -48,7 +48,12 @@ class write_dict():
                 inner_dict.update({k: v})
 
         list_dict.append(inner_dict)
-        dictionary[parent_key] = list_dict
+        
+        if ( (len(list_dict) == 1) & (('id' not in list_dict[0].keys()) or ('name' not in list_dict[0].keys())
+                                     or ('id-ref' not in list_dict[0].keys()))):
+            dictionary[parent_key] = list_dict[0]
+        else:
+            dictionary[parent_key] = list_dict
 
         return dictionary
 
@@ -149,6 +154,9 @@ class write_dict():
                         elif (isinstance(v, list)):
                             dictionary[k][int(pos[-1])].update(value)
                     
+                        elif(isinstance(v, str) and v == 'NULL'):
+                            dictionary[k] = value
+                        
                         return dictionary
                     
                     else:
@@ -186,7 +194,7 @@ class write_dict():
         full_dict = {}
         
         for level in levels:   # iterating at each level and creating a dictionary and mapping it further down with higher levels
-            for key,val,pos in self.make_json(dataset.sort_values(by='lineage'), level):
+            for key,val,pos in self.make_json(dataset, level):
 
                 if not full_dict: # check to ensure this the first iteration and full_dict is empty
                     for i in range(len(key)):
@@ -199,7 +207,7 @@ class write_dict():
 
         return full_dict
 
-    def translate_nsd(self,ds):
+    def translate(self,ds):
         '''
         takes a pandas.DataFrame and pass it as parameter to write function
         along with an array containing the number of levels
@@ -215,6 +223,6 @@ class write_dict():
             returns a dictionary of the translated descriptor
         
         '''
-        return self.write(ds.sort_values(by='lineage'),range(8))
+        return self.write(ds,range(8))
 
 

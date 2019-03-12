@@ -28,129 +28,9 @@ class setup():
         return recieved_file[0]
 
 
-    def translate_to_osm(self,received_file):
-
-        record = self.db_mappings.nsd_mapping
-                
-       
-        doc = self.db_descriptors["translated_nsd"]
-        
-        sonata = received_file
-        
-        reader = read_dict()
-
-        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, '0|preroot|0'), 
-                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
-        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
-        sonata_dataset.fillna('NULL', inplace=True)
-        
-        res = record.find()
-        
-        t = [i for i in res]
-        
-        if(len(t) ==0):
-            insert = insert_into_db(self.client)
-            insert.insert_mapping()
-            res = record.find()
-            t = [i for i in res]
-               
-        
-        map= transformation()
-                                  
-        osm_sonata = pd.DataFrame.from_dict(t[0])
-        osm_son_vld = pd.DataFrame.from_dict(t[1])
-        osm_son_vnffgd = pd.DataFrame.from_dict(t[2])
-        
-        dataset=pd.merge(sonata_dataset,osm_sonata,
-             left_on=['key','parent_key','level','parent_level'],
-             right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
-
-        dataset.fillna('NULL',inplace=True)
-        dataset = dataset[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
-        dataset.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
-
-        dataset = dataset.append(pd.DataFrame([[2,'nsd',3,'vnffgd','NULL','NULL','NULL'],
-                                            [2,'nsd',3,'constituent-vnfd','NULL','NULL','NULL'],
-                                            [2,'nsd',3,'vld','NULL','NULL','NULL'],
-                                            [2,'nsd',3,'connection-point','NULL','NULL','NULL'],
-                                            [0,'root',1,'nsd:nsd-catalog','NULL','NULL','NULL'],
-                                            [1,'nsd:nsd-catalog',2,'nsd','NULL','NULL','NULL']],
-                                           columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
-
-        dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
-        dataset=dataset.sort_values(by= 'lineage',ascending=True)
-        
-        df = map.ret_ds(sonata_dataset,'virtual_links',2)
-        vl = map.son_vld(df,'value','key',':')
-        vl['level'] = vl['level'].astype('int64')
-        vl['parent_level'] = vl['parent_level'].astype('int64')
-
-        df_son_vld = pd.merge(vl,osm_son_vld,
-                         left_on=['key','parent_key','level','parent_level'],
-                         right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
-
-        df_son_vld =  df_son_vld[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
-        df_son_vld.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
-        df_son_vld = df_son_vld.append(pd.DataFrame([[3,'vld',4,'vnfd-connection-point-ref','NULL','NULL','NULL']],
-                                  columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
-
-        df_son_vld.loc[(df_son_vld['level'] == 4) & (df_son_vld['parent_level'] == 3) & (df_son_vld['value'] != 'NULL'),'lineage'] = df_son_vld[(df_son_vld['level'] == 4) & (df_son_vld['parent_level'] == 3) & (df_son_vld['value'] != 'NULL')].apply(
-            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
-
-        df_son_vld.loc[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL'),'osm_lineage'] = df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')].apply(
-        lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-1] +'|'+ x['osm_lineage'].split('|')[-2],axis=1 )
-
-        df =df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')].copy()
-        df['c'] = df.groupby(['key','osm_lineage']).cumcount()
-        df['lineage'] = df.apply(lambda x : x['osm_lineage'] + '|' + str(x['c']),axis=1)
-        df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')] = df.copy()
-
-        dataset = dataset.append(df_son_vld)
-        dataset=dataset.sort_values(by= 'lineage',ascending=True)
-        
-        df = map.ret_ds(sonata_dataset,'forwarding_graphs',2)
-        fg = map.son_fwdg(df,'value','key',':')
-        fg['level'] = fg['level'].astype('int64')
-        fg['parent_level'] = fg['parent_level'].astype('int64')
-        df_son_vnffgd = pd.merge(fg,osm_son_vnffgd,
-                         left_on=['key','parent_key','level','parent_level'],
-                         right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
-
-        df_son_vnffgd =  df_son_vnffgd[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
-        df_son_vnffgd.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
-        df_son_vnffgd = df_son_vnffgd.append(pd.DataFrame([[3,'vnffgd',4,'rsp','NULL','NULL','NULL'],
-                                                          [4,'rsp',5,'vnfd-connection-point-ref','NULL','NULL','NULL']],
-                                  columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
-       
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
-
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
-
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['osm_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1 )
-
-        
-        dataset = dataset.append(df_son_vnffgd)
-        
-        dataset.drop('osm_lineage',axis=1,inplace=True)
-        
-        writer = write_dict()
-        message = writer.translate_nsd(dataset)
-        
-        #temp = doc.insert_one(message).inserted_id
-        #translate_ref = str(temp)
-        
-        return message#translate_ref
-
-
     def translate_to_sonata(self,received_file):
-
-        record = self.db_mappings.nsd_mapping
     
- 
-        
+        record = self.db_mappings.nsd_mapping
         doc = self.db_descriptors["translated_nsd"]
         
         osm = received_file
@@ -167,7 +47,7 @@ class setup():
         
         if(len(t) ==0):
             insert = insert_into_db(self.client)
-            insert.insert_mapping()
+            insert.insert_nsd_mapping()
             res = record.find()
             t = [i for i in res]     
         
@@ -200,7 +80,7 @@ class setup():
 
         
         df = map.ret_ds(osm_dataset,'vld',4)
-        vl = map.osm_vld(df)
+        vl = map.osm_vld_nsd(df)
         vl['level'] = vl['level'].astype('int64')
         vl['parent_level'] = vl['parent_level'].astype('int64')
 
@@ -221,7 +101,7 @@ class setup():
         df = map.ret_ds(osm_dataset,'vnffgd',4)
 
         if not df.empty:
-            fg= map.osm_fwdg(df)
+            fg= map.osm_fwdg_nsd(df)
             fg['level'] = fg['level'].astype('int64')
             fg['parent_level'] = fg['parent_level'].astype('int64')
 
@@ -271,14 +151,472 @@ class setup():
             dataset=dataset.sort_values(by= ['lineage','parent_key'],ascending=True)
         
         writer = write_dict()
-        message = writer.translate_nsd(dataset)
-        message = message['preroot']["root"][0]
+        message = writer.translate(dataset.sort_values(by='lineage'))
+        message = message['preroot']['root']
         
-        #temp = doc.insert_one(message).inserted_id
-        #translated_ref = str(temp)
+        return message
+
+
+
+    def translate_to_sonata_vnfd(self,received_file):
+
+        doc = self.db_descriptors["translated_vnfd"]
+        record = self.db_mappings.vnfd_mapping
         
-        return message#translated_ref
-            
+        osm = received_file
+        reader = read_dict()
+        
+        osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, '0|preroot|0'),
+                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
+
+        osm_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+        osm_dataset.fillna('NULL', inplace=True)
+        
+        res = record.find()
+        t = [i for i in res]
+        
+        if(len(t) ==0):
+            insert = insert_into_db(self.client)
+            insert.insert_vnfd_mapping()
+            res = record.find()
+            t = [i for i in res]     
+        
+        map= transformation()
+        
+        mapping_vnfd = pd.DataFrame.from_dict(t[0])
+        osm_son_vl = pd.DataFrame.from_dict(t[1])
+        osm_son_cp = pd.DataFrame.from_dict(t[2])
+        osm_son_vdu = pd.DataFrame.from_dict(t[3])
+        osm_son_vdu_ext = pd.DataFrame.from_dict(t[4])
+        
+        
+        
+        dataset=pd.merge(osm_dataset,mapping_vnfd,
+                     left_on=['key','parent_key','level','parent_level'],
+                     right_on=['osm_key','osm_parent_key','osm_level','osm_parent_level'],how='inner')
+        dataset.fillna('NULL',inplace=True)
+        dataset = dataset[['son_parent_level','son_level','son_parent_key','son_key','value','lineage','son_lineage']]
+        dataset.columns = ['parent_level','level','parent_key','key','value','lineage','son_lineage']
+        dataset['lineage'] = dataset.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)    
+        dataset=dataset.append(pd.DataFrame([
+        ['NULL',0, 1, 'root', 'connection_points','NULL','NULL'],
+        ['NULL',0, 1, 'root', 'virtual_deployment_units','NULL','NULL']],
+                                           columns = ['son_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+        dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset.reset_index(inplace=True,drop=True)
+
+
+        df_cp = map.ret_ds(osm_dataset,'connection-point',4)
+        df_cp['level'] = df_cp['level'].astype('int64')
+        df_cp['parent_level'] = df_cp['parent_level'].astype('int64')
+        df_osm_cp = pd.merge(df_cp, osm_son_cp,
+                             left_on=['key', 'parent_key', 'level', 'parent_level'],
+                             right_on=['osm_key', 'osm_parent_key', 'osm_level', 'osm_parent_level'], how='inner')
+
+        df_osm_cp = df_osm_cp[
+            ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
+        df_osm_cp.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
+
+        df_osm_cp['lineage'] = df_osm_cp.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_osm_cp.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset = dataset.append(df_osm_cp)
+
+
+
+        df_vl = map.ret_ds(osm_dataset,'vdu',4)
+        df_vl = map.osm_vld_vnfd(df_vl)
+        df_vl['level'] = df_vl['level'].astype('int64')
+        df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
+        df_osm_vl =  pd.merge(df_vl, osm_son_vl,
+                             left_on=['key', 'parent_key', 'level', 'parent_level'],
+                             right_on=['osm_key', 'osm_parent_key', 'osm_level', 'osm_parent_level'], how='inner')
+        df_osm_vl = df_osm_vl[
+            ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
+        df_osm_vl.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
+        df_osm_vl['lineage'] = df_osm_vl.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_osm_vl.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset = dataset.append(df_osm_vl)
+
+
+
+        df_vdu = map.ret_ds(osm_dataset,'vdu',4)
+
+        df_vdu['level'] = df_vdu['level'].astype('int64')
+        df_vdu['parent_level'] = df_vdu['parent_level'].astype('int64')
+        df_vdu['value'] = df_vdu['value'].astype('object')
+        df_osm_vdu = pd.merge(df_vdu, osm_son_vdu,
+                              left_on=['key', 'parent_key', 'level', 'parent_level'],
+                              right_on=['osm_key', 'osm_parent_key', 'osm_level', 'osm_parent_level'], how='inner')
+        df_osm_vdu.sort_values(['son_level'], inplace=True)
+        df_osm_vdu = df_osm_vdu[
+            ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
+        df_osm_vdu.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
+
+        df_osm_vdu['son_lineage'] = df_osm_vdu.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_osm_vdu.loc[(df_osm_vdu['parent_level']==1) & 
+                       (df_osm_vdu['level'] == 2),'lineage'] = df_osm_vdu[(df_osm_vdu['parent_level']==1) & (df_osm_vdu['level'] == 2)].apply(
+            lambda x: x['son_lineage'] , axis=1)
+
+        df_osm_vdu.loc[(df_osm_vdu['parent_level']==2) & 
+                       (df_osm_vdu['level'] == 3),'lineage'] = df_osm_vdu[(df_osm_vdu['parent_level']==2) & (df_osm_vdu['level'] == 3)].apply(lambda x: ('|').join(x['son_lineage'].split('|')[:-3]) + '|'+x['lineage'].split('|')[-3] 
+                                                                                                        + '|' + ('|').join(x['son_lineage'].split('|')[-2:]) if x['lineage'] !='NULL' else 'NULL', axis=1)
+
+        df_osm_vdu.loc[(df_osm_vdu['parent_level']==3) & 
+                       (df_osm_vdu['level'] == 4),'lineage'] = df_osm_vdu[(df_osm_vdu['parent_level']==3) &(df_osm_vdu['level'] == 4)].apply(lambda x: ('|').join(x['son_lineage'].split('|')[:-5]) + '|'+x['lineage'].split('|')[-3] 
+                                                                                                        + '|' + ('|').join(x['son_lineage'].split('|')[-4:]) if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_osm_vdu.loc[(df_osm_vdu['parent_level']==3) & 
+                       (df_osm_vdu['level'] == 4),'value'] = df_osm_vdu[(df_osm_vdu['parent_level']==3) &(df_osm_vdu['level'] == 4)].apply(lambda x: 'MB' if ((x['key'] =='size_unit') & (x['parent_key'] =='memory')) 
+                                                                                                                                               else ( 'GB' if ((x['key'] =='size_unit') & (x['parent_key'] =='storage'))
+                                                                                                                                                    else x['value']),axis=1)
+
+        df_osm_vdu=df_osm_vdu.append(pd.DataFrame([
+        ['NULL',1, 2, 'virtual_deployment_units', 'connection_points','NULL','NULL'],
+        ['NULL',1, 2, 'virtual_deployment_units', 'resource_requirements','NULL','NULL'],
+        ['NULL',2, 3, 'resource_requirements', 'cpu','NULL','NULL'],
+        ['NULL',2, 3, 'resource_requirements', 'memory','NULL','NULL'],
+        ['NULL',2, 3, 'resource_requirements', 'storage','NULL','NULL']
+        ],
+         columns = ['son_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+
+        for i in range(len(df_osm_vdu[(df_osm_vdu['level'] == 2) & (df_osm_vdu['value'] != 'NULL')]['lineage'].unique())):                                                                                                                      
+            df_osm_vdu=df_osm_vdu.append(pd.DataFrame([
+            ['NULL',2, 3, 'resource_requirements', 'cpu','0|preroot|0|root|'+str(i)+'|virtual_deployment_units|0','1'],
+            ['NULL',2, 3, 'resource_requirements', 'memory','0|preroot|0|root|'+str(i)+'|virtual_deployment_units|0','2'],
+            ['NULL',2, 3, 'resource_requirements', 'storage','0|preroot|0|root|'+str(i)+'|virtual_deployment_units|0','3']],
+            columns = ['son_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+        df_osm_vdu.sort_values(by= ['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+
+        dataset = dataset.append(df_osm_vdu)
+        dataset.drop('son_lineage',inplace=True,axis=1)
+        dataset.reset_index(inplace=True,drop=True)
+        
+        
+        writer = write_dict()
+        message = writer.translate(dataset)
+        message = message['preroot']['root']
+        
+        return message
+        
+        
+        
+    def translate_to_osm(self,received_file):
+    
+        doc = self.db_descriptors["translated_nsd"]
+        record = self.db_mappings.nsd_mapping
+        sonata = received_file
+        
+        reader = read_dict()
+
+        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, '0|preroot|0'), 
+                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
+        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+        sonata_dataset.fillna('NULL', inplace=True)
+        
+        res = record.find()
+        
+        t = [i for i in res]
+        
+        if(len(t) ==0):
+            insert = insert_into_db(self.client)
+            insert.insert_nsd_mapping()
+            res = record.find()
+            t = [i for i in res]
+               
+        
+        map= transformation()
+                                  
+        osm_sonata = pd.DataFrame.from_dict(t[0])
+        osm_son_vld = pd.DataFrame.from_dict(t[1])
+        osm_son_vnffgd = pd.DataFrame.from_dict(t[2])
+        
+        dataset=pd.merge(sonata_dataset,osm_sonata,
+             left_on=['key','parent_key','level','parent_level'],
+             right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+
+        dataset.fillna('NULL',inplace=True)
+        dataset = dataset[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
+        dataset.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
+
+        dataset = dataset.append(pd.DataFrame([[2,'nsd',3,'vnffgd','NULL','NULL','NULL'],
+                                            [2,'nsd',3,'constituent-vnfd','NULL','NULL','NULL'],
+                                            [2,'nsd',3,'vld','NULL','NULL','NULL'],
+                                            [2,'nsd',3,'connection-point','NULL','NULL','NULL'],
+                                            [0,'root',1,'nsd:nsd-catalog','NULL','NULL','NULL'],
+                                            [1,'nsd:nsd-catalog',2,'nsd','NULL','NULL','NULL']],
+                                           columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
+
+        dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+        dataset=dataset.sort_values(by= 'lineage',ascending=True)
+        
+        df = map.ret_ds(sonata_dataset,'virtual_links',2)
+        vl = map.son_vld_nsd(df,'value','key',':')
+        vl['level'] = vl['level'].astype('int64')
+        vl['parent_level'] = vl['parent_level'].astype('int64')
+
+        df_son_vld = pd.merge(vl,osm_son_vld,
+                         left_on=['key','parent_key','level','parent_level'],
+                         right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+
+        df_son_vld =  df_son_vld[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
+        df_son_vld.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
+        df_son_vld = df_son_vld.append(pd.DataFrame([[3,'vld',4,'vnfd-connection-point-ref','NULL','NULL','NULL']],
+                                  columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
+
+        df_son_vld.loc[(df_son_vld['level'] == 4) & (df_son_vld['parent_level'] == 3) & (df_son_vld['value'] != 'NULL'),'lineage'] = df_son_vld[(df_son_vld['level'] == 4) & (df_son_vld['parent_level'] == 3) & (df_son_vld['value'] != 'NULL')].apply(
+            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+
+        df_son_vld.loc[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL'),'osm_lineage'] = df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')].apply(
+        lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-1] +'|'+ x['osm_lineage'].split('|')[-2],axis=1 )
+
+        df =df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')].copy()
+        df['c'] = df.groupby(['key','osm_lineage']).cumcount()
+        df['lineage'] = df.apply(lambda x : x['osm_lineage'] + '|' + str(x['c']),axis=1)
+        df_son_vld[(df_son_vld['level'] == 5) & (df_son_vld['parent_level'] == 4) & (df_son_vld['value'] != 'NULL')] = df.copy()
+
+        dataset = dataset.append(df_son_vld)
+        dataset=dataset.sort_values(by= 'lineage',ascending=True)
+        
+        df = map.ret_ds(sonata_dataset,'forwarding_graphs',2)
+        fg = map.son_fwdg_nsd(df,'value','key',':')
+        fg['level'] = fg['level'].astype('int64')
+        fg['parent_level'] = fg['parent_level'].astype('int64')
+        df_son_vnffgd = pd.merge(fg,osm_son_vnffgd,
+                         left_on=['key','parent_key','level','parent_level'],
+                         right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+
+        df_son_vnffgd =  df_son_vnffgd[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
+        df_son_vnffgd.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
+        df_son_vnffgd = df_son_vnffgd.append(pd.DataFrame([[3,'vnffgd',4,'rsp','NULL','NULL','NULL'],
+                                                          [4,'rsp',5,'vnfd-connection-point-ref','NULL','NULL','NULL']],
+                                  columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
+       
+        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL')].apply(
+            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+
+        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL')].apply(
+            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+
+        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL')].apply(
+            lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['osm_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1 )
+
+        
+        dataset = dataset.append(df_son_vnffgd)
+        
+        dataset.drop('osm_lineage',axis=1,inplace=True)
+        
+        writer = write_dict()
+        message = writer.translate(dataset.sort_values(by='lineage'))
+        
+        return message
+
+
+
+    def translate_to_osm_vnfd(self,received_file):
+
+        doc = self.db_descriptors["translated_vnfd"]
+        record = self.db_mappings.vnfd_mapping
+
+        sonata = received_file
+        
+        reader = read_dict()
+
+        sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, '0|preroot|0'), 
+                                      columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
+        sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
+        sonata_dataset.fillna('NULL', inplace=True)
+        
+        res = record.find()
+        
+        t = [i for i in res]
+        
+        if(len(t) ==0):
+            insert = insert_into_db(self.client)
+            insert.insert_vnfd_mapping()
+            res = record.find()
+            t = [i for i in res]
+               
+        
+        map= transformation()
+                                  
+        mapping_vnfd = pd.DataFrame.from_dict(t[0])
+        osm_son_vl = pd.DataFrame.from_dict(t[1])
+        osm_son_cp = pd.DataFrame.from_dict(t[2])
+        osm_son_vdu = pd.DataFrame.from_dict(t[3])
+        osm_son_vdu_ext = pd.DataFrame.from_dict(t[4])
+        
+        
+        dataset = pd.merge(sonata_dataset, mapping_vnfd,
+                           left_on=['key', 'parent_key', 'level', 'parent_level'],
+                           right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
+        dataset.fillna('NULL', inplace=True)
+        dataset = dataset[
+            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
+        dataset.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
+
+        dataset=dataset.append(pd.DataFrame([
+            ['NULL',0, 1, 'root', 'vnfd:vnfd-catalog','NULL','NULL'],
+            ['NULL',1, 2, 'vnfd:vnfd-catalog', 'vnfd','NULL','NULL'],
+            ['NULL',2, 3, 'vnfd', 'internal-vld','NULL','NULL'],
+            ['NULL',2, 3, 'vnfd', 'connection-point', 'NULL','NULL'],
+            ['NULL',2, 3, 'vnfd', 'vdu', 'NULL','NULL'],
+            ['NULL',2, 3, 'vnfd', 'monitoring-param','NULL','NULL']
+        ],
+                                              columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+        dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL',axis=1)
+        dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset.reset_index(inplace=True,drop=True)
+
+        df_vl = map.ret_ds(sonata_dataset, 'virtual_links', 2)
+        df_vl['level'] = df_vl['level'].astype('int64')
+        df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
+        df_vl['value'] = df_vl['value'].astype('object')
+        df_son_vl = pd.merge(df_vl, osm_son_vl,
+                             left_on=['key', 'parent_key', 'level', 'parent_level'],
+                             right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
+        df_son_vl.sort_values(['osm_level'], inplace=True)
+        df_son_vl = df_son_vl[
+            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
+        df_son_vl.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
+
+        df_son_vl = df_son_vl.append(pd.DataFrame([
+        ['NULL',3, 4, 'internal-vld', 'internal-connection-point','NULL','NULL']],
+                                           columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+        df_son_vl.loc[(df_son_vl['level'] != 5)  ,'lineage'] = df_son_vl[(df_son_vl['level'] != 5)] .apply(lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_son_vl.loc[(df_son_vl['level'] == 5) & 
+                     (df_son_vl['parent_key'] == 'internal-connection-point'),'lineage'] = df_son_vl[(df_son_vl['level'] == 5) & 
+                                                                                                     (df_son_vl['parent_key'] == 'internal-connection-point')].apply(
+                                                                                                       lambda x: ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+ x['lineage'].split('|')[-1]+'|'+x['osm_lineage'].split('|')[-2]+'|'+'0' 
+                                                                                                        if x['lineage'] !='NULL' else 'NULL', axis=1)
+
+        df_son_vl= map.son_vld_vnfd(df_son_vl)
+        df_son_vl.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+
+        dataset = dataset.append(df_son_vl)
+        dataset.reset_index(inplace=True,drop=True)
+
+
+
+        df_cp = map.ret_ds(sonata_dataset, 'connection_points', 2)
+        df_cp['level'] = df_cp['level'].astype('int64')
+        df_cp['parent_level'] = df_cp['parent_level'].astype('int64')
+        df_son_vdu_ext = pd.merge(df_cp, osm_son_cp,
+                             left_on=['key', 'parent_key', 'level', 'parent_level'],
+                             right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
+
+        df_son_vdu_ext = df_son_vdu_ext[
+            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
+        df_son_vdu_ext.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
+
+
+
+        df_vdu = map.ret_ds(sonata_dataset, 'virtual_deployment_units', 2)
+        df_vdu['level'] = df_vdu['level'].astype('int64')
+        df_vdu['parent_level'] = df_vdu['parent_level'].astype('int64')
+        df_vdu['value'] = df_vdu['value'].astype('object')
+        df_son_vdu = pd.merge(df_vdu, osm_son_vdu,
+                              left_on=['key', 'parent_key', 'level', 'parent_level'],
+                              right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
+        df_son_vdu.sort_values(['osm_level'], inplace=True)
+        df_son_vdu = df_son_vdu[
+            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
+        df_son_vdu.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
+
+        df_son_vdu=df_son_vdu.append(pd.DataFrame([
+        ['NULL',3, 4, 'vdu', 'vm-flavor','NULL','NULL'],
+        ['NULL',3, 4, 'vdu', 'internal-connection-point','NULL','NULL'],
+        ['NULL',3, 4, 'vdu', 'interface','NULL','NULL']],
+                                           columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+
+        df_son_vdu.loc[(df_son_vdu['level'] == 4) & 
+                       (df_son_vdu['parent_level'] == 3), 'lineage'] = df_son_vdu[(df_son_vdu['level'] == 4) & 
+                                                                                  (df_son_vdu['parent_level'] == 3)].apply(lambda x: 
+                                                                                    x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_son_vdu.loc[(df_son_vdu['level'] == 5) & 
+                       (df_son_vdu['parent_level'] == 4), 'lineage'] = df_son_vdu[(df_son_vdu['level'] == 5) & 
+                                                                                  (df_son_vdu['parent_level'] == 4)].apply(lambda x: 
+                                                                                    ('|').join(x['osm_lineage'].split('|')[:8])+'|' +x['lineage'].split('|')[4] +'|'+ x['osm_lineage'].split('|')[9]+'|'+x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+
+        df_son_vdu.loc[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'] == 'storage-gb') & 
+                       (df_son_vdu['value'].isin(['GB','MB','TB','KB'])),'value'] = df_son_vdu[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'] == 'storage-gb') & 
+                       (df_son_vdu['value'].isin(['GB','MB','TB','KB']))]['value'].apply(
+                        lambda x : 1 if x == 'GB' else (1/1024.0 if x == 'MB' else (1/(1024.0*1024.0) if x== 'KB' else 0))) 
+
+
+        df_son_vdu.loc[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'] == 'memory-mb') & 
+                       (df_son_vdu['value'].isin(['GB','MB','TB','KB'])),'value'] = df_son_vdu[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'] == 'memory-mb') & 
+                       (df_son_vdu['value'].isin(['GB','MB','TB','KB']))]['value'].apply(
+                        lambda x : 1 if x == 'MB' else (1024 if x == 'GB' else (1024*1024 if x== 'KB' else 0))) 
+
+        temp = df_son_vdu[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'].isin(['memory-mb','storage-gb']))].groupby(['lineage','key'])['value'].apply(
+                            lambda x : np.prod(x)).reset_index()
+
+        temp = temp.assign(**{
+                      'osm_lineage' : '0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',
+                      'parent_key': 'vm-flavor',
+                      'level': 5, 
+                      'parent_level': 4
+                     })
+
+        df_son_vdu.drop(df_son_vdu[(df_son_vdu['level']==5) & 
+                       (df_son_vdu['key'].isin(['memory-mb','storage-gb']))].index,inplace =True, axis=0)
+
+        for _,row in df_son_vdu[(df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==4)][['value','lineage']].iterrows():
+            df_son_vdu.loc[(df_son_vdu['lineage'].str.startswith(row['lineage'])) & 
+                              (df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==5),'value'] = df_son_vdu[(df_son_vdu['lineage'].str.startswith(str(row['lineage']))) & 
+                               (df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==5)]['value'].apply(lambda x : row['value']+'-'+x)
+
+
+        df_son_vdu=df_son_vdu.append(temp)
+        df_son_vdu.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset = dataset.append(df_son_vdu)
+
+        dataset.drop('osm_lineage',inplace=True,axis=1)
+
+        df_vl = map.ret_ds(sonata_dataset, 'virtual_links', 2)
+        df_vl['level'] = df_vl['level'].astype('int64')
+        df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
+        df_vl['value'] = df_vl['value'].astype('object')
+        df_son_vdu_int_ext = pd.merge(df_vl, osm_son_vdu_ext,
+                             left_on=['key', 'parent_key', 'level', 'parent_level'],
+                             right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
+        df_son_vdu_int_ext.sort_values(['osm_level'], inplace=True)
+        df_son_vdu_int_ext = df_son_vdu_int_ext[
+            ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
+        df_son_vdu_int_ext.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
+
+        df_son_vdu_int_ext = map.son_vld_int_ext_vnfd(df_son_vdu_int_ext)
+        df_son_vdu_int_ext['temp'] = df_son_vdu_int_ext.apply(lambda x: x.value.split(':')[0] if 1==1 else 'NULL',axis=1)
+        df_son_vdu_int_ext['value'] = df_son_vdu_int_ext.apply(lambda x: x.value.split(':')[-1] if 1==1 else 'NULL',axis=1)
+        df_son_vdu_int_ext['temp'] = df_son_vdu_int_ext['temp'].astype('category').cat.codes
+
+        df_son_vdu_int_ext['lineage'] = df_son_vdu_int_ext.apply(lambda x : '|'.join(x['osm_lineage'].split('|')[:-3])+
+                                                             '|'+str(x['temp'])+
+                                                             '|'+x['osm_lineage'].split('|')[-2]+
+                                                             '|'+x['lineage'].split('|')[-1],axis=1)
+        df_son_vdu_int_ext.drop(['temp','osm_lineage'],axis=1,inplace=True)
+        df_son_vdu_int_ext.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,False,True],inplace=True)
+        df_son_vdu_int_ext.reset_index(drop=True,inplace=True)
+
+        dataset=dataset.append(df_son_vdu_int_ext)
+
+        dataset.reset_index(inplace=True,drop=True)
+        
+        
+        writer = write_dict()
+        message = writer.translate(dataset)
+        
+        return message
 
 class insert_into_db():
     
@@ -288,7 +626,7 @@ class insert_into_db():
         self.db_mappings = self.client.mapping
         self.db_descriptors = self.client.descriptors
         
-    def insert_mapping(self):
+    def insert_nsd_mapping(self):
         '''
             creates 3 mongoDB documents to store the mapping Virtual Functions , Forwarding Graphs and the rest parameters
 
@@ -369,21 +707,123 @@ class insert_into_db():
         
         temp = json.loads(osm_son_vnffgd.to_json())
         id = record.insert_one(temp).inserted_id
+        
+
+    def insert_vnfd_mapping(self):
+        
+        osm_sonata_vnfd_mapping = [
+            ['0|preroot|0|root|',1, 2, 'vnfd:vnfd-catalog', 'schema-version','0|preroot|', 0, 1, 'root', 'descriptor_version'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'name','0|preroot|', 0, 1, 'root', 'name'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'vendor','0|preroot|', 0, 1, 'root', 'vendor'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'description','0|preroot|', 0, 1, 'root', 'description'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'version','0|preroot|', 0, 1, 'root', 'version']
+        ]
+
+        osm_sonata_vl_mapping = [
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'internal-vld', '0|preroot|',0, 1, 'root', 'virtual_links'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'internal-vld', 'id','0|preroot|0|root|', 1, 2, 'virtual_links', 'id'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'internal-vld', 'type','0|preroot|0|root|', 1, 2, 'virtual_links', 'connectivity_type'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'internal-vld' , 'internal-connection-point', '0|preroot|0|root|',1, 2, 'virtual_links',
+             'connection_points_reference'],
+        ]
+
+        osm_sonata_cp_mapping = [
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'connection-point', '0|preroot|',0, 1, 'root', 'connection_points'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'connection-point', 'id', '0|preroot|0|root|',1, 2, 'connection_points', 'id'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'connection-point', 'type', '0|preroot|0|root|',1, 2, 'connection_points', 'type'],
+        ]
+
+        osm_sonata_vdu_mapping = [
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'vdu', '0|preroot|',0, 1, 'root', 'virtual_deployment_units'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'vdu', 'id', '0|preroot|0|root|',1, 2, 'virtual_deployment_units', 'id'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'vdu', 'image', '0|preroot|0|root|',1, 2, 'virtual_deployment_units', 'vm_image'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'vdu', 'image-checksum','0|preroot|0|root|', 1, 2, 'virtual_deployment_units', 'vm_image_md5'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'vm-flavor', 'vcpu-count','0|preroot|0|root|0|virtual_deployment_units|0|resource_requirements|', 3, 4, 'cpu', 'vcpus'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'vm-flavor', 'memory-mb','0|preroot|0|root|0|virtual_deployment_units|0|resource_requirements|', 3, 4, 'memory', 'size'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'vm-flavor', 'memory-mb', '0|preroot|0|root|0|virtual_deployment_units|0|resource_requirements|',3, 4, 'memory', 'size_unit'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'vm-flavor', 'storage-gb', '0|preroot|0|root|0|virtual_deployment_units|0|resource_requirements|',3, 4, 'storage', 'size'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'vm-flavor', 'storage-gb','0|preroot|0|root|0|virtual_deployment_units|0|resource_requirements|' ,3, 4, 'storage', 'size_unit'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'internal-connection-point', 'id','0|preroot|0|root|0|virtual_deployment_units|', 2, 3, 'connection_points', 'id'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'internal-connection-point', 'type','0|preroot|0|root|0|virtual_deployment_units|', 2, 3, 'connection_points', 'type'],
+        ]
 
 
+        osm_sonata_vdu_ext_mapping = [
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0|vdu|',4, 5, 'interface', 'name','0|preroot|0|root|',1, 2, 'virtual_links',
+             'connection_points_reference']
+        ]
+
+
+        mapping_vnfd = pd.DataFrame(osm_sonata_vnfd_mapping,
+                                    columns=["osm_lineage","osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
+                                             "son_lineage","son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
+            by=['son_level', 'osm_level'], ascending=True)
+
+        osm_son_vl = pd.DataFrame(osm_sonata_vl_mapping,
+                                  columns=["osm_lineage","osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
+                                           "son_lineage","son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
+            by=['son_level', 'osm_level'], ascending=True)
+
+        osm_son_cp = pd.DataFrame(osm_sonata_cp_mapping,
+                                  columns=["osm_lineage","osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
+                                           "son_lineage","son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
+            by=['son_level', 'osm_level'], ascending=True)
+
+
+        osm_son_vdu = pd.DataFrame(osm_sonata_vdu_mapping,
+                                   columns=["osm_lineage","osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
+                                            "son_lineage","son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
+            by=['son_level', 'osm_level'], ascending=True)
+
+        osm_son_vdu_ext = pd.DataFrame(osm_sonata_vdu_ext_mapping,
+                                  columns=["osm_lineage","osm_parent_level", "osm_level", "osm_parent_key", "osm_key",
+                                           "son_lineage","son_parent_level", "son_level", "son_parent_key", "son_key"]).sort_values(
+            by=['son_level', 'osm_level'], ascending=True)
+
+        
+        mapping_vnfd.index = [str(i) for i in mapping_vnfd.index]
+        osm_son_vl.index = [str(i) for i in osm_son_vl.index]
+        osm_son_cp.index = [str(i) for i in osm_son_cp.index]
+        osm_son_vdu.index = [str(i) for i in osm_son_vdu.index]
+        osm_son_vdu_ext.index = [str(i) for i in osm_son_vdu_ext.index]
+
+        record = self.db_mappings.vnfd_mapping
+        
+        temp = mapping_vnfd.to_dict()
+        id = record.insert_one(temp)
+
+        temp = osm_son_vl.to_dict()
+        id = record.insert_one(temp)
+
+        temp = osm_son_cp.to_dict()
+        id = record.insert_one(temp)
+
+        temp = osm_son_vdu.to_dict()
+        id = record.insert_one(temp)  
+        
+        temp = osm_son_vdu_ext.to_dict()
+        id = record.insert_one(temp)
+        
+        
     def insert_nsd(self,framework):
         
         if framework == 'osm':
-            nsd=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_ns\hackfest_multivdu_nsd.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_vnf\hackfest_multivdu_vnfd.yaml"))
         
         elif framework == 'sonata':
-            nsd=yaml.load(open(r"sonata-demo.yml"), Loader=yaml.Loader)
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\NSD.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\son_firewall_vnfd.yaml"))
+            
+        record_nsd = self.db_descriptors.source_nsd
         
-        record = self.db_descriptors.source_nsd
+        id_nsd = record_nsd.insert_one(nsd).inserted_id
         
-        id = record.insert_one(nsd).inserted_id
+        record_vnfd = self.db_descriptors.source_vnfd
         
-        return id
+        id_vnfd = record_vnfd.insert_one(vnfd).inserted_id
+        
+        return [id_nsd , id_vnfd]
     
 class transformation():
 
@@ -497,7 +937,7 @@ class transformation():
             
         return temp_ds
 
-    def osm_fwdg(self,df):
+    def osm_fwdg_nsd(self,df):
         
         temp = df[df['parent_key'].isin(['vnfd-connection-point-ref','classifier']) & 
            df['key'].isin(['vnfd-connection-point-ref','member-vnf-index-ref'])].groupby(
@@ -523,7 +963,7 @@ class transformation():
         return df.append(temp)
 
 
-    def osm_vld(self,df):
+    def osm_vld_nsd(self,df):
         
         temp = df[df['parent_key'].isin(['vnfd-connection-point-ref']) & 
                df['key'].isin(['vnfd-connection-point-ref','member-vnf-index-ref'])].groupby(
@@ -549,9 +989,34 @@ class transformation():
         
         return df.append(temp) 
 
+    def osm_vld_vnfd(self,df):
+        
+        temp=df[(df['key'].isin(['id'])) & (df['parent_key'] == 'vdu')].copy()
+        temp['parent_key'] = 'internal-vld'
+        temp2 = temp.copy()
+        temp2['key']= 'type'
+        temp2['value'] = temp2['value'].apply(lambda x : 'E-LAN' if 'mgmt' in x else 'E-Line')
+        temp=temp.append(temp2).reset_index(drop=True)
 
+        temp2=df[df['key'].isin(['external-connection-point-ref','internal-connection-point-ref']) & (df['parent_key'] == 'interface')].copy()
+        temp2['lineage']=temp2.apply(lambda x : ('|').join(x['lineage'].split('|')[:-2]),axis=1)
+        temp=temp.append(temp2).reset_index(drop=True)
 
-    def son_fwdg(self,df, column1='value',column2='key', sep=':'):
+        temp.loc[temp['key'].isin(['internal-connection-point-ref']),['lineage','value']] = temp[temp['key'].isin(['id','internal-connection-point-ref'])].groupby(['lineage']).agg({'value' : lambda x : (':').join(x)}).reset_index().values
+
+        temp.loc[~temp['key'].isin(['id','type'])]=temp[~temp['key'].isin(['id','type'])].assign(**{'key':'internal-connection-point', 
+                      'parent_key': 'internal-vld',
+                      'level':4, 
+                      'parent_level': 3
+                     })
+        temp2 = temp[temp['key'].isin(['internal-connection-point'])].groupby(['parent_level','parent_key','level','key','lineage']).agg({'value' : lambda x : (',').join(x)}).reset_index()
+        temp2 = temp2.groupby(['parent_level','parent_key','level','key','lineage']).agg({'value' : lambda x : x.values[0].split(',')}).reset_index()
+        temp.drop(temp[temp['key'].isin(['internal-connection-point'])].index, axis=0,inplace=True)
+        temp= temp.append(temp2).reset_index(drop=True)
+        
+        return temp
+
+    def son_fwdg_nsd(self,df, column1='value',column2='key', sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -609,7 +1074,7 @@ class transformation():
 
 
 
-    def son_vld(self,df,column1='value',column2='key', sep=':'):
+    def son_vld_nsd(self,df,column1='value',column2='key', sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -661,6 +1126,141 @@ class transformation():
         new_df[column1] = new_values
         new_df[column2] = new_values2
         
+        return new_df
+
+    
+    def son_vld_int_ext_vnfd(self,df,column1='value',column2='key',column3='lineage',sep=':'):
+        '''
+        Split the values of a column and expand so the new DataFrame has one split
+        value per row. Filters rows where the column is missing.
+
+        Params
+        ------
+        df : pandas.DataFrame
+            dataframe with the column to split and expand
+        column : str
+            the column to split and expand
+        sep : str
+            the string used to split the column's values
+        keep : bool
+            whether to retain the presplit value as it's own row
+
+        Returns
+        -------
+        pandas.DataFrame
+            Returns a dataframe with the same columns as df.
+        '''
+        index = []
+        new_value = []
+        new_key = []
+        new_lineage = []
+        prev_vdu= ''
+
+        for i, row in enumerate(df[[column1,column3]].itertuples()):
+
+            if (prev_vdu != row[1][0].split(sep)[0]):
+                j=0
+                prev_vdu = row[1][0].split(sep)[0]
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][1] + '-int')
+            new_key.append('name')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][1] +sep+ str(j+1))
+            new_key.append('position')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][1] +sep+'EXTERNAL' )
+            new_key.append('type')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][1])
+            new_key.append('external-connection-point-ref')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            j+=1
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][0]+ '-int')
+            new_key.append('name')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0] +sep+ str(j+1))
+            new_key.append('position')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0] +sep+ 'INTERNAL')
+            new_key.append('type')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            new_value.append(row[1][0].split(sep)[0] + sep + row[1][0])
+            new_key.append('internal-connection-point-ref')
+            index.append(i)
+            new_lineage.append(row[2][:-1] +str(j))
+
+            j+=1
+
+
+        new_df = df.loc[index,:].copy()
+        new_df[column1] = new_value
+        new_df[column2] = new_key
+        new_df[column3] = new_lineage
+        new_df
+
+        return new_df
+    
+    def son_vld_vnfd(self,df,column1='value',column2='key',sep=':'):
+        '''
+        Split the values of a column and expand so the new DataFrame has one split
+        value per row. Filters rows where the column is missing.
+
+        Params
+        ------
+        df : pandas.DataFrame
+            dataframe with the column to split and expand
+        column : str
+            the column to split and expand
+        sep : str
+            the string used to split the column's values
+        keep : bool
+            whether to retain the presplit value as it's own row
+
+        Returns
+        -------
+        pandas.DataFrame
+            Returns a dataframe with the same columns as df.
+        '''
+        indexes = []
+        new_values = []
+        new_key = []
+        new_parentKey = []
+        df = df.dropna(subset=[column1])
+
+        for i, presplit in enumerate(df[[column1,column2]].itertuples()):
+
+            if(isinstance(presplit[1],list)):
+                for item in presplit[1]:
+                    values = str(item).split(sep) 
+
+                    if len(values) > 1:
+                        indexes.append(i) 
+                        new_values.append(values[0]+'-'+values[1])
+                        new_key.append('id-ref')
+            else:
+                indexes.append(i)
+                new_values.append(presplit[1])
+                new_key.append(presplit[2])
+
+        new_df = df.iloc[indexes, :].copy()
+        new_df[column1] = new_values
+        new_df[column2] = new_key
+
         return new_df
 
 

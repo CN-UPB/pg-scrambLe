@@ -2,3 +2,4 @@ nameko
 pandas
 numpy
 pymongo
+watchdog
