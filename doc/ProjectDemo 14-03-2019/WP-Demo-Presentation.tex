@@ -47,12 +47,15 @@
 \frametitle{Agenda} % Table of contents slide, comment this block out to remove it
 \tableofcontents 
 
-\section{WP1 Demo}
-\section{WP2 Demo}
-\section{WP3 Demo}
-\subsection{Front End}
+\section{Introduction}
+\section{Adaptor Demo}
 \subsection{Test cases}
+\subsection{Front End}
 \subsection{MANO Scalability Investigation}
+\section{Translator Demo}
+\section{Splitter Demo}
+\section{Conclusion}
+
 
 
 % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
@@ -61,11 +64,19 @@
 %----------------------------------------------------------------------------------------
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
-\include{WP1}
-\include{WP2}
-\include{WP3}
+\include{Introduction}
+\include{Architecture}
+\include{Adaptor}
 \include{Frontend}
 \include{Tetcases}
+\begin{frame}
+\Huge{\centerline{MANO Scalability Investigation}}
+\end{frame}
+\include{ScalabilityInvestigation}
+\include{Translator}
+\include{Splitter}
+\include{Conclusion}
+
 
 
 
@@ -74,11 +85,9 @@
 
 %------------------------------------------------
 
-\begin{frame}
-\Huge{\centerline{MANO Scalability Investigation}}
-\end{frame}
 
-\include{ScalabilityFindings}
+
+
 
 %----------------------------------------------------------------------------------------
 \begin{frame}
