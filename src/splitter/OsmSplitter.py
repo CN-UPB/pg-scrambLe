@@ -101,6 +101,12 @@ def create_files():
                 "vnfd-id-ref": str(constituent_vnfd.vnfd_id_ref)
             })
 
+        for k in constituent_vnfds.keys():
+            for constituent_vnfds_k in constituent_vnfds[k]:
+                for k_data in constituent_vnfds_k.keys():
+                    if not constituent_vnfds_k[k_data] or constituent_vnfds_k[k_data] == 'None':
+                        del constituent_vnfds_k[k_data]
+
         dns_server = {}
         dns_server['dns-server'] = []
         for ip_profile_data in NSDs[i].ip_profiles:
@@ -109,6 +115,12 @@ def create_files():
                 "address": str(ip_profile_data.ip_profile_params.dns_server[1].address)
             })
 
+        for k in dns_server.keys():
+            for dns_server_k in dns_server[k]:
+                for k_data in dns_server_k.keys():
+                    if not dns_server_k[k_data] or dns_server_k[k_data] == 'None':
+                        del dns_server_k[k_data]
+
         dhcp_params = {}
         dhcp_params['dhcp-params'] = []
         for ip_profile_data in NSDs[i].ip_profiles:
@@ -116,6 +128,12 @@ def create_files():
                 "count": str(ip_profile_data.ip_profile_params.dhcp_params[0].count),
                 "start-address": str(ip_profile_data.ip_profile_params.dhcp_params[0].start_address)
             })
+
+        for k in dhcp_params.keys():
+            for dhcp_params_k in dhcp_params[k]:
+                for k_data in dhcp_params_k.keys():
+                    if not dhcp_params_k[k_data] or dhcp_params_k[k_data] == 'None':
+                        del dhcp_params_k[k_data]
 
         ip_profile_params = {}
         ip_profile_params['ip-profile-params'] = []
@@ -128,6 +146,11 @@ def create_files():
                 "dhcp-params": dhcp_params['dhcp-params']
             })
 
+        for k in ip_profile_params.keys():
+            for ip_profile_params_k in ip_profile_params[k]:
+                for k_data in ip_profile_params_k.keys():
+                    if not ip_profile_params_k[k_data] or ip_profile_params_k[k_data] == 'None':
+                        del ip_profile_params_k[k_data]
 
         ip_profile = {}
         ip_profile['ip-profiles'] = []
@@ -138,6 +161,12 @@ def create_files():
                 "ip-profile-params": ip_profile_params['ip-profile-params']
             })
 
+        for k in ip_profile.keys():
+            for ip_profile_k in ip_profile[k]:
+                for k_data in ip_profile_k.keys():
+                    if not ip_profile_k[k_data] or ip_profile_k[k_data] == 'None':
+                        del ip_profile_k[k_data]
+
         vnfd_connection_point_ref = {}
         vnfd_connection_point_ref['vnfd-connection-point-ref'] = []
         for vnfd_connection_point_ref_data in NSDs[i].vld[0].vnfd_connection_point_ref_vld:
@@ -146,6 +175,12 @@ def create_files():
                 "vnfd-id-ref": str(vnfd_connection_point_ref_data.vnfd_id_ref),
                 "vnfd-connection-point-ref": str(vnfd_connection_point_ref_data.vnfd_connection_point_ref)
             })
+
+        for k in vnfd_connection_point_ref.keys():
+            for vnfd_connection_point_ref_k in vnfd_connection_point_ref[k]:
+                for k_data in vnfd_connection_point_ref_k.keys():
+                    if not vnfd_connection_point_ref_k[k_data] or vnfd_connection_point_ref_k[k_data] == 'None':
+                        del vnfd_connection_point_ref_k[k_data]
 
         vld = {}
         vld['vld'] = []
@@ -158,6 +193,12 @@ def create_files():
                 "ip-profile-ref": str(vld_data.ip_profile_ref),
                 "vnfd-connection-point-ref": vnfd_connection_point_ref['vnfd-connection-point-ref']
             })
+
+        for k in vld.keys():
+            for vld_k in vld[k]:
+                for k_data in vld_k.keys():
+                    if not vld_k[k_data] or vld_k[k_data] == 'None':
+                        del vld_k[k_data]
 
         match_attributes = {}
         match_attributes['match-attributes'] = []
@@ -172,6 +213,11 @@ def create_files():
                         "source-port": str(match_attribute.source_port),
                         "destination-port": str(match_attribute.destination_port)
                     })
+        for k in match_attributes.keys():
+            for match_attributes_k in match_attributes[k]:
+                for k_data in match_attributes_k.keys():
+                    if not match_attributes_k[k_data] or match_attributes_k[k_data] == 'None':
+                        del match_attributes_k[k_data]
 
         classifier = {}
         classifier['classifier'] = []
@@ -186,6 +232,12 @@ def create_files():
                     "vnfd-connection-point-ref": str(classifier_data.vnfd_connection_point_ref),
                     "match-attributes": match_attributes['match-attributes']
                 })
+
+        for k in classifier.keys():
+            for classifier_k in classifier[k]:
+                for k_data in classifier_k.keys():
+                    if not classifier_k[k_data] or classifier_k[k_data] == 'None':
+                        del classifier_k[k_data]
 
         rsp = {}
         rsp['rsp'] = []
@@ -204,6 +256,12 @@ def create_files():
                         "vnfd-id-ref": str(rsp_data.vnf_id_ref),
                         "vnfd-connection-point-ref": str(rsp_data.vnfd_connection_point_ref)
                     })
+
+        for k in rsp.keys():
+            for rsp_k in rsp[k]:
+                for k_data in rsp_k.keys():
+                    if not rsp_k[k_data] or rsp_k[k_data] == 'None':
+                        del rsp_k[k_data]
 
         vnffgd = {}
         vnffgd['vnffgd'] = []
@@ -231,6 +289,12 @@ def create_files():
                     "classifier": classifier['classifier']
                 })
 
+        for k in vnffgd.keys():
+            for vnffgd_k in vnffgd[k]:
+                for k_data in vnffgd_k.keys():
+                    if not vnffgd_k[k_data] or vnffgd_k[k_data] == 'None':
+                        del vnffgd_k[k_data]
+
         general_information = {}
         general_information['nsd'] = []
         general_information['nsd'].append({
@@ -246,6 +310,12 @@ def create_files():
             "vld": vld['vld'],
             "vnffgd": vnffgd['vnffgd']
         })
+
+        for k in general_information.keys():
+            for general_information_k in general_information[k]:
+                for k_data in general_information_k.keys():
+                    if not general_information_k[k_data] or general_information_k[k_data] == 'None':
+                        del general_information_k[k_data]
 
         data['nsd:nsd-catalog'] = {
             "nsd": general_information['nsd']
