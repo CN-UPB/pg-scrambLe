@@ -1,0 +1,70 @@
+\chapter{Effects of scaling}
+\label{ch:Effects of scaling}
+
+\section{Availability}
+Availability describes how often a service can be used over a defined period of time.
+
+\subsection{How to estimate the availability of a system}
+
+Most service outages are the result of misbehaving equipment. These outages can be prolonged by misdiagnosis of the problem and other mistakes in responding to the outage in question.Determining expected availability as stated in \cite{reese_cloud_nodate} involves two variables:
+
+\begin{enumerate}
+
+
+	\item  The likelihood that one will encounter a failure in the system during the measurement period.
+
+	\item  How much downtime is expected in the event the system fails.The mathematical formulation of the availability of a component is: 
+\end{enumerate}
+\begin{equation}
+a = (p - (c*d))/p
+\end{equation}
+where a = expected availability\\
+c = the \% of likelihood that there is a server loss in a given period\\
+d = expected downtime from the loss of the server\\
+p = the measurement period\\
+
+To achieve an accurate availability rating, one needs to rate all of the points of failure of the system and add them together. The availability of a system is the total time of a period minus the sum of all expected downtime during that period, all divided by the total time in the period:
+
+\begin{equation}
+a = (p - SUM(c1*d1:cn*dn))/p
+\end{equation}
+
+\section{Reliability}
+
+Reliability is \cite{reese_cloud_nodate} often related to availability, but it’s a slightly different concept. Specifically,reliability refers to how well one can trust a system to protect data integrity and execute its transactions. The instability associated with low availability often has the side effect of making people not trust that their last request actually executed, which can cause data corruption in relational database systems.
+
+Much of the reliability of a system depends on how one writes the code that runs it. The cloud presents a few issues outside the scope of the application code that can impact a system’s reliability. Within the cloud, the most significant of these issues is how persistent data is managed. Virtual instances tend to have lower availability than their physical counterparts, the chance for data corruption is higher in the cloud than it is in a traditional data center. In particular, any time one loses a server, the following factors become real concerns:
+\begin{enumerate}
+
+
+	\item  Loss of data stored on that instance which has not been backed up somewhere.
+ 
+ 	\item   Block storage devices have a chance of becoming corrupted (just as they would in a traditional data center)
+\end{enumerate}
+
+
+\section{Heterogeneity}
+\paragraph{}Heterogeneity refers to the state of being diverse. The scaling in a distributed system is also affected by the heterogeneity of systems involved. The administrative dimension of the scaling constitutes to the problem regarding heterogeneity focusing of both hardware and also software required, to deliver the services efficiently. One of the solutions to such a problem is coherence. In a coherence system, the different administrative systems have a common interface \cite{ord1994scale}.
+
+\subsection{Administration in a MANO framework}
+
+\paragraph{}The administrative domain in an NFV architectural framework is majorly divided into Infrastructure domain and Tenant domain. Infrastructure domains are defined based on the criteria like type of resource such as networking, compute and storage in traditional data-centre environments, by geographical locations or by organisation. The tenant domains are defined based on the criteria like by the type of network service, etc. In a framework, multiple infrastructure domains may co-exist, providing infrastructure to a single or multiple tenant domain. The VNFs and Network Services reside in the tenant domain which consumes resources from one or more infrastructure domains \cite{peinetwork}.
+
+\subsection{Multi-MANO Interworking}
+\paragraph{}To achieve a better provisioning of network services, two or more Service Platforms (SPs) cooperate or one orchestrator leverages on the NFV interface or on the other orchestrator to instantiate functions, services. The infrastructure domain is segmented to accommodate the demands of separate organisation hence deploying a hierarchy of service platforms that need to collaborate in order to deploy NFV end-to-end services.The interaction between the two MANOs is achieved by mapping the services and infrastructure domains of the MANO. 
+
+\paragraph{}In a hierarchical placement of the two MANO service platforms, it either supports complete outsourcing of a network service for deployment in a lower service platform or split the service deployment across two MANO SPs.Hence, the NFVO of the upper MANO constitutes a resource orchestrator (RO) along with network service orchestrator (NSO) to facilitate the services.
+
+
+
+\paragraph{}According to \cite{de2018network} , For a network service to support across multiple administrative domains, they require coordination and synchronisation between multiple involved infrastructure domains which are performed by one or more orchestrators. The ETSI approaches for multiple administrative domains are depicted in the figure below.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\linewidth]{"figures/ETSI approaches"}
+	\caption{ETSI approaches for multiple administrative domains. Adapted from \cite{de2018network}}
+	\label{fig:etsi-approaches}
+\end{figure}
+
+
+\paragraph{}In the above figure 3.1, (a) refers to a approach in which the orchestrator is split into two components (NSO and RO), (b) refers to a approach with multiple orchestrators and a new reference point: Umbrella NFVO and (c) refers to a approach that introduces hierarchy and the new reference point Or-Or.

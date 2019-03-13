@@ -1,0 +1,17 @@
+\chapter{Scaling a Network Service}
+\label{ch:Scaling a Network Service}
+
+\paragraph{}The Scaling of a network service plays a key role while handling the system load on a MANO or for a better performance. The network service contains a NSD that limits the instantiation levels of an NS instance, by defining them as the discrete set of levels addressing the number of instantiation levels required while scaling a network service \cite{adamuz2018automated}.
+
+\paragraph{}According to \cite{adamuz2018automated},the deployment flavors of an NSD contains information about the instantiation levels permitted for an NS instance, with the help of information from VNFDs and VLDs. The VNF flavour of the VNFD specifies which part of VNFCs are to be deployed. The NS flavour selects the part of VNFs and VLs to be deployed as a part of NS. With this information it defines the instantiation levels.The below figure shows the scaling attributes of an NSD.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{"figures/NSD structure"}
+	\caption{NSD structure. Adapted from \cite{adamuz2018automated}}
+	\label{fig:nsd-structure}
+\end{figure}
+
+
+
+
