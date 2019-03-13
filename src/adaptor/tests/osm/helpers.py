@@ -5,6 +5,7 @@ from .config import *
 class Helpers():
 
     def _upload_test_vnf():
+        time.sleep(3) # Wait 
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -18,6 +19,7 @@ class Helpers():
             return False
 
     def _delete_test_vnf(vnfname="test_osm_cirros_vnfd"):
+        time.sleep(3) # Wait 
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -38,6 +40,7 @@ class Helpers():
                                     id=_vnfd))
 
     def _upload_test_nsd():
+        time.sleep(3) # Wait 
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
         osm_nsd = OSMClient.Nsd(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
@@ -91,6 +94,7 @@ class Helpers():
                                     id=_vnfd))
 
     def _upload_reference_vnfd_for_nsd(_referencevnfdname="test_osm_cirros_vnfd"):
+        time.sleep(3) # Wait 
         osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -105,6 +109,7 @@ class Helpers():
             return False
     
     def _upload_test_ns_instance():
+        time.sleep(3) # Wait 
         osm_nslcm = OSMClient.Nslcm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -117,6 +122,7 @@ class Helpers():
         
         
     def _delete_test_ns_instance():
+        time.sleep(3) # Wait 
         osm_nslcm = OSMClient.Nslcm(HOST_URL)
         osm_auth = OSMClient.Auth(HOST_URL)
         _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
@@ -131,7 +137,7 @@ class Helpers():
         # time.sleep(5) #wait for NS Creation
         response = None
         if _ns:
-            response = json.loads(osm_nslcm.delete_ns_instances_nsinstanceid(
+            response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
                                     token=_token["id"], 
                                     id=_ns))
             _rid = response["data"]

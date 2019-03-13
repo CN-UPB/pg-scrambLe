@@ -37,7 +37,8 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)
         
 
-    def post_ns_instances(self, token, nsDescription,nsName,nsdId,vimAccountId, host=None, port=None):
+    def post_ns_instances_nsinstanceid_instantiate(self, token, nsDescription,
+                                 nsName, nsdId, vimAccountId, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -45,7 +46,8 @@ class Nslcm(CommonInterfaceNslcm):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/yaml", "accept": "application/json",
                         'Authorization': 'Bearer {}'.format(token)}
-        ns_data = {"nsDescription": nsDescription ,"nsName": nsName ,"nsdId": nsdId, "vimAccountId": vimAccountId}                
+        ns_data = {"nsDescription": nsDescription, "nsName": nsName,
+                        "nsdId": nsdId, "vimAccountId": vimAccountId}                
 
         _endpoint = "{0}/nslcm/v1/ns_instances_content".format(base_path)
 
@@ -84,7 +86,7 @@ class Nslcm(CommonInterfaceNslcm):
 
 
    
-    def delete_ns_instances_nsinstanceid(self, token, id, host=None, port=None, force=None):
+    def post_ns_instances_nsinstanceid_terminate(self, token, id, host=None, port=None, force=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -101,7 +103,7 @@ class Nslcm(CommonInterfaceNslcm):
         except Exception as e:
             result['data'] = str(e)
             return result
-        if r.status_code == requests.codes.no_content:
+        if r.status_code == requests.codes.accepted:
             result['error'] = False
 
         result['data'] = r.text
@@ -109,14 +111,7 @@ class Nslcm(CommonInterfaceNslcm):
 
 
    
-    def post_ns_instances_nsinstanceid_instantiate(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Instantiate NS task
-
-        /ns_instances_nsinstanceid_instantiate
-            GET - Read an individual NS instance resource.
-
-        """
+    def post_ns_instances(self, nsInstanceId):
         pass
 
 
@@ -130,8 +125,6 @@ class Nslcm(CommonInterfaceNslcm):
 
         """
         pass
-
-
    
     def post_ns_instances_nsinstanceid_update(self, nsInstanceId):
         """  NS Lifecycle Management interface - 
@@ -143,19 +136,8 @@ class Nslcm(CommonInterfaceNslcm):
         """
         pass
 
-
-   
-    def post_ns_instances_nsinstanceid_terminate(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Terminate NS task
-
-        /ns_instances_nsinstanceid_terminate
-            POST - Terminate a NS instance.
-
-        """
+    def delete_ns_instances_nsinstanceid(self, nsInstanceId):
         pass
-
-
     
     def post_ns_instances_nsinstanceid_heal(self, nsInstanceId):
         """  NS Lifecycle Management interface - 
@@ -167,8 +149,6 @@ class Nslcm(CommonInterfaceNslcm):
         """
         pass
 
-
-    
     def get_ns_lcm_op_ops(self, token, id , host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
@@ -189,7 +169,6 @@ class Nslcm(CommonInterfaceNslcm):
                 
         result['data'] = r.text
         return json.dumps(result)
-
 
     def get_ns_lcm_op_ops_nslcmopoccid(self, token, id , host=None, port=None):
         if host is None:

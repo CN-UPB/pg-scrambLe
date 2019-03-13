@@ -66,7 +66,7 @@ class CommonInterfaceNslcm(ABC):
                 Instantiate NS task
 
         /ns_instances_nsinstanceid_instantiate
-            GET - Read an individual NS instance resource.
+            POST - Instantiate a NS instance.
 
         """
         pass

@@ -45,7 +45,7 @@ def get_ns_instances_keys():
                 'ns-instance-config-ref', 'nsd', 'operational-status', '_admin']
 
 @fixture
-def delete_ns_instances_nsinstanceid_keys():
+def post_ns_instances_nsinstanceid_terminate_keys():
     return['_id']
 
 @fixture
@@ -59,7 +59,7 @@ def get_ns_lcm_op_ops_nslcmopoccid_keys():
     return['operationParams', 'isAutomaticInvocation']
 
 @fixture
-def post_ns_instances_keys():
+def post_ns_instances_nsinstanceid_instantiate_keys():
     return['id']
 
 @fixture

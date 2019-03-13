@@ -7,6 +7,7 @@ from .helpers import Helpers
 
 def test_post_vnf_packages(post_vnf_packages_keys):
     """Tests API call to onboard VNF descriptor resources"""
+    Helpers._delete_test_nsd()
     Helpers._delete_test_vnf()
     osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
     osm_auth = OSMClient.Auth(HOST_URL)

@@ -17,7 +17,7 @@ def test_post_ns_descriptors(post_ns_descriptors_keys):
     Helpers._delete_test_nsd(_token=_token["token"]["access_token"])
 
     sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
-	package_path="tests/samples/vnfd_example.yml")
+	                    package_path="tests/samples/vnfd_example.yml")
 
     response = json.loads(sonata_nsd.post_ns_descriptors(
                         token=_token["token"]["access_token"],

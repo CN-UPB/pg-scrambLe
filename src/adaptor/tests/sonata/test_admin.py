@@ -7,6 +7,7 @@ import time
 # from .helpers import Helpers
 
 def test_get_user_list(get_user_list_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -20,6 +21,7 @@ def test_get_user_list(get_user_list_keys):
                     response[0].keys()), "All keys should be in the response"
 
 def test_get_user_info(get_user_info_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -39,6 +41,7 @@ def test_get_user_info(get_user_info_keys):
             return False
 
 def test_get_nsinstances_records(get_nsinstances_records_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -52,6 +55,7 @@ def test_get_nsinstances_records(get_nsinstances_records_keys):
                     response[0].keys()), "All keys should be in the response"
 
 def test_get_nsinstances_records_instanceId(get_nsinstances_records_instanceId_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -71,6 +75,7 @@ def test_get_nsinstances_records_instanceId(get_nsinstances_records_instanceId_k
             return False
 
 def test_get_vims_list(get_vims_list_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -85,6 +90,7 @@ def test_get_vims_list(get_vims_list_keys):
 
 
 def test_get_instantions_requests(get_instantions_requests_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -99,6 +105,7 @@ def test_get_instantions_requests(get_instantions_requests_keys):
 
 
 def test_get_instantions_requests_requestId(get_instantions_requests_requestId_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -118,6 +125,7 @@ def test_get_instantions_requests_requestId(get_instantions_requests_requestId_k
             return False
 
 def test_get_functions(get_functions_keys): 
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -132,6 +140,7 @@ def test_get_functions(get_functions_keys):
  
 
 def test_get_functions_functionId(get_functions_functionId_keys):
+    time.sleep(2) #Wait 
     sonata_admin = SONATAClient.Admin(HOST_URL)
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
@@ -146,16 +155,16 @@ def test_get_functions_functionId(get_functions_functionId_keys):
 
     response = json.loads(sonata_admin.get_functions_functionId(token=_token["token"]["access_token"], id=_fun))
   
-def test_get_packages(get_packages_keys):
-    sonata_admin = SONATAClient.Admin(HOST_URL)
-    sonata_auth = SONATAClient.Auth(HOST_URL)
-    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-    _token = json.loads(_token["data"])
-    response = json.loads(sonata_admin.get_packages(token=_token["token"]["access_token"]))
-    response = json.loads(response["data"])
+# def test_get_packages(get_packages_keys):
+#     sonata_admin = SONATAClient.Admin(HOST_URL)
+#     sonata_auth = SONATAClient.Auth(HOST_URL)
+#     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+#     _token = json.loads(_token["data"])
+#     response = json.loads(sonata_admin.get_packages(token=_token["token"]["access_token"]))
+#     response = json.loads(response["data"])
     
-    assert isinstance(response, list)
-    if len(response) > 0:
-         assert set(get_packages_keys).issubset(
-                    response[0].keys()), "All keys should be in the response"
+#     assert isinstance(response, list)
+#     if len(response) > 0:
+#          assert set(get_packages_keys).issubset(
+#                     response[0].keys()), "All keys should be in the response"
 
