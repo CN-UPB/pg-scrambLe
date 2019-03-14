@@ -1,17 +1,24 @@
 \begin{frame}
-\frametitle{Front end}
+\frametitle{Adaptor REST API}
 
-\begin{itemize}
-			\item A sneak peek of how SCrAMbLE plug in looks like 
-			
-	\item Simple html for uploading VNFD , NSD and instantiating a Network Service(NS). 
+\begin{itemize}[<+->]
+	\item Unified access to MANO instances			
+
+	\item Implements ETSI endpoints
+	\begin{itemize}
+		\item Enforce if a MANO is using non-standard endpoint
+	\end{itemize}
 	
-	\item Termination of NS 
+	\item \textbf{MANO}: parameter sent with each request
+	\begin{itemize}
+		\item Currently supports \textbf{OSM} and \textbf{Sonata}
+	\end{itemize}
 		
-	\item In this way, adaptor installed in OSM communicates with another OSM or SONATA MANO
 \end{itemize}
 \end{frame}
+
 \begin{frame}
+
 \Huge{\centerline{DEMO ---$ > $}}
 
 \end{frame}
