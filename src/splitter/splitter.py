@@ -5,7 +5,9 @@ import yaml
 
 
 NSDs = []
+#network_function_sets = [["vnf_iperf"], ["vnf_tcpdump"], ["vnf_firewall"]]
 network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
+#network_function_sets = [["vnf_iperf", "vnf_firewall"], ["vnf_tcpdump"]]
 old_new_link_mapping = []
 
 

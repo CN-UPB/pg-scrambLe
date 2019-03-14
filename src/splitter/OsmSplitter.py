@@ -298,7 +298,7 @@ def create_files():
         general_information = {}
         general_information['nsd'] = []
         general_information['nsd'].append({
-            "id": str(NSDs[i].id),
+            "id": str(NSDs[i].id) + "_" + str(i),
             "name": str(NSDs[i].name),
             "short-name": str(NSDs[i].short_name),
             "description": str(NSDs[i].description),
