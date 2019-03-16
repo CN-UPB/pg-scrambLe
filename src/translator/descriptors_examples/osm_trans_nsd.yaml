@@ -1,0 +1,57 @@
+nsd:nsd-catalog:
+  nsd:
+  - name: sonata-demo
+    version: 0.2.1
+    description: '"The network service descriptor for the SONATA demo,\n comprising
+      iperf, a firewall, and tcpump."\n'
+    connection-point:
+    - type: VPORT
+      name: mgmt
+    - name: input
+      type: VPORT
+    - name: output
+      type: VPORT
+    constituent-vnfd:
+    - member-vnf-index: vnf_firewall
+      vnfd-id-ref: firewall-vnf
+    - member-vnf-index: vnf_iperf
+      vnfd-id-ref: iperf-vnf
+    - vnfd-id-ref: tcpdump-vnf
+      member-vnf-index: vnf_tcpdump
+    vld:
+    - type: ELAN
+      id: mgmt
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: vnf_iperf
+        vnfd-connection-point-ref: mgmt
+      - member-vnf-index-ref: vnf_firewall
+        vnfd-connection-point-ref: mgmt
+      - vnfd-connection-point-ref: mgmt
+        member-vnf-index-ref: vnf_tcpdump
+      - vnfd-connection-point-ref: mgmt
+    - type: ELINE
+      id: input-2-iperf
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: vnf_iperf
+        vnfd-connection-point-ref: input
+      - vnfd-connection-point-ref: input
+    - id: iperf-2-firewall
+      type: ELINE
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: vnf_iperf
+        vnfd-connection-point-ref: output
+      - vnfd-connection-point-ref: input
+        member-vnf-index-ref: vnf_firewall
+    - type: ELINE
+      id: firewall-2-tcpdump
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: vnf_firewall
+        vnfd-connection-point-ref: output
+      - member-vnf-index-ref: vnf_tcpdump
+        vnfd-connection-point-ref: input
+    - id: tcpdump-2-output
+      type: ELINE
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: vnf_tcpdump
+        vnfd-connection-point-ref: output
+      - vnfd-connection-point-ref: output

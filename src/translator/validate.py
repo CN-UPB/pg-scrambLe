@@ -1,225 +1,144 @@
-from __future__ import print_function
 import json
 import yaml
 import sys
 import getopt
-import osm_im.vnfd as vnfd_catalog
-import osm_im.nsd as nsd_catalog
-from pyangbind.lib.serialise import pybindJSONDecoder
 from jsonschema import *
 import pprint
 import os
-import pymongo
 from utilities import setup
 
+class validator():
 
-"""
-Tests the format of OSM VNFD and NSD descriptors
-"""
-__author__ = "Alfonso Tierno, Guillermo Calvino"
-__date__ = "2018-04-16"
-__version__ = "0.0.1"
-version_date = "Apr 2018"
+    def __init__(self,source = None,translated = None):
+        
+        self.source = source
+        self.translated = translated
 
+    def sonata_nsd_validator(self):
+        '''
+            validates a sonata json against nsd schema
 
-def remove_prefix(desc, prefix):
-    """
-    Recursively removes prefix from keys
-    :param desc: dictionary or list to change
-    :param prefix: prefix to remove. Must
-    :return: None, param desc is changed
-    """
-    prefix_len = len(prefix)
-    if isinstance(desc, dict):
-        prefixed_list=[]
-        for k,v in desc.items():
-            if isinstance(v, (list, tuple, dict)):
-                remove_prefix(v, prefix)
-            if isinstance(k, str) and k.startswith(prefix) and k != prefix:
-                prefixed_list.append(k)
-        for k in prefixed_list:
-            desc[k[prefix_len:]] = desc.pop(k)
-    elif isinstance(desc, (list, tuple)):
-        for i in desc:
-            if isinstance(desc, (list, tuple, dict)):
-                remove_prefix(i, prefix)
-
-
-def osm_validator(descriptor):
-    input_file_name = descriptor
-    try:
-        # Open files
-        file_name = input_file_name
-        with open(file_name, 'r') as f:
-            descriptor_str = f.read()
-        file_name = None
-
-        if input_file_name.endswith('.yaml') or input_file_name.endswith('.yml') or not \
-            (input_file_name.endswith('.json') or '\t' in descriptor_str):
-            data = yaml.load(descriptor_str)
-        else:   # json
-            data = json.loads(descriptor_str)
-
-        if "vnfd:vnfd-catalog" in data or "vnfd-catalog" in data:
-            descriptor = "VNF"
-            # Check if mgmt-interface is defined:
-            remove_prefix(data, "vnfd:")
-            vnfd_descriptor = data["vnfd-catalog"]
-            vnfd_list = vnfd_descriptor["vnfd"]
-            mgmt_iface = False
-            for vnfd in vnfd_list:
-                vdu_list = vnfd["vdu"]
-                for vdu in vdu_list:
-                    interface_list = []
-                    external_interface_list = vdu.pop("external-interface", ())
-                    for external_interface in external_interface_list:
-                        if external_interface.get("virtual-interface", {}).get("type") == "OM-MGMT":
-                            raise KeyError(
-                                "Wrong 'Virtual-interface type': Deprecated 'OM-MGMT' value. Please, use 'PARAVIRT' instead")
-                    interface_list = vdu.get("interface", ())
-                    for interface in interface_list:
-                        if interface.get("virtual-interface", {}).get("type") == "OM-MGMT":
-                            raise KeyError(
-                                "Wrong 'Virtual-interface type': Deprecated 'OM-MGMT' value. Please, use 'PARAVIRT' instead")
-                if vnfd.get("mgmt-interface"):
-                    mgmt_iface = True
-                    if vnfd["mgmt-interface"].get("vdu-id"):
-                        raise KeyError("'mgmt-iface': Deprecated 'vdu-id' field. Please, use 'cp' field instead")
-            if not mgmt_iface:
-                raise KeyError("'mgmt-iface' is a mandatory field and it is not defined")
-            myvnfd = vnfd_catalog.vnfd()
-            pybindJSONDecoder.load_ietf_json(data, None, None, obj=myvnfd)
-            return True
-        elif "nsd:nsd-catalog" in data or "nsd-catalog" in data:
-            descriptor = "NS"
-            mynsd = nsd_catalog.nsd()
-            pybindJSONDecoder.load_ietf_json(data, None, None, obj=mynsd)
-            return True
-        else:
-            descriptor = None
-            raise KeyError("This is not neither nsd-catalog nor vnfd-catalog descriptor")
-
-    except yaml.YAMLError as exc:
-        error_pos = ""
-        if hasattr(exc, 'problem_mark'):
-            mark = exc.problem_mark
-            error_pos = "at line:%s column:%s" % (mark.line + 1, mark.column + 1)
-        print("Error loading file '{}'. yaml format error {}".format(input_file_name, error_pos), file=sys.stderr)
-    except ArgumentParserError as e:
-        print(str(e), file=sys.stderr)
-    except IOError as e:
-            print("Error loading file '{}': {}".format(file_name, e), file=sys.stderr)
-    except ImportError as e:
-        print ("Package python-osm-im not installed: {}".format(e), file=sys.stderr)
-    except Exception as e:
-        if file_name:
-            print("Error loading file '{}': {}".format(file_name, str(e)), file=sys.stderr)
-        else:
-            if descriptor:
-                print("Error. Invalid {} descriptor format in '{}': {}".format(descriptor, input_file_name, str(e)),
-                      file=sys.stderr)
+        '''
+       
+        descriptor_to_validate = self.translated
+        
+        if "descriptor_version" in descriptor_to_validate:
+            schema = yaml.load(open("nsd-Pishahang.yml"))
+            validator = Draft4Validator(schema , format_checker=FormatChecker())
+            lastidx = 0
+            error=[]
+            for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+                lastidx = idx
+                error.append( pprint.pformat(err))
+            if lastidx == 0:
+                return True
             else:
-                print("Error. Invalid descriptor format in '{}': {}".format(input_file_name, str(e)), file=sys.stderr)
+                return error
+        else:
+            schema = yaml.load(open("nsd-schema.yml"))
+            validator = Draft4Validator(schema , format_checker=FormatChecker())
+            lastidx = 0
+            error=[]
+            for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+                lastidx = idx
+                error.append(pprint.pformat(err))
+            if lastidx == 0:
+                return True
+            else:
+                return error
 
 
-def sonata_nsd_validator(descriptor):
-    descriptor_to_validate = descriptor
-    if "descriptor_version" in descriptor_to_validate:
-        schema = yaml.load(open("tng-schema/Nsd/nsd-Pishahang.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-    else:
-        schema = yaml.load(open("tng-schema/Nsd/nsd-schema.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
+    def sonata_vnfd_validator(self):
+        '''
+            validates a sonata json against vnfd schema
 
+        '''        
+        descriptor_to_validate = self.translated
+        
+        if "descriptor_version" in descriptor_to_validate:
+            
+            schema = yaml.load(open("vnfd-Pishahang.yml"))
+            validator = Draft4Validator(schema , format_checker=FormatChecker())
+            lastidx = 0
+            
+            for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+                lastidx = idx
+                return pprint.pformat(err)
+            
+            if lastidx == 0:
+                return True
+        else:
+            
+            schema = yaml.load(open("vnfd-schema.yml"))
+            validator = Draft4Validator(schema , format_checker=FormatChecker())
+            lastidx = 0
+            
+            for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+                lastidx = idx
+                return pprint.pformat(err)
+            
+            if lastidx == 0:
+                return True
 
-def sonata_vnfd_validator(descriptor):
-    descriptor_to_validate = descriptor
-    if "descriptor_version" in descriptor_to_validate:
-        schema = yaml.load(open("tng-schema/Vnfd/vnfd-Pishahang.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-    else:
-        schema = yaml.load(open("tng-schema/Vnfd/vnfd-schema.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
+    def validate(self):
+        '''
+            lists out the common and missing keys between a source descriptor and its 
+            reverse translated descriptor.
 
-def validate(source, translated):
-    received_file = source
-    translated_file = translated
-    if 'virtual_deployment_units' in received_file:
-        var = VNFD_Translator.translate_to_sonata_vnfd(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        words1 = set(file1.read().split())
-	words2 = set(file2.read().split())
-	duplicates  = words1.intersection(words2)
-	uniques = words1.difference(words2).union(words2.difference(words1))
-	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
-	print "\nUniques(%d):%s"%(len(uniques),uniques)
-	config_check = sonata_vnfd_validator(translated_file)
+        '''
+        client = pymongo.MongoClient("mongodb://localhost:27017/")
+        setup_obj = setup(client)
 
-    elif 'network_functions' in received_file:
-        var = setup.translate_to_sonata(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        words1 = set(file1.read().split())
-	words2 = set(file2.read().split())
-	duplicates  = words1.intersection(words2)
-	uniques = words1.difference(words2).union(words2.difference(words1))
-	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
-	print "\nUniques(%d):%s"%(len(uniques),uniques)
-	config_check = sonata_nsd_validator(translated_file)
+        uniques=[]
+        duplicates=[]
 
-    elif 'constituent-vnfd' in received_file:
-        var = VNFD_Translator.translate_to_osm_vnfd(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        words1 = set(file1.read().split())
-	words2 = set(file2.read().split())
-	duplicates  = words1.intersection(words2)
-	uniques = words1.difference(words2).union(words2.difference(words1))
-	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
-	print "\nUniques(%d):%s"%(len(uniques),uniques)
-	config_check = osm_validator(translated_file)
+        if 'virtual_deployment_units' in self.source:
 
-    elif 'management interface' in received_file:
-        var = setup.translate_to_osm(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        words1 = set(file1.read().split())
-	words2 = set(file2.read().split())
-	duplicates  = words1.intersection(words2)
-	uniques = words1.difference(words2).union(words2.difference(words1))
-	print "Duplicates(%d):%s"%(len(duplicates),duplicates)
-	print "\nUniques(%d):%s"%(len(uniques),uniques)
-	config_check = osm_validator(translated_file)
+            source_rev_trans = setup_obj.translate_to_sonata_vnfd(self.translated)
+            result = pd.DataFrame(self.compare_dict(self.source,source_rev_trans),columns=['matched','missing'])
+            return result
+            
+        elif 'network_functions' in self.source:
+
+            source_rev_trans = setup_obj.translate_to_sonata_nsd(self.translated)
+            result = pd.DataFrame(self.compare_dict(self.source,source_rev_trans),columns=['matched','missing'])
+            return result
+
+        elif 'vnfd:vnfd-catalog' in self.source:
+
+            source_rev_trans = setup_obj.translate_to_osm_vnfd(self.translated)
+            result = pd.DataFrame(self.compare_dict(self.source,source_rev_trans),columns=['matched','missing'])
+            return result
+
+        elif 'nsd:nsd-catalog' in self.source:
+
+            source_rev_trans = setup_obj.translate_to_osm_nsd(self.translated)
+            result = pd.DataFrame(self.compare_dict(self.source,source_rev_trans),columns=['matched','missing'])
+            return result
+
+    def compare_dict(self,dict1, dict2):
+        '''
+            compares two dictionary by matching the keys present/ absent in both of them
+
+        '''
+        if isinstance(dict1,dict) and isinstance(dict2,dict): 
+
+            words1 = set(dict1.keys())
+            words2 = set(dict2.keys())
+
+            duplicates  = words1.intersection(words2)
+            uniques = words1.difference(words2).union(words2.difference(words1))
+
+            yield [duplicates, uniques]
+
+            for key in duplicates:            
+                for result in self.compare_dict(dict1[key],dict2[key]):
+                    yield result
+
+        elif isinstance(dict1,list) and isinstance(dict2,list): 
+
+            if(len(dict1) == len(dict2)):
+
+                for i in range(len(dict1)):
+                    for result in  self.compare_dict(dict1[i],dict2[i]):
+                        yield result   

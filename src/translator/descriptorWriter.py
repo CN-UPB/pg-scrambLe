@@ -7,6 +7,9 @@ from bson.objectid import ObjectId
 
 class write_dict():
 
+    def getKey(self,item):
+        return item[0]
+
     def append_dict(self,parent_key, lvl, dictionary):
         '''
         reads a parent key , a list of values that should be mapped to the parent key and an empty dictionary
@@ -49,11 +52,18 @@ class write_dict():
 
         list_dict.append(inner_dict)
         
-        if ( (len(list_dict) == 1) & (('id' not in list_dict[0].keys()) or ('name' not in list_dict[0].keys())
-                                     or ('id-ref' not in list_dict[0].keys()))):
-            dictionary[parent_key] = list_dict[0]
-        else:
+        if ( (len(list_dict) >= 1) & (('id' in list_dict[0].keys()) 
+                                      or ('name' in list_dict[0].keys())
+                                     or ('id-ref' in list_dict[0].keys())
+                                     or ('vnf_id' in list_dict[0].keys())
+                                      or ('vnfd-id-ref' in list_dict[0].keys())
+                                     or (('member-vnf-index-ref' in list_dict[0].keys())
+                                        or ('order' in list_dict[0].keys())
+                                        or ('vnfd-connection-point-ref' in list_dict[0].keys())
+                                        ))):
             dictionary[parent_key] = list_dict
+        else:
+            dictionary[parent_key] = list_dict[0]
 
         return dictionary
 
@@ -75,7 +85,6 @@ class write_dict():
             returns an iterator containing both a list of parent key values and a current level dictionary 
         
         '''
-
         s = dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL')].groupby(by=['parent_key']).agg(
             {'key':lambda x: x.nunique() })  # getting the unique set of keys whose values are at higher levels 
                                             # along with the number of items
@@ -96,7 +105,7 @@ class write_dict():
             val = [x.values for _,x in lvl.groupby(lvl[0])]
             
             length=2
-            for i in range(2,dataset['level'].max(),2):
+            for i in range(2,dataset['level'].max()*2,2):
                 if len(np.unique(lvl[0].apply(lambda x : x.split("|")[:-i]).values)) == 1:
                     length = i
                     break
@@ -113,7 +122,8 @@ class write_dict():
                 
                 parent_key.append(parent_temp)
                 parent_pos.append(parent_pos_temp)
-                
+            
+            
             yield parent_key, lvl_dict ,parent_pos
         
         
@@ -224,5 +234,8 @@ class write_dict():
         
         '''
         return self.write(ds,range(8))
+
+
+
 
 
