@@ -4,6 +4,8 @@ import sys
 import getopt
 from jsonschema import *
 import pprint
+import pandas as pd
+import pymongo
 import os
 from utilities import setup
 
