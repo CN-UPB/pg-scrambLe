@@ -6,6 +6,8 @@ import getopt
 from jsonschema import *
 import pandas as pd
 import pprint
+import pandas as pd
+import pymongo
 import os
 import pymongo
 import json
@@ -162,6 +164,7 @@ class validator():
 
                 for i in range(len(dict1)):
                     for result in  self.compare_dict(dict1[i],dict2[i]):
+<<<<<<< HEAD
                         yield result  
 
 def validate_service(nsd, vnfd):
@@ -742,3 +745,6 @@ def convert(data):
             data[key] = val.strftime(ISO8601_DATETIME)
         if isinstance(val, type(None)):
             del data[key] 
+=======
+                        yield result   
+>>>>>>> 3a46b6919f3601fc6331a91fb2d463955c100438
