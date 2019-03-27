@@ -27,7 +27,7 @@ class setup():
         recieved_file[0].pop('_id')
         return recieved_file[0]
 
-
+    ### @Suheel
     def translate_to_osm_vnfd(self,received_file):
         '''
         reads a pandas.DataFrame
@@ -92,7 +92,7 @@ class setup():
             ['NULL',2, 3, 'vnfd', 'vdu', 'NULL','NULL'],
             ['NULL',2, 3, 'vnfd', 'monitoring-param','NULL','NULL']
         ],
-                                              columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+             columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
 
         dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL',axis=1)
         dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
@@ -127,6 +127,8 @@ class setup():
         df_son_vl.loc[df_son_vl[(df_son_vl['key'] == 'type') & (df_son_vl['parent_key'] == 'internal-vld')].index,'value'] = df_son_vl[(df_son_vl['key'] == 'type') & (df_son_vl['parent_key'] == 'internal-vld')].apply(lambda x : 'ELAN' if x.value == 'E-LAN' else ( 'ELINE' if x.value == 'E-Line' else 'NULL'),axis=1 )
         dataset = dataset.append(df_son_vl)
         dataset.reset_index(inplace=True,drop=True)
+        
+        
         df_cp = transformation_obj.ret_ds(sonata_dataset, 'connection_points', 2)
         df_cp['level'] = df_cp['level'].astype('int64')
         df_cp['parent_level'] = df_cp['parent_level'].astype('int64')
@@ -138,6 +140,12 @@ class setup():
             ['osm_parent_level', 'osm_level', 'osm_parent_key', 'osm_key', 'value', 'osm_lineage', 'lineage']]
         df_son_cp.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'osm_lineage', 'lineage']
         df_son_cp['lineage'] = df_son_cp.apply(lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        
+        temp = df_son_cp[(df_son_cp['key'] == 'id') & 
+                                (df_son_cp['parent_key'] == 'connection-point')].copy()
+        temp['key'] = 'name'
+        df_son_cp = df_son_cp.append(temp)
+        
         df_son_cp.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
         df_son_cp.loc[df_son_cp[(df_son_cp['key'] == 'type') & 
                                 (df_son_cp['parent_key'] == 'connection-point')].index,'value'] = df_son_cp[(df_son_cp['key'] == 'type') & 
@@ -201,12 +209,6 @@ class setup():
 
         df_son_vdu.drop(df_son_vdu[(df_son_vdu['level']==5) & 
                        (df_son_vdu['key'].isin(['memory-mb','storage-gb']))].index,inplace =True, axis=0)
-
-        #for _,row in df_son_vdu[(df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==4)][['value','lineage']].iterrows():
-         #   df_son_vdu.loc[(df_son_vdu['lineage'].str.startswith(row['lineage'])) & 
-         #                     (df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==5),'value'] = df_son_vdu[(df_son_vdu['lineage'].str.startswith(str(row['lineage']))) & 
-         #                      (df_son_vdu['key'] == 'id') & (df_son_vdu['level'] ==5)]['value'].apply(lambda x : row['value']+'-'+x)
-
 
         df_son_vdu=df_son_vdu.append(temp)
         df_son_vdu.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
@@ -276,6 +278,7 @@ class setup():
 
         return message#translated_ref
 
+    ### @Arka
     def translate_to_osm_nsd(self,received_file):
         '''
         reads a pandas.DataFrame
@@ -340,8 +343,23 @@ class setup():
                                                                                (dataset['parent_key'] == 'connection-point')].apply(lambda x : 'VPORT' if x.value in ['management','internal','external'] else 'NULL',axis=1)
 
         dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
-        dataset=dataset.sort_values(by= 'lineage',ascending=True)
 
+        dataset.loc[dataset['parent_key'] == 'constituent-vnfd','value'] = dataset[dataset['parent_key'] == 'constituent-vnfd'].apply(lambda x :
+                                                                   str(int(x['lineage'].split('|')[-1]) + 1) if x['key']=='member-vnf-index' else x['value'],axis=1 )
+
+        dataset=dataset.sort_values(by= 'lineage',ascending=True)
+        
+        temp = dataset[(dataset['key'] == 'name') & 
+                       (dataset['parent_key'] == 'nsd')].copy()
+        temp['key'] = 'id'
+        dataset= dataset.append(temp)
+        
+        temp = dataset[(dataset['key'] == 'name') & 
+                       (dataset['parent_key'] == 'connection-point')].copy()
+        temp['key'] = 'id'
+        dataset= dataset.append(temp)
+        
+        
         df = transformation_obj.ret_ds(sonata_dataset,'virtual_links',2)
         vl = transformation_obj.son_vld_nsd(df,'value','key',':')
         vl['level'] = vl['level'].astype('int64')
@@ -371,10 +389,29 @@ class setup():
                        (df_son_vld['parent_key'] == 'vld'),'value']=df_son_vld[(df_son_vld['key'] == 'type') & 
                                                                                (df_son_vld['parent_key'] == 'vld')].apply(lambda x : 'ELAN' if x.value == 'E-LAN'
                                                                                              else ( 'ELINE' if x.value == 'E-Line' else 'NULL'),axis=1)
+
+        temp = df_son_vld[(df_son_vld['parent_key'] == 'vld') & (df_son_vld['key'] == 'id')].copy()
+        temp['key'] = 'name'
+        df_son_vld = df_son_vld.append(temp)
+
+        temp = df_son_vld[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & (df_son_vld['key'] == 'member-vnf-index-ref')].copy()
+        temp['key'] = 'vnfd-id-ref'
+        df_son_vld = df_son_vld.append(temp)
+
+        def lookup_value(value):
+            vnf_lkup = dataset[(dataset['parent_key'] == 'constituent-vnfd')][['lineage','key','value']].pivot(index='lineage',columns='key',values='value').copy()
+            return str(vnf_lkup[vnf_lkup['vnfd-id-ref']==value]['member-vnf-index'].values[0])
+
+        
+        df_son_vld.loc[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & 
+        (df_son_vld['key'] == 'member-vnf-index-ref'),'value'] =df_son_vld[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & 
+        (df_son_vld['key'] == 'member-vnf-index-ref')].apply(lambda x : lookup_value(x['value']) if 1==1 else 'NULL',axis=1)
+
         df_son_vld.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
         dataset = dataset.append(df_son_vld)
         dataset=dataset.sort_values(by= 'lineage',ascending=True)
-
+        
+        
         df = transformation_obj.ret_ds(sonata_dataset,'forwarding_graphs',2)
         fg = transformation_obj.son_fwdg_nsd(df,'value','key',':')
         fg['level'] = fg['level'].astype('int64')
@@ -398,6 +435,15 @@ class setup():
         df_son_vnffgd.loc[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL')].apply(
             lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['osm_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1 )
 
+        temp = df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & (df_son_vnffgd['key'] == 'member-vnf-index-ref')].copy()
+        temp['key'] = 'vnfd-id-ref'
+        df_son_vnffgd = df_son_vnffgd.append(temp)  
+            
+        df_son_vnffgd.loc[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
+        (df_son_vnffgd['key'] == 'member-vnf-index-ref'),'value'] =df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
+        (df_son_vnffgd['key'] == 'member-vnf-index-ref')].apply(lambda x :
+                                                                            lookup_value(x['value']) if 1==1 else 'NULL',axis=1)
+
         df_son_vnffgd.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
         dataset = dataset.append(df_son_vnffgd)
 
@@ -411,7 +457,7 @@ class setup():
 
         return message#translated_ref
 
-
+    ### @Arka
     def translate_to_sonata_nsd(self,received_file):
         '''
         reads a pandas.DataFrame
@@ -481,15 +527,23 @@ class setup():
         dataset.loc[dataset['value'] != 'NULL','lineage'] = dataset.loc[dataset['value'] != 'NULL'].apply(
             lambda x: ('|').join(x['son_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['son_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1)
 
+        dataset.loc[dataset['key'] == 'vnf_name','value'] = dataset.loc[dataset['key'] == 'vnf_id','value'].values
+            
+        
+        temp = dataset[(dataset['parent_key'] == 'connection_points') & (dataset['key'] == 'type')].copy()
+        temp['key'] = 'interface'
+        temp['value'] = 'ipv4'
+        dataset = dataset.append(temp)
         if(len(dataset[dataset['parent_key'] == 'connection_points']) >0):
             dataset.loc[(dataset['key'] == 'type') & 
                            (dataset['parent_key'] == 'connection_points'),'value']=dataset[(dataset['key'] == 'id') & 
                                                                                    (dataset['parent_key'] == 'connection_points')].apply(lambda x : 'management' if x.value == 'mgmt' else 'external' , axis=1).values
 
         dataset=dataset.sort_values(by= ['lineage','parent_key'],ascending=True)
-
+        dataset['value'] = dataset['value'].astype('str')
 
         df = transformation_obj.ret_ds(osm_dataset,'vld',4)
+        df.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,False,True],inplace=True)
         vl = transformation_obj.osm_vld_nsd(df)
         vl['level'] = vl['level'].astype('int64')
         vl['parent_level'] = vl['parent_level'].astype('int64')
@@ -570,6 +624,7 @@ class setup():
 
         return message#translated_ref
 
+    ### @Suheel
     def translate_to_sonata_vnfd(self,received_file):
         '''
         reads a pandas.DataFrame
@@ -627,7 +682,7 @@ class setup():
         dataset=dataset.append(pd.DataFrame([
         ['NULL',0, 1, 'root', 'connection_points','NULL','NULL'],
         ['NULL',0, 1, 'root', 'virtual_deployment_units','NULL','NULL'],
-        ['0|preroot|',0,1,'root','descriptor_schema','0|preroot|0','https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml'],
+        #['0|preroot|',0,1,'root','descriptor_schema','0|preroot|0','https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml'],
         ['0|preroot|',0,1,'root','vendor','0|preroot|0','pg-scramble']],
                                            columns = ['son_lineage','parent_level','level','parent_key','key','lineage','value']))
 
@@ -646,27 +701,42 @@ class setup():
             ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
         df_osm_cp.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
 
+        
         df_osm_cp['lineage'] = df_osm_cp.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        
+        temp = df_osm_cp[(df_osm_cp['parent_key'] == 'connection_points') & 
+                        (df_osm_cp['key'] == 'type')&
+                        (df_osm_cp['level']==2) & 
+                        (df_osm_cp['parent_level']==1)].copy()
+        temp['key'] = 'interface'
+        temp['value'] = 'ipv4'
+        df_osm_cp = df_osm_cp.append(temp)
+        
         df_osm_cp.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
-        df_osm_cp.loc[df_osm_cp[(df_osm_cp['key']=='type') & 
+        df_osm_cp.loc[(df_osm_cp['key']=='type') & 
                                 (df_osm_cp['parent_key']=='connection_points')&
                                  (df_osm_cp['level']==2) & 
-                                  (df_osm_cp['parent_level']==1)].index,'value'] = 'external'
+                                  (df_osm_cp['parent_level']==1),'value'] = 'external'
+                                  
+        
 
         dataset = dataset.append(df_osm_cp)
         df_vl = transformation_obj.ret_ds(osm_dataset,'vdu',4)
         df_vl = transformation_obj.osm_vld_vnfd(df_vl)
-        df_vl['level'] = df_vl['level'].astype('int64')
-        df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
-        df_osm_vl =  pd.merge(df_vl, osm_son_vl,
-                             left_on=['key', 'parent_key', 'level', 'parent_level'],
-                             right_on=['osm_key', 'osm_parent_key', 'osm_level', 'osm_parent_level'], how='inner')
-        df_osm_vl = df_osm_vl[
-            ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
-        df_osm_vl.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
-        df_osm_vl['lineage'] = df_osm_vl.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
-        df_osm_vl.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
-        dataset = dataset.append(df_osm_vl)
+        if 'internal-connection-point-ref' in df_vl['key'].values:
+        
+            df_vl['level'] = df_vl['level'].astype('int64')
+            df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
+            df_osm_vl =  pd.merge(df_vl, osm_son_vl,
+                                 left_on=['key', 'parent_key', 'level', 'parent_level'],
+                                 right_on=['osm_key', 'osm_parent_key', 'osm_level', 'osm_parent_level'], how='inner')
+            df_osm_vl = df_osm_vl[
+                ['son_parent_level', 'son_level', 'son_parent_key', 'son_key', 'value', 'son_lineage', 'lineage']]
+            df_osm_vl.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
+            df_osm_vl['lineage'] = df_osm_vl.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+            df_osm_vl.sort_values(['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+            dataset = dataset.append(df_osm_vl)
+            
         df_vdu = transformation_obj.ret_ds(osm_dataset,'vdu',4)
 
         df_vdu['level'] = df_vdu['level'].astype('int64')
@@ -714,12 +784,24 @@ class setup():
             ['NULL',2, 3, 'resource_requirements', 'storage','0|preroot|0|root|'+str(i)+'|virtual_deployment_units|0','3']],
             columns = ['son_lineage','parent_level','level','parent_key','key','lineage','value']))
 
+            
+            
+        temp = df_osm_vdu[(df_osm_vdu['parent_key'] == 'connection_points') & 
+                                (df_osm_vdu['key'] == 'type') &
+                                 (df_osm_vdu['level']==3) & 
+                                  (df_osm_vdu['parent_level']==2)].copy()
+        temp['key'] = 'interface'
+        temp['value'] = 'ipv4'
+        df_osm_vdu = df_osm_vdu.append(temp)
+        
         df_osm_vdu.sort_values(by= ['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
 
-        df_osm_vdu.loc[df_osm_vdu[(df_osm_vdu['key']=='type') & 
+        df_osm_vdu.loc[(df_osm_vdu['key']=='type') & 
                                   (df_osm_vdu['parent_key']=='connection_points') &
                                  (df_osm_vdu['level']==3) & 
-                                  (df_osm_vdu['parent_level']==2)].index,'value'] = 'internal'
+                                  (df_osm_vdu['parent_level']==2),'value'] = 'internal'
+                                  
+
 
         df_osm_vdu.loc[(df_osm_vdu['key'].isin(['size','vcpus'])) & 
                                   (df_osm_vdu['parent_key'].isin(['memory','storage','cpu'])) &
@@ -768,8 +850,8 @@ class insert_into_db():
                 ['0|preroot|0|root|0|nsd:nsd-catalog|',2,3,'nsd','version','0|preroot|',0,1,'root','version'],
 
 
-                ['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','member-vnf-index','0|preroot|0|root|',1,2,'network_functions','vnf_id'],
-                ['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','vnfd-id-ref','0|preroot|0|root|',1,2,'network_functions','vnf_name'],
+                ['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','vnfd-id-ref','0|preroot|0|root|',1,2,'network_functions','vnf_id'],
+                ['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','member-vnf-index','0|preroot|0|root|',1,2,'network_functions','vnf_name'],
                 #['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','vnfd-id-ref','0|preroot|0|root|',1,2,'network_functions','vnf_version'],
                 #['0|preroot|0|root|0|nsd:nsd-catalog|0|nsd|',3,4,'constituent-vnfd','vnfd-id-ref','0|preroot|0|root|',1,2,'network_functions','vnf_vendor'],
 
@@ -864,7 +946,7 @@ class insert_into_db():
 
         osm_sonata_cp_mapping = [
             ['0|preroot|0|root|0|vnfd:vnfd-catalog|',2, 3, 'vnfd', 'connection-point', '0|preroot|',0, 1, 'root', 'connection_points'],
-            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'connection-point', 'id', '0|preroot|0|root|',1, 2, 'connection_points', 'id'],
+            ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'connection-point', 'name', '0|preroot|0|root|',1, 2, 'connection_points', 'id'],
             ['0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|',3, 4, 'connection-point', 'type', '0|preroot|0|root|',1, 2, 'connection_points', 'type'],
         ]
 
@@ -939,16 +1021,20 @@ class insert_into_db():
         temp = osm_son_vdu_ext.to_dict()
         id = record.insert_one(temp)
     
-        
+    ### temporary code ... to be removed after integration
     def insert_nsd(self,framework):
         
         if framework == 'osm':
-            nsd=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
-            vnfd=yaml.load(open(r"hackfest_multivdu_vnfd.yaml"))
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
+            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_ns\hackfest_multivdu_nsd.yaml"))
+            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_vnf\hackfest_multivdu_vnfd.yaml"))
         
         elif framework == 'sonata':
-            nsd=yaml.load(open(r"NSD.yaml"))
-            vnfd=yaml.load(open(r"VNFD.yaml"))
+            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_nsd.yml"))
+            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_vnfd.yml"))
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\NSD.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\VNFD.yaml"))
             
         record_nsd = self.db_descriptors.source_nsd
         id_nsd = record_nsd.insert_one(nsd).inserted_id
@@ -957,7 +1043,8 @@ class insert_into_db():
         id_vnfd = record_vnfd.insert_one(vnfd).inserted_id
         
         return [id_nsd , id_vnfd]
-    
+
+### @Arka
 class transformation():
 
     def sub_ds(self,df,parent,level) :   
@@ -1083,7 +1170,7 @@ class transformation():
             
         '''        
         temp = df[df['parent_key'].isin(['vnfd-connection-point-ref','classifier']) & 
-           df['key'].isin(['vnfd-connection-point-ref','member-vnf-index-ref'])].groupby(
+           df['key'].isin(['vnfd-connection-point-ref','vnfd-id-ref'])].groupby(
            ['parent_level','parent_key','level','lineage'])['value'].apply(
            lambda x : ':'.join(x.astype(str)) ).reset_index()
     
@@ -1101,7 +1188,7 @@ class transformation():
         temp = temp.append(temp2)
         
         df = df.drop(df[df['parent_key'].isin(['vnfd-connection-point-ref','classifier']) & 
-           df['key'].isin(['vnfd-connection-point-ref','order','member-vnf-index-ref'])].index,axis=0)
+           df['key'].isin(['vnfd-connection-point-ref','order','vnfd-id-ref'])].index,axis=0)
         
         return df.append(temp)
 
@@ -1122,7 +1209,7 @@ class transformation():
             
         '''        
         temp = df[df['parent_key'].isin(['vnfd-connection-point-ref']) & 
-               df['key'].isin(['vnfd-connection-point-ref','member-vnf-index-ref'])].groupby(
+               df['key'].isin(['vnfd-connection-point-ref','vnfd-id-ref'])].groupby(
                    ['parent_key','parent_level','level','lineage']).agg(
             {'value':lambda x : ':'.join(x.values.astype('str')) }).reset_index()
 
@@ -1145,6 +1232,7 @@ class transformation():
         
         return df.append(temp) 
 
+    ### @Suheel
     def osm_vld_vnfd(self,df):
         '''
         reads a pandas.DataFrame
@@ -1315,7 +1403,7 @@ class transformation():
         
         return new_df
 
-    
+    ### @Suheel & Arka
     def son_vld_int_ext_vnfd(self,df,column1='value',column2='key',sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
@@ -1538,6 +1626,7 @@ class transformation():
 
         return new_df
     
+    ### @Suheel & Arka
     def son_vld_vnfd(self,df,column1='value',column2='key',sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
@@ -1614,5 +1703,3 @@ class transformation():
         new_df[column6] = new_lineage
         
         return new_df
-
-

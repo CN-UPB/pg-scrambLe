@@ -5,6 +5,7 @@ import json
 import pymongo
 from bson.objectid import ObjectId
 
+### @Arka
 class write_dict():
 
     def getKey(self,item):
@@ -33,16 +34,16 @@ class write_dict():
         inner_dict = {}
         list_dict = []
 
-        k = list(lvl[0][1].keys())[0]
-        v = list(lvl[0][1].values())[0]
+        k = list(lvl[0][2].keys())[0]
+        v = list(lvl[0][2].values())[0]
         inner_dict.update({k: v})
 
         for i in range(1, len(lvl)):
 
-            k = list(lvl[i][1].keys())[0]
-            v = list(lvl[i][1].values())[0]
+            k = list(lvl[i][2].keys())[0]
+            v = list(lvl[i][2].values())[0]
             
-            if k in inner_dict.keys():
+            if lvl[i][0] != lvl[i-1][0]:#k in inner_dict.keys():
                 list_dict.append(inner_dict)
                 inner_dict = {}
                 inner_dict.update({k: v})
@@ -98,15 +99,16 @@ class write_dict():
             
             lvl = pd.DataFrame(list(dataset[(dataset['level'] == level) & (dataset['value']!= 'NULL') & 
                                   (dataset['parent_key']== parent )][['lineage','key','value']].apply(
-                                                    lambda x : [x.lineage[:-2],{x.key : x.value}] 
+                                                    lambda x : [x.lineage,x.lineage[:-2],{x.key : x.value}] 
                                                     if (x.lineage[-2] == '|' )  
-                                                    else [x.lineage,{x.key : x.value}], axis=1).values))
+                                                    else [x.lineage,x.lineage,{x.key : x.value}], axis=1).values),
+                          columns = ['lineage','lineage_grp','key-value'] )
             
-            val = [x.values for _,x in lvl.groupby(lvl[0])]
+            val = [x.values for _,x in lvl.groupby(['lineage_grp'])]
             
             length=2
             for i in range(2,dataset['level'].max()*2,2):
-                if len(np.unique(lvl[0].apply(lambda x : x.split("|")[:-i]).values)) == 1:
+                if len(np.unique(lvl['lineage_grp'].apply(lambda x : x.split("|")[:-i]).values)) == 1:
                     length = i
                     break
             
@@ -117,8 +119,8 @@ class write_dict():
                 parent_pos_temp =[]
                 
                 for j in range(0,length,2):
-                    parent_temp.append(val[g][0][0].split('|')[-j-1])
-                    parent_pos_temp.append(val[g][0][0].split('|')[-j-2])
+                    parent_temp.append(val[g][0][1].split('|')[-j-1])
+                    parent_pos_temp.append(val[g][0][1].split('|')[-j-2])
                 
                 parent_key.append(parent_temp)
                 parent_pos.append(parent_pos_temp)
