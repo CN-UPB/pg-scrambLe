@@ -1,7 +1,8 @@
 from nameko.rpc import rpc
 import SonataSchema as SS
 import SonataUtilityFunctions as utilityFunctions
-import yaml
+import json
+import pymongo
 
 
 NSDs = []
@@ -261,13 +262,18 @@ def create_files():
                 "network_forwarding_paths": sub_data['network_forwarding_paths']
             })
 
-        file_name = "NSD_" + str(i)
-        with open(file_name + '.yml', 'w') as outfile:
+        file_name = "Sonata_" + str(i)
+        with open(file_name + '.json', 'w') as outfile:
             print("Creating NSD_" + str(i))
-            yaml.dump(data, outfile, default_flow_style=False)
+            json.dump(data, outfile) #default_flow_style=False)
             print("Created NSD_" + str(i))
 
-
+        client = pymongo.MongoClient("mongodb://localhost:27017")
+        db = client["scramble_nsd"]
+        check = db["sonata_nsd"]
+        with open('Sonata_' +str(i) +'.json') as f:
+            file_data = json.load(f)
+        check.insert_one(file_data)
 def split_sonata():
     set_connection_point_refs_for_virtual_functions()
     split_network_function()
