@@ -1,0 +1,42 @@
+vnfd:vnfd-catalog:
+    vnfd:
+    -   connection-point:
+        -   name: eth0
+            type: VPORT
+        -   name: eth1
+            type: VPORT
+        description: A VNF with nginx from cloud-init
+        id: scramble-nginx-2-vnf
+        logo: osm.png
+        mgmt-interface:
+            cp: eth0
+        name: scramble-nginx-2-vnf
+        short-name: PGS-NGINX-2
+        vdu:
+        -   cloud-init-file: cloud-config.txt
+            count: 1
+            description: nginx_2_vnfd-VM
+            id: nginx_2_vnfd-VM
+            image: ubuntu-cloud
+            interface:
+            -   external-connection-point-ref: eth0
+                name: eth0
+                type: EXTERNAL
+                virtual-interface:
+                    bandwidth: '0'
+                    type: VIRTIO
+                    vpci: 0000:00:0a.0
+            -   external-connection-point-ref: eth1
+                name: eth1
+                type: EXTERNAL
+                virtual-interface:
+                    bandwidth: '0'
+                    type: VIRTIO
+                    vpci: 0000:00:0a.0
+            name: nginx_2_vnfd-VM
+            vm-flavor:
+                memory-mb: 1024
+                storage-gb: 5
+                vcpu-count: 1
+        vendor: T3-SCrAMbLE
+        version: '1.0'

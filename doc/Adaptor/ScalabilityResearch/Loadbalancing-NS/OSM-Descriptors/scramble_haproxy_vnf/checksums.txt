@@ -1,0 +1,3 @@
+84894c67dc0cde1d66a8935ed8ef6493  scramble_haproxy_vnfd.yaml
+65af0b23f5fe5a47ab7e25f11163542f  cloud_init/cloud-config.txt
+bc681c5a4c3cdc09c013df2d2239f3d2  icons/osm.png

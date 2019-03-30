@@ -1,7 +1,7 @@
 {
     "descriptor_version": "vnfd-schema-01",
     "description": "Dummy VNF",
-    "name": "dummy-vnf",
+    "name": "dummy-vnf_v2",
     "vendor": "eu.sonata-nfv.vnf-descriptor",
     "version": "1.0",
     "author": "Team3 Scramble",

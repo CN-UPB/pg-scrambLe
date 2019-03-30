@@ -8,9 +8,7 @@ def auth_keys():
 
 @fixture
 def get_ns_descriptors_keys():
-    return ['id', 'logo', 'vld', 'short-name', 'constituent-vnfd',
-                '_admin', 'description', 'name', 
-                'vendor', 'id', 'version']
+    return ['id']
 
 @fixture
 def delete_ns_descriptors_nsdinfoid_keys():
@@ -38,11 +36,7 @@ def delete_vnf_packages_vnfpkgid_keys():
 
 @fixture
 def get_ns_instances_keys():
-    return ['vld', 'short-name', 'ssh-authorized-key', 'constituent-vnfr-ref',
-       'name', '_id', 'admin-status', 'nsd-name-ref', 'description', 'instantiate_params', 
-          'config-status', 'operational-events', 'datacenter', 'orchestration-progress', 'id', 
-            'name-ref', 'resource-orchestrator', 'nsd-ref', 'detailed-status', 'crete-time', 
-                'ns-instance-config-ref', 'nsd', 'operational-status', '_admin']
+    return ['name', '_id']
 
 @fixture
 def post_ns_instances_nsinstanceid_terminate_keys():

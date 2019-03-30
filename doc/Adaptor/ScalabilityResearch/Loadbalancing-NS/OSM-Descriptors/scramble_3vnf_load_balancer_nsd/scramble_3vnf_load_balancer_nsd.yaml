@@ -1,0 +1,94 @@
+nsd:nsd-catalog:
+    nsd:
+    -   constituent-vnfd:
+        -   member-vnf-index: 1
+            vnfd-id-ref: scramble-haproxy-vnf
+        -   member-vnf-index: 2
+            vnfd-id-ref: scramble-nginx-1-vnf
+        -   member-vnf-index: 3
+            vnfd-id-ref: scramble-nginx-2-vnf
+        description: NS with two Nginx servers load balanced using HAProxy
+        id: scramble_3vnf_load_balancer_ns
+
+        connection-point:
+        -   name: nsd_cp_haproxy
+            floating-ip-required: 'true'
+            vld-id-ref: datanet
+            member-vnf-index-ref: 1
+            vnfd-connection-point-ref: eth1
+            vnfd-id-ref: scramble-haproxy-vnf
+            type: VPORT
+        # ip-profiles:
+        # -   description: Proxy Subnet
+        #     ip-profile-params:
+        #         dhcp-params:
+        #             enabled: true
+        #         dns-server:
+        #         -   address: 8.8.8.8
+        #         gateway-address: 192.168.28.1
+        #         ip-version: ipv4
+        #         subnet-address: 192.168.28.0/28
+        #     name: proxysub
+        logo: osm_2x.png
+        name: scramble_3vnf_load_balancer_ns
+        short-name: PGS_Load_Balancer
+        vendor: T3-SCrAMbLE
+        version: '1.0'
+        vld:
+        -   id: datanet
+            # ip-profile-ref: proxysub
+            name: datanet
+            short-name: datanet
+            type: ELAN
+            vim-network-name: datanet
+            vnfd-connection-point-ref:
+            -   ip-address: 172.17.17.11 
+                member-vnf-index-ref: 1
+                vnfd-connection-point-ref: eth1
+                vnfd-id-ref: scramble-haproxy-vnf
+            -   ip-address: 172.17.17.12
+                member-vnf-index-ref: 2
+                vnfd-connection-point-ref: eth1
+                vnfd-id-ref: scramble-nginx-1-vnf
+            -   ip-address: 172.17.17.13
+                member-vnf-index-ref: 3
+                vnfd-connection-point-ref: eth1
+                vnfd-id-ref: scramble-nginx-2-vnf
+        -   id: mgmtnet
+            mgmt-network: 'true'
+            name: mgmtnet
+            short-name: mgmtnet
+            type: ELAN
+            vim-network-name: mgmt
+            vnfd-connection-point-ref:
+            -   member-vnf-index-ref: 1
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-haproxy-vnf
+            -   member-vnf-index-ref: 2
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-nginx-1-vnf
+            -   member-vnf-index-ref: 3
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-nginx-2-vnf
+
+        # vnffgd:
+        # -   id: test-nsd-vnffg
+        #     name: test-nsd-vnffg
+        #     rsp:
+        #     -   id: test-nsd-rsp
+        #         name: test-nsd-rsp
+        #         vnfd-connection-point-ref:
+        #         -   member-vnf-index-ref: 2
+        #             order: 0
+        #             vnfd-ingress-connection-point-ref: eth1
+        #             vnfd-egress-connection-point-ref: eth1
+        #     classifier:
+        #     -   id: test-nsd-classifier
+        #         name: test-nsd-classifier
+        #         rsp-id-ref: test-nsd-rsp
+        #         member-vnf-index-ref: 1
+        #         vnfd-connection-point-ref: eth1
+        #         match-attributes:
+        #         -   id: HTTP
+        #             ip-proto: 6
+        #             destination-port: 80

@@ -1,0 +1,96 @@
+#cloud-config
+apt_update: true
+packages:
+  - haproxy
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhl0ngbfJjCjo/6dD+J7IkZG++Q1Xk74Q5+pMnG3e/2KfJS43lBhFMC7dvTvuaiNbrxM9hi837HRw64WcEWwVLzatl6kMWDhGsy+e7WfJ96JbzrcIMukZwfNLBdPrpXfau5OFauKHsFxgnIocApyJjruN6IeV7WX7R9CvxgAyI8tOn6yg4Ac6sN2DamlMfalmar+Kvzzw8Yrm8LbHXC4zqlLSDsBQcKSuhhDiNvouS+OmBEE0YgSHut4GX10kogJFA4SWfM3IZoaoVLzTvYH68VSkdtpM96A2dtmfGIyC5KbhImoKdyDVeQDtGW+PNdFRj/PplYGJKgxrCtukVG3T5 vm6@vm6-virtual-machine
+
+write_files:
+  - path: /home/ubuntu/multinic.sh
+    content: |
+      #!/bin/bash
+      hname=$(hostname)
+      cat /etc/hosts | grep $hname >> /dev/null
+      if [ $? -ne 0 ];then
+      sudo bash -c "echo '127.0.0.1 $hname' >> /etc/hosts"
+      fi
+      netfile=$(find /etc/network/interfaces.d -name "*.cfg")
+      for interface in $(ls -1 /sys/class/net | grep ens) ;do
+        cat $netfile | grep $interface >> /dev/null
+        if [ $? -ne 0 ];then
+          sudo bash -c "echo 'auto $interface' >> ${netfile}"
+          sudo bash -c "echo 'iface $interface inet dhcp' >> ${netfile}"
+          sudo ifup $interface
+        fi
+      done
+
+  - path: /etc/default/haproxy
+    content: |
+      ENABLED=1
+  - path: /etc/haproxy/haproxy.cfg
+    content: |
+      global
+          log /dev/log    local0
+          log /dev/log    local1 notice
+          chroot /var/lib/haproxy
+          stats socket /run/haproxy/admin.sock mode 660 level admin
+          stats timeout 30s
+          user haproxy
+          group haproxy
+          daemon
+
+          # Default SSL material locations
+          ca-base /etc/ssl/certs
+          crt-base /etc/ssl/private
+
+          # Default ciphers to use on SSL-enabled listening sockets.
+          # For more information, see ciphers(1SSL). This list is from:
+          #  https://hynek.me/articles/hardening-your-web-servers-ssl-ciphers/
+          # An alternative list with additional directives can be obtained from
+          #  https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=haproxy
+          ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:RSA+AESGCM:RSA+AES:!aNULL:!MD5:!DSS
+          ssl-default-bind-options no-sslv3
+
+      defaults
+          log     global
+          mode    http
+          option  httplog
+          option  dontlognull
+          timeout connect 5000
+          timeout client  50000
+          timeout server  50000
+          errorfile 400 /etc/haproxy/errors/400.http
+          errorfile 403 /etc/haproxy/errors/403.http
+          errorfile 408 /etc/haproxy/errors/408.http
+          errorfile 500 /etc/haproxy/errors/500.http
+          errorfile 502 /etc/haproxy/errors/502.http
+          errorfile 503 /etc/haproxy/errors/503.http
+          errorfile 504 /etc/haproxy/errors/504.http
+
+      frontend haproxynode
+          bind *:80
+          mode http
+          default_backend backendnodes
+
+      backend backendnodes
+          balance roundrobin
+          option forwardfor
+          http-request set-header X-Forwarded-Port %[dst_port]
+          http-request add-header X-Forwarded-Proto https if { ssl_fc }
+          option httpchk HEAD / HTTP/1.1\r\nHost:localhost
+          server nginx1 172.17.17.12:80 check
+          server nginx2 172.17.17.13:80 check
+
+      listen stats
+          bind :32700
+          stats enable
+          stats uri /
+          stats hide-version
+          stats auth someuser:password
+
+runcmd:
+  - [ systemctl, restart, --no-block, haproxy.service ]
+  - [ "chown", "ubuntu:ubuntu", "/home/ubuntu/multinic.sh" ]
+  - [ "chmod", "+x", "/home/ubuntu/multinic.sh" ]      
+  - [ "/home/ubuntu/multinic.sh" ]     
