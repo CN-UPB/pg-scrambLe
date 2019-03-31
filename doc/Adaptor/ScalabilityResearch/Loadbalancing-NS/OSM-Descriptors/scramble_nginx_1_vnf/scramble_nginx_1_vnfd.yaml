@@ -37,6 +37,6 @@ vnfd:vnfd-catalog:
             vm-flavor:
                 memory-mb: 1024
                 storage-gb: 5
-                vcpu-count: 1
+                vcpu-count: 2
         vendor: T3-SCrAMbLE
         version: '1.0'

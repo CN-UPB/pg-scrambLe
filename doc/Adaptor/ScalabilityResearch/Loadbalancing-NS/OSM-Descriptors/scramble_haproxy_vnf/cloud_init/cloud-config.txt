@@ -18,13 +18,25 @@ write_files:
       netfile=$(find /etc/network/interfaces.d -name "*.cfg")
       for interface in $(ls -1 /sys/class/net | grep ens) ;do
         cat $netfile | grep $interface >> /dev/null
-        if [ $? -ne 0 ];then
-          sudo bash -c "echo 'auto $interface' >> ${netfile}"
-          sudo bash -c "echo 'iface $interface inet dhcp' >> ${netfile}"
-          sudo ifup $interface
-        fi
+        if [ $? -ne 0 ]
+        then
+          if [ $interface == "ens4" ]
+          then
+            sudo bash -c "echo 'auto $interface' >> ${netfile}"
+            sudo bash -c "echo 'iface $interface inet static' >> ${netfile}"
+            sudo bash -c "echo 'address 172.17.17.11' >> ${netfile}"
+            sudo bash -c "echo 'netmask 255.255.255.0' >> ${netfile}"
+            sudo bash -c "echo 'post-up ip route add 172.17.17.0/24 dev $interface src 172.17.17.11 table rt2' >> ${netfile}"
+            sudo bash -c "echo 'post-up ip route add default via 172.17.17.1 dev $interface table rt2' >> ${netfile}"
+            sudo bash -c "echo 'post-up ip rule add from 172.17.17.11/32 table rt2' >> ${netfile}"
+            sudo bash -c "echo 'post-up ip rule add to 172.17.17.11/32 table rt2' >> ${netfile}"
+          else
+            sudo bash -c "echo 'auto $interface' >> ${netfile}"
+            sudo bash -c "echo 'iface $interface inet dhcp' >> ${netfile}"
+            sudo ifup $interface
+            fi
+          fi
       done
-
   - path: /etc/default/haproxy
     content: |
       ENABLED=1
@@ -88,9 +100,30 @@ write_files:
           stats uri /
           stats hide-version
           stats auth someuser:password
+  - path: /etc/iproute2/rt_tables
+    content: |      
+      #
+      # reserved values
+      #
+      255     local
+      254     main
+      253     default
+      0       unspec
+      #
+      # local
+      #
+      #1      inr.ruhep
+      1 rt2
 
 runcmd:
   - [ systemctl, restart, --no-block, haproxy.service ]
   - [ "chown", "ubuntu:ubuntu", "/home/ubuntu/multinic.sh" ]
   - [ "chmod", "+x", "/home/ubuntu/multinic.sh" ]      
   - [ "/home/ubuntu/multinic.sh" ]     
+
+power_state:
+ delay: "+1"
+ mode: reboot
+ message: Bye Bye
+ timeout: 10
+ condition: True

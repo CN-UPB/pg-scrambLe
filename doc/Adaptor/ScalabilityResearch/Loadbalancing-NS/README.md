@@ -9,8 +9,9 @@
 
 + Online guide for vnffg? - https://wiki.opnfv.org/display/sfc/OSM+guide
 
-+ Multinic VM image - https://leadwithoutatitle.wordpress.com/2017/07/06/how-to-create-a-multi-nic-ubuntu-cloud-image/
++ Multi NIC VM image - https://leadwithoutatitle.wordpress.com/2017/07/06/how-to-create-a-multi-nic-ubuntu-cloud-image/
 
++ Multi NIC ubuntu interfaces settings - https://askubuntu.com/questions/868942/how-to-configure-2-network-interfaces-with-different-gateways 
 ----
 Devstack Requirements
 
