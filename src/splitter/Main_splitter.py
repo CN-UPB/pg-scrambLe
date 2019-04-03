@@ -1,13 +1,12 @@
 import pymongo
 from pprint import pprint
 import SonataUtilityFunctions as sonataUtilityFunctions
-import splitter as splitter
+import SonataSplitter as splitter
 import OsmSplitter as osmSplitter
 import OsmUtilityFunctions as osm_utility
 import OSMUtilityFunctions as OSM_utility
 from Fetchfile import Fetchfile
 
-parameters = "xyz"
 reference_osm = "5c8869f4c957a9e5caf98629"    #Example reference id
 reference_sonata = "5c833a400594c7824aba2714"
 
@@ -16,9 +15,9 @@ def main():
 
     #To fetch OSM file and to call osm splitter
 
-    received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
-    OSM_utility.get_osm_nsd(received_file_osm)
-    osmSplitter.split_osm()
+    #received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
+    #OSM_utility.get_osm_nsd(received_file_osm)
+    #osmSplitter.split_osm()
 
 
 
