@@ -1,6 +1,8 @@
 import OsmSchema as OS
-import OSMUtilityFunctions as utilityFunctions
-import yaml
+import OSM_UtilityFunctions as utilityFunctions
+import json
+import pymongo
+
 
 NSDs = []
 network_function_sets = [["1"], ["2"]]
@@ -322,12 +324,19 @@ def create_files():
         }
 
 
-        file_name = "OSM_NSD_" + str(i)
-        with open(file_name + '.yml', 'w') as outfile:
-            print("Creating OSM NSD_" + str(i))
-            yaml.dump(data, outfile, default_flow_style=False)
-            print("Created OSM NSD_" + str(i))
+        file_name = "OSM_" + str(i)
+        with open(file_name + '.json', 'w') as outfile:
+            print("Creating OSM_" + str(i))
+            json.dump(data, outfile)
 
+            print("Created OSM_" + str(i))
+
+        client = pymongo.MongoClient("mongodb://localhost:27017")
+        db = client["scramble_nsd"]
+        check = db["osm_nsd"]
+        with open('OSM_'+str(i) +'.json') as f:
+            file_data = json.load(f)
+        check.insert_one(file_data)
 
 def split_osm():
     split_network_function()
