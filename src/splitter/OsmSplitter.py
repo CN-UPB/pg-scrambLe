@@ -1,5 +1,5 @@
 import OsmSchema as OS
-import OSM_UtilityFunctions as utilityFunctions
+import OSMUtilityFunctions as utilityFunctions
 import json
 import pymongo
 
