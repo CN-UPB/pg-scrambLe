@@ -56,8 +56,7 @@ def toSonata(received_file):
     
         doc = setup_obj.db_descriptors["translated_vnfd"]
         translated = setup_obj.translate_to_sonata_vnfd(received_file)
-        validity_check= validator(received_file,translated)
-        check = validity_check.sonata_vnfd_validator()
+        check= sonata_vnfd_validate(translated)
         
         if check == "True":
             temp = doc.insert_one(translated)
@@ -69,8 +68,7 @@ def toSonata(received_file):
     
         doc = setup_obj.db_descriptors["translated_nsd"]
         translated = setup_obj.translate_to_sonata_nsd(received_file)
-        validity_check= validator(received_file,translated)
-        check = validity_check.sonata_nsd_validator()
+        check= sonata_nsd_validate(translated)
         
         if check == "True":
             temp = doc.insert_one(translated)
@@ -87,8 +85,9 @@ def toOsm(received_file):
     
         doc = setup_obj.db_descriptors["translated_nsd"]
         translated = setup_obj.translate_to_osm_nsd(received_file)
-        validity_check= validator(received_file,translated)
-        #if check == "True":
+        check= osm_validator(translated)
+        
+		if check == "True":
         temp = doc.insert_one(translated)
         translated_ref = temp.inserted_id
         
@@ -98,8 +97,9 @@ def toOsm(received_file):
     
         doc = setup_obj.db_descriptors["translated_vnfd"]
         translated = setup_obj.translate_to_osm_vnfd(received_file)
-        validity_check= validator(received_file,translated)
-        #if check == "True":
+        check= osm_validator(translated)
+        
+		check == "True":
         temp = doc.insert_one(translated)
         translated_ref = temp.inserted_id
         
