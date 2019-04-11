@@ -236,8 +236,3 @@ class write_dict():
         
         '''
         return self.write(ds,range(8))
-
-
-
-
-
