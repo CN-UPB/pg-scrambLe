@@ -1,0 +1,42 @@
+vnfd:vnfd-catalog:
+    vnfd:
+    -   connection-point:
+        -   name: eth0
+            type: VPORT
+        -   name: eth1
+            type: VPORT
+        description: A VNF acting as a client
+        id: scramble_client_vnf
+        logo: osm.png
+        mgmt-interface:
+            cp: eth0
+        name: scramble_client_vnf
+        short-name: PGS-Client
+        vdu:
+        -   cloud-init-file: cloud-config.txt
+            count: 1
+            description: client_vnfd-VM
+            id: client_vnfd-VM
+            image: ubuntu-cloud
+            interface:
+            -   external-connection-point-ref: eth0
+                name: eth0
+                type: EXTERNAL
+                virtual-interface:
+                    bandwidth: '0'
+                    type: VIRTIO
+                    vpci: 0000:00:0a.0
+            -   external-connection-point-ref: eth1
+                name: eth1
+                type: EXTERNAL
+                virtual-interface:
+                    bandwidth: '0'
+                    type: VIRTIO
+                    vpci: 0000:00:0a.0
+            name: client_vnfd-VM
+            vm-flavor:
+                memory-mb: 1024
+                storage-gb: 5
+                vcpu-count: 2
+        vendor: T3-SCrAMbLE
+        version: '1.0'

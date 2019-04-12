@@ -12,7 +12,14 @@
 + Multi NIC VM image - https://leadwithoutatitle.wordpress.com/2017/07/06/how-to-create-a-multi-nic-ubuntu-cloud-image/
 
 + Multi NIC ubuntu interfaces settings - https://askubuntu.com/questions/868942/how-to-configure-2-network-interfaces-with-different-gateways 
+
++ Preparing virtual image
+
+virt-sysprep -a ubuntu-16.04-server-cloudimg-amd64-disk1.img --root-password password:12345 --ssh-inject root:file:/home/ashwin/.ssh/id_rsa.pub
+
++ qemu-img convert -O qcow2 -c source.qcow2 dest.qcow2
 ----
+
 Devstack Requirements
 
 + Create a new user and assign a project in devstack, while doing so, assign max quotas
@@ -23,4 +30,6 @@ Devstack Requirements
 
 + Upload ubuntu cloud 16.04 image under the name "ubuntu-cloud". Image can be downloaded here - use qcow2 format
     - https://cloud-images.ubuntu.com/releases/16.04/release/
+
+----
 

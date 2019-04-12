@@ -2,22 +2,27 @@ nsd:nsd-catalog:
     nsd:
     -   constituent-vnfd:
         -   member-vnf-index: 1
-            vnfd-id-ref: scramble-haproxy-vnf
+            vnfd-id-ref: scramble_client_vnf
         -   member-vnf-index: 2
-            vnfd-id-ref: scramble-nginx-1-vnf
+            vnfd-id-ref: scramble_tcpdump_vnf
         -   member-vnf-index: 3
+            vnfd-id-ref: scramble-haproxy-vnf
+        -   member-vnf-index: 4
+            vnfd-id-ref: scramble-nginx-1-vnf
+        -   member-vnf-index: 5
             vnfd-id-ref: scramble-nginx-2-vnf
+
         description: NS with two Nginx servers load balanced using HAProxy
         id: scramble_3vnf_load_balancer_ns
 
-        connection-point:
-        -   name: nsd_cp_haproxy
-            floating-ip-required: 'true'
-            vld-id-ref: datanet
-            member-vnf-index-ref: 1
-            vnfd-connection-point-ref: eth1
-            vnfd-id-ref: scramble-haproxy-vnf
-            type: VPORT
+        # connection-point:
+        # -   name: nsd_cp_haproxy
+        #     floating-ip-required: 'true'
+        #     vld-id-ref: datanet
+        #     member-vnf-index-ref: 3
+        #     vnfd-connection-point-ref: eth1
+        #     vnfd-id-ref: scramble-haproxy-vnf
+        #     type: VPORT
         # ip-profiles:
         # -   description: Proxy Subnet
         #     ip-profile-params:
@@ -42,16 +47,24 @@ nsd:nsd-catalog:
             type: ELAN
             vim-network-name: datanet
             vnfd-connection-point-ref:
-            -   ip-address: 172.17.17.11 
+            -   ip-address: 172.17.17.21
                 member-vnf-index-ref: 1
+                vnfd-connection-point-ref: eth1
+                vnfd-id-ref: scramble_client_vnf
+            -   ip-address: 172.17.17.22
+                member-vnf-index-ref: 2
+                vnfd-connection-point-ref: eth1
+                vnfd-id-ref: scramble_tcpdump_vnf
+            -   ip-address: 172.17.17.11 
+                member-vnf-index-ref: 3
                 vnfd-connection-point-ref: eth1
                 vnfd-id-ref: scramble-haproxy-vnf
             -   ip-address: 172.17.17.12
-                member-vnf-index-ref: 2
+                member-vnf-index-ref: 4
                 vnfd-connection-point-ref: eth1
                 vnfd-id-ref: scramble-nginx-1-vnf
             -   ip-address: 172.17.17.13
-                member-vnf-index-ref: 3
+                member-vnf-index-ref: 5
                 vnfd-connection-point-ref: eth1
                 vnfd-id-ref: scramble-nginx-2-vnf
         -   id: mgmtnet
@@ -63,32 +76,40 @@ nsd:nsd-catalog:
             vnfd-connection-point-ref:
             -   member-vnf-index-ref: 1
                 vnfd-connection-point-ref: eth0
-                vnfd-id-ref: scramble-haproxy-vnf
+                vnfd-id-ref: scramble_client_vnf
             -   member-vnf-index-ref: 2
                 vnfd-connection-point-ref: eth0
-                vnfd-id-ref: scramble-nginx-1-vnf
+                vnfd-id-ref: scramble_tcpdump_vnf
             -   member-vnf-index-ref: 3
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-haproxy-vnf
+            -   member-vnf-index-ref: 4
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-nginx-1-vnf
+            -   member-vnf-index-ref: 5
                 vnfd-connection-point-ref: eth0
                 vnfd-id-ref: scramble-nginx-2-vnf
 
-        # vnffgd:
-        # -   id: test-nsd-vnffg
-        #     name: test-nsd-vnffg
-        #     rsp:
-        #     -   id: test-nsd-rsp
-        #         name: test-nsd-rsp
-        #         vnfd-connection-point-ref:
-        #         -   member-vnf-index-ref: 2
-        #             order: 0
-        #             vnfd-ingress-connection-point-ref: eth1
-        #             vnfd-egress-connection-point-ref: eth1
-        #     classifier:
-        #     -   id: test-nsd-classifier
-        #         name: test-nsd-classifier
-        #         rsp-id-ref: test-nsd-rsp
-        #         member-vnf-index-ref: 1
-        #         vnfd-connection-point-ref: eth1
-        #         match-attributes:
-        #         -   id: HTTP
-        #             ip-proto: 6
-        #             destination-port: 80
+        vnffgd:
+        -   id: test-nsd-vnffg
+            name: test-nsd-vnffg
+            rsp:
+            -   id: test-nsd-rsp
+                name: test-nsd-rsp
+                vnfd-connection-point-ref:
+                -   member-vnf-index-ref: 2
+                    vnfd-id-ref: scramble_tcpdump_vnf
+                    order: 0
+                    vnfd-ingress-connection-point-ref: eth1
+                    vnfd-egress-connection-point-ref: eth1
+            classifier:
+            -   id: test-nsd-classifier
+                name: test-nsd-classifier
+                rsp-id-ref: test-nsd-rsp
+                member-vnf-index-ref: 1
+                vnfd-id-ref: scramble_client_vnf
+                vnfd-connection-point-ref: eth1
+                match-attributes:
+                -   id: HTTP
+                    ip-proto: 6
+                    destination-port: 80
