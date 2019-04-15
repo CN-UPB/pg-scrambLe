@@ -1,9 +1,11 @@
 from ..CommonInterface import CommonInterfaceNsd
 import json
-import yaml
 import requests
 
 class Nsd(CommonInterfaceNsd):
+    """
+    NSD Management Interfaces
+    """
 
     def __init__(self, host, port=4002):
         self._host = host
@@ -12,6 +14,33 @@ class Nsd(CommonInterfaceNsd):
         self._user_endpoint = '{0}'
 
     def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
+        """ NSD Management Interface - NS Descriptors
+
+        /ns_descriptors:
+            GET - Query information about multiple
+            NS descriptor resources.
+
+        :param token: auth token retrieved by the auth call
+        :param _filter: content query filter 
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_nsd = SONATAClient.Nsd(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+                _token = json.loads(sonata_auth.auth(
+                                        username=USERNAME, 
+                                        password=PASSWORD))
+                _token = json.loads(_token["data"])
+
+                response = json.loads(sonata_nsd.get_ns_descriptors(
+                                    token=_token["token"]["access_token"]))
+                response = json.loads(response["data"])
+
+
+        """        
         if host is None:
             base_path = "http://{0}:{1}".format(self._host, self._port)
         else:
@@ -38,6 +67,36 @@ class Nsd(CommonInterfaceNsd):
         return json.dumps(result)
 
     def post_ns_descriptors(self, token, package_path, host=None, port=None):
+        """ NSD Management Interface - NS Descriptors
+
+        /ns_descriptors:
+            POST - Create a new NS descriptor resource.
+
+        :param token: auth token retrieved by the auth call
+        :param package_path: file path of the package
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+                sonata_nsd = SONATAClient.Nsd(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+
+                sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
+                                    package_path="tests/samples/vnfd_example.yml")
+
+                response = json.loads(sonata_nsd.post_ns_descriptors(
+                                    token=_token["token"]["access_token"],
+                                    package_path="tests/samples/nsd_example.yml"))
+
+
+        """
+
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -59,7 +118,18 @@ class Nsd(CommonInterfaceNsd):
         return json.dumps(result)
         
     
-    def delete_ns_descriptors_nsdinfoid(self, token, id, host=None, port=None):
+    def delete_ns_descriptors_nsdinfoid(self, token, nsdinfoid, host=None, port=None):
+        """ NSD Management Interface - Individual NS Descriptor
+
+        /ns_descriptors/{nsdInfoId}:
+            DELETE - Delete the content of NSD
+
+        :param token: auth token retrieved by the auth call
+        :param nsdinfoid: id of the individual NSD
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -68,7 +138,7 @@ class Nsd(CommonInterfaceNsd):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
                     'Authorization': 'Bearer {}'.format(token)}
-        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, id)
+        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, nsdinfoid)
         
         try:
             r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
@@ -82,12 +152,40 @@ class Nsd(CommonInterfaceNsd):
         return json.dumps(result)        
 
     def get_ns_descriptors_nsdinfoid(self, token, _filter=None, host=None, port=None):
+        # """ NSD Management Interface -  Individual NS Descriptor
+
+        # /ns_descriptors/{nsdInfoId}:
+        #     Read information about an individual NS
+        #     descriptor resource.
+
+        # :param token: auth token retrieved by the auth call
+        # :param nsdinfoid: id of the individual NSD
+        # :param host: host url
+        # :param port: port where the MANO API can be accessed
+
+        # Example:
+        #     .. code-block:: python
+        #         sonata_nsd = SONATAClient.Nsd(HOST_URL)
+        #         sonata_auth = SONATAClient.Auth(HOST_URL)
+        #         _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+        #         _token = json.loads(_token["data"])
+        #         _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+        #                             token=_token["token"]["access_token"]))
+        #         _nsd_list = json.loads(_nsd_list["data"])
+
+        #         _nsd = "24d8ea1c-3d96-47d6-8fc4-473c9a6f1ad2"
+
+
+        #         response = json.loads(sonata_nsd.get_ns_descriptors(
+        #                             token=_token["token"]["access_token"]))
+        # """
+
         if host is None:
                 base_path = "http://{0}:{1}".format(self._host, self._port)
         else:
                 base_path = "http://{0}:{1}".format(host, port)
            
-        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, id)
+        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, id)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
@@ -108,153 +206,57 @@ class Nsd(CommonInterfaceNsd):
         return json.dumps(result)
 
     def get_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
-
-              Upload the content of NSD
-              """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def patch_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Individual NS Descriptor
-
-        /ns_descriptors/{nsdInfoId}
-            PATCH - Modify the operational state and/or 
-                the user defined data of an individual
-                NS descriptor resource.
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def put_ns_descriptors_nsd_content(self):
-        """ NSD Management Interface - Upload NSD
-
-        Upload the content of NSD
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
-
     def get_pnf_descriptors(self):
-        """ NSD Management interface -
-                PNF Descriptors
-
-        /pnf_descriptors
-            GET - Query information about multiple
-                PNF descriptor resources.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
    
     def post_pnf_descriptors(self):
-        """ NSD Management interface -
-                PNF Descriptors
-
-        /pnf_descriptors
-            POST - Create a new PNF descriptor resource.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
  
     def get_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
-        """ NSD Management interface -
-                Individual PNF Descriptor
-
-        /pnf_descriptors/pnfdinfoid
-            GET - Read an individual PNFD resource.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def patch_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
-        """ NSD Management interface -
-                Individual PNF Descriptor
-
-        /pnf_descriptors/pnfdinfoid
-            PATCH - Modify the user defined data of an 
-                        individual PNF descriptor resource.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
     
     def delete_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
-        """ NSD Management interface -
-                Individual PNF Descriptor
-
-        /pnf_descriptors/pnfdinfoid
-            DELETE - Delete the user defined data of an 
-                        individual PNF descriptor resource.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_pnf_descriptors_pnfd_content(self, pnfdInfoId):
-        """ NSD Management interface -
-                PNFD Content
-
-        /pnf_descriptors/pnfdinfoid/pnfd_content
-            GET - Fetch the content of a PNFD.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def put_pnf_descriptors_pnfd_content(self, pnfdInfoId):
-        """ NSD Management interface -
-                PNFD Content
-
-        /pnf_descriptors/pnfdinfoid/pnfd_content
-            PUT - Upload the content of a PNFD.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def post_subscriptions(self, pnfdInfoId):
-        """ NSD Management interface -
-                Subscriptions
-
-        /subscriptions
-            POST - Subscribe to NSD and PNFD change notifications.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_subscriptions(self, subscriptionId):
-        """ NSD Management interface -
-                Subscriptions
-
-        /subscriptions
-            GET - Query multiple subscriptions.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
   
     def get_subscriptions_subscriptionid(self, subscriptionid):
-        """ NSD Management interface -
-                Individual Subscription
-
-        /subscriptions/subscriptionId
-            GET - Read an individual subscription resource
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def delete_subscriptions_subscriptionid(self, subscriptionid):
-        """ NSD Management interface -
-                Individual Subscription
-
-        /subscriptions/subscriptionId
-            DELETE - Terminate a subscription.
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)

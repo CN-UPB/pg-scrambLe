@@ -60,7 +60,7 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
     time.sleep(10) # Wait for NSD onboarding
     response = json.loads(osm_nsd.delete_ns_descriptors_nsdinfoid(
                                 token=_token["id"], 
-                                id=_nsd))
+                                nsdinfoid=_nsd))
 
     time.sleep(2) # Wait for NSD onboarding
 
@@ -76,7 +76,7 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
     if _vnfd:
         response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                 token=_token["id"], 
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
 
@@ -99,7 +99,7 @@ def test_get_ns_descriptors_nsd_content():
 
     response = json.loads(osm_nsd.get_ns_descriptors_nsd_content(
                                 token=_token["id"], 
-                                id=_nsd))
+                                nsdinfoid=_nsd))
     Helpers._delete_test_nsd()
     if response["error"]:
             return True
@@ -124,7 +124,7 @@ def test_put_ns_descriptors_nsd_content():
 
     response = json.loads(osm_nsd.put_ns_descriptors_nsd_content(
                         token=_token["id"], 
-                        id=_nsd, 
+                        nsdinfoid=_nsd, 
                         data_path="tests/samples/test_osm_cirros_nsd.tar.gz" ))
     Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
     if response["error"]:
@@ -146,7 +146,7 @@ def test_get_ns_descriptors_nsdinfoid():
         if "test_osm_cirros_2vnf_nsd" == _n['id']:            
             _nsd = _n['_id']
 
-    response = json.loads(osm_nsd.get_ns_descriptors_nsdinfoid(token=_token["id"], id=_nsd))
+    response = json.loads(osm_nsd.get_ns_descriptors_nsdinfoid(token=_token["id"], nsdinfoid=_nsd))
     Helpers._delete_test_nsd()
     if response["error"]:
         return True

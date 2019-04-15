@@ -1,6 +1,5 @@
 from .auth import Auth
 import json
-import yaml
 import requests
 
 class Admin():

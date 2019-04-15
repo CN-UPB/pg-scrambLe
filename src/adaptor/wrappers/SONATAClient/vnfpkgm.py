@@ -1,9 +1,11 @@
 from ..CommonInterface import CommonInterfaceVnfPkgm
 import json
-import yaml
 import requests
 
 class VnfPkgm(CommonInterfaceVnfPkgm):
+    """
+    VNF Package Management Interfaces
+    """
     
     def __init__(self, host, port=4002):
         self._host = host
@@ -12,6 +14,17 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         self._user_endpoint = '{0}'
 
     def get_vnf_packages(self, token, _filter=None, host=None, port=None):
+        """ VNF Package Management Interface - VNF packages
+
+        /vnf_packages:
+            GET - Query VNF packages information
+
+        :param token: auth token retrieved by the auth call
+        :param _filter: content query filter 
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -38,6 +51,31 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         return json.dumps(result)        
 
     def post_vnf_packages(self, token, package_path, host=None, port=None):
+        """ VNF Package Management Interface - VNF packages
+
+        /vnf_packages:
+            POST - Create a new individual 
+            VNFpackage resource
+
+        :param token: auth token retrieved by the auth call
+        :param package_path: file path of the package
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+
+                response = json.loads(sonata_vnfpkgm.post_vnf_packages(
+                                        token=_token["token"]["access_token"],
+                                        package_path="tests/samples/vnfd_example.yml"))
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -58,13 +96,26 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result['data'] = r.text
         return json.dumps(result)
 
-    def get_vnf_packages_vnfpkgid(self, token, id, host=None, port=None):
+    def get_vnf_packages_vnfpkgid(self, token, vnfPkgId, host=None, port=None):
+        """ VNF Package Management Interface - 
+        Individual VNF package
+
+        /vnf_packages/{vnfPkgId}:
+            GET - Read information about an 
+            individual VNF package
+   
+        :param token: auth token retrieved by the auth call
+        :param vnfPkgId: id of the vnf package to fetch
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
             base_path = self._base_path.format(host, port)
        
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, id)
+        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, vnfPkgId)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
@@ -81,18 +132,22 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         return json.dumps(result)        
 
     def patch_vnf_packages_vnfpkgid(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                Individual VNF package
-
-        /vnf_packages/{vnfPkgId}
-        PATCH - Update information about an
-                    individual VNF package
-
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
-    def delete_vnf_packages_vnfpkgid(self, token, id, host=None, port=None):
+    def delete_vnf_packages_vnfpkgid(self, token, vnfPkgId, host=None, port=None):
+        """ VNF Package Management Interface - 
+        Individual VNF package
+
+        /vnf_packages/{vnfPkgId}:
+            DELETE - Delete an individual VNF package
+
+        :param token: auth token retrieved by the auth call
+        :param vnfPkgId: id of the vnf package to fetch
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -101,7 +156,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
 
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, id)
+        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, vnfPkgId)
 
         try:
             r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
@@ -115,82 +170,30 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid_vnfd(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNFD of an individual VNF package
-
-        /vnf_packages/{vnfPkgId}/vnfd
-            GET - Read VNFD of an on-boarded VNF package
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNF package content
-
-        /vnf_packages/{vnfPkgId}/package_content
-            GET - Fetch an on-boarded VNF package
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def put_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                VNF package content
-
-        /vnf_packages/{vnfPkgId}/package_content
-            PUT - Upload a VNF package by providing 
-                    the content of the VNF package
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def post_vnf_packages_vnfpkgid_package_content(self, vnfPkgId):
-        """ VNF Package Management Interface - 
-                Upload VNF package from URI task
-
-        /vnf_packages/{vnfPkgId}/package_content/upload_from_uri
-            POST - Upload a VNF package by providing
-                    the address information of the VNF package
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid_artifacts_artifactpath(self, 
             vnfPkgId, artifactPath):
-        """ VNF Package Management Interface - 
-                Individual VNF package artifact
-
-        /vnf_packages/{vnfPkgId}/artifacts/{artifactPath}
-            GET - Fetch individual VNF package artifact
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def get_vnf_packages_subscriptions(self):
-        """ VNF Package Management Interface - 
-                Subscriptions
-
-        /subscriptions
-            GET - Query multiple subscriptions
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)
 
     def post_vnf_packages_subscriptions(self):
-        """ VNF Package Management Interface - 
-                Subscriptions
-
-        /subscriptions
-            POST - Subscribe to notifications related
-                to on-boarding and/or changes of VNF packages
-   
-        """
         result = {'error': True, 'data': 'Method not implemented in target MANO'}
         return json.dumps(result)

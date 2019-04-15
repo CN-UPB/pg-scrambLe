@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 class CommonInterfaceNsd(ABC):
     """
     NSD Management Interfaces
-
+        
     Base: {apiRoot}/nsd/v1
     """
 
@@ -22,9 +22,10 @@ class CommonInterfaceNsd(ABC):
     def get_ns_descriptors(self):
         """ NSD Management Interface - NS Descriptors
 
-        /ns_descriptors
+        /ns_descriptors:
             GET - Query information about multiple
-                    NS descriptor resources.
+            NS descriptor resources.
+
         """
         pass
 
@@ -32,7 +33,7 @@ class CommonInterfaceNsd(ABC):
     def post_ns_descriptors(self):
         """ NSD Management Interface - NS Descriptors
 
-        /ns_descriptors
+        /ns_descriptors:
             POST - Create a new NS descriptor resource.
         """
         pass
@@ -41,26 +42,27 @@ class CommonInterfaceNsd(ABC):
     def get_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface -  Individual NS Descriptor
 
-              Read information about an individual NS
-                descriptor resource.
-              """
+        /ns_descriptors/{nsdInfoId}:
+            Read information about an individual NS
+            descriptor resource.
+        """
         pass
 
     @abstractmethod
     def patch_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface - Individual NS Descriptor
 
-        /ns_descriptors/{nsdInfoId}
+        /ns_descriptors/{nsdInfoId}:
             PATCH - Modify the operational state and/or 
-                the user defined data of an individual
-                NS descriptor resource.
+            the user defined data of an individual
+            NS descriptor resource.
         """
         pass
 
     def delete_ns_descriptors_nsdinfoid(self):
         """ NSD Management Interface - Individual NS Descriptor
 
-        /ns_descriptors/{nsdInfoId}
+        /ns_descriptors/{nsdInfoId}:
             DELETE - Delete the content of NSD
         """
         pass
@@ -69,7 +71,7 @@ class CommonInterfaceNsd(ABC):
     def get_ns_descriptors_nsd_content(self):
         """ NSD Management Interface - NSD Content
         
-        /ns_descriptors/{nsdInfoId}/nsd_c
+        /ns_descriptors/{nsdInfoId}/nsd_c:
             GET - Fetch the content of a NSD.
         """
         pass
@@ -78,7 +80,7 @@ class CommonInterfaceNsd(ABC):
     def put_ns_descriptors_nsd_content(self):
         """ NSD Management Interface - NSD Content
         
-        /ns_descriptors/{nsdInfoId}/nsd_c
+        /ns_descriptors/{nsdInfoId}/nsd_c:
             PUT - Upload the content of NSD
         """
         pass
@@ -87,11 +89,11 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def get_pnf_descriptors(self):
         """ NSD Management interface -
-                PNF Descriptors
+        PNF Descriptors
 
-        /pnf_descriptors
+        /pnf_descriptors:
             GET - Query information about multiple
-                PNF descriptor resources.
+            PNF descriptor resources.
 
         """
         pass
@@ -99,9 +101,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def post_pnf_descriptors(self):
         """ NSD Management interface -
-                PNF Descriptors
+        PNF Descriptors
 
-        /pnf_descriptors
+        /pnf_descriptors:
             POST - Create a new PNF descriptor resource.
 
         """
@@ -110,9 +112,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def get_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
-                Individual PNF Descriptor
+        Individual PNF Descriptor
 
-        /pnf_descriptors/pnfdinfoid
+        /pnf_descriptors/pnfdinfoid:
             GET - Read an individual PNFD resource.
 
         """
@@ -121,11 +123,11 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def patch_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
-                Individual PNF Descriptor
+        Individual PNF Descriptor
 
-        /pnf_descriptors/pnfdinfoid
+        /pnf_descriptors/pnfdinfoid:
             PATCH - Modify the user defined data of an 
-                        individual PNF descriptor resource.
+            individual PNF descriptor resource.
 
         """
         pass
@@ -133,9 +135,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def delete_pnf_descriptors_pnfdinfoid(self, pnfdInfoId):
         """ NSD Management interface -
-                Individual PNF Descriptor
+        Individual PNF Descriptor
 
-        /pnf_descriptors/pnfdinfoid
+        /pnf_descriptors/pnfdinfoid:
             DELETE - Delete an individual PNF descriptor resource.
 
         """
@@ -144,9 +146,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def get_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
-                PNFD Content
+        PNFD Content
 
-        /pnf_descriptors/pnfdinfoid/pnfd_content
+        /pnf_descriptors/pnfdinfoid/pnfd_content:
             GET - Fetch the content of a PNFD.
 
         """
@@ -155,9 +157,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def put_pnf_descriptors_pnfd_content(self, pnfdInfoId):
         """ NSD Management interface -
-                PNFD Content
+        PNFD Content
 
-        /pnf_descriptors/pnfdinfoid/pnfd_content
+        /pnf_descriptors/pnfdinfoid/pnfd_content:
             PUT - Upload the content of a PNFD.
 
         """
@@ -166,9 +168,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def post_subscriptions(self, pnfdInfoId):
         """ NSD Management interface -
-                Subscriptions
+        Subscriptions
 
-        /subscriptions
+        /subscriptions:
             POST - Subscribe to NSD and PNFD change notifications.
 
         """
@@ -177,9 +179,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def get_subscriptions(self, subscriptionId):
         """ NSD Management interface -
-                Subscriptions
+        Subscriptions
 
-        /subscriptions
+        /subscriptions:
             GET - Query multiple subscriptions.
 
         """
@@ -188,9 +190,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def get_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
-                Individual Subscription
+        Individual Subscription
 
-        /subscriptions/subscriptionId
+        /subscriptions/subscriptionId:
             GET - Read an individual subscription resource
 
         """
@@ -199,9 +201,9 @@ class CommonInterfaceNsd(ABC):
     @abstractmethod
     def delete_subscriptions_subscriptionid(self, subscriptionid):
         """ NSD Management interface -
-                Individual Subscription
+        Individual Subscription
 
-        /subscriptions/subscriptionId
+        /subscriptions/subscriptionId:
             DELETE - Terminate a subscription.
 
         """

@@ -3,13 +3,33 @@ import json
 import requests
 
 class Auth(CommonInterfaceAuth):
-
+    """
+    Auth
+    """
     def __init__(self, host, port=80):
         self._host = host
         self._port = port
         self._base_path = 'http://{0}:{1}/api/v2'
 
     def auth(self, username, password, host=None, port=None):
+        """ Authorization API
+
+        POST method which returns an 
+        authorization token to be used by other calls. 
+
+        :param username: username for login
+        :param password: password for login
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+                response = json.loads(sonata_auth.auth(
+                                        username=USERNAME,
+                                        password=PASSWORD))
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:

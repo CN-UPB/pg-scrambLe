@@ -72,7 +72,7 @@ def test_get_ns_instances_nsinstanceid():
 
     response = json.loads(osm_nslcm.get_ns_instances_nsinstanceid(
                         token=_token["id"], 
-                        id=_ns))
+                        nsInstanceId=_ns))
 
     if response["error"]:
         return True
@@ -158,7 +158,7 @@ def test_post_ns_instances_nsinstanceid_terminate(post_ns_instances_nsinstanceid
     if _ns:
         response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
                                 token=_token["id"], 
-                                id=_ns))
+                                nsInstanceId=_ns))
         _rid = response["data"]
         assert isinstance(response, dict)
         assert response["data"] == _rid

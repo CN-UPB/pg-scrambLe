@@ -57,7 +57,9 @@ def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
 
     response = None
     if _vnfd:
-        response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
+        response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(
+                                        token=_token["token"]["access_token"],
+                                        vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
 
@@ -76,4 +78,6 @@ def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
         if "vnfd_example" == _v['uuid']:            
             _vnfd = _v['uuid']
 
-    response = json.loads(sonata_vnfpkgm.get_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], id=_vnfd))
+    response = json.loads(sonata_vnfpkgm.get_vnf_packages_vnfpkgid(
+                                token=_token["token"]["access_token"], 
+                                vnfPkgId=_vnfd))

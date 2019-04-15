@@ -37,7 +37,7 @@ class Helpers():
         if _vnfd:
             response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                     token=_token["id"], 
-                                    id=_vnfd))
+                                    vnfPkgId=_vnfd))
 
     def _upload_test_nsd():
         time.sleep(3) # Wait 
@@ -75,7 +75,7 @@ class Helpers():
         time.sleep(10) # Wait for NSD onboarding
         response = json.loads(osm_nsd.delete_ns_descriptors_nsdinfoid(
                                 token=_token["id"], 
-                                id=_nsd))
+                                nsdinfoid=_nsd))
 
         time.sleep(2) # Wait for NSD onboarding
 
@@ -91,7 +91,7 @@ class Helpers():
         if _vnfd:
             response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                     token=_token["id"], 
-                                    id=_vnfd))
+                                    vnfPkgId=_vnfd))
 
     def _upload_reference_vnfd_for_nsd(_referencevnfdname="test_osm_cirros_vnfd"):
         time.sleep(3) # Wait 
@@ -139,7 +139,7 @@ class Helpers():
         if _ns:
             response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
                                     token=_token["id"], 
-                                    id=_ns))
+                                    nsInstanceId=_ns))
             _rid = response["data"]
         
 

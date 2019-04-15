@@ -86,7 +86,8 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
  
     time.sleep(10) # Wait for NSD onboarding
     response = json.loads(sonata_nsd.delete_ns_descriptors_nsdinfoid(
-                        token=_token["token"]["access_token"], id=_nsd))
+                        token=_token["token"]["access_token"],
+                        nsdinfoid=_nsd))
     assert isinstance(response, dict)
     assert response["data"] == "{\"error\":\"The NSD ID None does not exist\"}"
     
@@ -104,6 +105,6 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
     response = None
     if _vnfd:
         response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(
-                        token=_token["token"]["access_token"], id=_vnfd))
+                        token=_token["token"]["access_token"], vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
