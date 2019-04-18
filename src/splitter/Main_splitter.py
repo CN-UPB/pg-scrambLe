@@ -13,19 +13,28 @@ reference_sonata = "5c833a400594c7824aba2714"
 
 def main():
 
-    #To fetch OSM file and to call osm splitter
+    class SplitterService:
+    	name = "splitter_service"
 
-    #received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
-    #OSM_utility.get_osm_nsd(received_file_osm)
-    #osmSplitter.split_osm()
+    	@rpc
+    	def hello(self, descriptor):
+	    descriptor = request.values.get('descriptor')
+	       #To fetch OSM file and to call osm splitter
+
+            #received_file_osm = Fetchfile(reference_osm, "osm_nsd") #we dont need parameters while fetching file
+            #OSM_utility.get_osm_nsd(descriptor)
+            #osmSplitter.split_osm()
 
 
 
-    #to fetch Sonata file and to call sonata splitter
+            #to fetch Sonata file and to call sonata splitter
 
-    received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
-    sonataUtilityFunctions.get_data_sonata(received_file_sonata)
-    splitter.split_sonata()
+            #received_file_sonata = Fetchfile(reference_sonata, "sonata_nsd")
+            sonataUtilityFunctions.get_data_sonata(descriptor)
+            splitter.split_sonata()
+            return "Success"
+
+ 
 
 
 if __name__ == '__main__':
