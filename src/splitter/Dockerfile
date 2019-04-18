@@ -20,6 +20,9 @@ COPY SonataSplitter.py ./
 COPY SonataUtilityFunctions.py ./
 COPY splitter.py ./
 
+COPY SonataNsd.json ./
+COPY OsmNsd.json ./
+
 
 RUN chmod +x ./start.sh
 
