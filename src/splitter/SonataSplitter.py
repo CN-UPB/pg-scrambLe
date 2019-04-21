@@ -262,7 +262,7 @@ def split_forwarding_path():
 def create_files():
     for i in range(len(NSDs)):
         data = {}
-        data['descriptor_version'] = str(NSDs[i].descriptor_version)
+        data['descriptor_schema'] = str("https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml")
         data['vendor'] = str(NSDs[i].vendor)
         data['name'] = str(NSDs[i].name)
         data['version'] = str(NSDs[i].version)
@@ -303,7 +303,7 @@ def create_files():
             for connection_point in network_forwarding_path.connection_points:
                 sub_data['connection_points'].append({
                     "connection_point_ref": str(connection_point.connection_point_ref),
-                    "position": str(connection_point.position)
+                    "position": connection_point.position
                 })
             sub_data['network_forwarding_paths'].append({
                 "fp_id": str(network_forwarding_path.fp_id),
@@ -315,8 +315,8 @@ def create_files():
         for forwarding_graph in NSDs[i].forwardingGraphs:
             data['forwarding_graphs'].append({
                 "fg_id": str(forwarding_graph.fg_id),
-                "number_of_endpoints": str(forwarding_graph.number_of_endpoints),
-                "number_of_virtual_links": str(forwarding_graph.number_of_virtual_links),
+                "number_of_endpoints": forwarding_graph.number_of_endpoints,
+                "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
                 "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
                 "constituent_vnfs": forwarding_graph.constituent_vnfs,
                 "network_forwarding_paths": sub_data['network_forwarding_paths']
