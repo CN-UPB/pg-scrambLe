@@ -33,7 +33,7 @@ Reliability is often related to availability, but it’s a slightly different co
 The cloud presents a few issues outside the scope of the application code that can impact a system’s reliability. Within the cloud, the most significant of these issues is how persistent data is managed. In particular, any time one loses a server, loss or corruption of data becomes a concern.
 
 \section{Heterogeneity}
-\paragraph{}Heterogeneity refers to the state of being diverse. The scaling in a distributed system is also affected by the heterogeneity of systems involved. The administrative dimension of the scaling constitutes to the problem regarding heterogeneity focusing of both hardware and also software required, to deliver the services efficiently. In terms of MANO, when a distributed system involves two or more MANO, the administrative domains of the MANOs are affected to scale such MANOs. Coherence can be one of the solutions to handle such MANOs. In a coherence system, the different administrative systems have a common interface \cite{ord1994scale}.
+\paragraph{}Heterogeneity refers to the state of being diverse. The scaling in a distributed system is also affected by the heterogeneity of systems involved. The administrative dimension of the scaling constitutes to the problem regarding heterogeneity focusing of both hardware and also software required, to deliver the services efficiently. One of the solutions to such a problem is coherence. In a coherence system, the different administrative systems have a common interface \cite{ord1994scale}.
 
 
 
@@ -41,13 +41,13 @@ The cloud presents a few issues outside the scope of the application code that c
 \paragraph{}The administrative domain in an NFV architectural framework is majorly divided into Infrastructure domain and Tenant domain. Infrastructure domains are defined based on the criteria like type of resource such as networking, compute and storage in traditional data-centre environments, by geographical locations or by organisation. The tenant domains are defined based on the criteria like by the type of network service, etc. In a MANO, multiple infrastructure domains may co-exist, providing infrastructure to a single or multiple tenant domain. The VNFs and Network Services reside in the tenant domain which consumes resources from one or more infrastructure domains \cite{peinetwork}.
 
 \subsection{Multi-MANO Interworking}
-\paragraph{}To achieve a better provisioning of network services in a multiple MANO system, two or more Service Platforms (SPs) cooperate or one orchestrator leverages on the NFV interface on the other orchestrator to instantiate functions, services. The infrastructure domain of a MANO is segmented to accommodate the demands of separate organisation hence deploying a hierarchy of service platforms that need to collaborate in order to deploy NFV end-to-end services.The interaction between the two MANOs is achieved by mapping the services and infrastructure domains of the MANO. 
+\paragraph{}To achieve a better provisioning of network services in a multiple MANO system, two or more Service Platforms (SPs) cooperate or one orchestrator leverages on the NFV interface on the other orchestrator to instantiate functions, services. The infrastructure domain of a MANO is segmented to accommodate the demands of separate organisation hence deploying a hierarchy of service platforms that need to collaborate in order to deploy NFV end-to-end services. The interaction between the two MANOs is achieved by mapping the services and infrastructure domains of the MANO. 
 
-\paragraph{}In a hierarchical placement of the two MANO service platforms, it either supports complete outsourcing of a network service for deployment in a lower service platform or split the service deployment across two MANO SPs.Hence, the NFVO of the upper MANO constitutes a resource orchestrator (RO) along with network service orchestrator (NSO) to facilitate the services.
+\paragraph{}In a hierarchical placement of the two MANO service platforms, it either supports complete outsourcing of a network service for deployment in a lower service platform or split the service deployment across two MANO SPs. Hence, the NFVO of the upper MANO constitutes a resource orchestrator (RO) along with network service orchestrator (NSO) to facilitate the services.
 
 
 
-\paragraph{}According to \cite{de2018network} , For a network service to support across multiple administrative domains, they require coordination and synchronisation between multiple involved infrastructure domains which are performed by one or more orchestrators. The ETSI approaches for multiple administrative domains are depicted in the figure below.
+\paragraph{}According to \cite{de2018network}, for a network service to support across multiple administrative domains, they require coordination and synchronisation between multiple involved infrastructure domains which are performed by one or more orchestrators. The ETSI approaches for multiple administrative domains are depicted in the figure below.
 
 \begin{figure} [H]
 	\centering
