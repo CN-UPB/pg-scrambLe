@@ -57,11 +57,11 @@ RSM component is installed on all the service nodes. It observes the status of i
 \begin{itemize}
 	
 
-\item In this process, firstly define metrics for scalability measure. This metric could also be used to decide raw data and to compute scalability. 
+\item In this process, firstly define metrics for scalability measure. This metric could also be used to decide raw data to collect from services and to compute scalability in further steps.
 
-\item Certain techniques from Qos monitored services are used to collect the set of raw data items. 
+\item Certain techniques from QoS monitored services are used to collect the set of raw data items \cite{Artaiam2008EnhancingSQ} \cite{hutchison_monitoring_2007}.
 
-\item Next step is to figure out scalability metrics. If the metrics indicate an acceptable scalability level then continue step 2 and 3 where as if the metrics indicate a need to repair the below averaged scalalability then execute the following steps. 
+\item Next step is to analyze scalability metrics. If the metrics indicate an acceptable scalability level then continue step 2 and 3 where as if the metrics indicate a need to repair the below averaged scalalability then execute the following steps. 
 
 
 \item Next up is to develop a remedy plan for improving the below avaraged scalability considering the current states of monitored service. Scalability assuring strategies like service replication and/or service migration could be adopted depending on the complexity and nature of the suffered service. 
@@ -71,6 +71,7 @@ RSM component is installed on all the service nodes. It observes the status of i
 
 \item The final step is to inspect the result of the remedy plan and understand from the entire procedure as to how to improve the scalability. If the outcome of the process is valuable, then both the consequence and the remedy plan are logged for future uses thus making it a smart scalability framework.
 
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\linewidth]{figures/ServiceScalability}
@@ -79,10 +80,16 @@ RSM component is installed on all the service nodes. It observes the status of i
 \end{figure}
 
 \end{itemize}
-\newpage
 
+Similarly In MANO's context, the metrics defined in section \ref{Metrics} could be the basis for deciding the scalabiliy. GSM and RSM can be developed as part of MANO's ecosystem. The scalability strategy can be a hybrid of the approaches discussed in this chapter.
+
+\newpage
 \section{Hierarchical Service Placement}
-In the centralized model, the service orchestrator has a detailed view of all Execution Zones(EZs).It may be impractical, for scalability reasons, for a globally centralised placement algorithm to maintain detailed knowledge of all users and all EZs and so here the author investigates a hierarchical solution where the overall orchestration domain is split into geographical sub-domains.
-In this model the high-level orchestrator has limited visibility of Execution Zone(EZ - Services will be deployed in datacenters/clouds called EZ) and user demands within a sub-domain - it sees only the aggregate of user demands and the aggregate of EZ capacities within a particular sub-domain. The high-level orchestrator places service instances at the coarse granularity of sub-domain only and subsequently each sub-domain orchestrator undertakes a further placement algorithm with the scope of that sub-domain only to determine in which specific EZs what quantity of service instances should be placed to supply the required number of session slots to meet the specific detailed demand pattern of user requests within that sub-domain.
-\paragraph{}There are many ways of sub-dividing an overall orchestration domain into sub-domains. One option is to map sub-domains onto the same geographical area covered by resolution domains: the entity responsible for resolving user requests to EZs with available session slots. Equating sub-domains for orchestration and service placement purposes with resolution domains is not essential as other coarser or finer grained sub-domains could be considered
- \cite{maini_hierarchical_2016}.
+Service placement in a centralized network model lacks scalability. The service orchestrator in the centralized network model has a detailed view of all nodes/servers. A centralized placement algorithm maintaining all the information of all users and nodes is not a feasible approach, so the author investigates a hierarchical solution where the overall orchestration domain is split into geographical sub-domains.
+
+In this model, the author refers a node as an Execution Zone (EZ - Services will be deployed in datacenters/clouds). The high-level orchestrator has limited visibility of EZ and user demands within a sub-domain - it sees only the aggregate of user demands and the aggregate of EZ capacities within a particular sub-domain. The high-level orchestrator places service instances at the coarse granularity of sub-domain only and subsequently each sub-domain orchestrator undertakes a further placement algorithm with the scope of that sub-domain only to determine in which specific EZs what quantity of service instances should be placed to supply the required number of session slots to meet the specific detailed demand pattern of user requests within that sub-domain \cite{maini_hierarchical_2016}.
+\paragraph{}There are many ways of sub-dividing an overall orchestration domain into sub-domains. One option is to map sub-domains onto the same geographical area covered by resolution domains: the entity responsible for resolving user requests to EZs with available session slots. Another option is to consider multiple hierarchical levels of service orchestration and placement. The author models two levels of analysis.
+
+The overview of this approach is that the lower-level domain is invisible to high-level orchestrator, the service placement problem can be subdivided into smaller units. One of them can be placed at the high level working at coarse granularity and the others: each per sub-domain can operate at a lower level with increased amount of information and decreased geographical exposure. In this way the optimisation algorithms can be executed with reduced quantities of information, increasing scalability. 
+ 
+ 
