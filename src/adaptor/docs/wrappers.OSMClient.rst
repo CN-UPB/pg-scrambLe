@@ -1,4 +1,5 @@
-wrappers\.OSMClient package
+===========================
+OSMClient package
 ===========================
 
 wrappers\.OSMClient\.admin 

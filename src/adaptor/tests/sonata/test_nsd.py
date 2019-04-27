@@ -58,8 +58,9 @@ def test_get_ns_descriptors_nsdinfoid():
         if "sonata-demo" == _n['nsd']['name']:
             _nsd = _n['uuid']
 
-    response = json.loads(sonata_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"]))
+    response = json.loads(sonata_nsd.get_ns_descriptors_nsdinfoid(
+                        token=_token["token"]["access_token"], nsdinfoid=_nsd))
+
     Helpers._delete_test_nsd(_token=_token["token"]["access_token"])
     if response["error"]:
         return True

@@ -149,7 +149,7 @@ class Nsd(CommonInterfaceNsd):
             base_path = self._base_path.format(self._host, self._port)
         else:
             base_path = self._base_path.format(host, port)
-        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd".format(base_path, id)
+        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd".format(base_path, nsdinfoid)
         result = {'error': True, 'data': ''}
         headers = {'Content-Type': 'application/yaml',
                     'Authorization': 'Bearer {}'.format(token)}  
@@ -259,7 +259,7 @@ class Nsd(CommonInterfaceNsd):
                         'Authorization': 'Bearer {}'.format(token),
                         'Content-File-MD5': Helpers.md5(open(data_path, 'rb'))}
 
-        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(base_path, id)
+        _endpoint = "{0}/nsd/v1/ns_descriptors/{1}/nsd_content".format(base_path, nsdinfoid)
 
         try:
             r = requests.put(_endpoint, data=open(data_path, 'rb'), verify=False,

@@ -151,41 +151,25 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text        
         return json.dumps(result)        
 
-    def get_ns_descriptors_nsdinfoid(self, token, _filter=None, host=None, port=None):
-        # """ NSD Management Interface -  Individual NS Descriptor
+    def get_ns_descriptors_nsdinfoid(self, token, nsdinfoid, host=None, port=None):
+        """ NSD Management Interface -  Individual NS Descriptor
 
-        # /ns_descriptors/{nsdInfoId}:
-        #     Read information about an individual NS
-        #     descriptor resource.
+        /ns_descriptors/{nsdInfoId}:
+            Read information about an individual NS
+            descriptor resource.
 
-        # :param token: auth token retrieved by the auth call
-        # :param nsdinfoid: id of the individual NSD
-        # :param host: host url
-        # :param port: port where the MANO API can be accessed
+        :param token: auth token retrieved by the auth call
+        :param nsdinfoid: id of the individual NSD
+        :param host: host url
+        :param port: port where the MANO API can be accessed
 
-        # Example:
-        #     .. code-block:: python
-        #         sonata_nsd = SONATAClient.Nsd(HOST_URL)
-        #         sonata_auth = SONATAClient.Auth(HOST_URL)
-        #         _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-        #         _token = json.loads(_token["data"])
-        #         _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
-        #                             token=_token["token"]["access_token"]))
-        #         _nsd_list = json.loads(_nsd_list["data"])
-
-        #         _nsd = "24d8ea1c-3d96-47d6-8fc4-473c9a6f1ad2"
-
-
-        #         response = json.loads(sonata_nsd.get_ns_descriptors(
-        #                             token=_token["token"]["access_token"]))
-        # """
-
+        """
         if host is None:
                 base_path = "http://{0}:{1}".format(self._host, self._port)
         else:
                 base_path = "http://{0}:{1}".format(host, port)
            
-        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, id)
+        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, nsdinfoid)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
