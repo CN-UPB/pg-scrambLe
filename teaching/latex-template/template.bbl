@@ -1,14 +1,16 @@
 \begin{thebibliography}{1}
 
-\bibitem{Taylor:SIGuide:95}
-B.~N. Taylor.
-\newblock Guide for the use of the international system of units (si).
-\newblock NIST Special Publication 811, 1995.
-\newblock \url{http://physics.nist.gov/Document/sp811.pdf}.
+\bibitem{mnih2015human}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei~A Rusu, Joel Veness,
+  Marc~G Bellemare, Alex Graves, Martin Riedmiller, Andreas~K Fidjeland, Georg
+  Ostrovski, et~al.
+\newblock Human-level control through deep reinforcement learning.
+\newblock {\em Nature}, 518(7540):529, 2015.
 
-\bibitem{leuwen00:_handb_schol}
-M.-C. van Leuwen.
-\newblock {\em A Handbook for Scholars}.
-\newblock ??, 1900.
+\bibitem{yu2019deep}
+Yiding Yu, Taotao Wang, and Soung~Chang Liew.
+\newblock Deep-reinforcement learning multiple access for heterogeneous
+  wireless networks.
+\newblock {\em IEEE Journal on Selected Areas in Communications}, 2019.
 
 \end{thebibliography}

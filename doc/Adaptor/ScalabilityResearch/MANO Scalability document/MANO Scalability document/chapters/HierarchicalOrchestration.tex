@@ -1,0 +1,11 @@
+\chapter{Hierarchical Orchestration}
+\label{ch:Hierarchical Orchestration}
+
+\paragraph{} To achieve an end-to-end network service provisioning, a single MANO platform is not feasible. So, a multi-domain NFVI comes into picture to cope up with different administrative organizations. In a multi-domain environment, orchestration of network services can be a hierarchical or as a peer-to-peer orchestration\cite{munoz2018hierarchical}.
+
+\paragraph{} In a hierarchical orchestrating model, one of the MANO acts as a global orchestrator to the underlying MANO with a parent/child hierarchy.This architecture uses a common API between the parent MANO and child MANOs, hence maintaining a good overview of the global system. This architecture is preferred because of its broader scope of network services from the lower MANOs, also for the better abstraction. The number of levels of hierarchy in this type of orchestration are based on the geographical region and network domain. The hierarchical levels are also based on abstraction required for the provisioning of network services\cite{munoz2018hierarchical}.
+
+
+\paragraph{}Whereas, In a peer-to-peer orchestrating model, the MANOs are interconnected to each other in an arbitrary fashion, to provide end-to-end network services. This model is preferred when there is no cross-domain control or cross-domain visibility is required, thus limiting the scaling possibilities of a MANO\cite{munoz2018hierarchical}.
+
+ 
