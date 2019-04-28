@@ -19,7 +19,7 @@ Scalability in the recent times has become one of the most important factors of 
 
 \section{Why does a MANO need scaling?}
 \paragraph{}
-In recent years, distributed systems have gained an increase in the number of users and resources. Scaling such a system is an important aspect when large user requests have to be served without compromising system performance or increase in administrative complexity. In terms of MANO, when there are a large number Network Service(NS) instantiations of various network functions, they need to be instantiated considering all the relevant metrics of the system.
+In recent years, distributed systems have gained an increase in the number of users and resources. Scaling such a system is an important aspect when large user requests have to be served without compromising system performance or increase in administrative complexity. In terms of MANO, when there are a large number Network Service(NS) instantiation of various network functions, they need to be instantiated considering all the relevant metrics of the system.
 
 \paragraph{System load:}
 In a distributed system, the system load is the large amount of data that is to be managed by network services increasing the total number of requests for service.
@@ -34,13 +34,13 @@ In this section, a few metrics that are important in terms of a MANO server are 
 	\item \textbf{Speedup} Speedup measures how the  rate of doing work increases with the number of processors, compared to one processor, and has an ideal linear speedup value. \cite{jogalekar_evaluating_2000}
 	\item  \textbf{Response time}: Service response time of a MANO is a time period from when a service invocation message is arrived to a MANO on the provider side to when a response for the invocation is returned to the service consumer.
 	\item \textbf {Throughput}: It is a metric which measures the efficiency of a MANO to handle service invocations within a given time.
-	\item \textbf{Cost}: High scalability under high service loads is an expensive affair. There is always some additional cost involved in planning a scalbility strategy.
+	\item \textbf{Cost}: High scalability under high service loads is an expensive affair. There is always some additional cost involved in planning a scalability strategy.
 	\item \textbf{Performance}: MANO should be able to handle the growing amount of service loads. Scalability should take into account MANOs' ability to manage high service loads without deteriorating Qos.
 	\item \textbf{Fault tolerance}: This refers to the ability of a MANO to continue operating without interruption when it's components fail
 \end{itemize}
 
 
-\paragraph{Lifecycle Management \& service provisioning:} To provision a network service, the NFVO of a MANO's functionality include instantiation, global resource management scaling in/out , event correlation and termination of services. These functionalities form the lifecycle of NS. With the increase in instantiations of NS over a distributed network, the lifecycle management of each service is a overhead, hence increasing the provision time. This can be better handled when the MANO can be scaled out. To manage services with a closer proximity of geographical region, MANOs could be scaled in. The provision time , also reducing provision time.
+\paragraph{Lifecycle Management \& service provisioning:} To provision a network service, the NFVO of a MANO's functionality include instantiation, global resource management scaling in/out , event correlation and termination of services. These functionalities form the lifecycle of NS. With the increase in instantiation of NS over a distributed network, the lifecycle management of each service is a overhead, hence increasing the provision time. This can be better handled when the MANO can be scaled out. To manage services with a closer proximity of geographical region, MANOs could be scaled in. The provision time , also reducing provision time.
 
 
 

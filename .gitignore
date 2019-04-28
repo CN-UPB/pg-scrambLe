@@ -126,6 +126,7 @@ dmypy.json
 *.cb
 *.cb2
 .*.lb
+*.brf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
