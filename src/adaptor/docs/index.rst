@@ -14,7 +14,7 @@ at the University of Paderborn for the 5G-PICTURE project
 PMW is easy to use and well documented. Code usage examples are available
 along with the function documentation.
 
-PMW can be installed using pip by using pip. 
+PMW can be installed using pip:
 
 .. code-block:: bash
     
