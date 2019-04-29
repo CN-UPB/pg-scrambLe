@@ -1,0 +1,2 @@
+e632a64a89b770d033bbeabce46271e9  intern_server_vnfd.yaml
+bc681c5a4c3cdc09c013df2d2239f3d2  icons/osm.png
