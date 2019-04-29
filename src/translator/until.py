@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 evtlog = event.get_logger('validator.events')
 
 
-def read_descriptor_files(file):
+def read_descriptor_files(files):
     """
     Loads the VNF descriptors provided in the file list. It builds a
     dictionary of the loaded descriptor files. Each entry has the
@@ -17,13 +17,17 @@ def read_descriptor_files(file):
     """
 
     descriptors = {}
-    content = read_descriptor_file(file)
-    did = descriptor_id(content)
-    if did in descriptors.keys():
-        log.error("Duplicate descriptor in files: '{0}' <==> '{1}'"
-                  .format(file, descriptors[did]))
-    descriptors[did] = file
-    return descriptors
+	for file in files:
+		content = read_descriptor_file(file)
+		if not content:
+			continue
+		did = descriptor_id(content)
+		if did in descriptors.keys():
+			log.error("Duplicate descriptor in files: '{0}' <==> '{1}'"
+					  .format(file , descriptors[did]))
+			continue
+		descriptors[did] = file
+	return descriptors
 
 
 def read_descriptor_file(file):

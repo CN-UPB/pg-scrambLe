@@ -58,7 +58,7 @@ def osm_validator(descriptor):
         print("This is not a valid OSM descriptor")
 
 
-def sonata_nsd_validate(descriptor, vnfd = None):
+def sonata_nsd_validate(descriptor, vnfd = []):
     if 'network_functions' and "descriptor_version" in descriptor:
         descriptor_to_validate = descriptor
         with open("tng-schema\nsd\nsd-Pishahang.yml", "r") as f:
