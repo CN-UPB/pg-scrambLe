@@ -7,32 +7,28 @@ from bson.objectid import ObjectId
 from validate import validator
 from utilities import setup, insert_into_db, transformation
 from nameko.rpc import rpc
-from flask import Flask, request
-
-app = Flask(__name__)
-
+API_VERSION = "v1"
 
 class TranslatorService():
 
     name = "translator_service"
     
     @rpc
-	@app.route('/translator', methods = ['POST', 'GET'] )
-    def hello(self=None):
-		descriptor = request.values.get('descriptor')
-        received_param = request.values.get('param')
+    def hello(self=None, name):
         client = pymongo.MongoClient("mongodb://mongo:27017")
         set = setup(client)
-        var = check_parameters(received_param)
+        var = check_parameters()
         return var
-	
+		
+@http('GET', '/translator/{}'.format(API_VERSION))	
 def check_parameters(received_param):
-
+	decscriptor = request.form["descriptor"]
+	param = request.form["param"]
     client = pymongo.MongoClient("mongodb://mongo:27017")
     set = setup(client)
     
     if received_param == "sonata_to_osm":
-    
+   
         insert = insert_into_db(client)
         ref = insert.insert_nsd('sonata')
         rcvd_file1 = set.get_source_descriptor(ref[0])
@@ -110,8 +106,3 @@ def toOsm(received_file):
         translated_ref = temp.inserted_id
         
         return translated
-		
-if __name__ == '__main__':
-    app.debug = True
-    app.run()
-    app.run(debug=True)
