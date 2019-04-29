@@ -1,0 +1,79 @@
+---
+vnfd:vnfd-catalog:
+  schema-version: vnfd-schema-01
+  vnfd:
+  - description: Virtual traffic classifier (vTC) descriptor file. vTC uses ndpi library
+      for the implementation of the vTC
+    name: vtc-vnf
+    version: '0.1'
+    connection-point:
+    - id: mgmt
+      type: VPORT
+    - id: input
+      type: VPORT
+    - id: output
+      type: VPORT
+    internal-vld:
+    - id: mgmt-vld
+      type: ELAN
+      internal-connection-point:
+      - id-ref: vdu01-eth0
+    - id: input-vld
+      type: ELINE
+      internal-connection-point:
+      - id-ref: vdu01-eth1
+    - id: output-vld
+      type: ELINE
+      internal-connection-point:
+      - id-ref: vdu01-eth2
+    vdu:
+    - id: vdu01
+      image: cirros034
+      interface:
+      - type: EXTERNAL
+        position: '1'
+        name: mgmt-int
+        external-connection-point-ref: mgmt
+        virtual-interface:
+          type: VIRTIO
+      - type: INTERNAL
+        position: '2'
+        name: eth0-int
+        internal-connection-point-ref: vdu01-eth0
+        virtual-interface:
+          type: VIRTIO
+      - type: EXTERNAL
+        position: '3'
+        name: input-int
+        external-connection-point-ref: input
+        virtual-interface:
+          type: VIRTIO
+      - type: INTERNAL
+        position: '4'
+        name: eth1-int
+        internal-connection-point-ref: vdu01-eth1
+        virtual-interface:
+          type: VIRTIO
+      - type: EXTERNAL
+        position: '5'
+        name: output-int
+        external-connection-point-ref: output
+        virtual-interface:
+          type: VIRTIO
+      - type: INTERNAL
+        position: '6'
+        name: eth2-int
+        internal-connection-point-ref: vdu01-eth2
+        virtual-interface:
+          type: VIRTIO
+      internal-connection-point:
+      - id: vdu01-eth0
+        type: VPORT
+      - id: vdu01-eth1
+        type: VPORT
+      - id: vdu01-eth2
+        type: VPORT
+      vm-flavor:
+        memory-mb: 2048
+        storage-gb: 1
+        vcpu-count: 1

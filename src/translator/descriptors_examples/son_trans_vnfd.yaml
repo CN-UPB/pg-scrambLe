@@ -1,0 +1,50 @@
+description: A VNF consisting of 2 VDUs connected to an internal VL
+descriptor_schema: https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml
+name: hackfest2-vnf
+vendor: pg-scramble
+version: '1.0'
+connection_points:
+- id: vnf-mgmt
+  type: external
+- id: vnf-data
+  type: external
+virtual_deployment_units:
+- id: mgmtVM
+  vm_image: US1604
+  connection_points:
+  - id: mgmtVM-internal
+    type: internal
+  resource_requirements:
+    cpu:
+      vcpus: 1
+    memory:
+      size: 1024
+      size_unit: MB
+    storage:
+      size: 10
+      size_unit: GB
+- id: dataVM
+  vm_image: US1604
+  connection_points:
+  - id: dataVM-internal
+    type: internal
+  resource_requirements:
+    cpu:
+      vcpus: 1
+    memory:
+      size: 1024
+      size_unit: MB
+    storage:
+      size: 10
+      size_unit: GB
+virtual_links:
+- connection_points_reference:
+  - vnf-mgmt
+  - mgmtVM:mgmtVM-internal
+  connectivity_type: E-Line
+  id: vnf-data
+- connection_points_reference:
+  - vnf-data
+  - dataVM:dataVM-internal
+  connectivity_type: E-LAN
+  id: vnf-mgmt

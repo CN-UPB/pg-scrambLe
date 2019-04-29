@@ -1,0 +1,6 @@
+*.pyc
+__pycache__
+dist
+.*
+*/__pycache__
+*/.pyc

@@ -1,0 +1,69 @@
+etsi = [    
+    {
+        "section": " NS Fault Management interface",
+        "resourceName": "Alarms",
+        "endpoint": "nsfm_alarms",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query alarms related to NS instances."
+            }
+        ]
+    },    {
+        "section": " NS Fault Management interface",
+        "resourceName": "Individual alarm",
+        "endpoint": "nsfm_alarms_alarmid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read individual alarm."
+            },
+            {
+                "method": "patch",
+                "meaning": "PATCH - Acknowledge individual alarm."
+            }
+        ]
+    },    {
+        "section": " NS Fault Management interface",
+        "resourceName": "Subscriptions",
+        "endpoint": "nsfm_subscriptions",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query multiple subscriptions."
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Subscribe to alarms related to NSs."
+            }
+        ]
+    },    {
+        "section": " NS Fault Management interface",
+        "resourceName": "Individual subscription",
+        "endpoint": "nsfm_subscriptions_subscriptionid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read an individual subscription."
+            },
+            {
+                "method": "delete",
+                "meaning": "DELETE - Terminate a subscription."
+            }
+        ]
+    }, {
+        "section": " NS Fault Management interface",
+        "resourceName": "Notification endpoint",
+        "endpoint": "nsfm_unknown",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Test the notification endpoint."
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Notify about NS alarms."
+            }
+        ]
+    }
+]

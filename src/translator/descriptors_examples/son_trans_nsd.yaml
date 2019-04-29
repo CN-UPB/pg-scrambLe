@@ -1,0 +1,24 @@
+name: hackfest2-ns
+description: NS with 2 VNFs connected by datanet and mgmtnet VLs
+version: '1.0'
+vendor: pg-scramble
+network_functions:
+- vnf_name: hackfest2-vnf
+  vnf_id: '1'
+  vnf_vendor: pg-scramble
+  vnf_version: '0.3'
+- vnf_version: '0.3'
+  vnf_vendor: pg-scramble
+  vnf_id: '2'
+  vnf_name: hackfest2-vnf
+virtual_links:
+- id: mgmtnet
+  connectivity_type: E-LAN
+  connection_points_reference:
+  - 1:vnf-mgmt
+  - 2:vnf-mgmt
+- connection_points_reference:
+  - 1:vnf-data
+  - 2:vnf-data
+  connectivity_type: E-LAN
+  id: datanet

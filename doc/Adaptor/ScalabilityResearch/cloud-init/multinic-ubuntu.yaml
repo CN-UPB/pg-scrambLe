@@ -1,0 +1,36 @@
+#cloud-config
+
+write_files:
+  - path: /etc/iproute2/rt_tables
+    content: |      
+      #
+      # reserved values
+      #
+      255     local
+      254     main
+      253     default
+      0       unspec
+      #
+      # local
+      #
+      #1      inr.ruhep
+      1 rt2
+
+runcmd:
+  - [ chown, ubuntu:ubuntu, /home/ubuntu/multinic.sh ]
+  - [ chmod, +x, /home/ubuntu/multinic.sh ]      
+  - [ /home/ubuntu/multinic.sh ]    
+
+ip route add 172.17.17.0/24 dev ens4 src 172.17.17.11 table rt2
+ip route add default via 172.17.17.1 dev ens4 table rt2
+
+ip rule add from 172.17.17.11/32 table rt2
+ip rule add to 172.17.17.11/32 table rt2
+
+# iface eth1 inet static
+#     address 10.10.0.10
+#     netmask 255.255.255.0
+#     post-up ip route add 10.10.0.0/24 dev eth1 src 10.10.0.10 table rt2
+#     post-up ip route add default via 10.10.0.1 dev eth1 table rt2
+#     post-up ip rule add from 10.10.0.10/32 table rt2
+#     post-up ip rule add to 10.10.0.10/32 table rt2
