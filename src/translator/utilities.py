@@ -334,7 +334,7 @@ class setup():
                     ( dataset['key'] == 'position'),'value'] = dataset[(dataset['parent_key'] == 'interface') & 
                                                                                                                 ( dataset['key'] == 'position')]['value'].astype('int64')
         dataset.reset_index(inplace=True,drop=True)
-        dataset.drop('osm_lineage',axis=1,inplace=True)
+        #dataset.drop('osm_lineage',axis=1,inplace=True)
 
         writer = write_dict()
         message = writer.translate(dataset)
@@ -1121,16 +1121,16 @@ class insert_into_db():
     def insert_nsd(self,framework):
         
         if framework == 'osm':
-            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
-            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
-            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_ns\hackfest_multivdu_nsd.yaml"))
-            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_vnf\hackfest_multivdu_vnfd.yaml"))
+            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
+            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
+            nsd=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
+            vnfd=yaml.load(open(r"hackfest_multivdu_vnfd.yaml"))
         
         elif framework == 'sonata':
             #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_nsd.yml"))
             #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_vnfd.yml"))
-            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\NSD.yaml"))
-            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\VNFD.yaml"))
+            nsd=yaml.load(open(r"NSD.yaml"))
+            vnfd=yaml.load(open(r"VNFD.yaml"))
             
         record_nsd = self.db_descriptors.source_nsd
         id_nsd = record_nsd.insert_one(nsd).inserted_id
@@ -1342,16 +1342,24 @@ class transformation():
         Returns
         -------
         pandas.DataFrame
-            returns a subset dataframe
-            
+        returns a subset dataframe
+        
         '''        
         vdu_name = df[df['key'].isin(['id']) & (df['parent_key'] == 'vdu')].copy()
         vdu_name[['parent_key','parent_level','level']] = ['interface',4,5]
         vdu_name['key'] = 'internal-connection-point-ref'
+        vdu_name['temp'] = vdu_name['value'].astype('category').cat.codes
+        vdu_name['lineage'] = vdu_name.apply(lambda x : '|'.join(x['lineage'].split('|')[:-1]) + '|' + str(x['temp']),axis=1)
+        vdu_name.drop(['temp'],axis=1,inplace=True)
 
         ext_conn_pts = df[(df['key'] =='external-connection-point-ref') & (df['parent_key'] == 'interface')].copy()
         ext_conn_pts['lineage'] = ext_conn_pts.apply(lambda x : ('|').join(x['lineage'].split('|')[:-2]),axis=1)
-            
+        ext_conn_pts['temp'] = ext_conn_pts['value'].astype('category').cat.codes
+        ext_conn_pts['lineage'] = ext_conn_pts.apply(lambda x : '|'.join(x['lineage'].split('|')[:-1]) + '|' + str(x['temp']),axis=1)
+        ext_conn_pts.drop(['temp'],axis=1,inplace=True)
+
+
+
         ext_conn_pts_typ=ext_conn_pts.copy()
         ext_conn_pts_typ['key'] = 'type'
         ext_conn_pts_typ['value'] = ext_conn_pts_typ['value'].apply(lambda x : 'E-LAN' if 'mgmt' in x else 'E-Line')
@@ -1369,6 +1377,9 @@ class transformation():
             int_conn_pts = int_conn_pts[~int_conn_pts['lineage'].isin(list(int_conn_pts_vdu['lineage'].values))]
 
         int_conn_pts['lineage'] = int_conn_pts.apply(lambda x : ('|').join(x['lineage'].split('|')[:-2]),axis=1)
+        int_conn_pts['temp'] = int_conn_pts['value'].astype('category').cat.codes
+        int_conn_pts['lineage'] = int_conn_pts.apply(lambda x : '|'.join(x['lineage'].split('|')[:-1]) + '|' + str(x['temp']),axis=1)
+        int_conn_pts.drop(['temp'],axis=1,inplace=True)
 
         ext_int_conn_pts_merge = pd.merge(vdu_name[['key','value','lineage']],
                          int_conn_pts[['value','lineage']],on=['lineage'],how='inner',
@@ -1382,7 +1393,7 @@ class transformation():
         ext_conn_pts.loc[ext_conn_pts.index,'lineage']  = int_conn_pts['lineage'].unique()
 
         if len(int_conn_pts_vdu) > 0 :     
-            lineage_number = len(vdu_name)
+            lineage_number = len(int_conn_pts['lineage'].unique())
             int_conn_pts_vdu['vdu_name']=int_conn_pts_vdu['value'].apply(lambda x : x.split('-')[0])
             int_conn_pts_vdu['lineage'] = int_conn_pts_vdu.apply(lambda x : ('|').join(x['lineage'].split('|')[:-3]) +'|'+ str(lineage_number),axis=1)
             int_conn_pts_vdu.loc[int_conn_pts_vdu.index,'value']= int_conn_pts_vdu.apply(lambda x : x.vdu_name + ':' + x.value,axis=1).values
@@ -1397,7 +1408,7 @@ class transformation():
             temp['key'] = 'type'
             temp['value'] = 'ELAN'
             int_conn_pts_vdu= int_conn_pts_vdu.append(temp)
-            
+
 
         vl_conn_pts= ext_conn_pts.append(ext_conn_pts_typ.append(ext_conn_pts_id.append(int_conn_pts.append(int_conn_pts_vdu))))
         vl_conn_pts['parent_key']='internal-vld'
@@ -1410,7 +1421,7 @@ class transformation():
         vl_conn_pts.loc[vl_conn_pts['key']=='internal-connection-point-ref','key']= 'internal-connection-point'
         vl_conn_pts.reset_index(drop=True,inplace=True)
         vl_conn_pts.drop(vl_conn_pts[vl_conn_pts['key'].isin(['external-connection-point-ref'])].index,inplace=True,axis=0)
-
+        
         return vl_conn_pts
 
     def son_fwdg_nsd(self,df, column1='value',column2='key', sep=':'):

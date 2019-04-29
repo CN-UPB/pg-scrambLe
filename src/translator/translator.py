@@ -17,15 +17,15 @@ class TranslatorService():
     name = "translator_service"
     
     @rpc
-	@app.route('/translator', methods = ['POST', 'GET'] )
-    def hello(self=None):
-		descriptor = request.values.get('descriptor')
-        received_param = request.values.get('param')
+    #@app.route('/translator', methods = ['POST'] )
+    def hello(self,name):
+    #descriptor = request.values.get('descriptor')
+        received_param = name#request.values.get('param')
         client = pymongo.MongoClient("mongodb://mongo:27017")
         set = setup(client)
         var = check_parameters(received_param)
         return var
-	
+    
 def check_parameters(received_param):
 
     client = pymongo.MongoClient("mongodb://mongo:27017")
@@ -57,12 +57,14 @@ def toSonata(received_file):
 
     client = pymongo.MongoClient("mongodb://mongo:27017")
     setup_obj = setup(client)
+    validate_obj = validator()
     
     if 'vnfd:vnfd-catalog' in received_file:
     
         doc = setup_obj.db_descriptors["translated_vnfd"]
         translated = setup_obj.translate_to_sonata_vnfd(received_file)
-        check= sonata_vnfd_validate(translated)
+        
+        check= validate_obj.sonata_vnfd_validate(translated)
         
         if check == "True":
             temp = doc.insert_one(translated)
@@ -74,7 +76,7 @@ def toSonata(received_file):
     
         doc = setup_obj.db_descriptors["translated_nsd"]
         translated = setup_obj.translate_to_sonata_nsd(received_file)
-        check= sonata_nsd_validate(translated)
+        check= validate_obj.sonata_nsd_validate(translated)
         
         if check == "True":
             temp = doc.insert_one(translated)
@@ -86,16 +88,17 @@ def toOsm(received_file):
 
     client = pymongo.MongoClient("mongodb://mongo:27017")
     setup_obj = setup(client)
+    validate_obj = validator()
     
     if 'network_functions' in received_file:
     
         doc = setup_obj.db_descriptors["translated_nsd"]
         translated = setup_obj.translate_to_osm_nsd(received_file)
-        check= osm_validator(translated)
+        check= validate_obj.osm_validator(translated)
         
-		if check == "True":
-        temp = doc.insert_one(translated)
-        translated_ref = temp.inserted_id
+        if check == "True":
+            temp = doc.insert_one(translated)
+            translated_ref = temp.inserted_id
         
         return translated
         
@@ -103,15 +106,15 @@ def toOsm(received_file):
     
         doc = setup_obj.db_descriptors["translated_vnfd"]
         translated = setup_obj.translate_to_osm_vnfd(received_file)
-        check= osm_validator(translated)
+        check= validate_obj.osm_validator(translated)
         
-		if check == "True":
-        temp = doc.insert_one(translated)
-        translated_ref = temp.inserted_id
+        if check == "True":
+            temp = doc.insert_one(translated)
+            translated_ref = temp.inserted_id
         
         return translated
-		
-if __name__ == '__main__':
-    app.debug = True
-    app.run()
-    app.run(debug=True)
+        
+#if __name__ == '__main__':
+#    app.debug = True
+#    app.run()
+#    app.run(debug=True)

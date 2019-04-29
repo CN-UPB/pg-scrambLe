@@ -21,6 +21,11 @@ COPY utilities.py ./
 COPY descriptorReader.py ./
 COPY descriptorWriter.py ./
 COPY validate.py ./
+COPY until.py ./
+COPY event.py ./
+COPY storage.py ./
+COPY osmdata.py ./
+COPY eventcfg.yml ./
 
 COPY ./descriptors_examples/hackfest_multivdu_nsd.yaml ./
 COPY ./descriptors_examples/NSD.yaml ./
@@ -32,6 +37,8 @@ COPY ./tng-schema/Nsd/nsd-schema.yml ./
 COPY ./tng-schema/Vnfd/vnfd-schema.yml ./
 COPY ./tng-schema/Nsd/nsd-pishahang.yml ./
 COPY ./tng-schema/Vnfd/vnfd-pishahang.yml ./
+COPY ./tng-schema/Vnfd/osm-vnfd-schema.json ./
+COPY ./tng-schema/Nsd/osm-schema-nsd.json ./
 
 RUN chmod +x ./start.sh
 

@@ -4,3 +4,7 @@ numpy
 pymongo
 watchdog
 jsonschema
+pyangbind
+networkx
+validators
+flask

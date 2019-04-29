@@ -10,14 +10,15 @@ class GatewayService:
     mainengine_rpc = RpcProxy('mainengine_service')
     adaptor_rpc = RpcProxy('adaptor_service')
 
-    @http('GET', 'POST','/translator/hello/<string:name>')
-    def get_hello_translator(self, request, name):
+    @http('GET','/translator/hello/<string:name>')
+    def get_hello_translator(self, request,name):
         message = self.mainengine_rpc.hello_translator(name)
         return json.dumps({'message': message})
 
-    @http('GET', '/splitter/hello/<string:name>')
-    def get_hello_splitter(self, request, name):
-        message = self.mainengine_rpc.hello_splitter(name)
+    @http('POST', '/splitter/hello')
+    def get_hello_splitter(self, request):
+        #message = self.mainengine_rpc.hello_splitter(name)
+		message = request.form["descriptor"]
         return json.dumps({'message': message})
 
     @http('GET', '/adaptor/hello/<string:name>')
