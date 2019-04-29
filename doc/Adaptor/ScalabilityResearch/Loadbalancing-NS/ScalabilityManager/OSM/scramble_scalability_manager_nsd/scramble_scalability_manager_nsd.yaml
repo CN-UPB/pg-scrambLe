@@ -1,0 +1,25 @@
+nsd:nsd-catalog:
+    nsd:
+    -   constituent-vnfd:
+        -   member-vnf-index: 1
+            vnfd-id-ref: scramble-scalability-manager
+
+        description: NS for Scalability Management
+        id: scramble_scalability_manager_ns
+
+        logo: osm_2x.png
+        name: scramble_scalability_manager_ns
+        short-name: PGS-Scalability-Manager
+        vendor: T3-SCrAMbLE
+        version: '1.0'
+        vld:
+        -   id: mgmtnet
+            mgmt-network: 'true'
+            name: mgmtnet
+            short-name: mgmtnet
+            type: ELAN
+            vim-network-name: mgmt
+            vnfd-connection-point-ref:
+            -   member-vnf-index-ref: 1
+                vnfd-connection-point-ref: eth0
+                vnfd-id-ref: scramble-scalability-manager

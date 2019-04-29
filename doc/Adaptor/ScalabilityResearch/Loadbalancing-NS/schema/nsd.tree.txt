@@ -1,0 +1,214 @@
+module: nsd
+  +--rw nsd-catalog
+     +--rw schema-version?   string
+     +--rw nsd* [id]
+        +--rw id                             string
+        +--rw name                           string
+        +--rw short-name?                    string
+        +--rw vendor?                        string
+        +--rw logo?                          string
+        +--rw description?                   string
+        +--rw version?                       string
+        +--rw connection-point* [name]
+        |  +--rw name                               string
+        |  +--rw floating-ip-required?              boolean
+        |  +--rw type?                              manotypes:connection-point-type
+        |  +--rw (connection)?
+        |     +--:(vld-ref)
+        |     |  +--rw vld-id-ref?                  -> ../../vld/id
+        |     +--:(vnfd-connection-point-ref)
+        |        +--rw member-vnf-index-ref?        -> ../../constituent-vnfd/member-vnf-index
+        |        +--rw vnfd-id-ref?                 -> ../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        |        +--rw vnfd-connection-point-ref?   -> /vnfd:vnfd-catalog/vnfd[vnfd:id = current()/../vnfd-id-ref]/connection-point/name
+        +--rw scaling-group-descriptor* [name]
+        |  +--rw name                     string
+        |  +--rw scaling-policy* [name]
+        |  |  +--rw name                        string
+        |  |  +--rw scaling-type?               manotypes:scaling-policy-type
+        |  |  +--rw enabled?                    boolean
+        |  |  +--rw scale-in-operation-type?    manotypes:scaling-criteria-operation
+        |  |  +--rw scale-out-operation-type?   manotypes:scaling-criteria-operation
+        |  |  +--rw threshold-time              uint32
+        |  |  +--rw cooldown-time               uint32
+        |  |  +--rw scaling-criteria* [name]
+        |  |     +--rw name                              string
+        |  |     +--rw scale-in-threshold?               uint64
+        |  |     +--rw scale-in-relational-operation?    manotypes:relational-operation-type
+        |  |     +--rw scale-out-threshold?              uint64
+        |  |     +--rw scale-out-relational-operation?   manotypes:relational-operation-type
+        |  |     +--rw ns-monitoring-param-ref?          -> ../../../../monitoring-param/id
+        |  +--rw vnfd-member* [member-vnf-index-ref]
+        |  |  +--rw member-vnf-index-ref    -> ../../../constituent-vnfd/member-vnf-index
+        |  |  +--rw count?                  uint32
+        |  +--rw min-instance-count?      uint32
+        |  +--rw max-instance-count?      uint32
+        |  +--rw scaling-config-action* [trigger]
+        |     +--rw trigger                          manotypes:scaling-trigger
+        |     +--rw ns-service-primitive-name-ref?   -> ../../../service-primitive/name
+        +--rw vnffgd* [id]
+        |  +--rw id             string
+        |  +--rw name?          string
+        |  +--rw short-name?    string
+        |  +--rw vendor?        string
+        |  +--rw description?   string
+        |  +--rw version?       string
+        |  +--rw rsp* [id]
+        |  |  +--rw id                           string
+        |  |  +--rw name?                        string
+        |  |  +--rw vnfd-connection-point-ref* [member-vnf-index-ref]
+        |  |     +--rw member-vnf-index-ref                 -> ../../../../constituent-vnfd/member-vnf-index
+        |  |     +--rw order?                               uint8
+        |  |     +--rw vnfd-id-ref?                         -> ../../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        |  |     +--rw vnfd-ingress-connection-point-ref?   string
+        |  |     +--rw vnfd-egress-connection-point-ref?    string
+        |  +--rw classifier* [id]
+        |     +--rw id                           string
+        |     +--rw name?                        string
+        |     +--rw rsp-id-ref?                  -> ../../rsp/id
+        |     +--rw match-attributes* [id]
+        |     |  +--rw id                        string
+        |     |  +--rw ip-proto?                 uint8
+        |     |  +--rw source-ip-address?        inet:ip-address
+        |     |  +--rw destination-ip-address?   inet:ip-address
+        |     |  +--rw source-port?              inet:port-number
+        |     |  +--rw destination-port?         inet:port-number
+        |     +--rw member-vnf-index-ref?        -> ../../../constituent-vnfd/member-vnf-index
+        |     +--rw vnfd-id-ref?                 -> ../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        |     +--rw vnfd-connection-point-ref?   string
+        +--rw ip-profiles* [name]
+        |  +--rw name                 string
+        |  +--rw description?         string
+        |  +--rw ip-profile-params
+        |     +--rw ip-version?           inet:ip-version
+        |     +--rw subnet-address?       inet:ip-prefix
+        |     +--rw gateway-address?      inet:ip-address
+        |     +--rw security-group?       string
+        |     +--rw dns-server* [address]
+        |     |  +--rw address    inet:ip-address
+        |     +--rw dhcp-params
+        |     |  +--rw enabled?         boolean
+        |     |  +--rw start-address?   inet:ip-address
+        |     |  +--rw count?           uint32
+        |     +--rw subnet-prefix-pool?   string
+        +--rw initial-service-primitive* [seq]
+        |  +--rw seq                    uint64
+        |  +--rw name                   string
+        |  +--rw user-defined-script?   string
+        |  +--rw parameter* [name]
+        |     +--rw name     string
+        |     +--rw value?   string
+        +--rw terminate-service-primitive* [seq]
+        |  +--rw seq                    uint64
+        |  +--rw name                   string
+        |  +--rw user-defined-script?   string
+        |  +--rw parameter* [name]
+        |     +--rw name     string
+        |     +--rw value?   string
+        +--rw input-parameter-xpath* [xpath]
+        |  +--rw xpath            string
+        |  +--rw label?           string
+        |  +--rw default-value?   string
+        +--rw parameter-pool* [name]
+        |  +--rw name     string
+        |  +--rw range
+        |     +--rw start-value    uint32
+        |     +--rw end-value      uint32
+        +--rw key-pair* [name]
+        |  +--rw name    string
+        |  +--rw key?    string
+        +--rw user* [name]
+        |  +--rw name         string
+        |  +--rw user-info?   string
+        |  +--rw key-pair* [name]
+        |     +--rw name    string
+        |     +--rw key?    string
+        +--rw vld* [id]
+        |  +--rw id                           string
+        |  +--rw name?                        string
+        |  +--rw short-name?                  string
+        |  +--rw vendor?                      string
+        |  +--rw description?                 string
+        |  +--rw version?                     string
+        |  +--rw type?                        manotypes:virtual-link-type
+        |  +--rw root-bandwidth?              uint64
+        |  +--rw leaf-bandwidth?              uint64
+        |  +--rw provider-network
+        |  |  +--rw physical-network?   string
+        |  |  +--rw segmentation_id?    uint32
+        |  +--rw mgmt-network?                boolean
+        |  +--rw (init-params)?
+        |  |  +--:(vim-network-ref)
+        |  |  |  +--rw vim-network-name?      string
+        |  |  +--:(vim-network-profile)
+        |  |     +--rw ip-profile-ref?        -> ../../ip-profiles/name
+        |  +--rw vnfd-connection-point-ref* [member-vnf-index-ref vnfd-connection-point-ref]
+        |     +--rw member-vnf-index-ref         -> ../../../constituent-vnfd/member-vnf-index
+        |     +--rw vnfd-connection-point-ref    -> /vnfd:vnfd-catalog/vnfd[vnfd:id = current()/../vnfd-id-ref]/connection-point/name
+        |     +--rw vnfd-id-ref?                 -> ../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        |     +--rw ip-address?                  inet:ip-address
+        +--rw constituent-vnfd* [member-vnf-index]
+        |  +--rw member-vnf-index    string
+        |  +--rw vnfd-id-ref?        -> /vnfd:vnfd-catalog/vnfd/id
+        |  +--rw start-by-default?   boolean
+        +--rw placement-groups* [name]
+        |  +--rw name           string
+        |  +--rw requirement?   string
+        |  +--rw strategy?      enumeration
+        |  +--rw member-vnfd* [member-vnf-index-ref]
+        |     +--rw member-vnf-index-ref    -> ../../../constituent-vnfd/member-vnf-index
+        |     +--rw vnfd-id-ref?            -> ../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        +--rw vnf-dependency* [vnf-source-ref]
+        |  +--rw vnf-source-ref        -> /vnfd:vnfd-catalog/vnfd/id
+        |  +--rw vnf-depends-on-ref?   -> /vnfd:vnfd-catalog/vnfd/id
+        +--rw monitoring-param* [id]
+        |  +--rw id                       string
+        |  +--rw name?                    string
+        |  +--rw value-type?              param-value-type
+        |  +--rw numeric-constraints
+        |  |  +--rw min-value?   uint64
+        |  |  +--rw max-value?   uint64
+        |  +--rw text-constraints
+        |  |  +--rw min-length?   uint8
+        |  |  +--rw max-length?   uint8
+        |  +--rw value-integer?           int64
+        |  +--rw value-decimal?           decimal64
+        |  +--rw value-string?            string
+        |  +--rw description?             string
+        |  +--rw group-tag?               string
+        |  +--rw widget-type?             manotypes:widget-type
+        |  +--rw units?                   string
+        |  +--rw aggregation-type?        aggregation-type
+        |  +--rw vnfd-monitoring-param* [member-vnf-index-ref vnfd-monitoring-param-ref]
+        |     +--rw vnfd-id-ref?                 -> ../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+        |     +--rw vnfd-monitoring-param-ref    -> /vnfd:vnfd-catalog/vnfd[vnfd:id = current()/../vnfd-id-ref]/monitoring-param/id
+        |     +--rw member-vnf-index-ref         -> ../../../constituent-vnfd/member-vnf-index
+        +--rw service-primitive* [name]
+           +--rw name                   string
+           +--rw parameter* [name]
+           |  +--rw name              string
+           |  +--rw data-type?        manotypes:parameter-data-type
+           |  +--rw mandatory?        boolean
+           |  +--rw default-value?    string
+           |  +--rw parameter-pool?   string
+           |  +--rw read-only?        boolean
+           |  +--rw hidden?           boolean
+           +--rw parameter-group* [name]
+           |  +--rw name         string
+           |  +--rw parameter* [name]
+           |  |  +--rw name              string
+           |  |  +--rw data-type?        manotypes:parameter-data-type
+           |  |  +--rw mandatory?        boolean
+           |  |  +--rw default-value?    string
+           |  |  +--rw parameter-pool?   string
+           |  |  +--rw read-only?        boolean
+           |  |  +--rw hidden?           boolean
+           |  +--rw mandatory?   boolean
+           +--rw vnf-primitive-group* [member-vnf-index-ref]
+           |  +--rw member-vnf-index-ref    -> ../../../constituent-vnfd/member-vnf-index
+           |  +--rw vnfd-id-ref?            -> ../../../constituent-vnfd[member-vnf-index = current()/../member-vnf-index-ref]/vnfd-id-ref
+           |  +--rw vnfd-name?              -> /vnfd:vnfd-catalog/vnfd[vnfd:id = current()/../vnfd-id-ref]/name
+           |  +--rw primitive* [index]
+           |     +--rw index    uint32
+           |     +--rw name?    string
+           +--rw user-defined-script?   string
+

@@ -1,0 +1,46 @@
+% This file defines the title page of your thesis. You typically do not need to
+% edit it. It is language sensitive and prints arguments passed to commands
+% \author, \title, \thesistype, \degree, \researchgroup, \supervisor and
+% \submissiondate, where required.
+
+\begin{titlepage}	
+	\begin{center}
+		\begin{minipage}{135mm}
+			\centering
+			\hbadness=10000
+			\includegraphics[height=35mm]{figures/uni-logo}			
+			\textsf{
+				\hspace*{8mm} 
+				\Large Department of Computer Science\\
+				\hspace*{8mm} Computer Networks Research Group \\
+			}		
+		\end{minipage}\\[40pt]
+		
+		
+		
+
+		{\Huge\textbf{\thetitle{}}}
+
+	\begin{minipage}{3000mm}
+	\hspace*{-1.3cm} 
+	\includegraphics[height=30mm]{figures/CuK-Logo2_rot}
+\end{minipage}\\[10pt]
+
+\begin{minipage}{3000mm}
+	\hspace*{-1cm} 
+	\includegraphics[height=13.5mm]{figures/subtitle}
+\end{minipage}\\[10pt]
+
+		\huge \centering \textbf{Authors:} \vspace{4mm}
+	
+		{\Huge \textsc {\theauthor{}}}
+
+		\ \textbf{Supervisors:}\vspace{3mm}\\ 
+		
+		{\Huge \thesupervisor{}}\\[30pt]
+
+		Paderborn, \thesubmissiondate{}
+	\end{center}
+\end{titlepage}
+\let\cleardoublepage\clearpage
+

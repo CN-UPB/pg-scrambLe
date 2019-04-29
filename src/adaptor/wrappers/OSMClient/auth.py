@@ -4,6 +4,9 @@ import requests
 
 
 class Auth(CommonInterfaceAuth):
+    """
+    Auth
+    """
 
     def __init__(self, host, port=9999):
         self._host = host
@@ -12,6 +15,25 @@ class Auth(CommonInterfaceAuth):
         self._user_endpoint = '{0}/admin/v1/users'
 
     def auth(self, username, password, host=None, port=None):
+        """ Authorization API
+
+        POST method which returns an 
+        authorization token to be used by other calls. 
+
+        :param username: username for login
+        :param password: password for login
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                osm_c = OSMClient.Auth(HOST_URL)
+                response = json.loads(osm_c.auth(
+                                    username=USERNAME, 
+                                    password=PASSWORD))
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:

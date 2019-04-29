@@ -17,7 +17,7 @@ def test_post_ns_descriptors(post_ns_descriptors_keys):
     Helpers._delete_test_nsd(_token=_token["token"]["access_token"])
 
     sonata_vnfpkgm.post_vnf_packages(token=_token["token"]["access_token"],
-	package_path="tests/samples/vnfd_example.yml")
+	                    package_path="tests/samples/vnfd_example.yml")
 
     response = json.loads(sonata_nsd.post_ns_descriptors(
                         token=_token["token"]["access_token"],
@@ -58,8 +58,9 @@ def test_get_ns_descriptors_nsdinfoid():
         if "sonata-demo" == _n['nsd']['name']:
             _nsd = _n['uuid']
 
-    response = json.loads(sonata_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"]))
+    response = json.loads(sonata_nsd.get_ns_descriptors_nsdinfoid(
+                        token=_token["token"]["access_token"], nsdinfoid=_nsd))
+
     Helpers._delete_test_nsd(_token=_token["token"]["access_token"])
     if response["error"]:
         return True
@@ -86,7 +87,8 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
  
     time.sleep(10) # Wait for NSD onboarding
     response = json.loads(sonata_nsd.delete_ns_descriptors_nsdinfoid(
-                        token=_token["token"]["access_token"], id=_nsd))
+                        token=_token["token"]["access_token"],
+                        nsdinfoid=_nsd))
     assert isinstance(response, dict)
     assert response["data"] == "{\"error\":\"The NSD ID None does not exist\"}"
     
@@ -104,6 +106,6 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
     response = None
     if _vnfd:
         response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(
-                        token=_token["token"]["access_token"], id=_vnfd))
+                        token=_token["token"]["access_token"], vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
