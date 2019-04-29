@@ -1,17 +1,406 @@
 from __future__ import print_function
 import json
-import yaml
 import sys
-import getopt
-import osm_im.vnfd as vnfd_catalog
-import osm_im.nsd as nsd_catalog
+from osmdata import vnfd as vnfd_catalog
+from osmdata import nsd as nsd_catalog
 from pyangbind.lib.serialise import pybindJSONDecoder
-from jsonschema import *
-import pprint
 import os
-import pymongo
-from utilities import setup
+import logging
+import uuid
+from jsonschema import *
+import networkx as nx
+import errno
+import yaml
+import event
+from storage import DescriptorStorage
+from until import read_descriptor_files, list_files, strip_root, build_descriptor_id
+import pprint
+import time
 
+log = logging.getLogger(__name__)
+evtlog = event.get_logger('validator.events')
+storage = DescriptorStorage()
+
+
+def osm_validator(descriptor):
+    if 'nsd:nsd-catalog' in descriptor:
+        descriptor_to_validate = descriptor
+        with open(r"tng-schema\nsd\osm_schema_nsd.json") as f:
+            schema = json.load(f)
+        v = Draft4Validator(schema, format_checker=FormatChecker())
+        lastidx = 0
+        for idx, err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
+            print("\t{0}. {1}\n".format(idx, pprint.pformat(err.path)))
+        osm_dep_validator(descriptor_to_validate)
+        if lastidx == 0:
+            return True
+
+    elif 'vnfd:vnfd-catalog' in descriptor:
+        descriptor_to_validate = descriptor
+        with open("tng-schema\vnfd\osm_vnfd_schema.json", "r") as f:
+            schema = json.load(f)
+        v = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+        osm_dep_validator(descriptor_to_validate)
+        if lastidx == 0:
+            return True
+    else:
+        print("This is not a valid OSM descriptor")
+
+
+def sonata_nsd_validate(descriptor, vnfd = None):
+    if 'network_functions' and "descriptor_version" in descriptor:
+        descriptor_to_validate = descriptor
+        with open("tng-schema\nsd\nsd-Pishahang.yml", "r") as f:
+            schema = yaml.load(f)
+        v = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+        if lastidx == 0:
+            return True
+
+    elif "network_functions" in descriptor:
+        service = storage.create_service(descriptor)
+        if not service:
+            evtlog.log("Invalid service descriptor",
+                       "Failed to read the service descriptor of file '{}'"
+                       .format(descriptor),
+                       descriptor,
+                       'evt_service_invalid_descriptor')
+            return
+        validate_service_syntax(descriptor)
+        if not vnfd:
+            print("service integrity is not validated as there is no vnfd")
+        elif vnfd != {}:
+            validate_service_integrity(service, vnfd)
+        return True
+    else:
+        print("This is not a valid sonata or Pishahang descriptor")
+
+
+def sonata_vnfd_validate(descriptor):
+    if "virtual_deployment_units" and "descriptor_version" in descriptor:
+        descriptor_to_validate = descriptor
+        with open("tng-schema\vnfd\vnfd-pishahang", "r") as f:
+            schema = yaml.load(f)
+        v = Draft4Validator(schema , format_checker=FormatChecker())
+        lastidx = 0
+        for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+            lastidx = idx
+            if idx == 1:
+                print("\tSCHEMA ERRORS:")
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+            print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+        if lastidx == 0:
+            return True
+    elif "virtual_deployment_units" in descriptor:
+        func = storage.create_function(descriptor)
+        if not func:
+            evtlog.log("Invalid function descriptor",
+                       "Couldn't store VNF of file '{0}'".format(descriptor),
+                       descriptor,
+                       'evt_function_invalid_descriptor')
+            return
+
+        validate_function_syntax(descriptor)
+        validate_function_integrity(func)
+        validate_function_topology(func)
+        return True
+    else:
+        print("This is not a valid sonata or Pishahang descriptor")
+
+
+def validate_service_syntax(descriptor):
+    descriptor_to_validate = descriptor
+    with open("tng-schema\nsd\nsd-schema.yml", 'r') as f:
+        schema = yaml.load(f)
+    validator = Draft4Validator(schema, format_checker=FormatChecker())
+    lastidx = 0
+    for idx, err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+        lastidx = idx
+        if idx == 1:
+            print("\tSCHEMA ERRORS:")
+        print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
+        print("\t{0}. {1}\n".format(idx, pprint.pformat(err.path)))
+    if lastidx == 0:
+        print("NSD syntax validated")
+        return True
+
+
+def validate_function_syntax(descriptor):
+    descriptor_to_validate = descriptor
+    with open("tng-schema\vnfd\vnfd-schema.yml", 'r') as f:
+        schema = yaml.load(f)
+    validator = Draft4Validator(schema , format_checker=FormatChecker())
+    lastidx = 0
+    for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
+        lastidx = idx
+        if idx == 1:
+            print("\tSCHEMA ERRORS:")
+        print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+        print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+    if lastidx == 0:
+        print("VNFD syntax validated")
+        return True
+
+
+def validate_service_integrity(service, vnfd):
+        # get referenced function descriptors (VNFDs)
+    if not load_service_functions(service, vnfd):
+        evtlog.log("Function not available",
+                   "Failed to read service function descriptors",
+                   service.id,
+                   'evt_nsd_itg_function_unavailable')
+        return
+
+    # validate service function descriptors (VNFDs)
+    for fid, f in service.functions.items():
+        if not sonata_vnfd_validate(f.filename):
+            evtlog.log("Invalid function",
+                       "Failed to validate function descriptor '{0}'"
+                       .format(f.filename),
+                       service.id,
+                       'evt_nsd_itg_function_invalid')
+            return
+
+    # load service connection points
+    if not service.load_connection_points():
+        evtlog.log("Bad section 'connection_points'",
+                   "Couldn't load the connection points of "
+                   "service id='{0}'"
+                   .format(service.id),
+                   service.id,
+                   'evt_nsd_itg_badsection_cpoints')
+        return
+
+    # load service links
+    if not service.load_virtual_links():
+        evtlog.log("Bad section 'virtual_links'",
+                   "Couldn't load virtual links of service id='{0}'"
+                   .format(service.id),
+                   service.id,
+                   'evt_nsd_itg_badsection_vlinks')
+        return
+
+    undeclared = service.undeclared_connection_points()
+    if undeclared:
+        for cxpoint in undeclared:
+            evtlog.log("{0} Undeclared connection point(s)"
+                       .format(len(undeclared)),
+                       "Virtual links section has undeclared connection "
+                       "point: {0}".format(cxpoint),
+                       service.id,
+                       'evt_nsd_itg_undeclared_cpoint')
+        return
+
+    # check for unused connection points
+    unused_ifaces = service.unused_connection_points()
+    if unused_ifaces:
+        for cxpoint in unused_ifaces:
+            evtlog.log("{0} Unused connection point(s)"
+                       .format(len(unused_ifaces)),
+                       "Unused connection point: {0}"
+                       .format(cxpoint),
+                       service.id,
+                       'evt_nsd_itg_unused_cpoint')
+
+    # verify integrity between vnf_ids and vlinks
+    for vl_id, vl in service.vlinks.items():
+        for cpr in vl.connection_point_refs:
+            s_cpr = cpr.split(':')
+            if len(s_cpr) == 1 and cpr not in service.connection_points:
+                evtlog.log("Undefined connection point",
+                           "Connection point '{0}' in virtual link "
+                           "'{1}' is not defined"
+                           .format(cpr, vl_id),
+                           service.id,
+                           'evt_nsd_itg_undefined_cpoint')
+                return
+            elif len(s_cpr) == 2:
+                func = service.mapped_function(s_cpr[0])
+                if not func or s_cpr[1] not in func.connection_points:
+                    evtlog.log("Undefined connection point",
+                               "Function (VNF) of vnf_id='{0}' declared "
+                               "in connection point '{0}' in virtual link "
+                               "'{1}' is not defined"
+                               .format(s_cpr[0], s_cpr[1], vl_id),
+                               service.id,
+                               'evt_nsd_itg_undefined_cpoint')
+                    return
+    print("NSD integrity validated")
+    return True
+
+
+def validate_function_integrity(func):
+    if not func.load_connection_points():
+        evtlog.log("Missing 'connection_points'",
+                   "Couldn't load the connection points of "
+                   "function id='{0}'"
+                   .format(func.id),
+                   func.id,
+                   'evt_vnfd_itg_badsection_cpoints')
+        return
+
+    if not func.load_units():
+        evtlog.log("Missing 'virtual_deployment_units'",
+                   "Couldn't load the units of function id='{0}'"
+                   .format(func.id),
+                   func.id,
+                   'evt_vnfd_itg_badsection_vdus')
+        return
+
+    if not func.load_unit_connection_points():
+        evtlog.log("Bad section 'connection_points'",
+                   "Couldn't load VDU connection points of "
+                   "function id='{0}'"
+                   .format(func.id),
+                   func.id,
+                   'evt_vnfd_itg_vdu_badsection_cpoints')
+        return
+
+    # load function links
+    if not func.load_virtual_links():
+        evtlog.log("Bad section 'virtual_links'",
+                   "Couldn't load the links of function id='{0}'"
+                   .format(func.id),
+                   func.id,
+                   'evt_vnfd_itg_badsection_vlinks')
+        return
+
+    # check for undeclared connection points
+    undeclared = func.undeclared_connection_points()
+    if undeclared:
+        for cxpoint in undeclared:
+            evtlog.log("{0} Undeclared connection point(s)"
+                       .format(len(undeclared)),
+                       "Virtual links section has undeclared connection "
+                       "points: {0}".format(cxpoint),
+                       func.id,
+                       'evt_vnfd_itg_undeclared_cpoint')
+        return
+
+    # check for unused connection points
+    unused_ifaces = func.unused_connection_points()
+    if unused_ifaces:
+        for cxpoint in unused_ifaces:
+            evtlog.log("{0} Unused connection point(s)"
+                       .format(len(unused_ifaces)),
+                       "Function has unused connection points: {0}"
+                       .format(cxpoint),
+                       func.id,
+                       'evt_vnfd_itg_unused_cpoint')
+
+    # verify integrity between unit connection points and units
+    for vl_id, vl in func.vlinks.items():
+        for cpr in vl.connection_point_refs:
+            s_cpr = cpr.split(':')
+            if len(s_cpr) == 1 and cpr not in func.connection_points:
+                evtlog.log("Undefined connection point",
+                           "Connection point '{0}' in virtual link "
+                           "'{1}' is not defined"
+                           .format(cpr, vl_id),
+                           func.id,
+                           'evt_nsd_itg_undefined_cpoint')
+                return
+            elif len(s_cpr) == 2:
+                unit = func.units[s_cpr[0]]
+                if not unit or s_cpr[1] not in unit.connection_points:
+                    evtlog.log("Undefined connection point(s)",
+                               "Invalid connection point id='{0}' "
+                               "of virtual link id='{1}': Unit id='{2}' "
+                               "is not defined"
+                               .format(s_cpr[1], vl_id, s_cpr[0]),
+                               func.id,
+                               'evt_vnfd_itg_undefined_cpoint')
+                    return
+    print("VNFD integrity validated")
+    return True
+
+
+def validate_function_topology(func):
+    log.info("Validating topology of function '{0}'"
+                 .format(func.id))
+    func.graph = func.build_topology_graph(bridges=True)
+    if not func.graph:
+        evtlog.log("Invalid topology graph",
+                       "Couldn't build topology graph of function '{0}'"
+                       .format(func.id),
+                       func.id,
+                       'evt_vnfd_top_topgraph_failed')
+        return
+
+    log.debug("Built topology graph of function '{0}': {1}"
+                  .format(func.id, func.graph.edges()))
+    print("VNFD topology validated")
+    return True
+
+
+def load_service_functions(service, vnfd):
+    # load all VNFDs
+    path_vnfs = read_descriptor_files(vnfd)
+    # check for errors
+    if 'network_functions' not in service.content:
+        log.error("Service doesn't have any functions. "
+                  "Missing 'network_functions' section.")
+        return
+
+    functions = service.content['network_functions']
+
+    # store function descriptors referenced in the service
+    for func in functions:
+        fid = build_descriptor_id(func['vnf_vendor'],
+                                  func['vnf_name'],
+                                  func['vnf_version'])
+        if fid not in path_vnfs.keys():
+            evtlog.log("VNF not found",
+                       "Referenced function descriptor id='{0}' couldn't "
+                       "be loaded".format(fid),
+                       service.id,
+                       'evt_nsd_itg_function_unavailable')
+            return
+
+        vnf_id = func['vnf_id']
+        new_func = storage.create_function(path_vnfs[fid])
+
+        service.associate_function(new_func, vnf_id)
+
+    return True
+
+
+def find_graph_cycles(graph, node, prev_node=None, backtrace=None):
+    if not backtrace:
+        backtrace = []
+        neighbors = graph.neighbors(node)
+
+        if prev_node:
+            neighbors.pop(neighbors.index(prev_node))
+        if not len(neighbors) > 0:
+            return None
+
+        if node in backtrace:
+            cycle = backtrace[backtrace.index(node):]
+            return cycle
+        backtrace.append(node)
+
+        for neighbor in neighbors:
+            return find_graph_cycles(graph, neighbor, prev_node=node, backtrace=backtrace)
+
+        return backtrace
 
 """
 Tests the format of OSM VNFD and NSD descriptors
@@ -45,21 +434,10 @@ def remove_prefix(desc, prefix):
                 remove_prefix(i, prefix)
 
 
-def osm_validator(descriptor):
+def osm_dep_validator(descriptor):
     input_file_name = descriptor
     try:
-        # Open files
-        file_name = input_file_name
-        with open(file_name, 'r') as f:
-            descriptor_str = f.read()
-        file_name = None
-
-        if input_file_name.endswith('.yaml') or input_file_name.endswith('.yml') or not \
-            (input_file_name.endswith('.json') or '\t' in descriptor_str):
-            data = yaml.load(descriptor_str)
-        else:   # json
-            data = json.loads(descriptor_str)
-
+        data = input_file_name
         if "vnfd:vnfd-catalog" in data or "vnfd-catalog" in data:
             descriptor = "VNF"
             # Check if mgmt-interface is defined:
@@ -87,172 +465,24 @@ def osm_validator(descriptor):
                         raise KeyError("'mgmt-iface': Deprecated 'vdu-id' field. Please, use 'cp' field instead")
             if not mgmt_iface:
                 raise KeyError("'mgmt-iface' is a mandatory field and it is not defined")
-            myvnfd = vnfd_catalog.vnfd()
+            myvnfd = vnfd_catalog()
             pybindJSONDecoder.load_ietf_json(data, None, None, obj=myvnfd)
             return True
         elif "nsd:nsd-catalog" in data or "nsd-catalog" in data:
             descriptor = "NS"
-            mynsd = nsd_catalog.nsd()
+            mynsd = nsd_catalog()
             pybindJSONDecoder.load_ietf_json(data, None, None, obj=mynsd)
             return True
         else:
             descriptor = None
             raise KeyError("This is not neither nsd-catalog nor vnfd-catalog descriptor")
 
-    except yaml.YAMLError as exc:
-        error_pos = ""
-        if hasattr(exc, 'problem_mark'):
-            mark = exc.problem_mark
-            error_pos = "at line:%s column:%s" % (mark.line + 1, mark.column + 1)
-        print("Error loading file '{}'. yaml format error {}".format(input_file_name, error_pos), file=sys.stderr)
-    except ArgumentParserError as e:
-        print(str(e), file=sys.stderr)
-    except IOError as e:
-            print("Error loading file '{}': {}".format(file_name, e), file=sys.stderr)
-    except ImportError as e:
-        print ("Package python-osm-im not installed: {}".format(e), file=sys.stderr)
     except Exception as e:
-        if file_name:
-            print("Error loading file '{}': {}".format(file_name, str(e)), file=sys.stderr)
+        if input_file_name:
+            print("Error loading file: {}".format(pprint.pformat(str(e))), file=sys.stderr)
         else:
             if descriptor:
                 print("Error. Invalid {} descriptor format in '{}': {}".format(descriptor, input_file_name, str(e)),
                       file=sys.stderr)
             else:
                 print("Error. Invalid descriptor format in '{}': {}".format(input_file_name, str(e)), file=sys.stderr)
-
-
-def sonata_nsd_validator(descriptor):
-    descriptor_to_validate = descriptor
-    if "descriptor_version" in descriptor_to_validate:
-        schema = yaml.load(open("tng-schema/Nsd/nsd-Pishahang.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-    else:
-        schema = yaml.load(open("tng-schema/Nsd/nsd-schema.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-
-
-def sonata_vnfd_validator(descriptor):
-    descriptor_to_validate = descriptor
-    if "descriptor_version" in descriptor_to_validate:
-        schema = yaml.load(open("tng-schema/Vnfd/vnfd-Pishahang.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-    else:
-        schema = yaml.load(open("tng-schema/Vnfd/vnfd-schema.yml"))
-        validator = Draft4Validator(schema , format_checker=FormatChecker())
-        lastidx = 0
-        for idx , err in enumerate(validator.iter_errors(descriptor_to_validate) , 1):
-            lastidx = idx
-            if idx == 1:
-                print("\tSCHEMA ERRORS:")
-            print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
-        if lastidx == 0:
-            return True
-
-def validate(source, translated):
-    received_file = source
-    translated_file = translated
-    if 'eu.5gtango' and 'virtual_deployment_units' in received_file:
-        var = setup.translate_to_sonata(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                    break
-        if value == "True":
-            format_check = sonata_vnfd_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-
-    elif 'descriptor_schema' and 'network_functions' in received_file:
-        var = setup.translate_to_sonata(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = sonata_vnfd_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-
-    elif 'osm' and 'constituent-vnfd' in received_file:
-        var = setup.translate_to_osm(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = osm_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-    elif 'osm' and 'management interface' in received_file:
-        var = setup.translate_to_osm(translated_file)
-        file1 = yaml.load(open("received_file"))
-        file2 = yaml.load(open("var"))
-        for line1 in file1:
-            for line2 in file2:
-                if line1 == line2:
-                    value = "True"
-                else:
-                    value = "false"
-                break
-        if value == "True":
-            format_check = osm_validator(translated_file)
-            if format_check == "True":
-                return True
-            else:
-                return False
-
-
-
-
-
-
-
-
-
-

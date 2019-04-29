@@ -20,11 +20,19 @@ COPY translator.py ./
 COPY utilities.py ./
 COPY descriptorReader.py ./
 COPY descriptorWriter.py ./
+COPY validate.py ./
 
+COPY ./descriptors_examples/hackfest_multivdu_nsd.yaml ./
+COPY ./descriptors_examples/NSD.yaml ./
 
-COPY hackfest_multivdu_nsd.yaml ./
-COPY sonata-demo.yml ./
+COPY ./descriptors_examples/hackfest_multivdu_vnfd.yaml ./
+COPY ./descriptors_examples/VNFD.yaml ./
+
+COPY ./tng-schema/Nsd/nsd-schema.yml ./
+COPY ./tng-schema/Vnfd/vnfd-schema.yml ./
+COPY ./tng-schema/Nsd/nsd-pishahang.yml ./
+COPY ./tng-schema/Vnfd/vnfd-pishahang.yml ./
 
 RUN chmod +x ./start.sh
 
-CMD ["./start.sh"]
+CMD watchmedo auto-restart --recursive --pattern="*.py" --directory="." /bin/bash start.sh

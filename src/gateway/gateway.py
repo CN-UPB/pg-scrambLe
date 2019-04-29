@@ -11,7 +11,7 @@ class GatewayService:
     mainengine_rpc = RpcProxy('mainengine_service')
     adaptor_rpc = RpcProxy('adaptor_service')
 
-    @http('GET', '/translator/hello/<string:name>')
+    @http('GET', 'POST','/translator/hello/<string:name>')
     def get_hello_translator(self, request, name):
         message = self.mainengine_rpc.hello_translator(name)
         return json.dumps({'message': message})

@@ -1,15 +1,15 @@
 nsd:nsd-catalog:
     nsd:
-    -   id: hackfest-simplecharm-ns
-        name: hackfest-simplecharm-ns
-        short-name: hackfest-simplecharm-ns
-        description: NS with 2 VNFs hackfest-simplecharm-vnf connected by datanet and mgmtnet VLs
+    -   id: hackfest2-ns
+        name: hackfest2-ns
+        short-name: hackfest2-ns
+        description: NS with 2 VNFs connected by datanet and mgmtnet VLs
         version: '1.0'
         logo: osm.png
         constituent-vnfd:
-        -   vnfd-id-ref: hackfest-simplecharm-vnf
+        -   vnfd-id-ref: hackfest2-vnf
             member-vnf-index: '1'
-        -   vnfd-id-ref: hackfest-simplecharm-vnf
+        -   vnfd-id-ref: hackfest2-vnf
             member-vnf-index: '2'
         vld:
         -   id: mgmtnet
@@ -19,10 +19,10 @@ nsd:nsd-catalog:
             mgmt-network: 'true'
             vim-network-name: mgmt
             vnfd-connection-point-ref:
-            -   vnfd-id-ref: hackfest-simplecharm-vnf
+            -   vnfd-id-ref: hackfest2-vnf
                 member-vnf-index-ref: '1'
                 vnfd-connection-point-ref: vnf-mgmt
-            -   vnfd-id-ref: hackfest-simplecharm-vnf
+            -   vnfd-id-ref: hackfest2-vnf
                 member-vnf-index-ref: '2'
                 vnfd-connection-point-ref: vnf-mgmt
         -   id: datanet
@@ -30,10 +30,10 @@ nsd:nsd-catalog:
             short-name: datanet
             type: ELAN
             vnfd-connection-point-ref:
-            -   vnfd-id-ref: hackfest-simplecharm-vnf
+            -   vnfd-id-ref: hackfest2-vnf
                 member-vnf-index-ref: '1'
                 vnfd-connection-point-ref: vnf-data
-            -   vnfd-id-ref: hackfest-simplecharm-vnf
+            -   vnfd-id-ref: hackfest2-vnf
                 member-vnf-index-ref: '2'
                 vnfd-connection-point-ref: vnf-data
 
