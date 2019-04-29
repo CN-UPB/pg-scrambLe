@@ -1,2 +1,6 @@
 nameko
 watchdog
+pandas
+numpy
+pymongo
+jsonschema
