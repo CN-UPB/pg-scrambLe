@@ -7,68 +7,81 @@ import tarfile
 
 def get_pm_jobs(self):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def post_pm_jobs(self):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_jobs_pmjobid(self, pmJobId):
    
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def delete_pm_jobs_pmjobid(self, pmJobId):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_jobs_pmjobid_reports_reportid(self, pmJobId, reportId):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_thresholds(self):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def post_pm_thresholds(self):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_thresholds_thresholdid(self, thresholdId):
    
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def delete_pm_thresholds_thresholdid(self, thresholdId):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_subscriptions(self):
 
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def post_pm_subscriptions(self):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def get_pm_subscriptions_subscriptionid(self, subscriptionId):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
 
 def delete_pm_subscriptions_subscriptionid(self, subscriptionId):
     
-    pass
+    result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+    return json.dumps(result)
 
     # 
     # def get_unknown(sfrom ..CommonInterface import CommonInterfaceNslcm
@@ -80,7 +93,7 @@ def delete_pm_subscriptions_subscriptionid(self, subscriptionId):
     #         GET - Test the notification endpoint
 
     #     """
-    #     pass
+    #     result = {'error': True, 'data': 'Method not implemented in target MANO'}     return json.dumps(result)
 
     # 
     # def post_unknown(self):
@@ -91,4 +104,4 @@ def delete_pm_subscriptions_subscriptionid(self, subscriptionId):
     #         POST - Notify about PM related events
 
     #     """
-    #     pass
+    #     result = {'error': True, 'data': 'Method not implemented in target MANO'}     return json.dumps(result)

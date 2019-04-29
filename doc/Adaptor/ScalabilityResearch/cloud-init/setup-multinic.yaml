@@ -1,0 +1,25 @@
+#cloud-config
+write_files:
+  - path: /home/ubuntu/multinic.sh
+    content: |
+      #!/bin/bash
+      hname=$(hostname)
+      cat /etc/hosts | grep $hname >> /dev/null
+      if [ $? -ne 0 ];then
+      sudo bash -c "echo '127.0.0.1 $hname' >> /etc/hosts"
+      fi
+      netfile=$(find /etc/network/interfaces.d -name "*.cfg")
+      for interface in $(ls -1 /sys/class/net | grep ens) ;do
+        cat $netfile | grep $interface >> /dev/null
+        if [ $? -ne 0 ];then
+          sudo bash -c "echo 'auto $interface' >> ${netfile}"
+          sudo bash -c "echo 'iface $interface inet dhcp' >> ${netfile}"
+          sudo ifup $interface
+        fi
+      done
+
+
+runcmd:
+  - [ chown, ubuntu:ubuntu, /home/ubuntu/multinic.sh ]
+  - [ chmod, +x, /home/ubuntu/multinic.sh ]      
+  - [ /home/ubuntu/multinic.sh ]     

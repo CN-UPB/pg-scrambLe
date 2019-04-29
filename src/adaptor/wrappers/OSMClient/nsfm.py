@@ -1,91 +1,38 @@
-from ..CommonInterface import CommonInterfaceNslcm
+from ..CommonInterface import CommonInterfaceNsfm
 from .helpers import Helpers
 import json
 import requests
 import tarfile
 
+class Nsfm(CommonInterfaceNsfm):
 
-def get_nsfm_alarms(self):
-    """  NS Fault Management interface - 
-            Alarms
+    def get_nsfm_alarms(self):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
-    /nsfm_alarms
-        GET - Query alarms related to NS instances.
+    def get_nsfm_alarms_alarmid(self, alarmId):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
-    """
-    pass
+    def patch_nsfm_alarms_alarmid(self, alarmId):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
+    def get_nsfm_subscriptions(self):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
+    def post_nsfm_subscriptions(self):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
-def get_nsfm_alarms_alarmid(self, alarmId):
-    """  NS Fault Management interface - 
-            Individual alarm
+    def get_nsfm_subscriptions_subscriptionid(self, subscriptionId):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
-    /nsfm_alarms_alarmid
-        GET - Read individual alarm.
-
-    """
-    pass
-
-
-
-def patch_nsfm_alarms_alarmid(self, alarmId):
-    """  NS Fault Management interface - 
-            Individual alarm
-
-    /nsfm_alarms_alarmid
-        PATCH - Acknowledge individual alarm.
-
-    """
-    pass
-
-
-
-def get_nsfm_subscriptions(self):
-    """  NS Fault Management interface - 
-            Subscriptions
-
-    /nsfm_subscriptions
-        GET - Query multiple subscriptions.
-
-    """
-    pass
-
-
-
-def post_nsfm_subscriptions(self):
-    """  NS Fault Management interface - 
-            Subscriptions
-
-    /nsfm_subscriptions
-        POST - Subscribe to alarms related to NSs.
-
-    """
-    pass
-
-
-
-def get_nsfm_subscriptions_subscriptionid(self, subscriptionId):
-    """  NS Fault Management interface - 
-            Individual subscription
-
-    /nsfm_subscriptions_subscriptionid
-        GET - Read an individual subscription.
-
-    """
-    pass
-
-
-
-def delete_nsfm_subscriptions_subscriptionid(self, subscriptionId):
-    """  NS Fault Management interface - 
-            Individual subscription
-
-    /nsfm_subscriptions_subscriptionid
-        DELETE - Terminate a subscription.
-
-    """
-    pass
+    def delete_nsfm_subscriptions_subscriptionid(self, subscriptionId):
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}
+        return json.dumps(result)
 
 
     # 

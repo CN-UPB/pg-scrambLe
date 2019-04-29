@@ -40,6 +40,8 @@ services:
       dockerfile: Dockerfile-dev
     depends_on:
       - rabbit
+    ports:
+        - "8001:8000"
     volumes:
       - ./adaptor:/app
     environment:

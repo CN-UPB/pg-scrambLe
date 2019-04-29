@@ -7,6 +7,7 @@ from .helpers import Helpers
 
 def test_post_vnf_packages(post_vnf_packages_keys):
     """Tests API call to onboard VNF descriptor resources"""
+    Helpers._delete_test_nsd()
     Helpers._delete_test_vnf()
     osm_vnfpkgm = OSMClient.VnfPkgm(HOST_URL)
     osm_auth = OSMClient.Auth(HOST_URL)
@@ -52,7 +53,7 @@ def test_get_vnf_packages_vnfpkgid(get_vnf_packages_vnfpkgid_keys):
 
     response = json.loads(osm_vnfpkgm.get_vnf_packages_vnfpkgid(
                                 token=_token["id"], 
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
 
 def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
     """Tests API call to delete NS descriptor resources"""
@@ -73,7 +74,7 @@ def test_delete_vnf_packages_vnfpkgid(delete_vnf_packages_vnfpkgid_keys):
     if _vnfd:
         response = json.loads(osm_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                 token=_token["id"], 
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
 
@@ -93,7 +94,7 @@ def test_get_vnf_packages_vnfpkgid_vnfd():
 
     response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_vnfd(
                         token=_token["id"], 
-                        id=_vnfd))
+                        vnfPkgId=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -116,7 +117,7 @@ def test_get_vnf_packages_vnfpkgid_package_content():
 
     response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_package_content(
                                 token=_token["id"], 
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -139,7 +140,7 @@ def test_get_vnf_packages_vnfpkgid_artifacts_artifactpath():
 
     response = json.loads(osm_vnfpkgm_vnfd.get_vnf_packages_vnfpkgid_artifacts_artifactpath(
                                 token=_token["id"], 
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
     Helpers._delete_test_vnf()
     if response["error"]:
             return True
@@ -164,9 +165,9 @@ def test_put_vnf_packages_vnfpkgid_package_content():
             _vnfd = _v['_id']
            
     response = json.loads(osm_vnfpkgm_vnfd.put_vnf_packages_vnfpkgid_package_content(
-                                token=_token["id"], id=_vnfd,
-                                data_path="tests/samples/test_osm_hackfest_1alt_vnfd.tar.gz"))
-    Helpers._delete_test_vnf("hackfest1alt-vnf")
+                                token=_token["id"], vnfPkgId=_vnfd,
+                                data_path="tests/samples/test_osm_cirros_vnfd.tar.gz"))
+    Helpers._delete_test_vnf("test_osm_cirros_2vnf_nsd")
     if response["error"]:
             return True
     else:

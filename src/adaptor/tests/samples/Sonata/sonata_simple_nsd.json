@@ -1,0 +1,15 @@
+{
+  "descriptor_version": "1.0",
+  "version": "1.0",
+  "name": "osm_cirros_2vnf_nsd_arka4_v2",
+  "description": "Generated for testing SCrAMbLE",
+  "vendor": "pg-scramble",
+  "network_functions": [
+      {
+          "vnf_name": "osm_cirros_vnfd_arka4_v2",
+          "vnf_id": "osm_cirros_vnfd_arka4_v2",
+          "vnf_vendor": "pg-scramble",
+          "vnf_version": "1.0"
+      }
+  ]
+}

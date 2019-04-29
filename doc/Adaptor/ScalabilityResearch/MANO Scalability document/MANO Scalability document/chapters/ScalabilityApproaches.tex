@@ -1,0 +1,36 @@
+\chapter{Scalability approaches}
+\label{ch:Scalability Approaches}
+
+Some of the scaling approaches from various academic work are discussed in this chapter. In each section a brief introduction about each  scalability approach and the relavance of a specific approach to our context of research (MANO scalability) is discussed.
+
+
+\section{Proactive scaling}
+
+Proactive scaling also known as scheduled scaling is mostly done in a cloud by scaling at predictable, fixed intervals or when big traffic stream is anticipated. A well-designed proactive scaling system enables providers to schedule capacity alterations based on a plan.
+With scheduled scaling, one can set when to increase the capacity or number of servers and when to decrease them. To implement proactive scaling, providers should understand  the expected traffic flow, which means the providers should have some kind of statistics which indicates the desired traffic and deviation from expected traffic \cite{falatah_cloud_2014}\cite{reese_cloud_nodate}. This type of scaling is suitable for servers that will have increased load during known days.
+
+In MANOs' terms, the MANO should be able to use these statistics and decide a scaling action. At specified times, it should scale up with the values for normal, minimum or maximum traffic surges.
+
+
+\section{Reactive scaling}
+
+A reactive scaling strategy also known as auto-scaling adjusts its capacity by scaling up or down dynamically based on system metrics.
+Cloud providers require periodic acquisition of performance metrics for maintaining QoS. In addition, reactive scaling enables a provider to react quickly to unexpected demand. The crudest form of reactive scaling is utilization-based, that is, when  CPU, RAM  or some other resource reaches a certain level of  utilization, the provider adds  more of that resource to the environment \cite{falatah_cloud_2014}\cite{reese_cloud_nodate}. This type of scaling is suitable for servers that will have increased load during a few unpredictable days.
+
+A "Scalability Manager" can be developed that could be installed in each instance of the MANO. This will help make scalability decisions based on dynamically collected metrics. It is the responsibility of the scalability manager to scale MANOs and redirect the requests to other instances. This can be done when the NS instances that are assigned to a particular MANO reaches the threshold.
+
+
+\section{Predictive scaling}
+This type of scaling uses machine learning to predict the traffic stream of a server/application beforehand so that the capacity changes can be done accordingly, It collects data from all the VM instances and various other data points and uses well trained machine learning models to actually predict the flow of traffic. This model would make use of one day's data and then the data is re-evaluated every 24 hours. This type of scaling strategy will be useful where servers are affected with cyclic periodic loads.
+
+In terms of MANO, this type of scaling can use existing monitoring data from MANO instances and predict the load on the server with the help of a machine learning model.
+
+
+\section{Hierarchical service placement}
+
+Service placement in a centralized network model lacks scalability. The service orchestrator in the centralized network model has a detailed view of all nodes/servers. A centralized placement algorithm maintaining all the information of all users and nodes is not a feasible approach. Maini et al. \cite{maini_hierarchical_2016} investigates a hierarchical solution where the overall orchestration domain is split into geographical sub-domains.
+
+In this model, the authors refers to a node as an Execution Zone (EZ - Services will be deployed in datacenters/clouds). The high-level orchestrator has limited visibility of EZ and user demands within a sub-domain - it sees only the aggregate of user demands and the aggregate of EZ capacities within a particular sub-domain. The high-level orchestrator places service instances at the coarse granularity of sub-domain only. Subsequent sub-domain orchestrators undertake a further placement algorithm with the scope of that sub-domain to determine in which specific EZs what QoS instances should be placed to meet the specific demand pattern of user requests within that sub-domain \cite{maini_hierarchical_2016}.
+
+
+There are many ways of sub-dividing an overall orchestration domain into sub-domains. One option is to map sub-domains onto the same geographical area covered by resolution domains: the entity responsible for resolving user requests to EZs with available session slots. Another option is to consider multiple hierarchical levels of service orchestration and placement. The author models two levels of analysis.

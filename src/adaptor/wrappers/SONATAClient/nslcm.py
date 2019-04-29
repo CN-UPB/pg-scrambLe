@@ -5,13 +5,38 @@ import requests
 # import tarfile
 
 class Nslcm(CommonInterfaceNslcm):
-
+    """
+    Lifecycle Management interface
+    """
     def __init__(self, host, port=32001):
         self._host = host
         self._port = port
         self._base_path = 'http://{0}:{1}/api/v2'
         
     def get_ns_instances(self, token, host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        NS instances
+
+        /ns_instances:
+            GET - Query multiple NS instances.
+
+        :param token: auth token retrieved by the auth call
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+                response = json.loads(sonata_nslcm.get_ns_instances(
+                                        token=_token["token"]["access_token"]))
+                response = json.loads(response["data"])            
+
+        """
+
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -37,6 +62,18 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)   
 
     def get_ns_instances_nsinstanceid(self, token, nsInstanceId ,host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        Individual NS instance
+
+        /ns_instances_nsinstanceid:
+            GET - Read an individual NS instance resource.
+
+        :param token: auth token retrieved by the auth call
+        :param nsInstanceId: id of the NS instance        
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -61,6 +98,43 @@ class Nslcm(CommonInterfaceNslcm):
 
    
     def post_ns_instances_nsinstanceid_instantiate(self, token, nsInstanceId, egresses=[], ingresses=[], host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        Instantiate NS task
+
+        /ns_instances_nsinstanceid_instantiate:
+            POST - Instantiate a NS instance.
+
+        :param token: auth token retrieved by the auth call
+        :param nsInstanceId: NS instaniation description
+        :param ingresses: ingresses list
+        :param egresses: egresses list 
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+                sonata_nsd = SONATAClient.Nsd(HOST_URL)
+
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+
+                _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
+                _nsd_list = json.loads(_nsd_list["data"])
+
+                _ns = None
+                for _n in _nsd_list:
+                    if "A dummy Example." == _n['nsd']['description']:            
+                        _ns = _n['uuid']
+
+                if _ns:
+                    response = json.loads(
+                                sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
+                                    token=_token["token"]["access_token"], nsInstanceId=_ns))
+
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -90,6 +164,19 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)
 
     def post_ns_instances_nsinstanceid_terminate(self, token, nsInstanceId, host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        Terminate NS task
+
+        /ns_instances_nsinstanceid_terminate:
+            POST - Terminate a NS instance.
+
+        :param token: auth token retrieved by the auth call
+        :param nsInstanceId: id of the NS instance        
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+        :param force: true/false whether to force terminate 
+        
+        """
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
         else:
@@ -120,136 +207,68 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)
 
     def post_ns_instances_nsinstanceid_scale(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Scale NS task
-
-        /ns_instances_nsinstanceid_scale
-            POST - Scale a NS instance.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
    
     def post_ns_instances_nsinstanceid_update(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Update NS task
-
-        /ns_instances_nsinstanceid_update
-            POST - Updates a NS instance.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
     
     def post_ns_instances_nsinstanceid_heal(self, nsInstanceId):
-        """  NS Lifecycle Management interface - 
-                Heal NS task
-
-        /ns_instances_nsinstanceid_heal
-            POST - Heal a NS instance.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
         
     def post_ns_lcm_op_occs_nslcmopoccid_retry(self, nsLcmOpOccId):
-        """  NS Lifecycle Management interface - 
-                Retry operation task
-
-        /ns_lcm_op_occs_nslcmopoccid_retry
-            POST - Retry a NS lifecycle management operation occurrence.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
     
     def post_ns_lcm_op_occs_nslcmopoccid_rollback(self, nsLcmOpOccId):
-        """  NS Lifecycle Management interface - 
-                Rollback operation task
-
-        /ns_lcm_op_occs_nslcmopoccid_rollback
-            POST - Rollback a NS lifecycle management operation occurrence.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
   
     def post_ns_lcm_op_occs_nslcmopoccid_continue(self, nsLcmOpOccId):
-        """  NS Lifecycle Management interface - 
-                Continue operation task
-
-        /ns_lcm_op_occs_nslcmopoccid_continue
-            POST - Continue a NS lifecycle management operation occurrence.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
    
     def post_ns_lcm_op_occs_nslcmopoccid_fail(self, nsLcmOpOccId):
-        """  NS Lifecycle Management interface - 
-                Fail operation task
-
-        /ns_lcm_op_occs_nslcmopoccid_fail
-            POST - Mark a NS lifecycle management operation occurrence as failed.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
    
     def post_ns_lcm_op_occs_nslcmopoccid_cancel(self, nsLcmOpOccId):
-        """  NS Lifecycle Management interface - 
-                Cancel operation task
-
-        /ns_lcm_op_occs_nslcmopoccid_cancel
-            POST - Cancel a NS lifecycle management operation occurrence.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
  
     def post_ns_lcm_subscriptions(self):
-        """  NS Lifecycle Management interface - 
-                Subscriptions
-
-        /ns_lcm_subscriptions
-            POST - Subscribe to NS lifecycle change notifications.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
     
     def get_ns_lcm_subscriptions(self):
-        """  NS Lifecycle Management interface - 
-                Subscriptions
-
-        /ns_lcm_subscriptions
-            GET - Query multiple subscriptions.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
 
     def delete_ns_instances_nsinstanceid(self):
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
 
     def get_ns_lcm_op_ops(self):
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
 
     def get_ns_lcm_op_ops_nslcmopoccid(self):
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
 
     def post_ns_instances(self):
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
     
     def get_ns_lcm_subscriptions_subscriptionid(self, subscriptionId):
-        """  NS Lifecycle Management interface - 
-                Individual subscription
-
-        /ns_lcm_subscriptions_subscriptionid
-            GET - Read an individual subscription resource.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
    
     def delete_ns_lcm_subscriptions_subscriptionid(self, subscriptionId):
-        """  NS Lifecycle Management interface - 
-                Individual subscription
-
-        /ns_lcm_subscriptions_subscriptionid
-            DELETE - Terminate a subscription.
-
-        """
-        pass
+        result = {'error': True, 'data': 'Method not implemented in target MANO'}     
+        return json.dumps(result)
 
 
     

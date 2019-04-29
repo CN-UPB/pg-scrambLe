@@ -31,7 +31,7 @@ def test_get_user_info():
     _u_list = json.loads(_u_list["data"])
 
     for _u in _u_list:
-        if "admin" == _u['_id']:            
+        if USERNAME == _u['_id']:            
             _usr = _u['_id']
 
     response = json.loads(osm_admin.get_user_info(token=_token["id"], id=_usr))
@@ -64,6 +64,7 @@ def test_get_project_info(get_project_info_keys):
     _p_list = json.loads(osm_admin.get_project_list(token=_token["id"]))
     _p_list = json.loads(_p_list["data"])
 
+    _project = None
     for _p in _p_list:
         if "test" == _p['_id']:            
             _project = _p['_id']
@@ -98,9 +99,7 @@ def test_get_vim_info(get_vim_info_keys):
     _v_list = json.loads(osm_admin.get_vim_list(token=_token["id"]))
     _v_list = json.loads(_v_list["data"])
 
-    for _v in _v_list:
-        if "admin" == _v['vim_user']:            
-            _vim = _v['_id']
+    _vim = _v_list[0]['_id']
 
     response = json.loads(osm_admin.get_vim_info(token=_token["id"], id=_vim))
     if response["error"]:
