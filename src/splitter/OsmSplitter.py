@@ -1,8 +1,6 @@
 import OsmSchema as OS
 import OSMUtilityFunctions as utilityFunctions
-import json
-import pymongo
-
+import yaml
 
 NSDs = []
 network_function_sets = [["1"], ["2"]]
@@ -198,7 +196,7 @@ def create_files():
 
         for k in vld.keys():
             for vld_k in vld[k]:
-                for k_data in vld_k.keys():
+                for k_data in vld_k.copy():
                     if not vld_k[k_data] or vld_k[k_data] == 'None':
                         del vld_k[k_data]
 
@@ -315,7 +313,7 @@ def create_files():
 
         for k in general_information.keys():
             for general_information_k in general_information[k]:
-                for k_data in general_information_k.keys():
+                for k_data in general_information_k.copy():
                     if not general_information_k[k_data] or general_information_k[k_data] == 'None':
                         del general_information_k[k_data]
 
@@ -324,19 +322,12 @@ def create_files():
         }
 
 
-        file_name = "OSM_" + str(i)
-        with open(file_name + '.json', 'w') as outfile:
-            print("Creating OSM_" + str(i))
-            json.dump(data, outfile)
+        file_name = "OSM_NSD_" + str(i)
+        with open(file_name + '.yml', 'w') as outfile:
+            print("Creating OSM NSD_" + str(i))
+            yaml.dump(data, outfile, default_flow_style=False)
+            print("Created OSM NSD_" + str(i))
 
-            print("Created OSM_" + str(i))
-
-        client = pymongo.MongoClient("mongodb://localhost:27017")
-        db = client["scramble_nsd"]
-        check = db["osm_nsd"]
-        with open('OSM_'+str(i) +'.json') as f:
-            file_data = json.load(f)
-        check.insert_one(file_data)
 
 def split_osm():
     split_network_function()
