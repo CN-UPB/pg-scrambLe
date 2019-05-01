@@ -1,0 +1,16 @@
+\chapter{Scramble Translator architecture}
+\label{ch:Scramble wrapper architecture}
+
+\paragraph{}
+In a hierarchical architecture1 involving different MANOs, there is a need of conversion of network descriptors to schemas of respective MANO. Service Descriptor Translator (SDT) serves the purpose of translating network descriptors, namely NSDs and VNFDs from schema of SONATA Pishahang to that of OSM and vice versa.
+\paragraph{}
+In a scenario, where a parent MANO, say Pishahang decides to deploy one of the network services in its lower hierarchy MANO, say OSM, the NSD and VNFD(s) need to be converted to the descriptor schema of OSM. In such an event, the Scramble plugin calls the translator service and sends the descriptors to the SDT, where the translation of the descriptors takes place and the translated descriptors are sent to Adaptor utility for deployment in appropriate MANO.
+\paragraph{}
+Scramble plug-in installed within the parent MANO forwards the network descriptors with service request to Scramble Main-Engine. Main-Engine checks the service request and sends the network descriptors to Translator along with the information of destination schema. On receiving the network descriptors, SDT translates the same to requested schema and calls the validator function to validate the translated network descriptors. Once validation is complete, the translated descriptors will be sent to Adaptor for deployment. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{figures/Service Descriptor Translator
+	\caption{}
+	\label{fig:translator_architecture}
+\end{figure}
