@@ -48,6 +48,7 @@ def test_get_ns_instances_nsinstanceid(test_get_ns_instances_nsinstanceid_keys):
     response = json.loads(sonata_nslcm.get_ns_instances_nsinstanceid(
                             token=_token["token"]["access_token"], nsInstanceId=_ns))
 
+    print(response)
     assert response['error'] == False
     response = json.loads(response["data"])
     assert isinstance(response, dict)

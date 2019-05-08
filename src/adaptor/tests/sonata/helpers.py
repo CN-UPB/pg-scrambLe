@@ -34,7 +34,7 @@ class Helpers():
         if _vnfd:
             response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                     token=_token,
-                                    id=_vnfd))
+                                    vnfPkgId=_vnfd))
 
     def _upload_test_nsd(_token):
         time.sleep(5)
@@ -67,7 +67,7 @@ class Helpers():
         time.sleep(10)
         response = json.loads(sonata_nsd.delete_ns_descriptors_nsdinfoid(
                                 token=_token,
-                                id=_nsd))
+                                nsdinfoid=_nsd))
 
         time.sleep(5)
 
@@ -83,7 +83,7 @@ class Helpers():
         if _vnfd:
             response = json.loads(sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(
                                 token=_token,
-                                id=_vnfd))
+                                vnfPkgId=_vnfd))
 
     
     def _upload_test_package(_token):

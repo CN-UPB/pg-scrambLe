@@ -1,0 +1,69 @@
+\documentclass[hidelinks]{upb_cs_thesis} % include german inside brackets for a German thesis
+
+
+% load your own packages and user-defined commands
+\input{packages}
+\input{commands}
+
+% set up some resources (graphics and bibliography)
+\graphicspath{{figures/}}
+
+
+%%%%%%%%%
+% your thesis title, name, advisor, etc. go here;	
+%%%%%%%%%
+\title{Investigation of MANO scalability challenges}
+\author {  
+	\large Ashwin Prasad Shivarpatna Venkatesh\\
+	\large	Bhargavi Mohan\\
+	\large	Deeksha Mysore Ramesh\\~
+}	
+\thesistype{Investigation of MANO scalability challenges}
+
+\supervisor{ \Large \vspace*{2mm} Prof. Dr. Holger Karl  | \hspace{2mm} Sevil Dräxler  | \hspace{2mm} Hadi Razzaghi Kouchaksaraei \centering}
+\submissiondate{\today{}}
+
+
+% here your thesis really starts
+\begin{document}
+	
+	% start with the titleage, the formalities, and then the abstract
+	\input{pretext/titlepage} % prints the title page
+	%\input{pretext/erklaerung} % prints the statement that you worked on your own and did not commit plagiarism
+	%\cleardoublepage
+%	\vspace*{\fill}
+%	\begin{abstract}
+	%	\input{abstract}
+%	\end{abstract}
+%	\acresetall
+%	\vspace*{\fill}
+%	\emptypage
+
+% Contents %
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+\tableofcontents
+
+% List of Figures %
+\pagenumbering{roman}
+\setcounter{page}{2}
+\listoffigures
+	
+	%%%%%%%%%
+	% the contents of your thesis go into file body.tex
+	%%%%%%%%%
+	\input{body}
+	
+	% include the bibliography, and add it as a chapter the table of contents
+	
+		\newpage
+	\addcontentsline{toc}{chapter}{Bibliography}
+	\bibliographystyle{alpha}
+	\bibliography{literature.bib}
+	
+	%%%%%%%%%
+	% the appendices of your thesis go into file appendix.tex
+	%%%%%%%%%
+
+	\end{document}

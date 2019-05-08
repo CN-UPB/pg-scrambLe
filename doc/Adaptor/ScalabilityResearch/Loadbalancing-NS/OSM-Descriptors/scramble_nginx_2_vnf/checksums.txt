@@ -1,0 +1,3 @@
+ffe70dde04af7653f523b6faefda2373  scramble_nginx_2_vnfd.yaml
+b635c24466f10386d1bc4cb6266ba1f7  cloud_init/cloud-config.txt
+bc681c5a4c3cdc09c013df2d2239f3d2  icons/osm.png

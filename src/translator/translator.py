@@ -17,13 +17,12 @@ class TranslatorService():
     name = "translator_service"
     
     @rpc
-    #@app.route('/translator', methods = ['POST'] )
     def hello(self,name):
-    #descriptor = request.values.get('descriptor')
-        received_param = name#request.values.get('param')
-        client = pymongo.MongoClient("mongodb://mongo:27017")
-        set = setup(client)
-        var = check_parameters(received_param)
+        #descriptor = request.values.get('descriptor')
+        #received_param = name#request.values.get('param')
+        #client = pymongo.MongoClient("mongodb://mongo:27017")
+        #set = setup(client)
+        var = check_parameters(name)  
         return var
     
 def check_parameters(received_param):
@@ -31,27 +30,28 @@ def check_parameters(received_param):
     client = pymongo.MongoClient("mongodb://mongo:27017")
     set = setup(client)
     
-    if received_param == "sonata_to_osm":
+    param=received_param['instruction']
+    if param == "sonata_to_osm":
     
-        insert = insert_into_db(client)
-        ref = insert.insert_nsd('sonata')
-        rcvd_file1 = set.get_source_descriptor(ref[0])
-        rcvd_file2 = set.get_source_descriptor(ref[1])
+        #insert = insert_into_db(client)
+        #ref = insert.insert_nsd('sonata')
+        rcvd_file1 = received_param['descriptor']#set.get_source_descriptor(ref[0])
+        #rcvd_file2 = set.get_source_descriptor(ref[1])
         ret_translated1 = toOsm(rcvd_file1)
-        ret_translated2 = toOsm(rcvd_file2)
+        #ret_translated2 = toOsm(rcvd_file2)
         #trnsltd_file = set.get_source_nsd(ret_translated)
-        return str(ret_translated1) + str(ret_translated2)  
+        return ret_translated1 #+ json.dumps(ret_translated2)
 
-    elif received_param == "osm_to_sonata":
+    elif param == "osm_to_sonata":
     
-        insert = insert_into_db(client)
-        ref = insert.insert_nsd('osm')
-        rcvd_file1 = set.get_source_descriptor(ref[0])
-        rcvd_file2 = set.get_source_descriptor(ref[1])
+        #insert = insert_into_db(client)
+        #ref = insert.insert_nsd('osm')
+        rcvd_file1 = received_param['descriptor']#set.get_source_descriptor(ref[0])
+        #rcvd_file2 = set.get_source_descriptor(ref[1])
         ret_translated1 = toSonata(rcvd_file1)
-        ret_translated2 = toSonata(rcvd_file2)
+        #ret_translated2 = toSonata(rcvd_file2)
         #trnsltd_file = set.get_source_nsd(ret_translated)
-        return str(ret_translated1) + str(ret_translated2) 
+        return ret_translated1 #+ json.dumps(ret_translated2)
         
 def toSonata(received_file):
 
@@ -70,7 +70,7 @@ def toSonata(received_file):
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
             
-        return str(translated) + 'validate status : ' + str(check)
+        return {"descriptor":translated ,"VALIDATE STATUS" :check}
 
     elif 'nsd:nsd-catalog' in received_file:
     
@@ -82,7 +82,7 @@ def toSonata(received_file):
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
             
-        return str(translated) + 'validate status : ' + str(check)
+        return {"descriptor":translated ,"VALIDATE STATUS" :check}
         
 def toOsm(received_file):
 
@@ -100,7 +100,7 @@ def toOsm(received_file):
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
         
-        return translated
+        return {"descriptor":translated ,"VALIDATE STATUS" :check}
         
     elif 'virtual_deployment_units' in received_file:
     
@@ -112,7 +112,7 @@ def toOsm(received_file):
             temp = doc.insert_one(translated)
             translated_ref = temp.inserted_id
         
-        return translated
+        return {"descriptor":translated ,"VALIDATE STATUS" :check}
         
 #if __name__ == '__main__':
 #    app.debug = True

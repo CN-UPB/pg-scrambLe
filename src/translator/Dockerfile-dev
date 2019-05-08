@@ -40,6 +40,7 @@ COPY ./tng-schema/Vnfd/vnfd-pishahang.yml ./
 COPY ./tng-schema/Vnfd/osm-vnfd-schema.json ./
 COPY ./tng-schema/Nsd/osm-schema-nsd.json ./
 
+
 RUN chmod +x ./start.sh
 
 CMD watchmedo auto-restart --recursive --pattern="*.py" --directory="." /bin/bash start.sh

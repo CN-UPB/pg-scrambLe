@@ -21,9 +21,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_jobs(self):
         """ NS Performance Management Interface - 
-                PM jobs
+        PM jobs
 
-        /pm_jobs
+        /pm_jobs:
             GET - Query PM jobs
 
         """
@@ -32,9 +32,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def post_pm_jobs(self):
         """ NS Performance Management Interface - 
-                PM jobs
+        PM jobs
 
-        /pm_jobs
+        /pm_jobs:
             POST - Create a PM job
 
         """
@@ -43,9 +43,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_jobs_pmjobid(self, pmJobId):
         """ NS Performance Management Interface - 
-                Individual PM job
+        Individual PM job
 
-        /pm_jobs_pmjobid
+        /pm_jobs_pmjobid:
             GET - Read a single PM job
 
         """
@@ -54,9 +54,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def delete_pm_jobs_pmjobid(self, pmJobId):
         """ NS Performance Management Interface - 
-                Individual PM job
+        Individual PM job
 
-        /pm_jobs_pmjobid
+        /pm_jobs_pmjobid:
             DELETE - Delete a PM job
 
         """
@@ -65,9 +65,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_jobs_pmjobid_reports_reportid(self, pmJobId, reportId):
         """ NS Performance Management Interface - 
-                Individual performance report
+        Individual performance report
 
-        /pm_jobs_pmjobid_reports_reportid
+        /pm_jobs_pmjobid_reports_reportid:
             GET - Read an individual performance report
 
         """
@@ -76,9 +76,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_thresholds(self):
         """ NS Performance Management Interface - 
-                Thresholds
+        Thresholds
 
-        /pm_thresholds
+        /pm_thresholds:
             GET - Query thresholds
 
         """
@@ -87,9 +87,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def post_pm_thresholds(self):
         """ NS Performance Management Interface - 
-                Thresholds
+        Thresholds
 
-        /pm_thresholds
+        /pm_thresholds:
             POST - Create a threshold
 
         """
@@ -98,9 +98,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_thresholds_thresholdid(self, thresholdId):
         """ NS Performance Management Interface - 
-                Individual threshold
+        Individual threshold
 
-        /pm_thresholds_thresholdid
+        /pm_thresholds_thresholdid:
             GET - Query a single threshold
 
         """
@@ -109,9 +109,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def delete_pm_thresholds_thresholdid(self, thresholdId):
         """ NS Performance Management Interface - 
-                Individual threshold
+        Individual threshold
 
-        /pm_thresholds_thresholdid
+        /pm_thresholds_thresholdid:
             DELETE - Delete a threshold
 
         """
@@ -120,9 +120,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_subscriptions(self):
         """ NS Performance Management Interface - 
-                Subscriptions
+        Subscriptions
 
-        /pm_subscriptions
+        /pm_subscriptions:
             GET - Query PM related subscriptions
 
         """
@@ -131,9 +131,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def post_pm_subscriptions(self):
         """ NS Performance Management Interface - 
-                Subscriptions
+        Subscriptions
 
-        /pm_subscriptions
+        /pm_subscriptions:
             POST - Subscribe to PM notifications
 
         """
@@ -142,9 +142,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def get_pm_subscriptions_subscriptionid(self, subscriptionId):
         """ NS Performance Management Interface - 
-                Individual
+        Individual
 
-        /pm_subscriptions_subscriptionid
+        /pm_subscriptions_subscriptionid:
             GET - Query a single PM related subscription
 
         """
@@ -153,9 +153,9 @@ class CommonInterfaceNspm(ABC):
     @abstractmethod
     def delete_pm_subscriptions_subscriptionid(self, subscriptionId):
         """ NS Performance Management Interface - 
-                Individual
+        Individual
 
-        /pm_subscriptions_subscriptionid
+        /pm_subscriptions_subscriptionid:
             DELETE - Terminate a subscription
 
         """

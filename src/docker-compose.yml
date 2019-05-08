@@ -44,6 +44,8 @@ services:
       context: adaptor
     depends_on:
       - rabbit
+    ports:
+        - "8001:8000"
     environment:
         RABBIT_PASSWORD: "guest"
         RABBIT_USER: "guest"

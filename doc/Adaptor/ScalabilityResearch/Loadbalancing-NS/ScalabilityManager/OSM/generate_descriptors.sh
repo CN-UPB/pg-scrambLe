@@ -1,0 +1,2 @@
+../../devops/descriptor-packages/tools/generate_descriptor_pkg.sh -t vnfd -N scramble_scalability_manager_vnfd/
+../../devops/descriptor-packages/tools/generate_descriptor_pkg.sh -t nsd -N scramble_scalability_manager_nsd/

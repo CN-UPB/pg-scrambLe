@@ -9,7 +9,427 @@
 			"name": "OSM",
 			"item": [
 				{
+					"name": "VNFD Calls",
+					"item": [
+						{
+							"name": "List VNFD",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}} ",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/vnfpkgm/vnf_packages",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"vnfpkgm",
+										"vnf_packages"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Upload VNFD",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "vnfd",
+											"type": "file",
+											"src": ""
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/vnfpkgm/vnf_packages",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"vnfpkgm",
+										"vnf_packages"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "NSD Calls",
+					"item": [
+						{
+							"name": "List NSD",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}} ",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nsd/ns_descriptors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nsd",
+										"ns_descriptors"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Upload NSD",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "nsd",
+											"type": "file",
+											"src": ""
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nsd/ns_descriptors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nsd",
+										"ns_descriptors"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "NS Calls",
+					"item": [
+						{
+							"name": "List NS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}} ",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Instantiate NS",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}} ",
+											"type": "text"
+										},
+										{
+											"key": "options",
+											"value": "{\n            \"nsName\": \"Postman\",\n            \"nsdId\": \"e9925813-5df3-47ad-9c6e-7125c25a2f41\",\n            \"vimAccountId\": \"9ee56ee7-5e3a-4456-ba36-e2385ec61fd5\",\n            \"nsDescription\": \"Postman_trial\"\n        }",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances/instantiate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances",
+										"instantiate"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Terminate NS",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-05.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "osm",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{OSMAuthToken}} ",
+											"type": "text"
+										},
+										{
+											"key": "options",
+											"value": "{\n            \"nsInstanceId\" : \"bd8f453f-077f-4797-82f1-c1cb1293afd7\"\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances/terminate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances",
+										"terminate"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b2eee81e-e702-4dda-b6d0-79126fff5f7a",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"var data = JSON.parse(data.data);",
+									"postman.setEnvironmentVariable(\"OSMAuthToken\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -47,14 +467,15 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8000/adaptor/auth",
+							"raw": "http://localhost:8001/adaptor/v1/auth",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8000",
+							"port": "8001",
 							"path": [
 								"adaptor",
+								"v1",
 								"auth"
 							]
 						},
@@ -68,7 +489,427 @@
 			"name": "Sonata",
 			"item": [
 				{
+					"name": "VNFD Calls",
+					"item": [
+						{
+							"name": "List VNFD",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8000/v1/adaptor/vnfpkgm/vnf_packages",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"v1",
+										"adaptor",
+										"vnfpkgm",
+										"vnf_packages"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Upload VNFD",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "vnfd",
+											"type": "file",
+											"src": ""
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/vnfpkgm/vnf_packages",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"vnfpkgm",
+										"vnf_packages"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "NSD Calls",
+					"item": [
+						{
+							"name": "List NSD",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nsd/ns_descriptors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nsd",
+										"ns_descriptors"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Upload NSD",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "nsd",
+											"type": "file",
+											"src": ""
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nsd/ns_descriptors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nsd",
+										"ns_descriptors"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "NS Calls",
+					"item": [
+						{
+							"name": "List NS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Instantiate NS",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										},
+										{
+											"key": "options",
+											"value": "{\n\"nsInstanceId\" : \"eeec7a43-4491-4846-8b13-4d7073765f9e\",\n\"egresses\" : [],\n\"ingresses\": []\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances/instantiate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances",
+										"instantiate"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						},
+						{
+							"name": "Terminate NS",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "host",
+											"value": "vm-hadik3r-08.cs.uni-paderborn.de",
+											"description": "\n\n",
+											"type": "text"
+										},
+										{
+											"key": "mano",
+											"value": "sonata",
+											"type": "text"
+										},
+										{
+											"key": "token",
+											"value": "{{SonataAuthToken}}",
+											"type": "text"
+										},
+										{
+											"key": "options",
+											"value": "{\n            \"nsInstanceId\" : \"1271f760-92ff-4105-b6ae-0e58d9c54c64\"\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8001/adaptor/v1/nslcm/ns_instances/terminate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"adaptor",
+										"v1",
+										"nslcm",
+										"ns_instances",
+										"terminate"
+									]
+								},
+								"description": "Get auth token"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "auth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6196407c-7f33-45a9-891b-adfc99d15cb1",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"var data = JSON.parse(data.data);",
+									"postman.setEnvironmentVariable(\"SonataAuthToken\", data.token.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -105,14 +946,15 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8003/adaptor/auth",
+							"raw": "http://localhost:8001/adaptor/v1/auth",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8003",
+							"port": "8001",
 							"path": [
 								"adaptor",
+								"v1",
 								"auth"
 							]
 						},
