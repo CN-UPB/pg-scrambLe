@@ -1,4 +1,4 @@
-class NSD:
+class NSD():
     descriptor_version = ""
     vendor = ""
     name = ""
@@ -24,7 +24,7 @@ class NSD:
         self.forwardingGraphs = forwarding_graphs
 
 
-class NetworkFunction:
+class NetworkFunction():
     vnf_id = ""
     vnf_name = ""
     vnf_vendor = ""
@@ -39,7 +39,7 @@ class NetworkFunction:
         self.connection_point_refs = connection_point_refs
 
 
-class ConnectionPoint:
+class ConnectionPoint():
     id = ""
     interface = ""
     type = ""
@@ -50,7 +50,7 @@ class ConnectionPoint:
         self.type = type
 
 
-class VirtualLink:
+class VirtualLink():
     id = ""
     connectivity_type = ""
     connection_points_reference = []
@@ -61,7 +61,7 @@ class VirtualLink:
         self.connection_points_reference = connection_points_reference
 
 
-class ForwardingGraphs:
+class ForwardingGraphs():
     fg_id = ""
     number_of_endpoints = 0
     number_of_virtual_links = 0
@@ -78,7 +78,7 @@ class ForwardingGraphs:
         self.network_forwarding_path = network_forwarding_path
 
 
-class NetworkForwardingPaths:
+class NetworkForwardingPaths():
     fp_id = ""
     policy = ""
     connection_points = []
@@ -89,11 +89,10 @@ class NetworkForwardingPaths:
         self.connection_points = connection_points
 
 
-class ConnectionPointsGraph:
+class ConnectionPointsGraph():
     connection_point_ref = ""
     position = 0
 
     def __init__(self, connection_point_ref, position):
         self.connection_point_ref = connection_point_ref
         self.position = position
-

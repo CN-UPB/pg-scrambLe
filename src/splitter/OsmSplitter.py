@@ -321,12 +321,10 @@ def create_files():
             "nsd": general_information['nsd']
         }
 
-
         file_name = "OSM_NSD_" + str(i)
         with open(file_name + '.yml', 'w') as outfile:
-            print("Creating OSM NSD_" + str(i))
+
             yaml.dump(data, outfile, default_flow_style=False)
-            print("Created OSM NSD_" + str(i))
 
 
 def split_osm():

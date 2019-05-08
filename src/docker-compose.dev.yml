@@ -6,6 +6,12 @@ services:
     ports:
         - "15672:15672"
 
+  mongo:
+    image: mongo
+    command: --smallfiles
+    ports:
+      - "27017:27017"
+
   translator:
     build:
       context: translator
@@ -26,6 +32,7 @@ services:
       dockerfile: Dockerfile-dev
     depends_on:
       - rabbit
+      - mongo
     volumes:
       - ./splitter:/app
     environment:
