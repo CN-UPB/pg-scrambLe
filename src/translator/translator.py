@@ -14,31 +14,19 @@ class TranslatorService():
     name = "translator_service"
     
     @rpc
-<<<<<<< HEAD
-    def hello(self,name):
+    def hello(self,param_list):
         #descriptor = request.values.get('descriptor')
         #received_param = name#request.values.get('param')
         #client = pymongo.MongoClient("mongodb://mongo:27017")
         #set = setup(client)
-        var = check_parameters(name)  
+        var = check_parameters(param_list)  
         return var
     
-=======
-    def hello(self=None, name):
-        client = pymongo.MongoClient("mongodb://mongo:27017")
-        set = setup(client)
-        var = check_parameters()
-        return var
-		
-@http('GET', '/translator/{}'.format(API_VERSION))	
->>>>>>> 74bc934b864cdcc28b3f297eb0204cc44c9c36df
 def check_parameters(received_param):
-	decscriptor = request.form["descriptor"]
-	param = request.form["param"]
+    
     client = pymongo.MongoClient("mongodb://mongo:27017")
     set = setup(client)
     
-<<<<<<< HEAD
     param=received_param['instruction']
     if param == "sonata_to_osm":
     
@@ -46,14 +34,6 @@ def check_parameters(received_param):
         #ref = insert.insert_nsd('sonata')
         rcvd_file1 = received_param['descriptor']#set.get_source_descriptor(ref[0])
         #rcvd_file2 = set.get_source_descriptor(ref[1])
-=======
-    if received_param == "sonata_to_osm":
-   
-        insert = insert_into_db(client)
-        ref = insert.insert_nsd('sonata')
-        rcvd_file1 = set.get_source_descriptor(ref[0])
-        rcvd_file2 = set.get_source_descriptor(ref[1])
->>>>>>> 74bc934b864cdcc28b3f297eb0204cc44c9c36df
         ret_translated1 = toOsm(rcvd_file1)
         #ret_translated2 = toOsm(rcvd_file2)
         #trnsltd_file = set.get_source_nsd(ret_translated)
@@ -131,11 +111,10 @@ def toOsm(received_file):
         
         return {"descriptor":translated ,"VALIDATE STATUS" :check}
         
-<<<<<<< HEAD
 #if __name__ == '__main__':
 #    app.debug = True
 #    app.run()
 #    app.run(debug=True)
-=======
-        return translated
->>>>>>> 74bc934b864cdcc28b3f297eb0204cc44c9c36df
+
+        #return translated
+

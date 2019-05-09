@@ -1121,16 +1121,16 @@ class insert_into_db():
     def insert_nsd(self,framework):
         
         if framework == 'osm':
-            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
-            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
-            nsd=yaml.load(open(r"hackfest_multivdu_nsd.yaml"))
-            vnfd=yaml.load(open(r"hackfest_multivdu_vnfd.yaml"))
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
+            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_ns\hackfest_multivdu_nsd.yaml"))
+            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_vnf\hackfest_multivdu_vnfd.yaml"))
         
         elif framework == 'sonata':
             #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_nsd.yml"))
             #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_vnfd.yml"))
-            nsd=yaml.load(open(r"NSD.yaml"))
-            vnfd=yaml.load(open(r"VNFD.yaml"))
+            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\NSD.yaml"))
+            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\VNFD.yaml"))
             
         record_nsd = self.db_descriptors.source_nsd
         id_nsd = record_nsd.insert_one(nsd).inserted_id
@@ -1445,16 +1445,27 @@ class transformation():
         pandas.DataFrame
             Returns a dataframe with the same columns as `df`.
         '''
+        column3='lineage'
         indexes = []
         new_values = []
         new_values2 = []
         df = df.dropna(subset=[column1])
         
-        for i, presplit in enumerate(df[[column1,column2]].itertuples()):
+        for i, presplit in enumerate(df[[column1,column2,column3]].itertuples()):
             values = str(presplit[1]).split(sep)
-            
+            if( len(values) > 1) and ( str(presplit[2]) != 'connection_point_ref'):
+                values = str(presplit[1]).split(sep)[1:]
+            if len(values) == 1 and str(presplit[2]) == 'connection_point_ref':
+                lineage = presplit[3]
+                continue 
+            if (str(presplit[2]) == 'position' and presplit[3] == lineage):
+                continue
             for j in range(len(values)):
                 indexes.append(i)
+                if (str(presplit[2]) == 'position'):
+                    new_values.append(int(values[j]) -1 ) 
+                    new_values2.append(str(presplit[2]))
+                    continue
                 new_values.append(values[j])
                 
                 if len(values) > 1:
