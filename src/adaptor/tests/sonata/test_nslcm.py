@@ -56,6 +56,42 @@ def test_get_ns_instances_nsinstanceid(test_get_ns_instances_nsinstanceid_keys):
                 response.keys()), "All keys should be in the response"
 
 
+def test_get_vnf_instances(get_vnf_instances_keys):
+    """Tests API call query multiple VNF instances"""
+    sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_nslcm.get_vnf_instances(
+                            token=_token["token"]["access_token"]))
+    response = json.loads(response["data"])
+
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_vnf_instances_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
+
+def test_get_vnf_instances_vnfinstanceid(get_vnf_instances_vnfinstanceid_keys):
+    """Tests API call to read an individual VNF instance resource"""
+    sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _vnf_list = json.loads(sonata_nslcm.get_vnf_instances(
+                            token=_token["token"]["access_token"]))
+    _vnf_list = json.loads(_vnf_list["data"])
+
+    response = json.loads(sonata_nslcm.get_vnf_instances_vnfinstanceid(
+                            token=_token["token"]["access_token"], vnfInstanceId=_vnf_list[0]["uuid"]))
+
+    assert response['error'] == False
+    response = json.loads(response["data"])
+    assert isinstance(response, dict)
+    assert set(get_vnf_instances_vnfinstanceid_keys).issubset(
+                response.keys()), "All keys should be in the response"
+
+
 def test_post_ns_instances_nsinstanceid_instantiate(post_ns_instances_nsinstanceid_instantiate_keys):
     """Tests API call to instantiate an NS"""
     sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
