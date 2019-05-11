@@ -33,6 +33,8 @@ import threading
 import sys
 import concurrent.futures as pool
 import wrappers
+import requests
+import numpy as np
 # import psutil
 
 from sonmanobase.plugin import ManoBasePlugin
@@ -88,7 +90,7 @@ class ScramblePlugin(ManoBasePlugin):
         super(self.__class__, self).declare_subscriptions()
 
         # The topic on which deploy requests are posted.
-        topic = 'mano.service.scramble'
+        topic = 'mano.service.place'
         self.manoconn.subscribe(self.scramble_engine, topic)
 
         LOG.info("Subscribed to topic: " + str(topic))
@@ -130,11 +132,214 @@ class ScramblePlugin(ManoBasePlugin):
 # Scramble
 ##########################
 
-    def scramble_engine(self, payload):
-        content = yaml.load(payload)
-        LOG.info("Scramble plugin: " + content)
-        pass
+    def get_network_functions(self,network_functions):
+    '''
+        extract the list of function ids.
+    '''
 
+        list_vnf = []
+        list_vnf_nm = []
+        for keyss in network_functions.keys():
+            if keyss == 'network_functions':
+                network_functions_data = network_functions[keyss]
+
+                for data in network_functions_data:
+                    vnf_id = data['vnf_id']
+                    vnf_name = data['vnf_name']
+                    list_vnf.append(vnf_id)
+                    list_vnf_nm.append(vnf_name)
+
+        return [list_vnf,list_vnf_nm]
+        
+        
+    def random_combination(self,vnf,mano=['PISHAHANG','OSM']):
+    '''
+        generate a random set of function ids and MANOs. 
+    '''
+    
+        vnf_ids = vnf[0] # get the ids of the vnf
+        vnf_nm = vnf[1]  # get the names of the vnf
+        
+        mano_len = len(mano) # no.of MANOs
+        vnf_len = len(vnf_ids) # no.of vnfs
+
+        for random_i in np.random.choice(vnf_len,size=1,replace=False):
+        
+            vnf_set1 = [vnf_ids[random_i]] # storing 1st set of vnf-ids
+            vnf_nm_set1 = [vnf_nm[random_i]]  # storing 1st set of vnf-names
+        
+        mano_set1 = [mano[random_i] for random_i in np.random.choice(mano_len,size=1,replace=False)]
+        # storing 1st set of MANO
+        
+        vnf_set2 = list(set(vnf_ids) - set(vnf_set1)) # storing 2nd set of vnf-ids
+        vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
+        mano_set2 = list(set(mano) - set(mano_set1)) # storing 2nd set of MANO
+        
+        return [[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]
+            
+    def scramble_engine(self, ch, method, prop, payload):
+        '''
+            Scramble placement plugin to decide and split VNFs randomly among MANOs and assign and send splitted vnfs 
+            to respective MANO framework.
+        '''
+        
+        content = yaml.load(payload)
+        LOG.info("Scramble plugin handling the placement request: " + content['serv_id'])
+        
+        topology = content['topology']
+        descriptor = content['nsd'] if 'nsd' in content else content['cosd']
+        functions = content['functions'] if 'functions' in content else []
+        cloud_services = content['cloud_services'] if 'cloud_services' in content else []
+
+        
+        # create a set of vnfs for different MANO frameworks through random logic
+        # Number of Splits is by default 2.
+        
+        function_list = self.get_network_functions(descriptor)
+        random_set = self.random_combination(function_list)
+        
+        vnfid_set = [rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
+        vnfname_set = [rndm_sets[0][1], rndm_sets[1][1]] # vnf-names of sets 1 and 2
+        mano_set = [rndm_sets[0][2], rndm_sets[1][2]] # MANOs of sets 1 and 2
+        
+        # send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
+        splitter_url = 'http://131.234.250.202:8000/Main_splitter/hello'
+        nsd = { 'descriptor' : descriptor, 'sets': vnfid_set}
+        
+        response  = requests.post(splitter_url,data=json.dumps(nsd))
+        nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
+
+       
+        # logic to check which vnf is to be send to which MANO
+        
+        function_pish =[] # list to store vnfs for PISHAHANG
+        function_osm = [] # list to store vnfs for OSM
+        
+        for i,sets in enumerate(random_set):
+            if sets[2] == 'PISHAHANG':
+                for vnf in functions:
+                    if(vnf['name'] in sets[1]):
+                        function_pish.append(vnf)
+                        
+            elif sets[2] == 'OSM':
+            
+                # translating NSD to OSM
+                
+                translator_url = 'http://131.234.250.202:8000/translator/hello'
+                headers = {"Content-Type": "application/json", "Accept": "application/json"}
+                nsd = {"instruction": "sonata_to_osm","descriptor" : nsds_splitted['message'][i]}
+                
+                response  = requests.post(translator_url,data=json.dumps(nsd))
+                osm_nsd = json.loads(response)
+                osm_nsd = osm_nsd['message']['descriptor']
+                
+                # translating VNFD to OSM
+                
+                # getting the vnfds list from Pishahang to translate to osm
+                for vnf in functions:
+                
+                    if(vnf['name'] in sets[1]):
+                        vnfd = {"instruction": "sonata_to_osm","descriptor" : vnf}
+                        response  = requests.post(translator_url,data=json.dumps(vnfd))
+                        osm_vnfd = json.loads(response)
+                        osm_vnfd = osm_nsd['message']['descriptor']
+                        
+                        function_osm.append(osm_vnfd)
+                
+        
+        
+        #below part not finished
+        # still to do :- 
+        # 1. create packages for osm_nsd and osm_vnfd
+        # 2. send both packages via wrapper to OSM
+        # 3. instantiate ns via wrapper in OSM
+        # 4. get back the vnfr via wrapper
+        # 5. store the vnfr in the PISHAHANG vnfr storage through wrapper.
+        
+        '''
+        # connecting to OSM to send the NS package
+        username = 'admin'
+        password = 'admin'
+        host = 'vm-hadik3r-05.cs.uni-paderborn.de'
+        
+        osm_auth = wrappers.OSMClient.Auth(host)
+        token = json.loads(osm_auth.auth(username =username , password= password))
+        _token = json.loads(token["data"])
+        _token['id']
+
+        osm_nsd = wrappers.OSMClient.Nsd(host)
+        
+        osm_nsd.post_ns_descriptors(_token['id'])
+        
+        '''
+        
+        
+        
+        placement = self.placement(descriptor, function_pish, cloud_services, topology) # sending only the vnfs assigned for PIshahang
+
+        response = {'mapping': placement}
+        topic = 'mano.service.place'
+
+        self.manoconn.notify(topic,
+                             yaml.dump(response),
+                             correlation_id=prop.correlation_id)
+
+        LOG.info("Scramble plugin sends Placement response for service: " + content['serv_id'])
+        LOG.info(response)
+
+    def placement(self, descriptor, functions, cloud_services, topology):
+        """
+        This is the default placement algorithm that is used if the SLM
+        is responsible to perform the placement
+        """
+        LOG.info("Embedding started on following topology: " + str(topology))
+
+        mapping = {}
+
+        for function in functions:
+            vnfd = function['vnfd']
+            vdu = vnfd['virtual_deployment_units']
+            needed_cpu = vdu[0]['resource_requirements']['cpu']['vcpus']
+            needed_mem = vdu[0]['resource_requirements']['memory']['size']
+            needed_sto = vdu[0]['resource_requirements']['storage']['size']
+
+            for vim in topology:
+                if vim['vim_type'] == 'Kubernetes':
+                    continue
+                cpu_req = needed_cpu <= (vim['core_total'] - vim['core_used'])
+                mem_req = needed_mem <= (vim['memory_total'] - vim['memory_used'])
+
+                if cpu_req and mem_req:
+                    mapping[function['id']] = {}
+                    mapping[function['id']]['vim'] = vim['vim_uuid']
+                    vim['core_used'] = vim['core_used'] + needed_cpu
+                    vim['memory_used'] = vim['memory_used'] + needed_mem
+                    break
+
+        for cloud_service in cloud_services:
+            csd = cloud_service['csd']
+            vdu = csd['virtual_deployment_units']
+            needed_mem = 0
+            if 'resource_requirements' in vdu[0] and 'memory' in vdu[0]['resource_requirements']:
+                needed_mem = vdu[0]['resource_requirements']['memory']['size']
+
+            for vim in topology:
+                if vim['vim_type'] != 'Kubernetes':
+                    continue
+                mem_req = needed_mem <= (vim['memory_total'] - vim['memory_used'])
+
+                if mem_req:
+                    mapping[cloud_service['id']] = {}
+                    mapping[cloud_service['id']]['vim'] = vim['vim_uuid']
+                    vim['memory_used'] = vim['memory_used'] + needed_mem
+                    break
+
+        # Check if all VNFs and CSs have been mapped
+        if len(mapping.keys()) == len(functions) + len(cloud_services):
+            return mapping
+        else:
+            LOG.info("Placement was not possible")
+            return None
 
 def main():
     """
