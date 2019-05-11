@@ -1,22 +1,19 @@
-# import SonataSchema as SS
-from SonataSchema import NSD, NetworkFunction, ConnectionPoint, VirtualLink, ForwardingGraphs, NetworkForwardingPaths, \
-    ConnectionPointsGraph
-# from SonataUtilityFunctions import utility
+#import SonataSchema as SS
+from SonataSchema import NSD,NetworkFunction,ConnectionPoint,VirtualLink,ForwardingGraphs,NetworkForwardingPaths,ConnectionPointsGraph
+#from SonataUtilityFunctions import utility
 import yaml
-
 
 class splitter():
 
-    def __init__(self, vnf_sets,utility=None):
+    def __init__(self,vnf_sets,utility = None):
         self.utilityFunctions = utility
         self.NSDs = []
-        #self.network_function_sets = [["vnf_iperf"], ["vnf_tcpdump"], ["vnf_firewall"]]
-        # network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
-        #self.network_function_sets = [["vnf_iperf"], ["vnf_tcpdump", "vnf_firewall"]]
-        self.network_function_sets =  vnf_sets#[["vnf_iperf", "vnf_firewall"], ["vnf_tcpdump"]]
+        #network_function_sets = [["vnf_iperf"], ["vnf_tcpdump"], ["vnf_firewall"]]
+        #network_function_sets = [["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
+        self.network_function_sets = vnf_sets#[["vnf_iperf", "vnf_tcpdump"], ["vnf_firewall"]]
+        #network_function_sets = [["vnf_iperf", "vnf_firewall"], ["vnf_tcpdump"]]
         self.old_new_link_mapping = []
         self.processed_connection_point_path = []
-        self.new_network_function_set = []
 
     def validate(self):
         size = 0
@@ -31,17 +28,20 @@ class splitter():
         if len(list_network_function) != len(set(list_network_function)):
             return False
 
-    def get_network_function_object(self, vnf_name):
+
+    def get_network_function_object(self,vnf_name):
         for nf_object in self.utilityFunctions.list_nf:
             if nf_object.vnf_id == vnf_name:
                 return nf_object
         return None
 
-    def get_connection_point_type(self, connection_point_id):
+
+    def get_connection_point_type(self,connection_point_id):
         for connection_point in self.utilityFunctions.list_connection_points:
             if connection_point.id == connection_point_id:
                 return connection_point.type
         return "not_external"
+
 
     def split_network_function(self):
         for network_function_set in self.network_function_sets:
@@ -52,47 +52,13 @@ class splitter():
                 sub_nsd.networkFunctions = network_function_list
             self.NSDs.append(sub_nsd)
 
-    def get_internal_links(self):
-        internal_links = []
-        for virtual_link in self.utilityFunctions.list_virtual_links:
-            if virtual_link.connectivity_type == "E-Line":
-                internal_link = []
-                cp_0 = virtual_link.connection_points_reference[0]
-                cp_1 = virtual_link.connection_points_reference[1]
-                if self.get_connection_point_type(cp_0) != "external" and \
-                        self.get_connection_point_type(cp_1) != "external":
-                    vnf_1 = cp_0.split(":")
-                    vnf_2 = cp_1.split(":")
-                    internal_link.append(vnf_1[0])
-                    internal_link.append(vnf_2[0])
-                    internal_links.append(internal_link)
-        return internal_links
-
-    #creates new function sets if needed
-    def create_new_function_sets(self):
-        changed = 0
-        for network_function_set in self.network_function_sets:
-            if len(network_function_set) == 2:
-                if network_function_set not in self.get_internal_links() and \
-                        network_function_set[::-1] not in self.get_internal_links():
-                    for network_function in network_function_set:
-                        new_sub_network_function_set = []
-                        new_sub_network_function_set.append(network_function)
-                        self.new_network_function_set.append(new_sub_network_function_set)
-                        changed = 1
-            if len(network_function_set) == 1 and changed == 1:
-                self.new_network_function_set.append(network_function_set)
-            if changed == 1:
-                self.network_function_sets = self.new_network_function_set
-
-
-
 
     def set_connection_points(self):
         for i in range(len(self.network_function_sets)):
             nsd_cp = self.NSDs[i]
             nsd_cp.connectionPoints = self.utilityFunctions.list_connection_points
             self.NSDs[i] = nsd_cp
+
 
     def set_general_information(self):
         for i in range(len(self.network_function_sets)):
@@ -105,15 +71,16 @@ class splitter():
             nsd_general_info.description = self.utilityFunctions.description
             self.NSDs[i] = nsd_general_info
 
+
     def set_connection_point_refs_for_virtual_functions(self):
         for virtual_link in self.utilityFunctions.list_virtual_links:
             for connection_point_ref in virtual_link.connection_points_reference:
                 split_string = connection_point_ref.split(':')
                 if self.get_network_function_object(split_string[0]) is not None:
-                    self.get_network_function_object(split_string[0]).connection_point_refs.append(
-                        str(connection_point_ref))
+                    self.get_network_function_object(split_string[0]).connection_point_refs.append(str(connection_point_ref))
 
-    def handle_elan_links(self, virtual_link_elan, nsd_vl):
+
+    def handle_elan_links(self,virtual_link_elan, nsd_vl):
         virtual_link_inner = VirtualLink(virtual_link_elan.id, virtual_link_elan.connectivity_type, [])
         for nf in nsd_vl.networkFunctions:
             for connection_point_ref in virtual_link_elan.connection_points_reference:
@@ -126,7 +93,8 @@ class splitter():
                                 virtual_link_inner.connection_points_reference.append(str(connection_point_ref))
         return virtual_link_inner
 
-    def link_already_processed(self, nsd, vl):
+
+    def link_already_processed(self,nsd, vl):
         cp0 = vl.connection_points_reference[0]
         cp1 = vl.connection_points_reference[1]
         for nsd_vl in nsd.virtualLinks:
@@ -135,15 +103,17 @@ class splitter():
                     return 1
         return 0
 
-    def get_connection_point_refs(self, virtual_function_set):
+
+    def get_connection_point_refs(self,virtual_function_set):
         connection_point_refs = []
         for virtual_function in virtual_function_set:
             for connection_point_ref in virtual_function.connection_point_refs:
                 connection_point_refs.append(connection_point_ref)
         return connection_point_refs
 
-    def split_virtual_links(self):
 
+    def split_virtual_links(self):
+        
         for i in range(len(self.NSDs)):
             nsd_vl = self.NSDs[i]
             for virtual_link in self.utilityFunctions.list_virtual_links:
@@ -190,14 +160,13 @@ class splitter():
                         virtual_link_inner.id = str1[0] + "-2-" + str2[0]
                         self.old_new_link_mapping.append([virtual_link.id, virtual_link_inner.id])
                     if found_0 == 1 and found_1 == 1:
-                        if (self.get_connection_point_type(
-                                virtual_link_inner.connection_points_reference[0]) == "external" and \
-                            self.get_connection_point_type(
-                                virtual_link_inner.connection_points_reference[1]) == "external") == False:
+                        if (self.get_connection_point_type(virtual_link_inner.connection_points_reference[0]) == "external" and \
+                                self.get_connection_point_type(virtual_link_inner.connection_points_reference[1]) == "external") == False:
                             nsd_vl.virtualLinks.append(virtual_link_inner)
             self.NSDs[i] = nsd_vl
 
-    def set_constituent_virtual_links(self, nsd, fg):
+
+    def set_constituent_virtual_links(self,nsd, fg):
         constituent_vl = []
         for vl in nsd.virtualLinks:
             for virtual_links in fg.constituent_virtual_links:
@@ -211,21 +180,24 @@ class splitter():
                             break
         return list(set(constituent_vl))
 
-    def number_of_connection_paths(self, constituent_vl):
+
+    def number_of_connection_paths(self,constituent_vl):
         count = 0
         for vl in constituent_vl:
             if "input" in vl:
                 count = count + 1
         return count
 
-    def connection_point_already_processed(self, connection_point_ref):
+
+    def connection_point_already_processed(self,connection_point_ref):
         for connection_point_ref_path in self.processed_connection_point_path:
             if connection_point_ref_path[0] == connection_point_ref:
                 if connection_point_ref_path[1] == 1:
                     return True
         return False
 
-    def normal_case(self, path, nsd_fg):
+
+    def normal_case(self,path, nsd_fg):
         path_inner = NetworkForwardingPaths(path.fp_id, path.policy, [])
         x = 1
         for cp in path.connection_points:
@@ -241,16 +213,16 @@ class splitter():
                         x = x + 1
         return path_inner
 
+
     def split_forwarding_path(self):
         for i in range(len(self.NSDs)):
             nsd_fg = self.NSDs[i]
             del self.processed_connection_point_path[:]
             for fg in self.utilityFunctions.list_forwarding_graphs:
-
+                
                 fg_inner = ForwardingGraphs(fg.fg_id, fg.number_of_endpoints,
-                                            len(self.set_constituent_virtual_links(nsd_fg, fg)),
-                                            self.network_function_sets[i],
-                                            self.set_constituent_virtual_links(nsd_fg, fg), [])
+                                               len(self.set_constituent_virtual_links(nsd_fg, fg)), self.network_function_sets[i],
+                                               self.set_constituent_virtual_links(nsd_fg, fg), [])
                 for path in fg.network_forwarding_path:
                     if self.number_of_connection_paths(self.set_constituent_virtual_links(nsd_fg, fg)) > 1:
                         for j in range(self.number_of_connection_paths(self.set_constituent_virtual_links(nsd_fg, fg))):
@@ -259,8 +231,7 @@ class splitter():
                             for cp in path.connection_points:
                                 if self.connection_point_already_processed(cp.connection_point_ref) is False:
                                     found = 0
-                                    if cp.connection_point_ref in self.get_connection_point_refs(
-                                            nsd_fg.networkFunctions):
+                                    if cp.connection_point_ref in self.get_connection_point_refs(nsd_fg.networkFunctions):
                                         x = x + 1
                                         point = ConnectionPointsGraph(cp.connection_point_ref, x)
                                         path_inner.connection_points.append(point)
@@ -273,8 +244,7 @@ class splitter():
                                                 point = ConnectionPointsGraph(cp.connection_point_ref, x)
                                                 path_inner.connection_points.append(point)
                                                 found = 1
-                                                self.processed_connection_point_path.append(
-                                                    [cp.connection_point_ref, 1])
+                                                self.processed_connection_point_path.append([cp.connection_point_ref, 1])
                                     if found == 0:
                                         string = cp.connection_point_ref.split(":")
                                         if string[1] == "input":
@@ -294,12 +264,12 @@ class splitter():
                 nsd_fg.forwardingGraphs.append(fg_inner)
             self.NSDs[i] = nsd_fg
 
+
     def create_files(self):
-        all_nsds = []
+        all_nsds=[]
         for i in range(len(self.NSDs)):
             data = {}
-            data['descriptor_schema'] = str(
-                "https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml")
+            data['descriptor_schema'] = str("https://raw.githubusercontent.com/sonata-nfv/tng-schema/master/service-descriptor/nsd-schema.yml")
             data['vendor'] = str(self.NSDs[i].vendor)
             data['name'] = str(self.NSDs[i].name)
             data['version'] = str(self.NSDs[i].version)
@@ -350,25 +320,36 @@ class splitter():
 
             data['forwarding_graphs'] = []
             for forwarding_graph in self.NSDs[i].forwardingGraphs:
-                data['forwarding_graphs'].append({
-                    "fg_id": str(forwarding_graph.fg_id),
-                    "number_of_endpoints": forwarding_graph.number_of_endpoints,
-                    "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
-                    "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
-                    "constituent_vnfs": forwarding_graph.constituent_vnfs,
-                    "network_forwarding_paths": sub_data['network_forwarding_paths']
-                })
+                if len(forwarding_graph.constituent_virtual_links) != 0:
+                    print(len(forwarding_graph.constituent_virtual_links))
+                    data['forwarding_graphs'].append({
+                        "fg_id": str(forwarding_graph.fg_id),
+                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+                        "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
+                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+                    })
+                else:
+                    data['forwarding_graphs'].append({
+                        "fg_id": str(forwarding_graph.fg_id),
+                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+                    })
 
             all_nsds.append(data)
-            #file_name = "NSD_" + str(i)
+        
+        #file_name = "NSD_" + str(i)
             #with open(file_name + '.yml', 'w') as outfile:
-            #    yaml.dump(data, outfile, default_flow_style=False)
-
+                #print("Creating NSD_" + str(i))
+                #yaml.dump(data, outfile, default_flow_style=False)
+                #print("Created NSD_" + str(i))
         return all_nsds
 
     def split_sonata(self):
         if self.validate() is not False:
-            self.create_new_function_sets()
             self.set_connection_point_refs_for_virtual_functions()
             self.split_network_function()
             self.set_connection_points()

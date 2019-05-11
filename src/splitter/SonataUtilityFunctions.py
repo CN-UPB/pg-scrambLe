@@ -113,7 +113,10 @@ class utility():
                         fg_id = data['fg_id']
                         number_of_endpoints = data['number_of_endpoints']
                         number_of_virtual_links = data['number_of_virtual_links']
-                        constituent_virtual_links = data['constituent_virtual_links']
+                        constituent_virtual_links = []
+                        if data.get('constituent_virtual_links') is not None:
+                            constituent_virtual_links = data['constituent_virtual_links']
+                        #constituent_virtual_links = data['constituent_virtual_links']
                         constituent_vnfs = data['constituent_vnfs']
                         forwarding_graphs_instance = ForwardingGraphs(fg_id, number_of_endpoints, number_of_virtual_links, constituent_vnfs, constituent_virtual_links, self.list_network_forwarding_paths)
                     self.list_forwarding_graphs.append(forwarding_graphs_instance)
