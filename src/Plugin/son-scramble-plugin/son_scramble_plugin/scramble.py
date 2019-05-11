@@ -322,9 +322,17 @@ class ScramblePlugin(ManoBasePlugin):
         
         
         # post the vnfrs to the repository of PISHAHANG
+		host = 'vm-hadik3r-08.cs.uni-paderborn.de'
+		VNFR_REPOSITORY_URL= 'http://'+host+':4002//records/vnfr/'
+		son_auth = wrappers.SONATAClient.Auth(host)
+		token = json.loads(son_auth.auth(username =username , password= password))
+		_token = json.loads(token["data"])
+		
+		
         for vnfr in osm_vnfrs:
-            url = t.VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr['id']
-            header = {'Content-Type': 'application/json'}
+            url = VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr['id']
+            header = headers={"Content-Type": "application/json", 
+								'Authorization': 'Bearer {}'.format(_token['token']['access_token'])}
             vnfr_resp = requests.put(url,data=json.dumps(vnfr),
                                          headers=header)
                                          
