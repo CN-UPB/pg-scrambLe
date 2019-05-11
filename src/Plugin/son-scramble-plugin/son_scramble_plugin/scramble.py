@@ -36,7 +36,7 @@ import wrappers
 import requests
 import numpy as np
 # import psutil
-
+from osm_helpers import generatePackage
 from sonmanobase.plugin import ManoBasePlugin
 
 logging.basicConfig(level=logging.INFO)
@@ -216,8 +216,11 @@ class ScramblePlugin(ManoBasePlugin):
         function_osm = [] # list to store vnfs for OSM
         
         for i,sets in enumerate(random_set):
+        
             if sets[2] == 'PISHAHANG':
+            
                 for vnf in functions:
+                
                     if(vnf['name'] in sets[1]):
                         function_pish.append(vnf)
                         
@@ -242,21 +245,19 @@ class ScramblePlugin(ManoBasePlugin):
                         vnfd = {"instruction": "sonata_to_osm","descriptor" : vnf}
                         response  = requests.post(translator_url,data=json.dumps(vnfd))
                         osm_vnfd = json.loads(response)
-                        osm_vnfd = osm_nsd['message']['descriptor']
+                        osm_vnfd = osm_vnfd['message']['descriptor']
                         
                         function_osm.append(osm_vnfd)
-                
+                      
+        
+        # creating packages
+        nsd_name = osm_nsd['nsd:nsd-catalog']['nsd'][0]['name']
+        generatePackage(packageType="nsd", descriptorName=nsd_name, payload=osm_nsd)
+        for vnf in functions_osm:
+            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['name']
+            generatePackage(packageType="vnfd", descriptorName=vnf_name, payload=vnf)
         
         
-        #below part not finished
-        # still to do :- 
-        # 1. create packages for osm_nsd and osm_vnfd
-        # 2. send both packages via wrapper to OSM
-        # 3. instantiate ns via wrapper in OSM
-        # 4. get back the vnfr via wrapper
-        # 5. store the vnfr in the PISHAHANG vnfr storage through wrapper.
-        
-        '''
         # connecting to OSM to send the NS package
         username = 'admin'
         password = 'admin'
@@ -267,13 +268,76 @@ class ScramblePlugin(ManoBasePlugin):
         _token = json.loads(token["data"])
         _token['id']
 
-        osm_nsd = wrappers.OSMClient.Nsd(host)
+        osm_nsd_client = wrappers.OSMClient.Nsd(host)
+        osm_nslcm = wrappers.OSMClient.Nslcm(HOST_URL) 
+        osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host)
         
-        osm_nsd.post_ns_descriptors(_token['id'])
+        #posting the packages to OSM
+        osm_nsd_client.post_ns_descriptors(token=_token['id'],package_path="./"+nsd_name+".tar.gz")
         
-        '''
+        osm_vnf_names = [] # to store the osm vnf names to be used to reference VNFRs later
+        
+        for vnf in functions_osm:
+            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['name']
+            osm_vnfpkgm.post_vnf_packages(token=_token["id"],package_path="./"+vnf_name+".tar.gz")
+            osm_vnf_names.append(vnf_name)
+        
+
+        #instantiate the ns on OSM
+        _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
+        _nsd_list = json.loads(_nsd_list["data"])
+        _nsd = None
+
+        for _n in _nsd_list:
+            if nsd_name == _n['id']:            
+                _nsd = _n['_id']
+
+        NSDESCRIPTION = '' 
+        NSNAME = _nsd
+        VIMACCOUNTID = ''# TODO : how to get this ??
+        
+        response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
+                            nsDescription=NSDESCRIPTION, 
+                            nsName=NSNAME, 
+                            nsdId=_nsd, 
+                            vimAccountId=VIMACCOUNTID))
+
+        instantiate_resp = json.loads(response["data"])
         
         
+        # get the VNFRs 
+        
+        response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
+        vnfr_resp = json.loads(response["data"])
+        
+        osm_vnfrs = [] # to store all the instantiated vnfrs
+        for vnfr in vnfr_resp:
+            if vnfr['vnfd-ref'] in osm_vnf_names:            
+                osm_vnfrs.append(vnfr)
+        
+        #TODO
+        # 1. map the ip address obtained in vnfr in previous step to the original vnf of PISHAHANG
+        
+        
+        
+        
+        # post the vnfrs to the repository of PISHAHANG
+        for vnfr in osm_vnfrs:
+            url = t.VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr['id']
+            header = {'Content-Type': 'application/json'}
+            vnfr_resp = requests.put(url,data=json.dumps(vnfr),
+                                         headers=header)
+                                         
+            vnfr_resp_json = str(vnfr_resp.json())
+            
+            if (vnfr_resp.status_code == 200):
+                msg = ": VNFR update accepted for " + vnfr['id']
+                
+            else:
+                msg = ": VNFR update not accepted: " + vnfr_resp_json
+                error = {'http_code': vnfr_resp.status_code,
+                         'message': vnfr_resp_json}
+                         
         
         placement = self.placement(descriptor, function_pish, cloud_services, topology) # sending only the vnfs assigned for PIshahang
 
