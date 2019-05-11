@@ -500,41 +500,41 @@ class setup():
         dataset = dataset.append(df_son_vld)
         dataset=dataset.sort_values(by= 'lineage',ascending=True)
         
-        
-        df = transformation_obj.ret_ds(sonata_dataset,'forwarding_graphs',2)
-        fg = transformation_obj.son_fwdg_nsd(df,'value','key',':')
-        fg['level'] = fg['level'].astype('int64')
-        fg['parent_level'] = fg['parent_level'].astype('int64')
-        df_son_vnffgd = pd.merge(fg,osm_son_vnffgd,
-                         left_on=['key','parent_key','level','parent_level'],
-                         right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
+        if len(dataset[(dataset['parent_key'] == 'constituent-vnfd') & (dataset['key'] == 'vnfd-id-ref')]) > 1:
+            df = transformation_obj.ret_ds(sonata_dataset,'forwarding_graphs',2)
+            fg = transformation_obj.son_fwdg_nsd(df,'value','key',':')
+            fg['level'] = fg['level'].astype('int64')
+            fg['parent_level'] = fg['parent_level'].astype('int64')
+            df_son_vnffgd = pd.merge(fg,osm_son_vnffgd,
+                             left_on=['key','parent_key','level','parent_level'],
+                             right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
 
-        df_son_vnffgd =  df_son_vnffgd[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
-        df_son_vnffgd.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
-        df_son_vnffgd = df_son_vnffgd.append(pd.DataFrame([[3,'vnffgd',4,'rsp','NULL','NULL','NULL'],
-                                                          [4,'rsp',5,'vnfd-connection-point-ref','NULL','NULL','NULL']],
-                                  columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
+            df_son_vnffgd =  df_son_vnffgd[['osm_parent_level','osm_level','osm_parent_key','osm_key','value','osm_lineage','lineage']]
+            df_son_vnffgd.columns = ['parent_level','level','parent_key','key','value','osm_lineage','lineage']
+            df_son_vnffgd = df_son_vnffgd.append(pd.DataFrame([[3,'vnffgd',4,'rsp','NULL','NULL','NULL'],
+                                                              [4,'rsp',5,'vnfd-connection-point-ref','NULL','NULL','NULL']],
+                                      columns = ['parent_level','parent_key','level','key','value','osm_lineage','lineage']))
 
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+            df_son_vnffgd.loc[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 4) & (df_son_vnffgd['parent_level'] == 3) & (df_son_vnffgd['value'] != 'NULL')].apply(
+                lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
 
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
+            df_son_vnffgd.loc[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 5) & (df_son_vnffgd['parent_level'] == 4) & (df_son_vnffgd['value'] != 'NULL')].apply(
+                lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1],axis=1)
 
-        df_son_vnffgd.loc[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL')].apply(
-            lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['osm_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1 )
+            df_son_vnffgd.loc[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL'),'lineage'] = df_son_vnffgd[(df_son_vnffgd['level'] == 6) & (df_son_vnffgd['parent_level'] == 5) & (df_son_vnffgd['value'] != 'NULL')].apply(
+                lambda x : ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+x['lineage'].split('|')[-3] +'|'+ x['osm_lineage'].split('|')[-2]+'|'+x['lineage'].split('|')[-1],axis=1 )
 
-        temp = df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & (df_son_vnffgd['key'] == 'member-vnf-index-ref')].copy()
-        temp['key'] = 'vnfd-id-ref'
-        df_son_vnffgd = df_son_vnffgd.append(temp)  
-            
-        df_son_vnffgd.loc[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
-        (df_son_vnffgd['key'] == 'member-vnf-index-ref'),'value'] =df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
-        (df_son_vnffgd['key'] == 'member-vnf-index-ref')].apply(lambda x :
-                                                                            lookup_value(x['value']) if 1==1 else 'NULL',axis=1)
+            temp = df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & (df_son_vnffgd['key'] == 'member-vnf-index-ref')].copy()
+            temp['key'] = 'vnfd-id-ref'
+            df_son_vnffgd = df_son_vnffgd.append(temp)  
+                
+            df_son_vnffgd.loc[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
+            (df_son_vnffgd['key'] == 'member-vnf-index-ref'),'value'] =df_son_vnffgd[(df_son_vnffgd['parent_key'] == 'vnfd-connection-point-ref') & 
+            (df_son_vnffgd['key'] == 'member-vnf-index-ref')].apply(lambda x :
+                                                                                lookup_value(x['value']) if 1==1 else 'NULL',axis=1)
 
-        df_son_vnffgd.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
-        dataset = dataset.append(df_son_vnffgd)
+            df_son_vnffgd.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+            dataset = dataset.append(df_son_vnffgd)
 
         dataset.drop('osm_lineage',axis=1,inplace=True)
 
