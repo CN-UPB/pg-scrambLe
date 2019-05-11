@@ -350,14 +350,24 @@ class splitter():
 
             data['forwarding_graphs'] = []
             for forwarding_graph in self.NSDs[i].forwardingGraphs:
-                data['forwarding_graphs'].append({
-                    "fg_id": str(forwarding_graph.fg_id),
-                    "number_of_endpoints": forwarding_graph.number_of_endpoints,
-                    "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
-                    "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
-                    "constituent_vnfs": forwarding_graph.constituent_vnfs,
-                    "network_forwarding_paths": sub_data['network_forwarding_paths']
-                })
+                if len(forwarding_graph.constituent_virtual_links) != 0:
+                    print(len(forwarding_graph.constituent_virtual_links))
+                    data['forwarding_graphs'].append({
+                        "fg_id": str(forwarding_graph.fg_id),
+                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+                        "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
+                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+                    })
+                else:
+                    data['forwarding_graphs'].append({
+                        "fg_id": str(forwarding_graph.fg_id),
+                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+                    })
 
             all_nsds.append(data)
             #file_name = "NSD_" + str(i)

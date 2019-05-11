@@ -4,16 +4,9 @@
     <bookmark url="file://$PROJECT_DIR$/src/splitter/OSMUtilityFunctions.py" description="match_attributes_data" line="161" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6c0de9f-00ea-463e-8e0a-d4089dadef70" name="Default Changelist" comment="removed descriptor version property and added descriptor schema&#10;removed some bugs.">
+    <list default="true" id="b6c0de9f-00ea-463e-8e0a-d4089dadef70" name="Default Changelist" comment="Check if constituent virtual links is empty or not">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/docker-compose.dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/docker-compose.dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitter/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitter/Dockerfile-dev" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/Dockerfile-dev" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/splitter/Fetchfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/Fetchfile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitter/Main_splitter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/Main_splitter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitter/OsmSplitter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/OsmSplitter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitter/SonataSchema.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/SonataSchema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/splitter/SonataSplitter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/SonataSplitter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py" afterDir="false" />
     </list>
@@ -25,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/splitter/SonataSplitter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="10" column="39" lean-forward="true" selection-start-line="10" selection-start-column="39" selection-end-line="10" selection-end-column="39" />
+            <state relative-caret-position="309">
+              <caret line="358" column="44" selection-start-line="358" selection-start-column="44" selection-end-line="358" selection-end-column="44" />
               <folding>
                 <element signature="e#28#174#0" expanded="true" />
               </folding>
@@ -38,10 +31,40 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/splitter/NSD_0.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="484">
+              <caret line="22" column="15" lean-forward="true" selection-start-line="22" selection-start-column="15" selection-end-line="22" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/splitter/NSD_1.yml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="110">
+              <caret line="5" column="11" lean-forward="true" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/splitter/OsmSplitter.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="770">
+              <caret line="291" column="8" selection-start-line="291" selection-start-column="8" selection-end-line="295" selection-end-column="44" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1461">
-              <caret line="50" column="17" selection-start-line="50" selection-start-column="17" selection-end-line="50" selection-end-column="17" />
+            <state relative-caret-position="334">
+              <caret line="120" column="67" lean-forward="true" selection-start-line="120" selection-start-column="67" selection-end-line="120" selection-end-column="67" />
               <folding>
                 <element signature="e#38#184#0" expanded="true" />
               </folding>
@@ -49,11 +72,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/splitter/OSMUtilityFunctions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2420">
+              <caret line="13" column="19" lean-forward="true" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/splitter/Main_splitter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="616">
-              <caret line="43" column="45" selection-start-line="43" selection-start-column="45" selection-end-line="43" selection-end-column="45" />
+            <state relative-caret-position="229">
+              <caret line="15" column="44" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="44" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
@@ -62,52 +94,13 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/splitter/placement_plugin_sonata.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="169" column="11" lean-forward="true" selection-start-line="169" selection-start-column="11" selection-end-line="169" selection-end-column="11" />
-              <folding>
-                <element signature="e#1103#1117#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/splitter/Fetchfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="154">
-              <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+            <state relative-caret-position="132">
+              <caret line="6" column="53" selection-start-line="6" selection-start-column="53" selection-end-line="6" selection-end-column="53" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/docker-compose.dev.yml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/splitter/Dockerfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="264">
-              <caret line="12" column="20" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/splitter/requirements.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="4" column="7" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -160,8 +153,11 @@
       <find>set</find>
       <find>print</find>
       <find>NSD(</find>
-      <find>get_data_sonata</find>
       <find>connection_point_refs</find>
+      <find>constituent_virtual_links</find>
+      <find>sonSpli</find>
+      <find>set_constituent_virtual_links</find>
+      <find>get_data_sonata</find>
     </findStrings>
   </component>
   <component name="Git.Rebase.Settings">
@@ -194,15 +190,15 @@
         <option value="$PROJECT_DIR$/src/splitter/Dockerfile" />
         <option value="$PROJECT_DIR$/src/splitter/Dockerfile-dev" />
         <option value="$PROJECT_DIR$/src/gateway/gateway.py" />
-        <option value="$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py" />
         <option value="$PROJECT_DIR$/src/splitter/NSD_1.yml" />
         <option value="$PROJECT_DIR$/src/splitter/placement_plugin_sonata.py" />
         <option value="$PROJECT_DIR$/src/splitter/OsmSplitter.py" />
-        <option value="$PROJECT_DIR$/src/splitter/Fetchfile.py" />
         <option value="$PROJECT_DIR$/src/docker-compose.yml" />
         <option value="$PROJECT_DIR$/src/docker-compose.dev.yml" />
-        <option value="$PROJECT_DIR$/src/splitter/SonataSplitter.py" />
+        <option value="$PROJECT_DIR$/src/splitter/Fetchfile.py" />
+        <option value="$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py" />
         <option value="$PROJECT_DIR$/src/splitter/Main_splitter.py" />
+        <option value="$PROJECT_DIR$/src/splitter/SonataSplitter.py" />
       </list>
     </option>
   </component>
@@ -500,7 +496,14 @@
       <option name="project" value="LOCAL" />
       <updated>1556723447131</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="removed descriptor version property and added descriptor schema&#10;removed some bugs.">
+      <created>1557335278806</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1557335278806</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -518,7 +521,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.40712744" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.36825055" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.2688985" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32937366" />
       <window_info anchor="bottom" id="Messages" order="11" />
@@ -646,13 +649,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/OSMUtilityFunctions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="17" column="26" selection-start-line="17" selection-start-column="26" selection-end-line="17" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/splitter/OsmSchema.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-240">
@@ -707,32 +703,8 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/splitter/NSD_2.yml" />
-    <entry file="file://$PROJECT_DIR$/src/splitter/NSD_0.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1122">
-          <caret line="51" column="18" selection-start-line="51" selection-start-column="18" selection-end-line="51" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/gateway/Dockerfile-dev">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/NSD_1.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="5" column="11" lean-forward="true" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/OsmSplitter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="35" column="55" lean-forward="true" selection-start-line="35" selection-start-column="55" selection-end-line="35" selection-end-column="55" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/splitter/NSDs/hackfest_sfc_nsd.yaml">
       <provider selected="true" editor-type-id="text-editor">
@@ -768,22 +740,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/Fetchfile.py">
+    <entry file="file://$PROJECT_DIR$/src/splitter/placement_plugin_sonata.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+        <state relative-caret-position="3432">
+          <caret line="169" column="11" selection-start-line="169" selection-start-column="11" selection-end-line="169" selection-end-column="11" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1461">
-          <caret line="50" column="17" selection-start-line="50" selection-start-column="17" selection-end-line="50" selection-end-column="17" />
-          <folding>
-            <element signature="e#38#184#0" expanded="true" />
+            <element signature="e#1103#1117#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -792,13 +754,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="682">
           <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/Dockerfile-dev">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="17" column="25" selection-start-line="17" selection-start-column="25" selection-end-line="17" selection-end-column="25" />
         </state>
       </provider>
     </entry>
@@ -816,6 +771,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/Dockerfile-dev">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="17" column="25" selection-start-line="17" selection-start-column="25" selection-end-line="17" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/docker-compose.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="616">
@@ -823,32 +785,73 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/placement_plugin_sonata.py">
+    <entry file="file://$PROJECT_DIR$/src/splitter/OSMUtilityFunctions.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="169" column="11" lean-forward="true" selection-start-line="169" selection-start-column="11" selection-end-line="169" selection-end-column="11" />
+        <state relative-caret-position="-2420">
+          <caret line="13" column="19" lean-forward="true" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/Fetchfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="6" column="53" selection-start-line="6" selection-start-column="53" selection-end-line="6" selection-end-column="53" />
           <folding>
-            <element signature="e#1103#1117#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/NSD_1.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="11" lean-forward="true" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/OsmSplitter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="770">
+          <caret line="291" column="8" selection-start-line="291" selection-start-column="8" selection-end-line="295" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/NSD_0.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="484">
+          <caret line="22" column="15" lean-forward="true" selection-start-line="22" selection-start-column="15" selection-end-line="22" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/Main_splitter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="15" column="44" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/splitter/SonataUtilityFunctions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="334">
+          <caret line="120" column="67" lean-forward="true" selection-start-line="120" selection-start-column="67" selection-end-line="120" selection-end-column="67" />
+          <folding>
+            <element signature="e#38#184#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/splitter/SonataSplitter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="10" column="39" lean-forward="true" selection-start-line="10" selection-start-column="39" selection-end-line="10" selection-end-column="39" />
+        <state relative-caret-position="309">
+          <caret line="358" column="44" selection-start-line="358" selection-start-column="44" selection-end-line="358" selection-end-column="44" />
           <folding>
             <element signature="e#28#174#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/splitter/Main_splitter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="616">
-          <caret line="43" column="45" selection-start-line="43" selection-start-column="45" selection-end-line="43" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
