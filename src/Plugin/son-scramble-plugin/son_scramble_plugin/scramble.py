@@ -133,9 +133,9 @@ class ScramblePlugin(ManoBasePlugin):
 ##########################
 
     def get_network_functions(self,network_functions):
-    '''
-        extract the list of function ids.
-    '''
+        '''
+            extract the list of function ids.
+        '''
 
         list_vnf = []
         list_vnf_nm = []
@@ -153,9 +153,9 @@ class ScramblePlugin(ManoBasePlugin):
         
         
     def random_combination(self,vnf,mano=['PISHAHANG','OSM']):
-    '''
-        generate a random set of function ids and MANOs. 
-    '''
+        '''
+            generate a random set of function ids and MANOs. 
+        '''
     
         vnf_ids = vnf[0] # get the ids of the vnf
         vnf_nm = vnf[1]  # get the names of the vnf
@@ -421,7 +421,7 @@ def main():
     # reduce messaging log level to have a nicer output for this plugin
     logging.getLogger("son-mano-base:messaging").setLevel(logging.INFO)
     logging.getLogger("son-mano-base:plugin").setLevel(logging.INFO)
-#    logging.getLogger("amqp-storm").setLevel(logging.DEBUG)
+    # logging.getLogger("amqp-storm").setLevel(logging.DEBUG)
     # create our function lifecycle manager
     scramble = ScramblePlugin()
 

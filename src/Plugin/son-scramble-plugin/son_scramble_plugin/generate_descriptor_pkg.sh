@@ -826,8 +826,4 @@ else
 
 fi
 
-<<<<<<< HEAD
 cd $cur_dir
-=======
-cd $cur_dir
->>>>>>> 6af069b0520feed183e74f95a8795eda6a71eb9c
