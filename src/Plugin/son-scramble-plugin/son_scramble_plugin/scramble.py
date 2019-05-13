@@ -269,7 +269,7 @@ class ScramblePlugin(ManoBasePlugin):
         _token['id']
 
         osm_nsd_client = wrappers.OSMClient.Nsd(host)
-        osm_nslcm = wrappers.OSMClient.Nslcm(HOST_URL) 
+        osm_nslcm = wrappers.OSMClient.Nslcm(host)
         osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host)
         
         #posting the packages to OSM
