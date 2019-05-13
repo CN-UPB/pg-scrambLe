@@ -28,6 +28,14 @@ ENV PLUGIN_BASE son-scramble-plugin
 ENV broker_host amqp://guest:guest@son-broker:5672/%2F
 ENV broker_exchange son-kernel
 
+# Environment variables
+ENV splitter_url=http://131.234.250.202:8000/Main_splitter/hello
+ENV translator_url=http://131.234.250.202:8000/translator/hello
+ENV username=admin
+ENV password=admin
+ENV host_5=vm-hadik3r-05.cs.uni-paderborn.de
+ENV host_8=vm-hadik3r-08.cs.uni-paderborn.de
+
 # add generic project files
 ADD son-mano-base /son-mano-base
 

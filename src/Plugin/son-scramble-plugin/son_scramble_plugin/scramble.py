@@ -185,7 +185,7 @@ class ScramblePlugin(ManoBasePlugin):
         
         content = yaml.load(payload)
         LOG.info("Scramble plugin handling the placement request: " + content['serv_id'])
-        
+
         topology = content['topology']
         descriptor = content['nsd'] if 'nsd' in content else content['cosd']
         functions = content['functions'] if 'functions' in content else []
@@ -203,7 +203,7 @@ class ScramblePlugin(ManoBasePlugin):
         mano_set = [rndm_sets[0][2], rndm_sets[1][2]] # MANOs of sets 1 and 2
         
         # send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
-        splitter_url = 'http://131.234.250.202:8000/Main_splitter/hello'
+        splitter_url = os.environ['splitter_url']#'http://131.234.250.202:8000/Main_splitter/hello'
         nsd = { 'descriptor' : descriptor, 'sets': vnfid_set}
         
         response  = requests.post(splitter_url,data=json.dumps(nsd))
@@ -228,7 +228,7 @@ class ScramblePlugin(ManoBasePlugin):
             
                 # translating NSD to OSM
                 
-                translator_url = 'http://131.234.250.202:8000/translator/hello'
+                translator_url = os.environ['translator_url']#'http://131.234.250.202:8000/translator/hello'
                 headers = {"Content-Type": "application/json", "Accept": "application/json"}
                 nsd = {"instruction": "sonata_to_osm","descriptor" : nsds_splitted['message'][i]}
                 
@@ -259,9 +259,9 @@ class ScramblePlugin(ManoBasePlugin):
         
         
         # connecting to OSM to send the NS package
-        username = 'admin'
-        password = 'admin'
-        host = 'vm-hadik3r-05.cs.uni-paderborn.de'
+        username = os.environ['username']#'admin'
+        password = os.environ['password']#'admin'
+        host = os.environ['host_5']#'vm-hadik3r-05.cs.uni-paderborn.de'
         
         osm_auth = wrappers.OSMClient.Auth(host)
         token = json.loads(osm_auth.auth(username =username , password= password))
@@ -322,7 +322,7 @@ class ScramblePlugin(ManoBasePlugin):
         
         
         # post the vnfrs to the repository of PISHAHANG
-		host = 'vm-hadik3r-08.cs.uni-paderborn.de'
+		host = os.environ['host_8']#'vm-hadik3r-08.cs.uni-paderborn.de'
 		VNFR_REPOSITORY_URL= 'http://'+host+':4002//records/vnfr/'
 		son_auth = wrappers.SONATAClient.Auth(host)
 		token = json.loads(son_auth.auth(username =username , password= password))
