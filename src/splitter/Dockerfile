@@ -9,16 +9,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY config.yml ./
 COPY start.sh ./
-COPY splitter.py ./
 COPY OsmSplitter.py ./
 COPY Fetchfile.py ./
 COPY Main_splitter.py ./
 COPY OsmSchema.py ./
-COPY OsmUtilityFunctions.py ./
+COPY OSMUtilityFunctions.py ./
 COPY SonataSchema.py ./
 COPY SonataSplitter.py ./
 COPY SonataUtilityFunctions.py ./
-COPY splitter.py ./
 
 COPY SonataNsd.json ./
 COPY OsmNsd.json ./
