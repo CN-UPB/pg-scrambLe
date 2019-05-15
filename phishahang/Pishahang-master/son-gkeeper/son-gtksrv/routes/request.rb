@@ -130,7 +130,11 @@ class GtkSrv < Sinatra::Base
       start_request['egresses'] = egresses
       start_request['ingresses'] = ingresses
       start_request['user_data'] = user_data
-      
+
+      if params['scramble'] == true
+        start_request['scramble'] = true        
+      end
+
       start_request_yml = YAML.dump(start_request.deep_stringify_keys)
       logger.debug(log_msg) {"#{params}:\n"+start_request_yml}
 

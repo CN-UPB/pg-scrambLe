@@ -39,6 +39,34 @@
                 defer.reject(error)});
             return defer.promise;
         },
+
+        instantiateScramble:function(id, ingresses, egresses, ENV){				
+            var defer=$q.defer();
+
+            /* check for empty ingress/egress */
+
+            if (Object.keys(ingresses).length > 0) {
+                var element = ingresses.pop();
+                if ( angular.toJson(element) != "{}") {
+                    ingresses.push(element);
+                }
+            }
+
+            if (Object.keys(egresses).length > 0) {
+                var element = egresses.pop();
+                if ( angular.toJson(element) != "{}") {
+                    egresses.push(element);
+                }
+            }
+
+            var data={"service_uuid":id, "ingresses": ingresses, "egresses":egresses, "scramble":true};
+            $http.post(ENV.apiEndpoint+"/requests",data)
+            .then(function successCallback(result){defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            
+            return defer.promise;
+        },
+
         
         instantiateNSD:function(id, ingresses, egresses, ENV){				
             var defer=$q.defer();

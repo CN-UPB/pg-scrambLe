@@ -1412,6 +1412,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
             message['nap']['ingresses'] = self.services[serv_id]['ingress']
         if self.services[serv_id]['egress'] is not None:
             message['nap']['egresses'] = self.services[serv_id]['egress']
+        if self.services[serv_id]['scramble']:
+            message['nap']['scramble'] = True
 
         # Contact SSM
         payload = yaml.dump(message)
