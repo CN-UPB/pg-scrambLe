@@ -1,0 +1,58 @@
+nsd:nsd-catalog:
+    nsd:
+    -   id:          test-nsd
+        name:        test-nsd
+        description: >
+            A client VM, a VNF and sevrer VM with 1 VNFFG connecting across the
+            VNF from client to server.
+        vendor: OPNFV
+
+        constituent-vnfd:
+        -   member-vnf-index: 1
+            vnfd-id-ref: test-client
+        -   member-vnf-index: 2
+            vnfd-id-ref: test-vnfd
+        -   member-vnf-index: 3
+            vnfd-id-ref: test-server
+
+        ip-profiles:
+        -   name: test-nsd-ipprofile
+            description: Inter VNF Link
+            ip-profile-params:
+                ip-version: ipv4
+                subnet-address: 11.0.0.0/24
+
+        vld:
+            -   id: test-nsd-vld
+                name: test-nsd-vld
+                ip-profile-ref: test-nsd-ipprofile
+                type: ELAN
+                vnfd-connection-point-ref:
+                -   member-vnf-index-ref: 1
+                    vnfd-connection-point-ref: vnf-cp0
+                -   member-vnf-index-ref: 2
+                    vnfd-connection-point-ref: vnf-cp0
+                -   member-vnf-index-ref: 3
+                    vnfd-connection-point-ref: vnf-cp0
+
+        vnffgd:
+            -   id: test-nsd-vnffg
+                name: test-nsd-vnffg
+                rsp:
+                -   id: test-nsd-rsp
+                    name: test-nsd-rsp
+                    vnfd-connection-point-ref:
+                    -   member-vnf-index-ref: 2
+                        order: 0
+                        vnfd-ingress-connection-point-ref: vnf-cp0
+                        vnfd-egress-connection-point-ref: vnf-cp0
+                classifier:
+                -   id: test-nsd-classifier
+                    name: test-nsd-classifier
+                    rsp-id-ref: test-nsd-rsp
+                    member-vnf-index-ref: 1
+                    vnfd-connection-point-ref: vnf-cp0
+                    match-attributes:
+                    -   id: HTTP
+                        ip-proto: 6
+                        destination-port: 80

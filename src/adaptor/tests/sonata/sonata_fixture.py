@@ -111,3 +111,10 @@ def get_packages_keys():
     return ['descriptor_version', 'package_group', 'package_name', 'package_version', 'package_maintainer', 'package_description', 
     'entry_service_template', 'sealed', 'package_content', 'artifact_dependencies']
 
+@fixture
+def get_vnf_instances_keys():
+    return ['created_at', 'descriptor_reference', 'descriptor_version', 'status', 'updated_at', 'version', 'virtual_deployment_units', 'uuid']
+
+@fixture
+def get_vnf_instances_vnfinstanceid_keys():
+    return ['created_at', 'descriptor_reference', 'descriptor_version', 'status', 'updated_at', 'version', 'virtual_deployment_units', 'uuid']

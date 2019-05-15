@@ -57,6 +57,88 @@ class Nslcm(CommonInterfaceNslcm):
         result['data'] = r.text
         return json.dumps(result)
 
+    def get_vnf_instances(self, token, host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        VNF instances - *NON ETSI
+
+        GET - Query multiple VNF instances.
+
+        :param token: auth token retrieved by the auth call
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                osm_nslcm = OSMClient.Nslcm(HOST_URL)
+                osm_auth = OSMClient.Auth(HOST_URL)
+                _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+
+                response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
+                response = json.loads(response["data"])
+
+        """
+
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", 
+                    "accept": "application/json" ,
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/nslcm/v1/vnfrs".format(base_path)
+        
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, 
+                                headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)   
+
+    def get_vnf_instances_vnfinstanceid(self, token, vnfInstanceId ,host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        Individual VNF instance - *NON ETSI
+
+        GET - Read an individual VNF instance resource.
+
+        :param token: auth token retrieved by the auth call
+        :param vnfInstanceId: id of the VNF instance        
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json",
+                    "accept": "application/json",
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/nslcm/v1/vnfrs/{1}".format(base_path, vnfInstanceId)
+
+        try:
+            r = requests.get(_endpoint, params=None, verify=False,
+                                headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
     def post_ns_instances_nsinstanceid_instantiate(self, token, nsDescription,
                                  nsName, nsdId, vimAccountId, host=None, port=None):
         """  NS Lifecycle Management interface - 

@@ -78,7 +78,44 @@ def test_get_ns_instances_nsinstanceid():
         return True
     else:
         return False
-    
+
+def test_get_vnf_instances(get_vnf_instances_keys):
+    """Tests API call query multiple VNF instances"""
+    osm_nslcm = OSMClient.Nslcm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    response = json.loads(osm_nslcm.get_vnf_instances(
+                            token=_token["id"]))
+    response = json.loads(response["data"])
+
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_vnf_instances_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
+
+def test_get_vnf_instances_vnfinstanceid(get_vnf_instances_vnfinstanceid_keys):
+    """Tests API call to read an individual VNF instance resource"""
+    osm_nslcm = OSMClient.Nslcm(HOST_URL)
+    osm_auth = OSMClient.Auth(HOST_URL)
+    _token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _vnf_list = json.loads(osm_nslcm.get_vnf_instances(
+                            token=_token["id"]))
+    _vnf_list = json.loads(_vnf_list["data"])
+
+    response = json.loads(osm_nslcm.get_vnf_instances_vnfinstanceid(
+                            token=_token["id"], vnfInstanceId=_vnf_list[0]["id"]))
+
+    assert response['error'] == False
+    response = json.loads(response["data"])
+    assert isinstance(response, dict)
+    assert set(get_vnf_instances_vnfinstanceid_keys).issubset(
+                response.keys()), "All keys should be in the response"
+
+
 
 # def test_get_ns_lcm_op_ops(get_ns_lcm_op_ops_keys):
 #     """Tests API call to query multiple NS LCM operation occurrences"""
