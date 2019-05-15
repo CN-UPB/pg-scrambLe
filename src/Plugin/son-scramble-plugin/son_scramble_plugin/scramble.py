@@ -152,7 +152,111 @@ class ScramblePlugin(ManoBasePlugin):
                     list_vnf_nm.append(vnf_name)
 
         return [list_vnf,list_vnf_nm]
+
+    def demo_cleanup(self):
+        '''
+        Cleanup code for demo purpose
+        '''
         
+        username_pish = os.environ['username_pish2']#'admin'
+        password_pish = os.environ['password_pish2']#'admin'
+        HOST_URL = os.environ['host_10']#'vm-hadik3r-10.cs.uni-paderborn.de'
+
+        sonata_nsd = wrappers.SONATAClient.Nsd(HOST_URL)
+        sonata_auth = wrappers.SONATAClient.Auth(HOST_URL)
+        sonata_vnfpkgm = wrappers.SONATAClient.VnfPkgm(HOST_URL)
+
+        _token = json.loads(sonata_auth.auth(
+                                username=username_pish, 
+                                password=password_pish))
+
+        _token = json.loads(_token["data"])
+
+        # Delete NSDs
+        nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                            token=_token["token"]["access_token"]))
+        nsd_list = json.loads(nsd_list["data"])
+
+        print(nsd_list)
+
+        for _nsd in nsd_list:
+            print(_nsd["uuid"])    
+            sonata_nsd.delete_ns_descriptors_nsdinfoid(token=_token["token"]["access_token"], nsdinfoid=_nsd["uuid"]) 
+
+        nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                            token=_token["token"]["access_token"]))
+        nsd_list = json.loads(nsd_list["data"])
+
+        print(nsd_list)
+
+        # Delete VNFDs
+
+        vnf_list = json.loads(sonata_vnfpkgm.get_vnf_packages(
+                            token=_token["token"]["access_token"]))
+        vnf_list = json.loads(vnf_list["data"])
+
+        print(vnf_list)
+
+        for _vnfd in vnf_list:
+            print(_vnfd["uuid"])    
+            sonata_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], vnfPkgId=_vnfd["uuid"]) 
+
+        vnf_list = json.loads(sonata_vnfpkgm.get_vnf_packages(
+                            token=_token["token"]["access_token"]))
+        vnf_list = json.loads(vnf_list["data"])
+
+        print(vnf_list)
+
+        username_osm = os.environ['username_osm']#'admin'
+        password_osm = os.environ['password_osm']#'admin'
+        HOST_URL = os.environ['host_5']#'vm-hadik3r-05.cs.uni-paderborn.de'
+
+        osm_nsd = wrappers.OSMClient.Nsd(HOST_URL)
+        osm_auth = wrappers.OSMClient.Auth(HOST_URL)
+        osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(HOST_URL)
+
+        _token = json.loads(osm_auth.auth(
+                                username=username_osm, 
+                                password=password_osm))
+
+        _token = json.loads(_token["data"])
+
+        # Delete NSDs
+        nsd_list = json.loads(osm_nsd.get_ns_descriptors(
+                            token=_token["id"]))
+        nsd_list = json.loads(nsd_list["data"])
+
+        print(nsd_list)
+
+        for _nsd in nsd_list:
+            print(_nsd["_id"])    
+            osm_nsd.delete_ns_descriptors_nsdinfoid(token=_token["id"], nsdinfoid=_nsd["_id"]) 
+
+        nsd_list = json.loads(osm_nsd.get_ns_descriptors(
+                            token=_token["id"]))
+        nsd_list = json.loads(nsd_list["data"])
+
+        print(nsd_list)
+
+        # Delete VNFDs
+
+        vnf_list = json.loads(osm_vnfpkgm.get_vnf_packages(
+                            token=_token["id"]))
+        vnf_list = json.loads(vnf_list["data"])
+
+        print(vnf_list)
+
+        for _vnfd in vnf_list:
+            print(_vnfd["_id"])    
+            osm_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["id"], vnfPkgId=_vnfd["_id"]) 
+
+        vnf_list = json.loads(osm_vnfpkgm.get_vnf_packages(
+                            token=_token["id"]))
+        vnf_list = json.loads(vnf_list["data"])
+
+        print(vnf_list)
+
+
         
     def random_combination(self,vnf,mano=['OSM','PISHAHANG']):
         '''
@@ -167,13 +271,18 @@ class ScramblePlugin(ManoBasePlugin):
 
         rand_int = random.randint(0, 1)
 
+        LOG.info("Random Split")
+        LOG.info(rand_int)
+
         vnf_set1 = [vnf_ids[rand_int]] # storing 1st set of vnf-ids
         vnf_nm_set1 = [vnf_nm[rand_int]]  # storing 1st set of vnf-names
 
         # for random_i in np.random.choice(vnf_len,size=1,replace=False):
         #     vnf_set1 = [vnf_ids[random_i]] # storing 1st set of vnf-ids
         #     vnf_nm_set1 = [vnf_nm[random_i]]  # storing 1st set of vnf-names
-                
+
+        rand_int = random.randint(0, 1)
+
         mano_set1 = [mano[rand_int]]
         # storing 1st set of MANO
         
@@ -181,6 +290,10 @@ class ScramblePlugin(ManoBasePlugin):
         vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
         mano_set2 = list(set(mano) - set(mano_set1)) # storing 2nd set of MANO
         
+        LOG.info("Random Split")
+        LOG.info(rand_int)
+        LOG.info(str([[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]))
+
         return [[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]
             
     def scramble_engine(self, ch, method, prop, payload):
@@ -188,7 +301,7 @@ class ScramblePlugin(ManoBasePlugin):
             Scramble placement plugin to decide and split VNFs randomly among MANOs and assign and send splitted vnfs 
             to respective MANO framework.
         '''
-        
+        self.demo_cleanup()
         content = yaml.load(payload)
         LOG.info("Scramble plugin handling the placement request: " + content['serv_id'])
 
@@ -214,9 +327,9 @@ class ScramblePlugin(ManoBasePlugin):
         
         LOG.info("Calling Scramble Splitter..." )
         response  = requests.post(splitter_url,data=json.dumps(nsd))
-        LOG.info(response)
+        # LOG.info(response)
         nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
-        LOG.info("Original NSD Splitted"+str(nsds_splitted))
+        # LOG.info("Original NSD Splitted"+str(nsds_splitted))
        
         # logic to check which vnf is to be send to which MANO
         
@@ -224,8 +337,8 @@ class ScramblePlugin(ManoBasePlugin):
         function_pish2 =[] # list to store vnfs for PISHAHANG2
         function_osm = [] # list to store vnfs for OSM
         
-        LOG.info("functions")
-        LOG.info(rndm_sets)
+        # LOG.info("functions")
+        # LOG.info(rndm_sets)
 
         for i,sets in enumerate(rndm_sets):
         
@@ -235,17 +348,17 @@ class ScramblePlugin(ManoBasePlugin):
                 
                     if(vnf['vnfd']['name'] in sets[1]):
                         function_pish.append(vnf)
-                LOG.info(function_pish)           
+                # LOG.info(function_pish)           
                         
             elif sets[2][0] == 'PISHAHANG':
             
                 pish2_nsd = nsds_splitted['message'][i]
-                LOG.info(pish2_nsd)
+                # LOG.info(pish2_nsd)
                 for vnf in functions:
                 
                     if(vnf['vnfd']['name'] in sets[1]):
                         function_pish2.append(vnf['vnfd'])
-                LOG.info(function_pish2)
+                # LOG.info(function_pish2)
                 
             elif sets[2][0] == 'OSM':
             
@@ -259,11 +372,11 @@ class ScramblePlugin(ManoBasePlugin):
                 
                 
                 response  = requests.post(translator_url,data=json.dumps(osm_nsd))
-                LOG.info(response)
+                # LOG.info(response)
                 osm_nsd = json.loads(response.text)
                 osm_nsd = osm_nsd['message']['descriptor']
                 
-                LOG.info('\ntranslated NSD:\n'+str(osm_nsd))
+                # LOG.info('\ntranslated NSD:\n'+str(osm_nsd))
                 #LOG.info('\ntranslating VNFD to OSM\n')
                 
                 # getting the vnfds list from Pishahang to translate to osm
@@ -280,7 +393,7 @@ class ScramblePlugin(ManoBasePlugin):
                                 osm_vnfd['vnfd-catalog']['vnfd'][0]['id'] = id_
                         
                         function_osm.append(osm_vnfd)
-                LOG.info('\ntranslated VNFD:\n'+str(function_osm))      
+                # LOG.info('\ntranslated VNFD:\n'+str(function_osm))      
         
                 
         # creating packages
@@ -331,12 +444,12 @@ class ScramblePlugin(ManoBasePlugin):
             vnf_name = vnf['vnfd-catalog']['vnfd'][0]['id']#vnf['vnfd-id-ref']#
             response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],package_path="/tmp/"+vnf_name+"_vnfd.tar.gz"))
             #osm_vnf_names.append(vnf_name)
-            LOG.info("VNFD posted to OSM...\n"+str(response) )
+            # LOG.info("VNFD posted to OSM...\n"+str(response) )
         
         response = json.loads(osm_nsd_client.post_ns_descriptors(token=_token['id'],package_path="/tmp/"+nsd_name+"_nsd.tar.gz"))
-        LOG.info("NSD posted to OSM...\n"+str(response) )
+        # LOG.info("NSD posted to OSM...\n"+str(response) )
         
-        LOG.info("instantiate the ns on OSM...\n")
+        # LOG.info("instantiate the ns on OSM...\n")
         _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
         _nsd_list = json.loads(_nsd_list["data"])
         _nsd = None
@@ -347,7 +460,7 @@ class ScramblePlugin(ManoBasePlugin):
 
         NSDESCRIPTION = 'SCRAMBLE' 
         NSNAME = _nsd
-        VIMACCOUNTID = 'e4f5d9b2-7e80-4895-8e1b-0a4ac97e7b4d'# TODO : how to get this ??
+        VIMACCOUNTID = 'c765fab4-f305-443d-be89-9c55838821e4'# TODO : how to get this ??
         
         response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
                             nsDescription=NSDESCRIPTION, 
@@ -357,7 +470,7 @@ class ScramblePlugin(ManoBasePlugin):
 
         instantiate_resp = json.loads(response["data"])
         
-        LOG.info("response from OSM after instantiating the ns\n"+str(instantiate_resp))
+        # LOG.info("response from OSM after instantiating the ns\n"+str(instantiate_resp))
         
         
         LOG.info("Connecting to Pishahang2..." )
@@ -388,13 +501,13 @@ class ScramblePlugin(ManoBasePlugin):
         for i,vnf in enumerate(function_pish2):
             response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
                     package_path=vnf['name']+'.yml'))
-            LOG.info("VNFD posted to Pishahang2..."+str(response)+"\n" )
+            # LOG.info("VNFD posted to Pishahang2..."+str(response)+"\n" )
             
         response = json.loads(son_nsd_client.post_ns_descriptors(
                     token=_token["token"]["access_token"],
                     package_path=pish2_nsd['name']+".yml"))
         
-        LOG.info("Sub-NSD posted to Pishahang2...\n"+str(response) +"\n")
+        # LOG.info("Sub-NSD posted to Pishahang2...\n"+str(response) +"\n")
         
 
         LOG.info("instantiate the ns on PISHAHANG...\n")
@@ -403,14 +516,14 @@ class ScramblePlugin(ManoBasePlugin):
         _nsd_list = json.loads(_nsd_list["data"])
         
         
-        LOG.info("nsd list response from Pishahang2\n"+str(_nsd_list)+"\n")
+        # LOG.info("nsd list response from Pishahang2\n"+str(_nsd_list)+"\n")
 
         _ns = None
         for _n in _nsd_list:
             if pish2_nsd['name'] == _n['nsd']['name']:            
                 _ns = _n['uuid']
         
-        LOG.info("nsd id: "+str(_ns))
+        # LOG.info("nsd id: "+str(_ns))
         
         if _ns:
             response = json.loads(
@@ -418,7 +531,7 @@ class ScramblePlugin(ManoBasePlugin):
                             token=_token["token"]["access_token"], nsInstanceId=_ns))
         
         
-        LOG.info("response from Pishahang2 after instantiating the ns\n"+str(response))
+        # LOG.info("response from Pishahang2 after instantiating the ns\n"+str(response))
         
         
         '''
@@ -497,12 +610,12 @@ class ScramblePlugin(ManoBasePlugin):
         
         #placement = self.placement(descriptor, functions, cloud_services, topology) # sending only the vnfs assigned for PIshahang
 
-        response = {'mapping': placement}
-        topic = 'mano.service.place'
+        # response = {'mapping': placement}
+        # topic = 'mano.service.place'
 
-        self.manoconn.notify(topic,
-                             yaml.dump(response),
-                             correlation_id=prop.correlation_id)
+        # self.manoconn.notify(topic,
+        #                      yaml.dump(response),
+        #                      correlation_id=prop.correlation_id)
 
         LOG.info("Scramble plugin sends Placement response for service: " + content['serv_id'])
         LOG.info(response)
