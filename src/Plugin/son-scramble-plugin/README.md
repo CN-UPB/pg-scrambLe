@@ -15,6 +15,11 @@
  
 
 
+sudo docker stop scrambleplugin
+sudo docker rm scrambleplugin
+sudo docker build -t scramble -f plugins/son-scramble-plugin/Dockerfile .
+sudo docker run --name scrambleplugin --net=son-sp --network-alias=scrambleplugin scramble
+
 ## Output
 The output of the Scramble plugin should look like this:
 

@@ -34,9 +34,11 @@ import sys
 import concurrent.futures as pool
 import wrappers
 import requests
-import numpy as np
+# import numpy as np
+import random
 # import psutil
-from osm_helpers import generatePackage
+from son_scramble_plugin import osm_helpers
+# import osm_helpers
 from sonmanobase.plugin import ManoBasePlugin
 
 logging.basicConfig(level=logging.INFO)
@@ -152,7 +154,7 @@ class ScramblePlugin(ManoBasePlugin):
         return [list_vnf,list_vnf_nm]
         
         
-    def random_combination(self,vnf,mano=['PISHAHANG','OSM']):
+    def random_combination(self,vnf,mano=['OSM','PISHAHANG']):
         '''
             generate a random set of function ids and MANOs. 
         '''
@@ -163,12 +165,16 @@ class ScramblePlugin(ManoBasePlugin):
         mano_len = len(mano) # no.of MANOs
         vnf_len = len(vnf_ids) # no.of vnfs
 
-        for random_i in np.random.choice(vnf_len,size=1,replace=False):
-        
-            vnf_set1 = [vnf_ids[random_i]] # storing 1st set of vnf-ids
-            vnf_nm_set1 = [vnf_nm[random_i]]  # storing 1st set of vnf-names
-        
-        mano_set1 = [mano[random_i] for random_i in np.random.choice(mano_len,size=1,replace=False)]
+        rand_int = random.randint(0, 1)
+
+        vnf_set1 = [vnf_ids[rand_int]] # storing 1st set of vnf-ids
+        vnf_nm_set1 = [vnf_nm[rand_int]]  # storing 1st set of vnf-names
+
+        # for random_i in np.random.choice(vnf_len,size=1,replace=False):
+        #     vnf_set1 = [vnf_ids[random_i]] # storing 1st set of vnf-ids
+        #     vnf_nm_set1 = [vnf_nm[random_i]]  # storing 1st set of vnf-names
+                
+        mano_set1 = [mano[rand_int]]
         # storing 1st set of MANO
         
         vnf_set2 = list(set(vnf_ids) - set(vnf_set1)) # storing 2nd set of vnf-ids
@@ -194,96 +200,143 @@ class ScramblePlugin(ManoBasePlugin):
         
         # create a set of vnfs for different MANO frameworks through random logic
         # Number of Splits is by default 2.
-        
+        LOG.info("\nRandomly assigning VNFs to existing MANO Frameworks...\n" )
         function_list = self.get_network_functions(descriptor)
-        random_set = self.random_combination(function_list)
+        rndm_sets = self.random_combination(function_list)
         
         vnfid_set = [rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
         vnfname_set = [rndm_sets[0][1], rndm_sets[1][1]] # vnf-names of sets 1 and 2
         mano_set = [rndm_sets[0][2], rndm_sets[1][2]] # MANOs of sets 1 and 2
         
         # send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
-        splitter_url = os.environ['splitter_url']#'http://131.234.250.202:8000/Main_splitter/hello'
+        splitter_url = os.environ['splitter_url'] #'http://131.234.250.202:8000/Main_splitter/hello'
         nsd = { 'descriptor' : descriptor, 'sets': vnfid_set}
         
+        LOG.info("Calling Scramble Splitter..." )
         response  = requests.post(splitter_url,data=json.dumps(nsd))
+        LOG.info(response)
         nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
-
+        LOG.info("Original NSD Splitted"+str(nsds_splitted))
        
         # logic to check which vnf is to be send to which MANO
         
         function_pish =[] # list to store vnfs for PISHAHANG
+        function_pish2 =[] # list to store vnfs for PISHAHANG2
         function_osm = [] # list to store vnfs for OSM
         
-        for i,sets in enumerate(random_set):
+        LOG.info("functions")
+        LOG.info(rndm_sets)
+
+        for i,sets in enumerate(rndm_sets):
         
-            if sets[2] == 'PISHAHANG':
+            if sets[2][0] == 'MAIN_PISHAHANG':
             
                 for vnf in functions:
                 
-                    if(vnf['name'] in sets[1]):
+                    if(vnf['vnfd']['name'] in sets[1]):
                         function_pish.append(vnf)
+                LOG.info(function_pish)           
                         
-            elif sets[2] == 'OSM':
+            elif sets[2][0] == 'PISHAHANG':
             
-                # translating NSD to OSM
+                pish2_nsd = nsds_splitted['message'][i]
+                LOG.info(pish2_nsd)
+                for vnf in functions:
                 
+                    if(vnf['vnfd']['name'] in sets[1]):
+                        function_pish2.append(vnf['vnfd'])
+                LOG.info(function_pish2)
+                
+            elif sets[2][0] == 'OSM':
+            
+                LOG.info('\nCalling Scramble Translator for translating NSD to OSM...\n')
+                
+                osm_vnf_ids = sets[0]
+                osm_vnf_names = sets[1]
                 translator_url = os.environ['translator_url']#'http://131.234.250.202:8000/translator/hello'
                 headers = {"Content-Type": "application/json", "Accept": "application/json"}
-                nsd = {"instruction": "sonata_to_osm","descriptor" : nsds_splitted['message'][i]}
+                osm_nsd = {"instruction": "sonata_to_osm","descriptor" : nsds_splitted['message'][i]}
                 
-                response  = requests.post(translator_url,data=json.dumps(nsd))
-                osm_nsd = json.loads(response)
+                
+                response  = requests.post(translator_url,data=json.dumps(osm_nsd))
+                LOG.info(response)
+                osm_nsd = json.loads(response.text)
                 osm_nsd = osm_nsd['message']['descriptor']
                 
-                # translating VNFD to OSM
+                LOG.info('\ntranslated NSD:\n'+str(osm_nsd))
+                #LOG.info('\ntranslating VNFD to OSM\n')
                 
                 # getting the vnfds list from Pishahang to translate to osm
                 for vnf in functions:
                 
-                    if(vnf['name'] in sets[1]):
-                        vnfd = {"instruction": "sonata_to_osm","descriptor" : vnf}
-                        response  = requests.post(translator_url,data=json.dumps(vnfd))
-                        osm_vnfd = json.loads(response)
+                    if(vnf['vnfd']['name'] in sets[1]):
+                        osm_vnfd = {"instruction": "sonata_to_osm","descriptor" : vnf['vnfd']}
+                        response  = requests.post(translator_url,data=json.dumps(osm_vnfd))
+                        osm_vnfd = json.loads(response.text)
                         osm_vnfd = osm_vnfd['message']['descriptor']
                         
+                        for id_, name_ in zip(osm_vnf_ids,osm_vnf_names):
+                            if (osm_vnfd['vnfd-catalog']['vnfd'][0]['name'] == name_ ):
+                                osm_vnfd['vnfd-catalog']['vnfd'][0]['id'] = id_
+                        
                         function_osm.append(osm_vnfd)
-                      
+                LOG.info('\ntranslated VNFD:\n'+str(function_osm))      
         
+                
         # creating packages
         nsd_name = osm_nsd['nsd:nsd-catalog']['nsd'][0]['name']
-        generatePackage(packageType="nsd", descriptorName=nsd_name, payload=osm_nsd)
-        for vnf in functions_osm:
-            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['name']
-            generatePackage(packageType="vnfd", descriptorName=vnf_name, payload=vnf)
+        if osm_helpers.generatePackage(packageType="nsd", descriptorName=nsd_name, payload=str(osm_nsd)):
+            LOG.info('NSD package created for OSM')
+        else:
+            LOG.info('NSD package not created. ERROR!')
+        
+        for vnf in function_osm:#osm_nsd['nsd:nsd-catalog']['nsd'][0]['constituent-vnfd']:#
+            
+            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['id']#vnf['vnfd-id-ref']#
+            LOG.info(vnf_name)
+            if osm_helpers.generatePackage(packageType="vnfd", descriptorName=vnf_name, payload=str(vnf)):
+                LOG.info('VNFD package created for OSM')
+            else:
+                LOG.info('VNFD package not created for OSM. ERROR!')
         
         
         # connecting to OSM to send the NS package
-        username = os.environ['username']#'admin'
-        password = os.environ['password']#'admin'
-        host = os.environ['host_5']#'vm-hadik3r-05.cs.uni-paderborn.de'
+        username_osm = os.environ['username_osm']#'admin'
+        password_osm = os.environ['password_osm']#'admin'
+        host_osm = os.environ['host_5']#'vm-hadik3r-05.cs.uni-paderborn.de'
         
-        osm_auth = wrappers.OSMClient.Auth(host)
-        token = json.loads(osm_auth.auth(username =username , password= password))
+        username_pish = os.environ['username_pish2']#'admin'
+        password_pish = os.environ['password_pish2']#'admin'
+        host_pish = os.environ['host_10']#'vm-hadik3r-10.cs.uni-paderborn.de'
+        
+        
+        LOG.info("Connecting to OSM..." )
+        
+        
+        osm_auth = wrappers.OSMClient.Auth(host_osm)
+        token = json.loads(osm_auth.auth(username =username_osm , password= password_osm))
         _token = json.loads(token["data"])
         _token['id']
 
-        osm_nsd_client = wrappers.OSMClient.Nsd(host)
-        osm_nslcm = wrappers.OSMClient.Nslcm(host)
-        osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host)
+        osm_nsd_client = wrappers.OSMClient.Nsd(host_osm)
+        osm_nslcm = wrappers.OSMClient.Nslcm(host_osm) 
+        osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host_osm)
         
-        #posting the packages to OSM
-        osm_nsd_client.post_ns_descriptors(token=_token['id'],package_path="./"+nsd_name+".tar.gz")
+        LOG.info("posting the packages to OSM\n")
+                
+        #osm_vnf_names = [] # to store the osm vnf names to be used to reference VNFRs later
         
-        osm_vnf_names = [] # to store the osm vnf names to be used to reference VNFRs later
-        
-        for vnf in functions_osm:
-            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['name']
-            osm_vnfpkgm.post_vnf_packages(token=_token["id"],package_path="./"+vnf_name+".tar.gz")
-            osm_vnf_names.append(vnf_name)
-        
+        for vnf in function_osm:#osm_nsd['nsd:nsd-catalog']['nsd'][0]['constituent-vnfd']:#
 
-        #instantiate the ns on OSM
+            vnf_name = vnf['vnfd-catalog']['vnfd'][0]['id']#vnf['vnfd-id-ref']#
+            response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],package_path="/tmp/"+vnf_name+"_vnfd.tar.gz"))
+            #osm_vnf_names.append(vnf_name)
+            LOG.info("VNFD posted to OSM...\n"+str(response) )
+        
+        response = json.loads(osm_nsd_client.post_ns_descriptors(token=_token['id'],package_path="/tmp/"+nsd_name+"_nsd.tar.gz"))
+        LOG.info("NSD posted to OSM...\n"+str(response) )
+        
+        LOG.info("instantiate the ns on OSM...\n")
         _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
         _nsd_list = json.loads(_nsd_list["data"])
         _nsd = None
@@ -292,9 +345,9 @@ class ScramblePlugin(ManoBasePlugin):
             if nsd_name == _n['id']:            
                 _nsd = _n['_id']
 
-        NSDESCRIPTION = '' 
+        NSDESCRIPTION = 'SCRAMBLE' 
         NSNAME = _nsd
-        VIMACCOUNTID = ''# TODO : how to get this ??
+        VIMACCOUNTID = 'e4f5d9b2-7e80-4895-8e1b-0a4ac97e7b4d'# TODO : how to get this ??
         
         response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
                             nsDescription=NSDESCRIPTION, 
@@ -304,50 +357,145 @@ class ScramblePlugin(ManoBasePlugin):
 
         instantiate_resp = json.loads(response["data"])
         
+        LOG.info("response from OSM after instantiating the ns\n"+str(instantiate_resp))
         
+        
+        LOG.info("Connecting to Pishahang2..." )
+        
+        son_auth = wrappers.SONATAClient.Auth(host_pish)
+        token = json.loads(son_auth.auth(username =username_pish , password= password_pish))
+        _token = json.loads(token["data"])
+
+        
+        son_nsd_client = wrappers.SONATAClient.Nsd(host_pish)
+        son_nslcm = wrappers.SONATAClient.Nslcm(host_pish)
+        son_vnfd = wrappers.SONATAClient.VnfPkgm(host_pish)
+        
+             
+        
+        LOG.info('posting the packages to PISHAHANG')
+        
+        ff = open(pish2_nsd['name']+'.yml','w')
+        yaml.dump(pish2_nsd, ff)
+        ff.close()
+        pish2_vnf_names = []
+        for i,vnf in enumerate(function_pish2):
+            ff = open(vnf['name']+'.yml','w')
+            yaml.dump(vnf, ff)
+            ff.close()
+            pish2_vnf_names.append(vnf['name'])
+        
+        for i,vnf in enumerate(function_pish2):
+            response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
+                    package_path=vnf['name']+'.yml'))
+            LOG.info("VNFD posted to Pishahang2..."+str(response)+"\n" )
+            
+        response = json.loads(son_nsd_client.post_ns_descriptors(
+                    token=_token["token"]["access_token"],
+                    package_path=pish2_nsd['name']+".yml"))
+        
+        LOG.info("Sub-NSD posted to Pishahang2...\n"+str(response) +"\n")
+        
+
+        LOG.info("instantiate the ns on PISHAHANG...\n")
+        
+        _nsd_list = json.loads(son_nsd_client.get_ns_descriptors(token=_token["token"]["access_token"]))
+        _nsd_list = json.loads(_nsd_list["data"])
+        
+        
+        LOG.info("nsd list response from Pishahang2\n"+str(_nsd_list)+"\n")
+
+        _ns = None
+        for _n in _nsd_list:
+            if pish2_nsd['name'] == _n['nsd']['name']:            
+                _ns = _n['uuid']
+        
+        LOG.info("nsd id: "+str(_ns))
+        
+        if _ns:
+            response = json.loads(
+                        son_nslcm.post_ns_instances_nsinstanceid_instantiate(
+                            token=_token["token"]["access_token"], nsInstanceId=_ns))
+        
+        
+        LOG.info("response from Pishahang2 after instantiating the ns\n"+str(response))
+        
+        
+        '''
         # get the VNFRs 
         
-        response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
-        vnfr_resp = json.loads(response["data"])
+        #response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
+        #vnfr_resp = json.loads(response["data"])
         
-        osm_vnfrs = [] # to store all the instantiated vnfrs
-        for vnfr in vnfr_resp:
-            if vnfr['vnfd-ref'] in osm_vnf_names:            
-                osm_vnfrs.append(vnfr)
+        #osm_vnfrs = [] # to store all the instantiated vnfrs
+        #for vnfr in vnfr_resp:
+        #    if vnfr['vnfd-ref'] in osm_vnf_names:            
+        #        osm_vnfrs.append(vnfr)
+
+        nsr_payload = json.loads(son_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
+        nsr_payload = json.loads(nsr_payload["data"])
+
+
+        vnfr_uuid= []
+        for nsr in nsr_payload:
+            if nsr['descriptor_reference'] == response:
+                for vnfr in nsr['network_functions']:
+                    vnfr_uuid.append(vnfr['vnfr_id'])
+
+
+        vnfr_response = json.loads(son_nslcm.get_vnf_instances_vnfinstanceid(
+                            token=_token["token"]["access_token"], vnfInstanceId=vnfr_uuid[0]))
+
+        vnfr_response = json.loads(vnfr_response["data"])
+
+        # response = json.loads(son_nslcm.get_vnf_instances(token=_token["token"]["access_token"]))
+        # vnfr_resp = json.loads(response["data"])
+        
+        LOG.info("VNFr response from Pishahang2 after instantiating the ns \n"+str(vnfr_response))
+        
+        pish2_vnfrs = [] # to store all the instantiated vnfrs
+        #for vnfr in vnfr_resp:
+            #if vnfr['vnfd-ref'] in pish2_vnf_names:            
+            #    pish2_vnfrs.append(vnfr)
+        
         
         #TODO
         # 1. map the ip address obtained in vnfr in previous step to the original vnf of PISHAHANG
-        
-        
-        
-        
         # post the vnfrs to the repository of PISHAHANG
-		host = os.environ['host_8']#'vm-hadik3r-08.cs.uni-paderborn.de'
-		VNFR_REPOSITORY_URL= 'http://'+host+':4002//records/vnfr/'
-		son_auth = wrappers.SONATAClient.Auth(host)
-		token = json.loads(son_auth.auth(username =username , password= password))
-		_token = json.loads(token["data"])
-		
-		
-        for vnfr in osm_vnfrs:
-            url = VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr['id']
-            header = headers={"Content-Type": "application/json", 
-								'Authorization': 'Bearer {}'.format(_token['token']['access_token'])}
-            vnfr_resp = requests.put(url,data=json.dumps(vnfr),
-                                         headers=header)
+        
+        
+        host = os.environ['host_8']#'vm-hadik3r-08.cs.uni-paderborn.de'
+        VNFR_REPOSITORY_URL= 'http://'+host+':4002/records/vnfr/'
+        son_auth = wrappers.SONATAClient.Auth(host)
+        token = json.loads(son_auth.auth(username =username , password= password))
+        _token = json.loads(token["data"])
+
+        url = VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr_response["uuid"]
+        header = headers={"Content-Type": "application/json", 
+                            'Authorization': 'Bearer {}'.format(_token['token']['access_token'])}
+        vnfr_resp = requests.put(url,data=json.dumps(vnfr),
+                                        headers=header)
+        
+        '''
+        # for vnfr in vnfr_resp:
+        #     url = VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfr['id']
+        #     header = headers={"Content-Type": "application/json", 
+        #                         'Authorization': 'Bearer {}'.format(_token['token']['access_token'])}
+        #     vnfr_resp = requests.put(url,data=json.dumps(vnfr),
+        #                                  headers=header)
                                          
-            vnfr_resp_json = str(vnfr_resp.json())
+        #     vnfr_resp_json = str(vnfr_resp.json())
             
-            if (vnfr_resp.status_code == 200):
-                msg = ": VNFR update accepted for " + vnfr['id']
+        #     if (vnfr_resp.status_code == 200):
+        #         msg = ": VNFR update accepted for " + vnfr['id']
                 
-            else:
-                msg = ": VNFR update not accepted: " + vnfr_resp_json
-                error = {'http_code': vnfr_resp.status_code,
-                         'message': vnfr_resp_json}
+        #     else:
+        #         msg = ": VNFR update not accepted: " + vnfr_resp_json
+        #         error = {'http_code': vnfr_resp.status_code,
+        #                  'message': vnfr_resp_json}
                          
         
-        placement = self.placement(descriptor, function_pish, cloud_services, topology) # sending only the vnfs assigned for PIshahang
+        #placement = self.placement(descriptor, functions, cloud_services, topology) # sending only the vnfs assigned for PIshahang
 
         response = {'mapping': placement}
         topic = 'mano.service.place'

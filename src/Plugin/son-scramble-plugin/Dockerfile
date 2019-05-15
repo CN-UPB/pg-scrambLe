@@ -31,9 +31,13 @@ ENV broker_exchange son-kernel
 # Environment variables
 ENV splitter_url=http://131.234.250.202:8000/Main_splitter/hello
 ENV translator_url=http://131.234.250.202:8000/translator/hello
-ENV username=admin
-ENV password=admin
+ENV username_osm=admin
+ENV password_osm=admin
 ENV host_5=vm-hadik3r-05.cs.uni-paderborn.de
+ENV username_pish2=sonata
+ENV password_pish2=1234
+ENV host_10=vm-hadik3r-10.cs.uni-paderborn.de
+ENV host_6=vm-hadik3r-06.cs.uni-paderborn.de
 ENV host_8=vm-hadik3r-08.cs.uni-paderborn.de
 
 # add generic project files
@@ -41,6 +45,7 @@ ADD son-mano-base /son-mano-base
 
 # add plugin related files
 ADD plugins/${PLUGIN_BASE} /plugins/${PLUGIN_BASE}
+RUN chmod +x /plugins/${PLUGIN_BASE}/son_scramble_plugin/generate_descriptor_pkg.sh
 
 # install son-mano-base to be able to use the plugin base class etc.
 WORKDIR /son-mano-base
@@ -52,6 +57,8 @@ RUN python setup.py develop
 
 # Install python requirements
 COPY /plugins/${PLUGIN_BASE}/requirements.txt ./
+
+COPY /plugins/${PLUGIN_BASE}/son_scramble_plugin/osm_helpers.py ./son_scramble_plugin/osm_helpers.py
 RUN pip install --no-cache-dir -r /plugins/${PLUGIN_BASE}/requirements.txt
 
 CMD ["son-scramble-plugin"]
