@@ -129,6 +129,24 @@ class setup():
 
         dataset = dataset.append(df_son_cp)
 
+        
+        
+        if 'mgmt' in dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist():
+            dataset= dataset.append(pd.DataFrame([
+                        ['NULL',2, 3, 'vnfd', 'mgmt-interface','NULL','NULL'],
+                        ['NULL',3, 4, 'mgmt-interface', 'cp','0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0','mgmt']],
+                          columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+
+        elif len(dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist()) ==1:
+            mgmt_cp=dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist()[0]
+            dataset= dataset.append(pd.DataFrame([
+                        ['NULL',2, 3, 'vnfd', 'mgmt-interface','NULL','NULL'],
+                        ['NULL',3, 4, 'mgmt-interface', 'cp','0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0',str(mgmt_cp)]],
+                          columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
+        
+        
+        
+        
         df_vdu = transformation_obj.ret_ds(sonata_dataset, 'virtual_deployment_units', 2)
         df_vdu['level'] = df_vdu['level'].astype('int64')
         df_vdu['parent_level'] = df_vdu['parent_level'].astype('int64')
