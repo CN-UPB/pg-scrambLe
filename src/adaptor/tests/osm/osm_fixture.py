@@ -82,5 +82,11 @@ def get_vim_info_keys():
   return ['_id', 'vim_user', 'name', '_admin', 'vim_password', 'vim_url', 
             'vim_type', 'vim_tenant_name', 'schema_version', 'config']
 
+@fixture
+def get_vnf_instances_keys():
+    return ['_id', 'member-vnf-index-ref', '_admin', 'id', 'vnfd-ref', 'vnfd-id', 'ip-address', 'vim-account-id', 'created-time', 'vdur', 'nsr-id-ref', 'connection-point']
 
+@fixture
+def get_vnf_instances_vnfinstanceid_keys():
+    return ['_id', 'member-vnf-index-ref', '_admin', 'id', 'vnfd-ref', 'vnfd-id', 'ip-address', 'vim-account-id', 'created-time', 'vdur', 'nsr-id-ref', 'connection-point']
     

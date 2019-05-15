@@ -1,0 +1,3 @@
+2e390fd0a9914f97c925c7231db4de4c  intern_vnf_vnfd.yaml
+e12564605fd2c5b6a4e2174858fa0886  cloud_init/cloud-config.txt
+bc681c5a4c3cdc09c013df2d2239f3d2  icons/osm.png

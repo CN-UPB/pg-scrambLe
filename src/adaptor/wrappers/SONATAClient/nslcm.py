@@ -8,10 +8,12 @@ class Nslcm(CommonInterfaceNslcm):
     """
     Lifecycle Management interface
     """
-    def __init__(self, host, port=32001):
+    def __init__(self, host, port=32001, repositories_port=4002):
         self._host = host
         self._port = port
+        self._repositories_port = repositories_port
         self._base_path = 'http://{0}:{1}/api/v2'
+        self._repositories_base_path = 'http://{0}:{1}/'
         
     def get_ns_instances(self, token, host=None, port=None):
         """  NS Lifecycle Management interface - 
@@ -96,7 +98,88 @@ class Nslcm(CommonInterfaceNslcm):
         result['data'] = r.text
         return json.dumps(result)
 
-   
+    def get_vnf_instances(self, token, host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        VNF instances - *NON ETSI
+
+        GET - Query multiple VNF instances.
+
+        :param token: auth token retrieved by the auth call
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        Example:
+            .. code-block:: python
+
+                sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+                sonata_auth = SONATAClient.Auth(HOST_URL)
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
+                response = json.loads(sonata_nslcm.get_vnf_instances(
+                                        token=_token["token"]["access_token"]))
+                response = json.loads(response["data"])            
+
+        """
+
+        if host is None:
+            base_path = self._repositories_base_path.format(self._host, self._repositories_port)
+        else:
+            base_path = self._repositories_base_path.format(host, port)
+        
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/yaml", 
+                    "accept": "application/json" ,
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/vnfr/vnf-instances".format(base_path)
+        
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, 
+                                headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)   
+
+    def get_vnf_instances_vnfinstanceid(self, token, vnfInstanceId ,host=None, port=None):
+        """  NS Lifecycle Management interface - 
+        Individual VNF instance - *NON ETSI
+
+        GET - Read an individual VNF instance resource.
+
+        :param token: auth token retrieved by the auth call
+        :param vnfInstanceId: id of the VNF instance        
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._repositories_base_path.format(self._host, self._repositories_port)
+        else:
+            base_path = self._repositories_base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json",
+                    "accept": "application/json",
+                    "Authorization": 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/vnfr/vnf-instances/{1}".format(base_path, vnfInstanceId)
+
+        try:
+            r = requests.get(_endpoint, params=None, verify=False,
+                                headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+
     def post_ns_instances_nsinstanceid_instantiate(self, token, nsInstanceId, egresses=[], ingresses=[], host=None, port=None):
         """  NS Lifecycle Management interface - 
         Instantiate NS task
