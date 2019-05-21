@@ -9,4 +9,5 @@
 - include: mano/smr.yml
 - include: mano/placement.yml
 - include: mano/placementplugin.yml
+- include: mano/scalingplugin.yml
 - include: mano/clm.yml
