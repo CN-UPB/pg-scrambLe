@@ -112,6 +112,11 @@ SonataApp.config(function($routeProvider) {
 				disableCache: true,
 				controller  : 'MainController'
 			})
+			.when('/mano_settings', {
+				templateUrl : 'js/views/settings/mano.html',
+				disableCache: true,
+				controller  : 'MainController'
+			})
 			.when('/instances/overview', {
 				templateUrl : 'js/views/instances/overview.html',
 				disableCache: true,

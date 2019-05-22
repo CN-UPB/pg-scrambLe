@@ -29,13 +29,17 @@ To contribute to the development of the SONATA gui you have to fork the reposito
 
 Build Docker container image 
 ```
-sudo docker build -t sonata-gui .
+sudo docker build -t son-gui .
 ```
 
 Run Docker container
 ```
-sudo docker run -d -p 80:80 -e "MON_URL=sp.int2.sonata-nfv.eu:8000" -e "GK_URL=sp.int.sonata-nfv.eu:32001" -e "LOGS_URL=logs.sonata-nfv.eu:12900" sonata-gui
+sudo docker run -d -e "MON_URL=sp.int2.sonata-nfv.eu:8000" -e "GK_URL=sp.int.sonata-nfv.eu:32001" -e "LOGS_URL=logs.sonata-nfv.eu:12900" son-gui
 ```
+sudo docker stop  son-gui
+sudo docker rm son-gui
+sudo docker build -t son-gui .
+sudo docker run -d -e "MON_URL=sp.int2.sonata-nfv.eu:8000" -e "GK_URL=sp.int.sonata-nfv.eu:32001" -e "LOGS_URL=logs.sonata-nfv.eu:12900" --net=son-sp --name son-gui son-gui
 
 ## License
 SONATA gui is published under Apache 2.0 license. Please see the LICENSE file for more details.
