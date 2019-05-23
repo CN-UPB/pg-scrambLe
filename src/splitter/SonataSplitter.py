@@ -51,6 +51,39 @@ class splitter():
                 network_function_list.append(self.get_network_function_object(network_function))
                 sub_nsd.networkFunctions = network_function_list
             self.NSDs.append(sub_nsd)
+            
+    def get_internal_links(self):
+        internal_links = []
+        for virtual_link in self.utilityFunctions.list_virtual_links:
+            if virtual_link.connectivity_type == "E-Line":
+                internal_link = []
+                cp_0 = virtual_link.connection_points_reference[0]
+                cp_1 = virtual_link.connection_points_reference[1]
+                if self.get_connection_point_type(cp_0) != "external" and \
+                        self.get_connection_point_type(cp_1) != "external":
+                    vnf_1 = cp_0.split(":")
+                    vnf_2 = cp_1.split(":")
+                    internal_link.append(vnf_1[0])
+                    internal_link.append(vnf_2[0])
+                    internal_links.append(internal_link)
+        return internal_links
+
+    #creates new function sets if needed
+    def create_new_function_sets(self):
+        changed = 0
+        for network_function_set in self.network_function_sets:
+            if len(network_function_set) == 2:
+                if network_function_set not in self.get_internal_links() and \
+                        network_function_set[::-1] not in self.get_internal_links():
+                    for network_function in network_function_set:
+                        new_sub_network_function_set = []
+                        new_sub_network_function_set.append(network_function)
+                        self.new_network_function_set.append(new_sub_network_function_set)
+                        changed = 1
+            if len(network_function_set) == 1 and changed == 1:
+                self.new_network_function_set.append(network_function_set)
+            if changed == 1:
+                self.network_function_sets = self.new_network_function_set
 
 
     def set_connection_points(self):
@@ -350,6 +383,7 @@ class splitter():
 
     def split_sonata(self):
         if self.validate() is not False:
+			self.create_new_function_sets()
             self.set_connection_point_refs_for_virtual_functions()
             self.split_network_function()
             self.set_connection_points()
