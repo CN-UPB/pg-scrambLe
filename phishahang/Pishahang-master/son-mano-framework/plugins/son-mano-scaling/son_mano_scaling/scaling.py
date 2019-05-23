@@ -66,12 +66,27 @@ class ScalingPlugin(ManoBasePlugin):
         ver = "0.1-dev"
         des = "Scaling plugin"
         # TODO: store a list of MANO instances
-        mano_instances = [
+        self.mano_instances = [
             {
-                "host_ip":"",
+                "host_ip":"vm-hadik3r-05.cs.uni-paderborn.de",
+                "monitoring_port": 19999,
                 "username":"",
                 "password":"",
-                "type":""
+                "type":"pishahang"
+            },
+            {
+                "host_ip":"vm-hadik3r-06.cs.uni-paderborn.de",
+                "monitoring_port": 19999,
+                "username":"",
+                "password":"",
+                "type":"pishahang"
+            },
+            {
+                "host_ip":"vm-hadik3r-07.cs.uni-paderborn.de",
+                "monitoring_port": 19999,
+                "username":"",
+                "password":"",
+                "type":"osm"
             }
         ]
 
@@ -87,16 +102,124 @@ class ScalingPlugin(ManoBasePlugin):
         """
         pass
 
+    def _getLoad(self, username=None, password=None, host=None, port=None, usehttps=False, num_points=5):
+        """ netdata system Load API
+        GET method which returns an an array of Load [1min, 5min, 15min]
+
+
+        :param username: username for login
+        :param password: password for login
+        :param host: host url
+        :param port: port where the netdata API can be accessed
+        :usehttps: https or http
+        :num_points: data points to fetch from netdata
+
+        Example:
+
+        """
+        if usehttps:
+            base_path = 'https://{0}:{1}'.format(host, port)
+        else:
+            base_path = 'http://{0}:{1}'.format(host, port)
+
+        _endpoint = '{0}/api/v1/data?chart=system.load&format=json&points={1}&after=-60&options=jsonwrap'.format(base_path, num_points)
+
+        # headers = {"Content-Type": "application/yaml", "accept": "application/json"}
+        # data = {"username": username, "password": password}
+
+        try:
+            r = requests.get(_endpoint)
+
+            if r.status_code != requests.codes.ok:
+                return False
+
+            response = json.loads(r.text)
+            cpu_load = response["latest_values"]
+
+        except Exception as e:
+            # result["data"] = str(e)
+            # LOG.info(str(e))
+            return False
+
+        return cpu_load
+
+
+    def _getMem(self, username=None, password=None, host=None, port=None, usehttps=False, num_points=5):
+        """ netdata system Memory API
+        GET method which returns free memory percentage
+        
+        :param username: username for login
+        :param password: password for login
+        :param host: host url
+        :param port: port where the netdata API can be accessed
+        :usehttps: https or http
+        :num_points: data points to fetch from netdata
+        
+        Example:
+
+        """
+        if usehttps:
+            base_path = 'https://{0}:{1}'.format(host, port)
+        else:
+            base_path = 'http://{0}:{1}'.format(host, port)
+
+        _endpoint = '{0}/api/v1/data?chart=system.ram&format=json&points=5&after=-60&options=jsonwrap|percentage'.format(base_path, num_points)
+
+        # headers = {"Content-Type": "application/yaml", "accept": "application/json"}
+        # data = {"username": username, "password": password}
+
+        try:
+            r = requests.get(_endpoint)
+
+            if r.status_code != requests.codes.ok:
+                return False
+
+            response = json.loads(r.text)
+            free_mem_percent = response["view_latest_values"][0]
+
+        except Exception as e:
+            # result["data"] = str(e)
+            # LOG.info(str(e))
+            return False
+
+        return free_mem_percent
+
+    def normalizeManoMetrics(self, manodata):
+        # TODO: For now take decision based on 15min load
+        _load = self._getLoad(host=manodata["host_ip"], port=manodata["monitoring_port"])
+        _mem = self._getMem(host=manodata["host_ip"], port=manodata["monitoring_port"])
+        LOG.info(_load)
+        LOG.info(_mem)
+        if _load:
+            return _load[2]
+        else:
+            return False
+
     def run(self):
         """
         To be overwritten by subclass
         """
         # TODO: fetch CPU information from all the instances
+        # TODO: if going more than threshold (50%?) then create an instance and when it reaches
+        #       second threshold (90%?) start delegating to new MANO
         while True:
-            LOG.info("Scaling run loop..")            
-            _memory = dict(psutil.virtual_memory()._asdict())
-            LOG.info("CPU: {0}% | Memory: {0}%".format(psutil.cpu_percent(interval=1), _memory['percent']))
-            time.sleep(1)
+            LOG.info("Scaling run loop..")
+            self.mano_priority = []
+            for _mano in self.mano_instances:
+                _mano_normal = self.normalizeManoMetrics(_mano)
+                LOG.info(_mano["host_ip"])
+                if _mano_normal:
+                    LOG.info(_mano_normal)
+                    _mano["priority"] = _mano_normal
+                    self.mano_priority.append(_mano)
+                else:
+                    LOG.info("Could'nt get MANO Metrics")
+
+            LOG.info("Priority List")
+            LOG.info(self.mano_priority)
+            # _memory = dict(psutil.virtual_memory()._asdict())
+            # LOG.info("CPU: {0}% | Memory: {0}%".format(psutil.cpu_percent(interval=1), _memory['percent']))
+            time.sleep(5)
 
     def __del__(self):
         """
