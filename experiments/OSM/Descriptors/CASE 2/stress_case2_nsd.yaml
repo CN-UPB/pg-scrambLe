@@ -1,0 +1,33 @@
+nsd:nsd-catalog:
+    nsd:
+    -   id: stress_case2-ns
+        name: stress_case2
+        short-name: stress_case2
+        description: Simple NS with three VNFs and a single VL
+        version: '1.0'
+        logo: osm.png
+        constituent-vnfd:
+        -   vnfd-id-ref: stress-vnf
+            member-vnf-index: '1'
+        -   vnfd-id-ref: stress-vnf
+            member-vnf-index: '2'
+        -   vnfd-id-ref: stress-vnf
+            member-vnf-index: '3'
+        vld:
+        -   id: mgmtnet
+            name: mgmtnet
+            short-name: mgmtnet
+            type: ELAN
+            mgmt-network: 'true'
+            vim-network-name: private
+            vnfd-connection-point-ref:
+            -   vnfd-id-ref: stress-vnf
+                member-vnf-index-ref: '1'
+                vnfd-connection-point-ref: vnf-cp0
+            -   vnfd-id-ref: stress-vnf
+                member-vnf-index-ref: '2'
+                vnfd-connection-point-ref: vnf-cp0
+            -   vnfd-id-ref: stress-vnf
+                member-vnf-index-ref: '3'
+                vnfd-connection-point-ref: vnf-cp0
+                
