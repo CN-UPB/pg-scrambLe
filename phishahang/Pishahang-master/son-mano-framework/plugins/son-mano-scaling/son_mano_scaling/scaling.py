@@ -196,6 +196,7 @@ class ScalingPlugin(ManoBasePlugin):
             return False
 
     def run(self):
+
         """
         To be overwritten by subclass
         """
@@ -206,8 +207,8 @@ class ScalingPlugin(ManoBasePlugin):
             LOG.info("Scaling run loop..")
             self.mano_priority = []
             for _mano in self.mano_instances:
-                _mano_normal = self.normalizeManoMetrics(_mano)
                 LOG.info(_mano["host_ip"])
+                _mano_normal = self.normalizeManoMetrics(_mano)
                 if _mano_normal:
                     LOG.info(_mano_normal)
                     _mano["priority"] = _mano_normal
