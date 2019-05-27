@@ -3,6 +3,10 @@ NETDATA_PORT = 19999
 
 DUMMY_INSTANCE_IP = "vm-hadik3r-07.cs.uni-paderborn.de"
 
+OSM_DEFAULT_USERNAME = "admin"
+OSM_DEFAULT_PASSWORD = "admin"
+PISHAHANG_DEFAULT_USERNAME = "sonata"
+PISHAHANG_DEFAULT_PASSWORD = "1234"
 
 def run_async(func):
 	"""

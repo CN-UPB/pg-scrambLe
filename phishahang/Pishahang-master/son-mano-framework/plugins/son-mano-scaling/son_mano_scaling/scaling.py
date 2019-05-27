@@ -34,6 +34,8 @@ import sys
 import psutil
 import concurrent.futures as pool
 import re
+import wrappers
+
 from son_mano_scaling.config import *
 from sonmanobase.plugin import ManoBasePlugin
 
