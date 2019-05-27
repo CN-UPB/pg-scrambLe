@@ -72,16 +72,14 @@ class ScalingPlugin(ManoBasePlugin):
         self.terminating_mano_instance = False
         self.child_mano_added = False
         # TODO: store a list of MANO instances
-        self.mano_instances = [
-            {
-                "host_ip":PARENT_IP,
-                "monitoring_port": NETDATA_PORT,
-                "username":"",
-                "password":"",
-                "type":"pishahang",
-                "parent":True
-            }
-        ]
+        self.mano_instances = []
+        self.parent_mano = {
+            "host_ip":PARENT_IP,
+            "monitoring_port": NETDATA_PORT,
+            "username":"",
+            "password":"",
+            "type":"pishahang"
+        }
 
         super(self.__class__, self).__init__(version=ver,
                                              description=des,
@@ -107,8 +105,7 @@ class ScalingPlugin(ManoBasePlugin):
                 "monitoring_port": NETDATA_PORT,
                 "username":"",
                 "password":"",
-                "type":"pishahang",
-                "parent":True                
+                "type":"pishahang"
             }
         )
 
@@ -117,7 +114,7 @@ class ScalingPlugin(ManoBasePlugin):
         LOG.info("\nFinished creating MANO instance...")
 
     @run_async
-    def terminate_mano_instance(self):
+    def terminate_mano_instance(self, host_ip):
         """
         Instantiate a new MANO instance
         """
@@ -128,10 +125,12 @@ class ScalingPlugin(ManoBasePlugin):
         time.sleep(5)
 
         for instance in self.mano_instances:
-            if instance['host_ip'] == DUMMY_INSTANCE_IP:
+            if instance['host_ip'] == host_ip:
                 del self.mano_instances[self.mano_instances.index(instance)]
     
-        self.child_mano_added = False
+        if len(self.mano_instances) == 0:
+            self.child_mano_added = False
+
         self.terminating_mano_instance = False
         LOG.info("\nFinished Terminating MANO instance...")
 
@@ -288,30 +287,55 @@ class ScalingPlugin(ManoBasePlugin):
         """
         # TODO: fetch CPU information from all the instances
         # TODO: if 5min aveerage crosses threshold 0.7 then start creating an instances 
-        #       and when 15min average crosses threshold 0.7 add it to the instances list
+        #       and when 15min average crosses threshold 0.7 add it to the priority list
         # TODO: Termination of the instance when the laod on both the lower MANO and parent
         #       MANO are less than 0.7
         while True:
             LOG.info("\n\n\n\nScaling run loop..")
             self.mano_priority = []
-            # if self.child_mano_added:
-            #     if not self.terminate_mano_instance:
-                    
-            for _mano in self.mano_instances:
-                LOG.info(_mano["host_ip"])
-                _mano_normal = self.normalizeManoMetrics(_mano)
-                if _mano_normal:
-                    # compare if 5min average > 0.7 for parent MANO, else create instance
-                    if _mano["parent"] and (float(_mano_normal[1]) > 0.7):
-                        if not self.child_mano_added:
-                            if not self.instantiating_mano_instance:
-                                self.create_mano_instance()
-                            
-                    LOG.info(_mano_normal)
-                    _mano["priority"] = _mano_normal
-                    self.mano_priority.append(_mano)
+
+            LOG.info("Checking parent MANO")
+            _parent_normal = self.normalizeManoMetrics(self.parent_mano)
+            if _parent_normal:
+                self.parent_mano["priority"] = _parent_normal
+
+            self.mano_priority.append(self.parent_mano)
+
+            if (float(_parent_normal[1]) > 0.7):
+                LOG.info("Parent MANO is getting loaded loaded")
+                if not self.child_mano_added:
+                    if not self.instantiating_mano_instance:
+                        self.create_mano_instance()
+
+            if (float(_parent_normal[2]) > 0.7):
+                LOG.info("Parent MANO is loaded, checking instances")
+                if self.child_mano_added:
+                    for _mano in self.mano_instances:
+                        LOG.info(_mano["host_ip"])
+                        _mano_normal = self.normalizeManoMetrics(_mano)
+                        if _mano_normal:                            
+                            LOG.info(_mano_normal)
+                            _mano["priority"] = _mano_normal
+                            self.mano_priority.append(_mano)
+                        else:
+                            LOG.info("Could'nt get MANO Metrics")
                 else:
-                    LOG.info("Could'nt get MANO Metrics")
+                    LOG.info("Child MANO not avalable!!")
+
+            if (float(_parent_normal[2]) < 0.5):
+                LOG.info("Parent MANO load is now decreasing...")
+                if self.child_mano_added:
+                    for _mano in self.mano_instances:
+                        LOG.info(_mano["host_ip"])
+                        _mano_normal = self.normalizeManoMetrics(_mano)
+                        if float(_mano_normal[2] < 0.5):
+                            LOG.info(_mano_normal)
+                            self.terminate_mano_instance(_mano["host_ip"])
+                        else:
+                            LOG.info("Could'nt get MANO Metrics")
+
+            LOG.info("\n \nChild Instance List")
+            LOG.info(self.mano_instances)
 
             LOG.info("\n \nPriority List")
             LOG.info(self.mano_priority)
