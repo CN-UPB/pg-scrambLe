@@ -3,7 +3,7 @@
 - name: MANO Scaling Plugin (Docker container)
   docker_container:
     name: scalingplugin
-    image: "scalingplugin"
+    image: "pgscramble/scalingplugin"
     env:
       broker_host: amqp://guest:guest@son-broker:5672/%2F
     restart_policy: "always"
