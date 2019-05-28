@@ -20,6 +20,12 @@ sudo docker rm scalingplugin
 sudo docker build -t scalingplugin -f plugins/son-mano-scaling/Dockerfile .
 sudo docker run --name scalingplugin --net=son-sp --network-alias=scalingplugin scalingplugin
 
+sudo docker exec -it scalingplugin bash
+
+from son_mano_scaling.mano_manager import ManoManager
+a = ManoManager()
+
+
 # Dev
 
 sudo docker stop scalingplugin

@@ -7,21 +7,21 @@ class ManoManager():
     def __init__(self):
         self._osm_instances = []
         self._pishahang_instances = []
-        self.sonata_nslcm = SONATAClient.Nslcm(PARENT_IP)
-        self.sonata_auth = SONATAClient.Auth(PARENT_IP)
-        self.sonata_nsd = SONATAClient.Nsd(PARENT_IP)
-        self.sonata_vnfpkgm = SONATAClient.VnfPkgm(PARENT_IP)
+        self.sonata_nslcm = wrappers.SONATAClient.Nslcm(PARENT_IP)
+        self.sonata_auth = wrappers.SONATAClient.Auth(PARENT_IP)
+        self.sonata_nsd = wrappers.SONATAClient.Nsd(PARENT_IP)
+        self.sonata_vnfpkgm = wrappers.SONATAClient.VnfPkgm(PARENT_IP)
 
     def create_osm_instance(self):
         _token = json.loads(self.sonata_auth.auth(username=PISHAHANG_DEFAULT_USERNAME, password=PISHAHANG_DEFAULT_PASSWORD))
         _token = json.loads(_token["data"])
 
         self.sonata_vnfpkgm.post_vnf_packages(token=_token,
-            package_path="descriptors/osm-instance-nsd.json")
+            package_path="descriptors/osm-instance-vnfd.yml")
         time.sleep(3)
 
         self.sonata_nsd.post_ns_descriptors(token=_token,
-            package_path="descriptors/osm-instance-vnfd.json")
+            package_path="descriptors/osm-instance-nsd.yml")
         time.sleep(3)
 
         _nsd_list = json.loads(self.sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
