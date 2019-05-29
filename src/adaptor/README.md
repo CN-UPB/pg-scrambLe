@@ -1,6 +1,6 @@
 # Adaptor
 
-Documentation is available here - `ReadtheDocs <https://python-mano-wrappers.readthedocs.io/en/adaptor/>`_.
+Documentation is available here - [ReadtheDocs](https://python-mano-wrappers.readthedocs.io/en/adaptor/).
 
 ## Structure
 
