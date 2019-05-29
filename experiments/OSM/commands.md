@@ -1,3 +1,13 @@
+## Openstack installation
+
++ Step 1 : create user 
+
++ Step 2 : go to
+https://github.com/CN-UPB/Pishahang/blob/master/osm/documentation/devstack/local.conf
+          and copy local.conf and nano to it and paste it. change IPs to VIMs IP and save
+          ./stack.sh
+
+
 #cloud-config
 
 ssh_authorized_keys:
@@ -17,11 +27,6 @@ NOTES
 
 + install osm , openstack and netdata
 + Modifications to NSDs and VNFDs
-
-## VIM
-+ Ubuntu image created and launched
-+ Instances launced (script! NTF)
-   - Associate floating IPs
 
 ## Terminal
 + ssh into vim
@@ -43,6 +48,11 @@ NOTES
 + tag vim in osm
 + instantiate ns 
 + check the instances in mano and vim to be running
+
+## VIM
++ Ubuntu image created and launched
++ Instances launced (script! NTF)
+   - Associate floating IPs
 
 important links
 
