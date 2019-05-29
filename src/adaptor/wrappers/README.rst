@@ -19,7 +19,7 @@ Documentation is available here - `ReadtheDocs <https://python-mano-wrappers.rea
     password = "admin"
     mano = "osm"
     # mano = "sonata"
-    host = "vm-hadik3r-05.cs.uni-paderborn.de"
+    host = "manosonatademo.com"
 
     if mano == "osm":
         _client = wrappers.OSMClient.Auth(host)
