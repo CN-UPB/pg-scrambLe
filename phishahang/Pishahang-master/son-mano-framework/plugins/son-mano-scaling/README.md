@@ -21,9 +21,13 @@ sudo docker build -t scalingplugin -f plugins/son-mano-scaling/Dockerfile .
 sudo docker run --name scalingplugin --net=son-sp --network-alias=scalingplugin scalingplugin
 
 sudo docker exec -it scalingplugin bash
+cd son_mano_scaling
+python
 
 from son_mano_scaling.mano_manager import ManoManager
 a = ManoManager()
+a.create_pishahang_instance()
+a.create_osm_instance()
 
 
 # Dev

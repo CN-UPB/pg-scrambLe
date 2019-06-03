@@ -45,3 +45,9 @@ It shows how the SLM connects to the broker, registers itself to the plugin mana
  * `./test/test_plugin-son-mano-slm.sh`
 
 
+sudo docker stop servicelifecyclemanagement
+sudo docker rm servicelifecyclemanagement
+sudo docker build -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile .
+sudo docker run -d --name servicelifecyclemanagement --net=son-sp --network-alias=servicelifecyclemanagement servicelifecyclemanagement
+
+sudo docker logs servicelifecyclemanagement -f

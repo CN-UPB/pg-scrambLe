@@ -1,23 +1,23 @@
 ---
 descriptor_version: vnfd-schema-01
-description: OSM Instance
-name: osm-instance
+description: Pishahang Instance
+name: pishahang-instance
 vendor: pg-scramble
 version: '1.0'
 author: pg-scramble
 virtual_deployment_units:
-- id: osm-instance
-  description: OSM Instance
-  vm_image: OSM-Image
+- id: pishahang-instance
+  description: Pishahang Instance
+  vm_image: "http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"
   vm_image_format: qcow2
   resource_requirements:
     cpu:
-      vcpus: 4
+      vcpus: 2
     memory:
-      size: 16
+      size: 1
       size_unit: GB
     storage:
-      size: 30
+      size: 1
       size_unit: GB
   connection_points:
   - id: eth0

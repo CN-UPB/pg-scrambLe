@@ -304,14 +304,14 @@ class ScalingPlugin(ManoBasePlugin):
             self.mano_priority.append(self.parent_mano)
 
             if (float(_parent_normal[1]) > 0.7):
-                LOG.info("Parent MANO is getting loaded loaded")
                 if not self.child_mano_added:
+                    LOG.info("Parent MANO is getting loaded loaded")
                     if not self.instantiating_mano_instance:
                         self.create_mano_instance()
 
             if (float(_parent_normal[2]) > 0.7):
-                LOG.info("Parent MANO is loaded, checking instances")
                 if self.child_mano_added:
+                    LOG.info("Parent MANO is loaded, checking instances")
                     for _mano in self.mano_instances:
                         LOG.info(_mano["host_ip"])
                         _mano_normal = self.normalizeManoMetrics(_mano)
@@ -325,8 +325,8 @@ class ScalingPlugin(ManoBasePlugin):
                     LOG.info("Child MANO not avalable!!")
 
             if (float(_parent_normal[2]) < 0.5):
-                LOG.info("Parent MANO load is now decreasing...")
                 if self.child_mano_added:
+                    LOG.info("Parent MANO load is now decreasing...")
                     for _mano in self.mano_instances:
                         LOG.info(_mano["host_ip"])
                         _mano_normal = self.normalizeManoMetrics(_mano)

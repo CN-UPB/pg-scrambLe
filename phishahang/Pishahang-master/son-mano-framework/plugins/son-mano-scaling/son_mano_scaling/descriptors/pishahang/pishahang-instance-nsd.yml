@@ -1,0 +1,12 @@
+---
+descriptor_version: '1.0'
+vendor: "pg-scramble"
+name: "Pishahang-Service"
+version: '1.0'
+author: "pg-scramble"
+description: "Pishahang Instance"
+network_functions:
+- vnf_id: "pishahang-instance"
+  vnf_vendor: "pg-scramble"
+  vnf_name: "pishahang-instance"
+  vnf_version: '1.0'
