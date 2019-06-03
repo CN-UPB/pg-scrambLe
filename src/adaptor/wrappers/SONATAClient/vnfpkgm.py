@@ -156,7 +156,7 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
 
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, vnfPkgId)
+        _endpoint = "{0}/catalogues/api/v2/vnfs/{1}".format(base_path, vnfPkgId)
 
         try:
             r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
