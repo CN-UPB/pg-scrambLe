@@ -6,6 +6,6 @@ finish() {
     chown -R ${user_id} /data
 }
 
-echo "Running python server"
+echo "Running Flask server"
 
-python3 -m http.server 9000
+python3 app/app.py
