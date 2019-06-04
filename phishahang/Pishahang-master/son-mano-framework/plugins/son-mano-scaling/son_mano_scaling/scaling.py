@@ -38,6 +38,7 @@ import wrappers
 
 from son_mano_scaling.config import *
 from sonmanobase.plugin import ManoBasePlugin
+from son_mano_scaling.mano_manager import ManoManager
 
 # TODO: Make NSD/VNFD for scaling instances
 
@@ -70,6 +71,7 @@ class ScalingPlugin(ManoBasePlugin):
         # broker and register the Scaling plugin to the plugin manger)
         ver = "0.1-dev"
         des = "Scaling plugin"
+        self.mano_manager = ManoManager()
         self.instantiating_mano_instance = False
         self.terminating_mano_instance = False
         self.child_mano_added = False
@@ -90,7 +92,7 @@ class ScalingPlugin(ManoBasePlugin):
                                              start_running=start_running)
 
     @run_async
-    def create_mano_instance(self):
+    def create_mano_instance(self, mano_type="osm"):
         """
         Instantiate a new MANO instance
         """
@@ -99,7 +101,34 @@ class ScalingPlugin(ManoBasePlugin):
         #       3) add instance to the list
         LOG.info("\nCreating MANO instance...")
         self.instantiating_mano_instance = True
-        time.sleep(5)
+        
+        if mano_type == "pishahang":
+            mano_instance_meta = self.mano_manager.create_pishahang_instance()
+            if not mano_instance_meta:
+                LOG.info("\n MANO could not be instantiated...")
+                self.instantiating_mano_instance = False
+                return False
+        elif mano_type == "osm":
+            mano_instance_meta = self.mano_manager.create_osm_instance()
+            if not mano_instance_meta:
+                LOG.info("\n MANO could not be instantiated...")
+                self.instantiating_mano_instance = False
+                return False
+        else:
+            LOG.info("\n MANO type not supported...")
+            self.instantiating_mano_instance = False
+            return False
+
+        # TODO: FIX ME! should be ip from the instantiation
+        # self.mano_instances.append(
+        #     {
+        #         "host_ip":mano_instance_meta["ip"],
+        #         "monitoring_port": NETDATA_PORT,
+        #         "username":"",
+        #         "password":"",
+        #         "type":mano_type
+        #     }
+        # )
 
         self.mano_instances.append(
             {
@@ -107,7 +136,7 @@ class ScalingPlugin(ManoBasePlugin):
                 "monitoring_port": NETDATA_PORT,
                 "username":"",
                 "password":"",
-                "type":"pishahang"
+                "type":mano_type
             }
         )
 

@@ -40,10 +40,12 @@ class ManoManager():
             response = json.loads(
                         self.sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
                             token=_token["token"]["access_token"], nsInstanceId=_ns))
+            print(response)
             if response["error"]:
                 return False
             else:
-                return True
+                # TODO: wait for instantiation and get IP and return meta dict
+                return response
         else:
             return False
 
@@ -81,3 +83,13 @@ class ManoManager():
 
     def pishahang_check(self):
         pass
+
+if __name__ == "__main__":
+    mano_manager = ManoManager()
+    # mano_manager.create_pishahang_instance()
+    mano_manager.create_osm_instance()
+    _token = json.loads(mano_manager.sonata_auth.auth(username=PISHAHANG_DEFAULT_USERNAME, password=PISHAHANG_DEFAULT_PASSWORD))
+    _token = json.loads(_token["data"])
+
+    nsr_payload = json.loads(mano_manager.sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
+    nsr_payload = json.loads(nsr_payload["data"])
