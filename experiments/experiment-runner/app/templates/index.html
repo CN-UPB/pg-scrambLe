@@ -4,30 +4,30 @@
 
 <div>
         CPU utilization : amount of work handled by a CPU(all cores) example : No idle time if this metric shows 100%
-        <div id="chart_cpu_util" style="width: 100%; height: 300px;"></div>
+        <div id="chart_cpu_util" style="width: 100%; height: 500px;"></div>
 </div>
 
 <div>
         System load : average number of processes over a given time. This metric can be used together with CPU usage. In
         netdata, three values of load average refer to the past one, five, and fifteen minutes of system operation
-        <div id="chart_cpu_load" style="width: 100%; height: 300px;"></div>
+        <div id="chart_cpu_load" style="width: 100%; height: 500px;"></div>
 </div>
 
 
 <div>
         RAM : This tells how much of a computer's memory (RAM) is being used.
-        <div id="chart_ram" style="width: 100%; height: 300px;"></div>
+        <div id="chart_ram" style="width: 100%; height: 500px;"></div>
 </div>
 
 <div>
         Network bandwidth : display real-time data such as download and upload speeds. In netdata, only the bandwidth of
         physical network interfaces is aggregated.
-        <div id="chart_net_band" style="width: 100%; height: 300px;"></div>
+        <div id="chart_net_band" style="width: 100%; height: 500px;"></div>
 </div>
 
 <div>
         Disk : rate of read/write operations on the disk.
-        <div id="chart_net_disk" style="width: 100%; height: 300px;"></div>
+        <div id="chart_net_disk" style="width: 100%; height: 500px;"></div>
 </div>
 
 <hr>
@@ -40,18 +40,18 @@
 <h2>{{ _name }}</h2>
 
   <div>
-      CPU usage : CPU Usage (800% = 8 cores) for each microservice
-      <div id="{chart_docker_{{ _id }}_CPU}" style="width: 100%; height: 300px;"></div>
+      CPU usage for each microservice
+      <div id="chart_docker_{{ _id }}_CPU" style="width: 100%; height: 500px;"></div>
   </div>
 
   <div>
         Disk : Throttle serviced I/O operations for each microservice
-        <div id="chart_docker_{{ _id }}_Disk" style="width: 100%; height: 300px;"></div>
+        <div id="chart_docker_{{ _id }}_Disk" style="width: 100%; height: 500px;"></div>
   </div>
 
   <div>
         Mem : Used Memory without Cache for each microservice
-        <div id="chart_docker_{{ _id }}_Mem" style="width: 100%; height: 300px;"></div>
+        <div id="chart_docker_{{ _id }}_Mem" style="width: 100%; height: 500px;"></div>
   </div>
 
 <hr>
@@ -193,7 +193,7 @@ function drawSystemDisk() {
 {% for _name, _id in docker_list.items() %}
 
 function drawDocker{{ _id }}CPUUsage() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.cpu_limit&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.cpu&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_docker_{{ _id }}_CPU')
   var chart = new google.visualization.AreaChart(chart_div);
