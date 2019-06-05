@@ -8,7 +8,7 @@ author: pg-scramble
 virtual_deployment_units:
 - id: osm-instance
   description: OSM Instance
-  vm_image: "http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"
+  vm_image: "osm-instance"
   vm_image_format: qcow2
   resource_requirements:
     cpu:
@@ -22,4 +22,6 @@ virtual_deployment_units:
   connection_points:
   - id: eth0
     interface: ipv4
-    type: internal
+    type: external
+
+# Image name on openstack should be "pg-scramble_osm-instance_1.0_osm-instance"
