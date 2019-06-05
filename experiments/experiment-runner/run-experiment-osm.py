@@ -6,29 +6,131 @@
 # get NS instantiation time
 # send instantiation request to osm/sonata
 
-import wrappers
+from wrappers import OSMClient
 import time
-nsName = "stress_case1"
-nsDescription = "NSDESCRIPTION"
+import json 
+
+IDLE_SLEEP = 1
+NS_TERMINATION_SLEEP = 15
+NO_INSTANCES = 100
+
+USERNAME = "admin"
+PASSWORD = "admin"
+
+HOST_URL = "osmmano.cs.upb.de"
+NSNAME = "stress_case1"
+NSDESCRIPTION = "stress test case 1"
 nsdId = "stress_case1-ns"
-vimAccountId = "openstack"
+VIMACCOUNTID = "6c74d590-aaad-4951-9200-5f1b6d8b0588"
 
-start_time = int(time.time())
-time.sleep(5)
-print (start_time)
+osm_nsd = OSMClient.Nsd(HOST_URL)
+osm_nslcm = OSMClient.Nslcm(HOST_URL) 
+osm_auth = OSMClient.Auth(HOST_URL)
 
-ns_inst_time = int(time.time())
+experiment_timestamps = {}
 
-wrappers.OSMClient.nslcm.Nslcm.post_ns_instances_nsinstanceid_instantiate(self, token, nsDescription,
-                                 nsName, nsdId, vimAccountId, host=None, port=None)
-time.sleep(20)
-ns_term_time = int(time.time())                                 
-
-print(ns_inst_time)
-print(ns_term_time)
+# http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
+print("""
 
 
+ ██████╗ ███████╗███╗   ███╗                                                     
+██╔═══██╗██╔════╝████╗ ████║                                                     
+██║   ██║███████╗██╔████╔██║                                                     
+██║   ██║╚════██║██║╚██╔╝██║                                                     
+╚██████╔╝███████║██║ ╚═╝ ██║                                                     
+ ╚═════╝ ╚══════╝╚═╝     ╚═╝                                                     
+███████╗██╗  ██╗██████╗ ███████╗██████╗ ██╗███╗   ███╗███████╗███╗   ██╗████████╗
+██╔════╝╚██╗██╔╝██╔══██╗██╔════╝██╔══██╗██║████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+█████╗   ╚███╔╝ ██████╔╝█████╗  ██████╔╝██║██╔████╔██║█████╗  ██╔██╗ ██║   ██║   
+██╔══╝   ██╔██╗ ██╔═══╝ ██╔══╝  ██╔══██╗██║██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   
+███████╗██╔╝ ██╗██║     ███████╗██║  ██║██║██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
+╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
+██████╗ ██╗   ██╗███╗   ██╗███╗   ██╗███████╗██████╗                             
+██╔══██╗██║   ██║████╗  ██║████╗  ██║██╔════╝██╔══██╗                            
+██████╔╝██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗  ██████╔╝                            
+██╔══██╗██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝  ██╔══██╗                            
+██║  ██║╚██████╔╝██║ ╚████║██║ ╚████║███████╗██║  ██║                            
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝                            
+                                                                                 
 
+""")
 
+print("PHASE 1 : Recording 5 min of idle metrics...")
+experiment_timestamps["start_time"] = int(time.time())
 
+time.sleep(60*IDLE_SLEEP)
 
+print("PHASE 2 : Starting Instantiation Sequence...")
+
+experiment_timestamps["ns_inst_time"] = int(time.time())
+
+_token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+_token = json.loads(_token["data"])
+
+_nsd_list = json.loads(osm_nsd.get_ns_descriptors(token=_token["id"]))
+_nsd_list = json.loads(_nsd_list["data"])
+
+_nsd = None
+for _n in _nsd_list:
+    if nsdId == _n['id']:            
+        _nsd = _n['_id']
+
+for i in range(0, NO_INSTANCES):
+    response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
+                    nsDescription=NSDESCRIPTION, 
+                    nsName=NSNAME, 
+                    nsdId=_nsd, 
+                    vimAccountId=VIMACCOUNTID))
+    response = json.loads(response["data"])
+    print(response)
+    time.sleep(1)
+
+# Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
+experiment_timestamps["ns_inst_end_time"] = int(time.time())
+
+print("PHASE 2 : Recording Metrics Post NS instantiation...")
+time.sleep(60*NS_TERMINATION_SLEEP)
+
+print("PHASE 3 : Starting Termination Sequence...")
+experiment_timestamps["ns_term_start_time"] = int(time.time())
+
+_token = json.loads(osm_auth.auth(username=USERNAME, password=PASSWORD))
+_token = json.loads(_token["data"])
+
+_ns_list = json.loads(osm_nslcm.get_ns_instances(token=_token["id"]))
+_ns_list = json.loads(_ns_list["data"])
+
+_ns = None
+for _n in _ns_list:
+    if nsdId == _n['nsd']['id']:            
+        _ns = _n['_id']
+        response = None
+        if _ns:
+            response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
+                                    token=_token["id"], 
+                                    nsInstanceId=_ns))
+            response = json.loads(response["data"])
+            print(response)
+
+experiment_timestamps["ns_term_end_time"] = int(time.time())
+
+print("PHASE 3 : Recording Metrics Post NS ...")
+
+time.sleep(60*IDLE_SLEEP)
+
+experiment_timestamps["end_time"] = int(time.time())                                 
+
+print("\n ########### FINISHED ########### \n")
+
+print("Experiment Start Time {0}".format(experiment_timestamps["start_time"]))
+print("Instantiation Start Time {0}".format(experiment_timestamps["ns_inst_time"]))
+print("Instantiation End Time {0}".format(experiment_timestamps["ns_inst_end_time"]))
+print("Termination Start Time {0}".format(experiment_timestamps["ns_term_start_time"]))
+print("Termination End Time {0}".format(experiment_timestamps["ns_term_end_time"]))
+print("Experiment End Time {0}".format(experiment_timestamps["end_time"]))
+
+# TODO: Save all the data generated into csv file
+#       + Use before, after and fetch csv data from url as it is in the html file and write it to a file, named accordingly
+#       + Create a folder with the "ns_inst_time" as name
+
+print("http://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))

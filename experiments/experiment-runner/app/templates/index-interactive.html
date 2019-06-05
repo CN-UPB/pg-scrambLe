@@ -92,13 +92,16 @@ function drawSystemCPUUtil() {
   var options = {
     title: 'CPU Utilization',
     isStacked: 'absolute',
-    vAxis: {minValue: 100}
+    vAxis: {minValue: 100},
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  
-      google.visualization.events.addListener(chart, 'ready', function () {
-        chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-      });
   
     query.send(function(data) {
         chart.draw(data.getDataTable(), options);
@@ -115,13 +118,16 @@ function drawSystemCPULoad() {
 
   var options = {
     title: 'CPU Load',
-    pointsVisible: true
+    pointsVisible: true,
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
-
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
     });  
@@ -129,38 +135,45 @@ function drawSystemCPULoad() {
 }
 
 function drawSystemRAM() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.ram&format=datasource&points=500&after=${after}&before=${before}&options=nonzero`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.ram&format=datasource&after=${after}&before=${before}&options=nonzero`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_ram')
   var chart = new google.visualization.AreaChart(chart_div);
 
   var options = {
     title: 'RAM',
-    isStacked: 'absolute'
+    isStacked: 'absolute',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
-
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
     });  
 }
 
 function drawSystemNetworkBandwidth() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.net&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.net&format=datasource&after=${after}&before=${before}&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_net_band')
-  var chart = new google.visualization.AreaChart(chart_div);
+  var chart = new google.visualization.LineChart(chart_div);
 
   var options = {
     title: 'Network Bandwidth',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
@@ -168,19 +181,22 @@ function drawSystemNetworkBandwidth() {
 }
 
 function drawSystemDisk() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.io&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=system.io&format=datasource&after=${after}&before=${before}&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_net_disk')
   var chart = new google.visualization.AreaChart(chart_div);
 
   var options = {
     title: 'Disk',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
-
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
     });  
@@ -191,7 +207,7 @@ function drawSystemDisk() {
 {% for _name, _id in docker_list.items() %}
 
 function drawDocker{{ _id }}CPUUsage() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.cpu&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.cpu&format=datasource&after=${after}&before=${before}&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_docker_{{ _id }}_CPU')
   var chart = new google.visualization.AreaChart(chart_div);
@@ -199,11 +215,16 @@ function drawDocker{{ _id }}CPUUsage() {
   var options = {
     title: 'CPU Usage',
     isStacked: 'absolute',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 8.0
+          },
+    // vAxis: {minValue: 100}
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
@@ -211,18 +232,22 @@ function drawDocker{{ _id }}CPUUsage() {
 }
 
 function drawDocker{{ _id }}Disk() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.throttle_io&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.throttle_io&format=datasource&after=${after}&before=${before}&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_docker_{{ _id }}_Disk')
   var chart = new google.visualization.AreaChart(chart_div);
 
   var options = {
     title: 'Disk',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
@@ -230,18 +255,22 @@ function drawDocker{{ _id }}Disk() {
 }
 
 function drawDocker{{ _id }}Mem() {
-  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.mem_usage&format=datasource&after=${after}&before=${before}&points=500&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
+  var query = new google.visualization.Query(`http://${host}:19999/api/v1/data?chart=cgroup_{{ _name }}.mem_usage&format=datasource&after=${after}&before=${before}&group=average&gtime=0&datasource&options=nonzeroseconds`, {sendMethod: 'auto'});
   
   var chart_div = document.getElementById('chart_docker_{{ _id }}_Mem')
-  var chart = new google.visualization.AreaChart(chart_div);
+  var chart = new google.visualization.LineChart(chart_div);
 
   var options = {
     title: 'Mem',
+    crosshair: { trigger: 'both' },
+    explorer: { 
+            actions: ['dragToZoom', 'rightClickToReset'],
+            axis: 'horizontal',
+            keepInBounds: true,
+            maxZoomIn: 4.0
+          },
   };
   
-  google.visualization.events.addListener(chart, 'ready', function () {
-    chart_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-  });
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);

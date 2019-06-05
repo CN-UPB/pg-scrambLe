@@ -15,8 +15,8 @@ vnfd:vnfd-catalog:
             image: stress-image
             count: '1'
             vm-flavor:
-                vcpu-count: '2'
-                memory-mb: '4096'
+                vcpu-count: '1'
+                memory-mb: '2048'
                 storage-gb: '5'
             interface:
             -   name: vdu-eth0
