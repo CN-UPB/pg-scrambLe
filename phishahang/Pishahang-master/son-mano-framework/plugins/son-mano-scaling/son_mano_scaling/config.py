@@ -1,7 +1,9 @@
-PARENT_IP = "vm-hadik3r-06.cs.uni-paderborn.de"
+PARENT_IP = "vm-hadik3r-08.cs.uni-paderborn.de"
 NETDATA_PORT = 19999
 
 DUMMY_INSTANCE_IP = "vm-hadik3r-07.cs.uni-paderborn.de"
+
+NS_TIMEOUT = 10
 
 OSM_DEFAULT_USERNAME = "admin"
 OSM_DEFAULT_PASSWORD = "admin"

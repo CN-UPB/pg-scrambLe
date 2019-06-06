@@ -29,28 +29,9 @@ from son_mano_scaling.config import *
 import json
 
 mano_manager = ManoManager()
-#_instance_id = json.loads(mano_manager.create_pishahang_instance())
+#_instance_id = mano_manager.create_pishahang_instance()
 _instance_id = mano_manager.create_osm_instance()
 
-if _instance_id:
-    _instance_id = json.loads(_instance_id["data"])
-else:
-    pass
-
-
-_token = json.loads(mano_manager.sonata_auth.auth(username=PISHAHANG_DEFAULT_USERNAME, password=PISHAHANG_DEFAULT_PASSWORD))
-_token = json.loads(_token["data"])
-
-nsr_payload = json.loads(mano_manager.sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"]))
-nsr_payload = json.loads(nsr_payload["data"])
-
-for nsr in nsr_payload:
-    print(nsr["descriptor_reference"])
-    if nsr['descriptor_reference'] == _instance_id["service_uuid"]:
-        for vnfr in nsr['network_functions']:
-            vnfr_uuid = vnfr['vnfr_id']
-
-print(vnfr_uuid)
 
 # Dev
 

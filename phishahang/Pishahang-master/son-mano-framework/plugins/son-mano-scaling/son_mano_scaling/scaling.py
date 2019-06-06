@@ -130,6 +130,8 @@ class ScalingPlugin(ManoBasePlugin):
         #     }
         # )
 
+        LOG.info("\n MANO instantiated with IP...".format(mano_instance_meta))
+
         self.mano_instances.append(
             {
                 "host_ip":DUMMY_INSTANCE_IP,
