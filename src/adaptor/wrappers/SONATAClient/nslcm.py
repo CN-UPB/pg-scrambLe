@@ -15,7 +15,7 @@ class Nslcm(CommonInterfaceNslcm):
         self._base_path = 'http://{0}:{1}/api/v2'
         self._repositories_base_path = 'http://{0}:{1}/'
         
-    def get_ns_instances(self, token, host=None, port=None):
+    def get_ns_instances(self, token, offset=None, limit=None, host=None, port=None):
         """  NS Lifecycle Management interface - 
         NS instances
 
@@ -23,6 +23,8 @@ class Nslcm(CommonInterfaceNslcm):
             GET - Query multiple NS instances.
 
         :param token: auth token retrieved by the auth call
+        :param offset: offset index while returning
+        :param limit: limit records while returning
         :param host: host url
         :param port: port where the MANO API can be accessed
 
@@ -48,8 +50,13 @@ class Nslcm(CommonInterfaceNslcm):
         headers = {"Content-Type": "application/yaml", 
                     "accept": "application/json" ,
                     "Authorization": 'Bearer {}'.format(token)}
-        _endpoint = "{0}/records/services".format(base_path)
         
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
+
+        _endpoint = "{0}/records/services?offset={1}&limit={2}".format(base_path, offset, limit)
         try:
             r = requests.get(_endpoint, params=None, verify=False, 
                                 headers=headers)
@@ -98,13 +105,15 @@ class Nslcm(CommonInterfaceNslcm):
         result['data'] = r.text
         return json.dumps(result)
 
-    def get_vnf_instances(self, token, host=None, port=None):
+    def get_vnf_instances(self, token, offset=None, limit=None, host=None, port=None):
         """  NS Lifecycle Management interface - 
         VNF instances - *NON ETSI
 
         GET - Query multiple VNF instances.
 
         :param token: auth token retrieved by the auth call
+        :param offset: offset index while returning
+        :param limit: limit records while returning
         :param host: host url
         :param port: port where the MANO API can be accessed
 
@@ -130,8 +139,14 @@ class Nslcm(CommonInterfaceNslcm):
         headers = {"Content-Type": "application/yaml", 
                     "accept": "application/json" ,
                     "Authorization": 'Bearer {}'.format(token)}
-        _endpoint = "{0}/records/vnfr/vnf-instances".format(base_path)
-        
+
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
+
+        _endpoint = "{0}/records/vnfr/vnf-instances?offset={1}&limit={2}".format(base_path, offset, limit)
+
         try:
             r = requests.get(_endpoint, params=None, verify=False, 
                                 headers=headers)

@@ -14,9 +14,10 @@ def test_get_ns_instances(get_ns_instances_keys):
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     response = json.loads(sonata_nslcm.get_ns_instances(
-                            token=_token["token"]["access_token"]))
+                            token=_token["token"]["access_token"], limit=1000))
     response = json.loads(response["data"])
-
+    print(len(response))
+    print(response)
     assert isinstance(response, list)
     if len(response) > 0:
          assert set(get_ns_instances_keys).issubset(
@@ -63,7 +64,7 @@ def test_get_vnf_instances(get_vnf_instances_keys):
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     response = json.loads(sonata_nslcm.get_vnf_instances(
-                            token=_token["token"]["access_token"]))
+                            token=_token["token"]["access_token"], limit=1000))
     response = json.loads(response["data"])
 
     assert isinstance(response, list)
