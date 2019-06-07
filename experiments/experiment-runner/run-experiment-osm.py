@@ -8,11 +8,20 @@
 
 from wrappers import OSMClient
 import time
-import json 
+import json
+import requests
+from urllib.request import urlopen
+import csv
+import os
+import docker
+client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
-IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 15
-NO_INSTANCES = 100
+DOCKER_EXCLUDE = ['experiment-runner']
+
+
+IDLE_SLEEP = 0.1
+NS_TERMINATION_SLEEP = 0.1
+NO_INSTANCES = 1
 
 USERNAME = "admin"
 PASSWORD = "admin"
@@ -132,5 +141,59 @@ print("Experiment End Time {0}".format(experiment_timestamps["end_time"]))
 # TODO: Save all the data generated into csv file
 #       + Use before, after and fetch csv data from url as it is in the html file and write it to a file, named accordingly
 #       + Create a folder with the "ns_inst_time" as name
+#       'http://osmmano.cs.upb.de:19999/api/v1/data?chart=system.cpu&format=csv&options=nonzero'
+
+def createFolder(directory):
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+        print ('Error: Creating directory. ' + directory)
+
+nit = experiment_timestamps["ns_inst_time"]
+createFolder("./{nit}/".format(nit=nit))
+
+_charts = {
+    "system-cpu" : { 
+        "url": "http://{host}:19999/api/v1/data?chart=system.cpu&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL,after=experiment_timestamps["start_time"],before=experiment_timestamps["end_time"])
+    },
+    "system-load" : { 
+        "url": "http://{host}:19999/api/v1/data?chart=system.load&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL, after=experiment_timestamps['start_time'], before=experiment_timestamps["end_time"])
+    },
+    "system-ram" : { 
+        "url": "http://{host}:19999/api/v1/data?chart=system.ram&format=datasource&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL, after=experiment_timestamps['start_time'], before=experiment_timestamps["end_time"])
+    },
+    "system-net" : { 
+        "url": "http://{host}:19999/api/v1/data?chart=system.net&format=datasource&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"])
+    },
+    "system-io" : { 
+        "url": "http://{host}:19999/api/v1/data?chart=system.io&format=datasource&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"])
+    }
+    }
+
+docker_list = {}
+for _container in client.containers.list():        
+    if not _container.attrs["Name"][1:] in DOCKER_EXCLUDE:
+            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
+            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
+            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "mem_usage")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.mem_usage&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
+            
+        
+for _sc, value  in _charts.items():
+    print(_sc)
+    try:
+        # TODO: make verify=false as a fallback
+        r = requests.get(value["url"], verify=False)
+    except Exception as e:
+        print(str(e))
+
+    if r.status_code == requests.codes.ok:
+        print("success")
+
+        with open('./{nit}/{sc}.csv'.format(nit=nit,sc=_sc), 'w') as csv_file:
+            csv_file.write(r.text)
+    else:
+        print("Failed")
+                
 
 print("http://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))

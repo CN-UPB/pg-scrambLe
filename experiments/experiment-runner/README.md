@@ -15,6 +15,7 @@ sudo docker run -d --name experiment-runner -p 9000:9000 -v $(pwd):/app -v /var/
 
 sudo docker logs experiment-runner -f
 
+# Attach shell
 sudo docker exec -it experiment-runner bash
 
 import docker
