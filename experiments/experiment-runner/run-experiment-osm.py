@@ -28,7 +28,7 @@ PASSWORD = "admin"
 
 HOST_URL = "osmmano.cs.upb.de"
 NSNAME = "stress_case1"
-NSDESCRIPTION = "stress test case 1"
+NSDESCRIPTION = "case1-100_NS"
 nsdId = "stress_case1-ns"
 VIMACCOUNTID = "6c74d590-aaad-4951-9200-5f1b6d8b0588"
 
@@ -62,6 +62,7 @@ print("""
 ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝                            
                                                                                  
 
+                
 """)
 
 print("PHASE 1 : Recording 5 min of idle metrics...")
@@ -90,7 +91,6 @@ for i in range(0, NO_INSTANCES):
                     nsName=NSNAME, 
                     nsdId=_nsd, 
                     vimAccountId=VIMACCOUNTID))
-    response = json.loads(response["data"])
     print(response)
     time.sleep(1)
 
@@ -111,15 +111,17 @@ _ns_list = json.loads(_ns_list["data"])
 
 _ns = None
 for _n in _ns_list:
-    if nsdId == _n['nsd']['id']:            
-        _ns = _n['_id']
-        response = None
-        if _ns:
-            response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
-                                    token=_token["id"], 
-                                    nsInstanceId=_ns))
-            response = json.loads(response["data"])
-            print(response)
+    try:
+        if nsdId == _n['nsd']['id']:            
+            _ns = _n['_id']
+            response = None
+            if _ns:
+                response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
+                                        token=_token["id"], 
+                                        nsInstanceId=_ns))
+                print(response)
+    except Exception as e:
+        pass
 
 experiment_timestamps["ns_term_end_time"] = int(time.time())
 
@@ -143,6 +145,9 @@ print("Experiment End Time {0}".format(experiment_timestamps["end_time"]))
 #       + Create a folder with the "ns_inst_time" as name
 #       'http://osmmano.cs.upb.de:19999/api/v1/data?chart=system.cpu&format=csv&options=nonzero'
 
+
+print("PHASE 4 : Saving Metrics  ...")
+
 def createFolder(directory):
     try:
         if not os.path.exists(directory):
@@ -150,7 +155,7 @@ def createFolder(directory):
     except OSError:
         print ('Error: Creating directory. ' + directory)
 
-nit = experiment_timestamps["ns_inst_time"]
+nit = "{0}-{1}".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
 createFolder("./{nit}/".format(nit=nit))
 
 _charts = {
@@ -184,16 +189,28 @@ for _sc, value  in _charts.items():
     try:
         # TODO: make verify=false as a fallback
         r = requests.get(value["url"], verify=False)
+
+        if r.status_code == requests.codes.ok:
+            print("success")
+
+            with open('./{nit}/{sc}.csv'.format(nit=nit,sc=_sc), 'w') as csv_file:
+                csv_file.write(r.text)
+        else:
+            print("Failed")
+
     except Exception as e:
         print(str(e))
 
-    if r.status_code == requests.codes.ok:
-        print("success")
 
-        with open('./{nit}/{sc}.csv'.format(nit=nit,sc=_sc), 'w') as csv_file:
-            csv_file.write(r.text)
-    else:
-        print("Failed")
-                
+with open('./{nit}/experiment-meta.md'.format(nit=nit), 'w') as _file:
+    _file.write("Experiment Start Time {0}\n".format(experiment_timestamps["start_time"]))
+    _file.write("Instantiation Start Time {0}\n".format(experiment_timestamps["ns_inst_time"]))
+    _file.write("Instantiation End Time {0}\n".format(experiment_timestamps["ns_inst_end_time"]))
+    _file.write("Termination Start Time {0}\n".format(experiment_timestamps["ns_term_start_time"]))
+    _file.write("Termination End Time {0}\n".format(experiment_timestamps["ns_term_end_time"]))
+    _file.write("Experiment End Time {0}\n".format(experiment_timestamps["end_time"]))
+    _file.write("\n\nhttp://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))
 
+print("Metrics saved in folder ./{nit}".format(nit=nit))
 print("http://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))
+print("http://{host}:9000/interactive?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))

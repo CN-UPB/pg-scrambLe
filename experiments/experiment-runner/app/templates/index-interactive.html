@@ -1,4 +1,5 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="static/sorttable.js"></script>
 
 <h1>System overview </h1>
 
@@ -58,6 +59,92 @@
 
 {% endfor %}
 
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-uys7{border-color:inherit;text-align:center}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}
+
+</style>
+
+<table class="tg sortable">
+  <tr>
+    <th class="tg-uys7">Service</th>
+    <th class="tg-uys7 sorttable_numeric">CPU U Avg</th>
+    <th class="tg-uys7 sorttable_numeric">CPU U Max</th>
+    <th class="tg-uys7 sorttable_numeric">CPU U Min</th>
+    <th class="tg-uys7 sorttable_numeric">CPU S Avg</th>
+    <th class="tg-uys7 sorttable_numeric">CPU S Max</th>
+    <th class="tg-uys7 sorttable_numeric">CPU S Min</th>
+  </tr>
+
+{% for _name, _id in docker_list.items() %}
+  <tr id="table_docker_{{ _id }}_CPU" ></tr>
+{% endfor %}
+
+</table>
+
+<table class="tg sortable">
+  <tr>
+    <th class="tg-uys7">Service</th>
+    <th class="tg-uys7">MEM Avg</th>
+    <th class="tg-uys7">MEM Max</th>
+    <th class="tg-uys7">MEM Min</th>
+  </tr>
+  <tr>
+    <td> Service</td>
+    <td> MEM Avg</td>
+    <td> MEM Max</td>
+    <td> MEM Min</td>
+  </tr>
+
+{% for _name, _id in docker_list.items() %}
+
+  <div id="table_docker_{{ _id }}_Mem" ></div>
+
+{% endfor %}
+
+</table>
+
+
+<table class="tg sortable">
+  <tr>
+    <th class="tg-uys7">Service</th>
+    <th class="tg-s6z2">DISK Read Avg</th>
+    <th class="tg-s6z2">DISK Read Max</th>
+    <th class="tg-s6z2">DISK Read Min</th>
+    <th class="tg-s6z2">DISK Write Avg</th>
+    <th class="tg-s6z2">DISK Write Max</th>
+    <th class="tg-s6z2">DISK Write Min</th>
+  </tr>
+  <tr>
+    <td> Service</td>
+    <td> DISK Read Avg</td>
+    <td> DISK Read Max</td>
+    <td> DISK Read Min</td>
+    <td> DISK Write Avg</td>
+    <td> DISK Write Max</td>
+    <td> DISK Write Min</td>
+  </tr>
+
+{% for _name, _id in docker_list.items() %}
+
+  <div id="table_docker_{{ _id }}_Disk"></div>
+
+{% endfor %}
+
+</table>
+
+
 <script type="text/javascript">
 
 google.charts.load('current', {'packages':['corechart']});
@@ -88,7 +175,7 @@ function drawSystemCPUUtil() {
   
   var chart_div = document.getElementById('chart_cpu_util')
   var chart = new google.visualization.AreaChart(chart_div);
-  
+
   var options = {
     title: 'CPU Utilization',
     isStacked: 'absolute',
@@ -227,6 +314,38 @@ function drawDocker{{ _id }}CPUUsage() {
   
 
   query.send(function(data) {
+    // 3 user, 4 system
+//      console.log(data.getDataTable())
+      //console.log(data.getDataTable().getValue(3, 1))
+    var groupData = google.visualization.data.group(
+      data.getDataTable(),
+      // group across entire table -- use modifier to return same value for every row
+      [{column: 0, modifier: function () {return '';}, type: 'string'}],
+      [
+        // aggregation functions
+        {column: 3, aggregation: google.visualization.data.avg, type: 'number', label: 'userAverage'},
+        {column: 3, aggregation: google.visualization.data.max, type: 'number', label: 'userMaximum'},
+        {column: 3, aggregation: google.visualization.data.min, type: 'number', label: 'userMinimum'},
+        {column: 4, aggregation: google.visualization.data.avg, type: 'number', label: 'systemAverage'},
+        {column: 4, aggregation: google.visualization.data.max, type: 'number', label: 'systemMaximum'},
+        {column: 4, aggregation: google.visualization.data.min, type: 'number', label: 'systemMinimum'},
+      ]
+    ); 
+      // console.log(groupData)
+      console.log(groupData.getValue(0, 1), groupData.getValue(0, 2), groupData.getValue(0, 3), groupData.getValue(0, 4), groupData.getValue(0, 5), groupData.getValue(0, 6));
+
+      var table_div = document.getElementById('table_docker_{{ _id }}_CPU')
+      table_div.innerHTML = '<td> {{ _name }} </td>' +
+    '<td>' + groupData.getValue(0, 1) + '</td>' +
+    '<td>' + groupData.getValue(0, 2) + '</td>' +
+    '<td>' + groupData.getValue(0, 3) + '</td>' +
+    '<td>' + groupData.getValue(0, 4) + '</td>' +
+    '<td>' + groupData.getValue(0, 5) + '</td>' +
+    '<td>' + groupData.getValue(0, 6) + '</td>';
+
+
+
+//      alert("Max: " + data.getDataTable());    
       chart.draw(data.getDataTable(), options);
     });  
 }
@@ -251,6 +370,22 @@ function drawDocker{{ _id }}Disk() {
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
+// 3- read 4 - write
+//      console.log(data.getDataTable())
+    var groupData = google.visualization.data.group(
+      data.getDataTable(),
+      // group across entire table -- use modifier to return same value for every row
+      [{column: 0, modifier: function () {return '';}, type: 'string'}],
+      [
+        // aggregation functions
+        {column: 3, aggregation: google.visualization.data.avg, type: 'number', label: 'Average'},
+        {column: 3, aggregation: google.visualization.data.min, type: 'number', label: 'Minimum'},
+        {column: 3, aggregation: google.visualization.data.max, type: 'number', label: 'Maximum'},
+      ]
+    ); 
+      // console.log(groupData)
+      console.log(groupData.getValue(0, 1), groupData.getValue(0, 2), groupData.getValue(0, 3));
+
     });  
 }
 
@@ -274,6 +409,22 @@ function drawDocker{{ _id }}Mem() {
 
   query.send(function(data) {
       chart.draw(data.getDataTable(), options);
+// 3 - ram
+//      console.log(data.getDataTable())
+    var groupData = google.visualization.data.group(
+      data.getDataTable(),
+      // group across entire table -- use modifier to return same value for every row
+      [{column: 0, modifier: function () {return '';}, type: 'string'}],
+      [
+        // aggregation functions
+        {column: 3, aggregation: google.visualization.data.avg, type: 'number', label: 'Average'},
+        {column: 3, aggregation: google.visualization.data.min, type: 'number', label: 'Minimum'},
+        {column: 3, aggregation: google.visualization.data.max, type: 'number', label: 'Maximum'},
+      ]
+    ); 
+      // console.log(groupData)
+      console.log(groupData.getValue(0, 1), groupData.getValue(0, 2), groupData.getValue(0, 3));
+
     });  
 }
 
