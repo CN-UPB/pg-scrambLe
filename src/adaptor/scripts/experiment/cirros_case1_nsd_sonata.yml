@@ -1,0 +1,12 @@
+---
+descriptor_version: '1.0'
+vendor: "pg-scramble"
+name: "cirros_case1"
+version: '1.0'
+author: "pg-scramble"
+description: "Cirros NS"  
+network_functions:
+- vnf_id: "cirros-image"
+  vnf_vendor: "pg-scramble"
+  vnf_name: "cirros-image"
+  vnf_version: '1.0'

@@ -1,0 +1,12 @@
+---
+descriptor_version: '1.0'
+vendor: "pg-scramble"
+name: "stress_case1"
+version: '1.0'
+author: "pg-scramble"
+description: "Stress NS"  
+network_functions:
+- vnf_id: "stress-image"
+  vnf_vendor: "pg-scramble"
+  vnf_name: "stress-image"
+  vnf_version: '1.0'
