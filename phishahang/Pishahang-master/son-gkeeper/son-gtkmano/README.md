@@ -1,10 +1,10 @@
-# [SONATA](http://www.sonata-nfv.eu)'s Gatekeeper VIM Management micro-service
+# [SONATA](http://www.sonata-nfv.eu)'s Gatekeeper MANO Management micro-service
 [![Build Status](http://jenkins.sonata-nfv.eu/buildStatus/icon?job=son-gkeeper)](http://jenkins.sonata-nfv.eu/job/son-gkeeper)
 
-This is the folder of the **VIM Management** micro-service. This micro-service is used by the [`Gatekeeper API`](https://github.com/sonata-nfv/son-gkeeper/son-gtkapi).
+This is the folder of the **MANO Management** micro-service. This micro-service is used by the [`Gatekeeper API`](https://github.com/sonata-nfv/son-gkeeper/son-gtkapi).
 
 ## Configuration
-The configuration of the Gatekeeper's VIM Management micro-service is done mostly by defining `ENV` variables in the [`Dockerfile`](https://github.com/sonata-nfv/son-gkeeper/blob/master/son-gtkvim/Dockerfile). These variables are:
+The configuration of the Gatekeeper's MANO Management micro-service is done mostly by defining `ENV` variables in the [`Dockerfile`](https://github.com/sonata-nfv/son-gkeeper/blob/master/son-gtkmano/Dockerfile). These variables are:
 
 * `PORT`: the port the micro-service is to provide it's services, currently `5700`;
 * `CATALOGUE_URL`: the URL of the catalogues service, currently `http://catalogues:4002/catalogues`;
@@ -25,12 +25,12 @@ $ foreman start
 ### Implemented API
 The implemented API of the Gatekeeper is the following:
 
-* `/vim`:
-    * `GET`: provides a list of VIMs, available in the infrabstructure abstraction;
+* `/mano`:
+    * `GET`: provides a list of MANOs, available in the infrabstructure abstraction;
     	* `/:uuid`: provides the service record data with the given `:uuid`;
-    * `POST`: creates a new vim registry for the infrabstructure abstraction
-* `/vim_request`:
-    * `GET`: provides a list of vim request;
+    * `POST`: creates a new mano registry for the infrabstructure abstraction
+* `/mano_request`:
+    * `GET`: provides a list of mano request;
     * `/:uuid/?`: provides the status of the request data with the given `:uuid`;
 
 **Note 1:** `PUT`and `DELETE`operations are already supported by some of the micro-services, and will be described in the next version(s);
