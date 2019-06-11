@@ -1,0 +1,26 @@
+---
+descriptor_version: '1.0'
+description: A basic VNF descriptor with load generater and one VDU
+name: stress
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+- id: stress
+  description: stress-image
+  vm_image: "stress-image"
+  vm_image_format: qcow2
+  resource_requirements:
+    cpu:
+      vcpus: 1
+    memory:
+      size: 2048
+      size_unit: MB
+    storage:
+      size: 5
+      size_unit: GB
+  connection_points:
+  - id: eth0
+    interface: ipv4
+    type: internal
+
