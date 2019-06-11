@@ -414,6 +414,59 @@
             $ref: "#/responses/RequiredRecordDoesNotExistResponse"
           500: 
             $ref: "#/responses/Standard500ErrorResponse"
+    /manos: 
+      get: 
+        summary: "Creates a new \"get list of manos\" request and returns its uuid."
+        description: ""
+        operationId: "getManos"
+        produces: 
+          - "application/json"
+        tags: 
+          - "Manos"
+        responses: 
+          200: 
+            description: "Get list of manos request's uuid returned"
+          500: 
+            $ref: "#/responses/Standard500ErrorResponse"
+      post: 
+        summary: "Creates a new \"add mano\" request"
+        description: ""
+        operationId: "newAddManoRequest"
+        produces: 
+          - "application/json"
+        tags: 
+          - "Requests"
+        responses: 
+          200: 
+            description: "Add mano request's uuid returned"
+          404: 
+            $ref: "#/responses/RequiredRecordDoesNotExistResponse"
+          500: 
+            $ref: "#/responses/Standard500ErrorResponse"
+    /mano_requests/{requestId}: 
+      get: 
+        summary: "Get the the given MANOs request"
+        description: ""
+        operationId: "getManoRequests"
+        produces: 
+          - "application/json"
+        parameters: 
+          - 
+            in: "path"
+            name: "requestId"
+            description: "The UUID of the request"
+            required: true
+            type: "string"
+            format: "uuid"
+        tags: 
+          - "Requests"
+        responses: 
+          200: 
+            description: "Mano request data is returned"
+          404: 
+            $ref: "#/responses/RequiredRecordDoesNotExistResponse"
+          500: 
+            $ref: "#/responses/Standard500ErrorResponse"
     /records: 
       get: 
         summary: "Get the list of all the instances registered"

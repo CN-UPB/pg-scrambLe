@@ -54,6 +54,12 @@
       state: stopped
   - wait_for: host=0.0.0.0 port=5700 timeout=30 delay=10 state=drained
 
+ - name: GATEKEEPER MANO - stopping
+    docker_container:
+      name: son-gtkmano
+      state: stopped
+  - wait_for: host=0.0.0.0 port=8001 timeout=30 delay=10 state=drained
+
   - name: GATEKEEPER API - stopping
     docker_container:
       name: son-gtkapi

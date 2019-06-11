@@ -51,6 +51,9 @@ development: &common_settings
     vims:
       model: VimManagerService
       env_var_url: VIM_MANAGEMENT_URL
+    manos:
+      model: ManoManagerService
+      env_var_url: MANO_MANAGEMENT_URL	
     wims:
       model: WimManagerService
       env_var_url: VIM_MANAGEMENT_URL
