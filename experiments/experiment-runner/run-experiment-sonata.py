@@ -13,33 +13,31 @@ import requests
 from urllib.request import urlopen
 import csv
 import os
-# import docker
-# client = docker.DockerClient(base_url='unix://container/path/docker.sock')
+import docker
+client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
-# DOCKER_EXCLUDE = ['experiment-runner']
+DOCKER_EXCLUDE = ['experiment-runner']
 
 
-IDLE_SLEEP = 0.1
-NS_TERMINATION_SLEEP = 2
-NO_INSTANCES = 15
+IDLE_SLEEP = 1
+NS_TERMINATION_SLEEP = 20
+NO_INSTANCES = 50
 
 USERNAME = "sonata"
 PASSWORD = "1234"
 
 HOST_URL = "vm-hadik3r-08.cs.uni-paderborn.de"
 NSNAME = "cirros_case1-{_id}"
-NSDESCRIPTION = "cirros-case2-50_NS-30mins-run2"
+NSDESCRIPTION = "cirros-case1-50_NS-20mins"
 
-# NSD_PATH = "/app/SONATA/Descriptors/CASE1/stress_case1_nsd.yaml"
-# VNFD_PATH = "/app/SONATA/Descriptors/CASE1/stress_vnfd.yaml"
-
-NSD_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/experiment-runner/SONATA/Descriptors/CASE1/stress_case1_nsd_sonata.yml"
-VNFD_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/experiment-runner/SONATA/Descriptors/CASE1/stress_vnfd.yml"
-
+NSD_PATH = "/app/SONATA/Descriptors/CASE1/stress_case1_nsd_sonata.yml"
+VNFD_PATH = "/app/SONATA/Descriptors/CASE1/stress_vnfd.yml"
 
 with open(NSD_PATH, 'r') as file:
     nsd_data = file.read()
 
+with open(VNFD_PATH, 'r') as file:
+    vnfd_data = file.read()
 
 sonata_nsd = SONATAClient.Nsd(HOST_URL)
 sonata_nslcm = SONATAClient.Nslcm(HOST_URL) 
@@ -59,9 +57,10 @@ def sonata_cleanup_update():
     _token = json.loads(_token["data"])
 
     nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"]))
+                        token=_token["token"]["access_token"], limit=1000))
     nsd_list = json.loads(nsd_list["data"])
 
+    print(len(nsd_list))
     for _nsd in nsd_list:
         sonata_nsd.delete_ns_descriptors_nsdinfoid(
                     token=_token["token"]["access_token"],
@@ -74,7 +73,7 @@ def sonata_cleanup_update():
     # Delete VNFDs
 
     vnf_list = json.loads(sonata_vnfpkgm.get_vnf_packages(
-                        token=_token["token"]["access_token"]))
+                        token=_token["token"]["access_token"], limit=1000))
     vnf_list = json.loads(vnf_list["data"])
 
     for _vnfd in vnf_list:
@@ -92,11 +91,19 @@ def sonata_cleanup_update():
     time.sleep(3)
 
     for i in range(0, NO_INSTANCES):
-        with open("/tmp/" + NSNAME.format(_id=str(i)), "w") as _file:
+        # with open("/tmp/" + NSNAME.format(_id=str(i)) + "vnfd.yml", "w") as _file:
+        #     _file.write(vnfd_data.format(_id=i))
+
+        with open("/tmp/" + NSNAME.format(_id=str(i)) + "nsd.yml", "w") as _file:
             _file.write(nsd_data.format(_id=i))
-            
+
+        # _res = sonata_vnfpkgm.post_vnf_packages(token=_token,
+        #     package_path="/tmp/" + NSNAME.format(_id=str(i)) + "vnfd.yml")
+        # print(_res)
+        # time.sleep(0.5)
+
         _res = sonata_nsd.post_ns_descriptors(token=_token,
-            package_path="/tmp/" + NSNAME.format(_id=str(i)))
+            package_path="/tmp/" + NSNAME.format(_id=str(i)) + "nsd.yml")
         print(_res)
         time.sleep(0.5)
 
@@ -142,14 +149,17 @@ experiment_timestamps["ns_inst_time"] = int(time.time())
 _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
 _token = json.loads(_token["data"])
 
-_nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"]))
+_nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token["token"]["access_token"], limit=1000))
 _nsd_list = json.loads(_nsd_list["data"])
+
+print(len(_nsd_list))
 
 for i in range(0, NO_INSTANCES):
     _ns = None
     for _n in _nsd_list:
         if NSNAME.format(_id=str(i)) == _n['nsd']['name']:            
             _ns = _n['uuid']
+            print("UUID")
             print(_ns)
             continue
 
@@ -157,6 +167,8 @@ for i in range(0, NO_INSTANCES):
         response = json.loads(
                     sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
                         token=_token["token"]["access_token"], nsInstanceId=_ns))
+        print("response")
+        print(response)
         if response["error"]:
             print("ERROR - no ns uuid")
     else:
@@ -171,31 +183,31 @@ print("PHASE 2 : Recording Metrics Post NS instantiation...")
 time.sleep(60*NS_TERMINATION_SLEEP)
 
 print("PHASE 3 : Starting Termination Sequence...")
-# experiment_timestamps["ns_term_start_time"] = int(time.time())
+experiment_timestamps["ns_term_start_time"] = int(time.time())
 
-# _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-# _token = json.loads(_token["data"])
+_token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+_token = json.loads(_token["data"])
 
-# _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
-#                         token=_token["token"]["access_token"]))
-# _nsd_list = json.loads(_nsd_list["data"])
+_nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                        token=_token["token"]["access_token"], limit=1000))
+_nsd_list = json.loads(_nsd_list["data"])
 
-# _ns_list = json.loads(sonata_nslcm.get_ns_instances(
-#                         token=_token["token"]["access_token"]))
-# _ns_list = json.loads(_ns_list["data"])
+_ns_list = json.loads(sonata_nslcm.get_ns_instances(
+                        token=_token["token"]["access_token"], limit=1000))
+_ns_list = json.loads(_ns_list["data"])
 
-# _ns = None
-# for _n in _nsd_list:
-#     try:
-#         if NSNAME.format(_id=str(i)) == _n['nsd']['name']:
-#             for _n2 in _ns_list:
-#                 if _n['uuid'] == _n2['descriptor_reference']:
-#                     _ns = _n2['uuid']
-#                     response = json.loads(
-#                                 sonata_nslcm.post_ns_instances_nsinstanceid_terminate(
-#                                     token=_token["token"]["access_token"], nsInstanceId=_ns))
-#     except Exception as e:
-#         pass
+_ns = None
+for _n in _nsd_list:
+    try:
+        if NSNAME.format(_id=str(i)) == _n['nsd']['name']:
+            for _n2 in _ns_list:
+                if _n['uuid'] == _n2['descriptor_reference']:
+                    _ns = _n2['uuid']
+                    response = json.loads(
+                                sonata_nslcm.post_ns_instances_nsinstanceid_terminate(
+                                    token=_token["token"]["access_token"], nsInstanceId=_ns))
+    except Exception as e:
+        pass
 
 
 experiment_timestamps["ns_term_end_time"] = int(time.time())
