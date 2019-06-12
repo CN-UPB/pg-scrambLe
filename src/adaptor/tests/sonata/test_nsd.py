@@ -34,7 +34,7 @@ def test_get_ns_descriptors(get_ns_descriptors_keys):
     _token = json.loads(_token["data"])
 
     response = json.loads(sonata_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"]))
+                        token=_token["token"]["access_token"], limit=1000))
     response = json.loads(response["data"])
 
     assert isinstance(response, list)

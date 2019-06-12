@@ -11,7 +11,7 @@ README = (HERE / "wrappers/README.rst").read_text()
 # This call to setup() does all the work
 setup(
     name="python-mano-wrappers",
-    version="0.9.8",
+    version="0.9.9",
     description="REST API Wrappers for various MANOs in compliance with ETSI SOL0005",
     long_description=README,
     long_description_content_type="text/x-rst",

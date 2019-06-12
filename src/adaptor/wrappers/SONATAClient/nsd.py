@@ -13,7 +13,7 @@ class Nsd(CommonInterfaceNsd):
         self._base_path = 'http://{0}:{1}'
         self._user_endpoint = '{0}'
 
-    def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
+    def get_ns_descriptors(self, token, offset=None, limit=None, host=None, port=None):
         """ NSD Management Interface - NS Descriptors
 
         /ns_descriptors:
@@ -21,7 +21,8 @@ class Nsd(CommonInterfaceNsd):
             NS descriptor resources.
 
         :param token: auth token retrieved by the auth call
-        :param _filter: content query filter 
+        :param offset: offset index while returning
+        :param limit: limit records while returning
         :param host: host url
         :param port: port where the MANO API can be accessed
 
@@ -46,11 +47,12 @@ class Nsd(CommonInterfaceNsd):
         else:
             base_path = "http://{0}:{1}".format(host, port)
 
-        query_path = ''
-        if _filter:
-            query_path = '?_admin.type=' + _filter
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
 
-        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, query_path)
+        _endpoint = "{0}/catalogues/api/v2/network-services?offset={1}&limit={2}".format(base_path, offset, limit)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 

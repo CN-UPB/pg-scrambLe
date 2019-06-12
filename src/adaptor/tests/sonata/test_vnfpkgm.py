@@ -31,7 +31,8 @@ def test_get_vnf_packages(get_vnf_packages_keys):
 	_token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
 	_token = json.loads(_token["data"])
 	
-	response = json.loads(sonata_vnfpkgm.get_vnf_packages(token=_token["token"]["access_token"]))
+	response = json.loads(sonata_vnfpkgm.get_vnf_packages(
+                        token=_token["token"]["access_token"], limit=1000))
 	
 	response = json.loads(response["data"])
 	assert isinstance(response, list)
