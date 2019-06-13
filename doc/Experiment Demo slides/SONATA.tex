@@ -1,28 +1,58 @@
 \begin{frame}
-\frametitle{SONATA}
+\Huge{\centerline{Results}}
+\Huge{\centerline{Pishahang}}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Pishahang}
 \begin{itemize}
 	
 	\item Experiment Parameters
 	\begin{itemize}
 		\item Different NSDs and VNFs (cirros, stress)
-		\item Multiple NSDs with 1 VNFD.
+		\item Multiple NSDs with 1 VNFD
+		\item ...
 	\end{itemize}
 
 	
 \end{itemize}
 
+\end{frame}
 
-\begin{itemize}
-	
-	\item Top 5 microservices with maximum average CPU utilisation
-	\begin{itemize}
-		\item Service Lifecycle Management
-		\item Functional Lifecycle Management
-		\item Placement Plugin
-		\item Plugin Manager
-		\item Specific Management Registry
-	\end{itemize}
-	
-	
-\end{itemize}
+\begin{frame}
+\frametitle{Pishahang Top 5 (CPU AVG)}
+\begin{table}
+	\begin{tabular}{l r}
+		\toprule
+		\textbf{Service} & \textbf{CPU} \\
+		\midrule
+		servicelifecyclemanagement & 3.47  \\
+		specificmanagerregistry & 3.42  \\
+		functionlifecyclemanagement & 2.86  \\
+		placementplugin & 1.78  \\
+		pluginmanager & 1.75 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+{ *Results from cirros vnf with 10 instances over 10 mins}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Pishahang Top 5 (Memory AVG)}
+\begin{table}
+	\begin{tabular}{l r}
+		\toprule
+		\textbf{Service} & \textbf{Memory (mb)}\\
+		\midrule
+		son-sp-infrabstract & 1075 \\
+		son-keycloak & 519 \\
+		son-monitor-influxdb & 161 \\
+		wim-adaptor & 113 \\
+		son-gtksrv & 105 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+{ *Results from cirros vnf with 10 instances over 10 mins}
 \end{frame}

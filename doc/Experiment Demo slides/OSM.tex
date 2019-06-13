@@ -1,9 +1,64 @@
 \begin{frame}
+\Huge{\centerline{Results}}
+\Huge{\centerline{OSM}}
+\end{frame}
+
+\begin{frame}
 \frametitle{OSM}
 \begin{itemize}
 	
 	\item Experiment Parameters
 
+	\begin{itemize}
+		\item Different NSDs and VNFs (cirros, stress)
+		\item Multiple NSDs with varying VNFD.
+		\item Observation time
+		\item ...
+	\end{itemize}
+	
+
 	
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\frametitle{OSM Top 5 (CPU AVG)}
+\begin{table}
+	\begin{tabular}{l r}
+		\toprule
+		\textbf{Service} & \textbf{CPU} \\
+		\midrule
+		mon & 30.71  \\
+		ro & 5.55  \\
+		nbi & 4.17  \\
+		lcm & 3.21  \\
+		pol & 0.52\\
+		\bottomrule
+	\end{tabular}
+\end{table}
+{ *Results from cirros vnf with 10 instances over 10 mins}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{OSM Top 5 (Memory AVG)}
+\begin{table}
+\begin{tabular}{l r}
+	\toprule
+	\textbf{Service} & \textbf{Memory (mb)}\\
+	\midrule
+	ro-db & 204 \\
+	light-ui & 168 \\
+	mon & 105 \\
+	ro & 87 \\
+	nbi & 68 \\
+	\bottomrule
+\end{tabular}
+\end{table}
+{ *Results from cirros vnf with 10 instances over 10 mins}
+\end{frame}
+
+
+
+
+
