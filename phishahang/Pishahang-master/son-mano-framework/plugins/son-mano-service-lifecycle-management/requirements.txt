@@ -1,1 +1,2 @@
 python-mano-wrappers
+watchdog
