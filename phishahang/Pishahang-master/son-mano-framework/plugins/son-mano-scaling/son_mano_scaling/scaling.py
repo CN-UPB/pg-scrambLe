@@ -75,6 +75,7 @@ class ScalingPlugin(ManoBasePlugin):
         self.instantiating_mano_instance = False
         self.terminating_mano_instance = False
         self.child_mano_added = False
+        self.parent_mano_loaded = False
         # TODO: store a list of MANO instances
         self.mano_instances = []
         self.parent_mano = {
@@ -341,6 +342,7 @@ class ScalingPlugin(ManoBasePlugin):
                         self.create_mano_instance()
 
             if (float(_parent_normal[2]) > 0.7):
+                self.parent_mano_loaded = True
                 if self.child_mano_added:
                     LOG.info("Parent MANO is loaded, checking instances")
                     for _mano in self.mano_instances:
@@ -356,6 +358,7 @@ class ScalingPlugin(ManoBasePlugin):
                     LOG.info("Child MANO not avalable!!")
 
             if (float(_parent_normal[2]) < 0.5):
+                self.parent_mano_loaded = False
                 if self.child_mano_added:
                     LOG.info("Parent MANO load is now decreasing...")
                     for _mano in self.mano_instances:
@@ -433,7 +436,7 @@ class ScalingPlugin(ManoBasePlugin):
 # Scaling
 ##########################
 
-    def scaling_engine(self, ch, method, prop, payload):
+    def scaling_request(self, ch, method, prop, payload):
         """
         This method handles a Scaling request
         """
@@ -443,24 +446,28 @@ class ScalingPlugin(ManoBasePlugin):
 
         content = yaml.load(payload)
         LOG.info("Scaling request for service: " + content['serv_id'])
-        topology = content['topology']
-        descriptor = content['nsd'] if 'nsd' in content else content['cosd']
-        functions = content['functions'] if 'functions' in content else []
-        cloud_services = content['cloud_services'] if 'cloud_services' in content else []
+        # topology = content['topology']
+        # descriptor = content['nsd'] if 'nsd' in content else content['cosd']
+        # functions = content['functions'] if 'functions' in content else []
+        # cloud_services = content['cloud_services'] if 'cloud_services' in content else []
 
         # TODO: Check if the current MANO instance is not overloaded by checking CPU and Memory usage
+        
+        if self.parent_mano_loaded:
+            if self.child_mano_added:
+                response = {'system_loaded': True}
+            else:
+                response = {'system_loaded': False}
+        else:
+            response = {'system_loaded': False}
 
-        # placement = self.placement(descriptor, functions, cloud_services, topology)
+        topic = 'mano.service.scaling'
+        self.manoconn.notify(topic,
+                             yaml.dump(response),
+                             correlation_id=prop.correlation_id)
 
-        # response = {'mapping': placement}
-        # topic = 'mano.service.place'
-
-        # self.manoconn.notify(topic,
-        #                      yaml.dump(response),
-        #                      correlation_id=prop.correlation_id)
-
-        # LOG.info("Placement response sent for service: " + content['serv_id'])
-        # LOG.info(response)
+        LOG.info("Scaling response sent for service: " + content['serv_id'])
+        LOG.info(response)
 
 
 def main():

@@ -50,6 +50,7 @@ MANO_START = "mano.function.start"
 MANO_CONFIG = "mano.function.configure"
 MANO_STOP = "mano.function.stop"
 MANO_SCALE = "mano.function.scale"
+MANO_SCALING = "mano.service.scaling"
 
 # With gatekeeper or other SLM
 WC_CREATE = "*.instances.create"

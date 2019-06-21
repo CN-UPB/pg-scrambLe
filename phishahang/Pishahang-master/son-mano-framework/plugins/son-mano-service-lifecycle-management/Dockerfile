@@ -51,6 +51,9 @@ ADD plugins/${PLUGIN_BASE} /plugins/${PLUGIN_BASE}
 WORKDIR /plugins/${PLUGIN_BASE}
 RUN python setup.py develop
 
+COPY /plugins/${PLUGIN_BASE}/requirements.txt ./
+RUN pip install --no-cache-dir -r /plugins/${PLUGIN_BASE}/requirements.txt
+
 CMD ["son-mano-service-lifecycle-management"]
 
 

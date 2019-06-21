@@ -461,6 +461,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         add_schedule.append('validate_deploy_request')
         add_schedule.append('contact_gk')
 
+        add_schedule.append('req_load_info')
+
         # Onboard and instantiate the SSMs, if required.
         if self.services[serv_id]['service']['ssm']:
             add_schedule.append('onboard_ssms')
@@ -784,6 +786,50 @@ class ServiceLifecycleManager(ManoBasePlugin):
         else:
             LOG.info("Service " + serv_id + ": Schedule update failed")
 
+    def resp_scaling(self, ch, method, prop, payload):
+        """
+        This method handles the response from scaling plugin.
+        """
+
+        message = yaml.load(payload)
+
+        is_dict = isinstance(message, dict)
+        LOG.debug("Type Dict: " + str(is_dict))
+
+        # Retrieve the service uuid
+        serv_id = tools.servid_from_corrid(self.services, prop.correlation_id)
+
+        system_loaded = message['system_loaded']        
+        error = message['error']
+
+        if error is not None:
+            LOG.info("Service " + serv_id + ": Error from scaling: " + error)
+            self.error_handling(serv_id, t.GK_CREATE, error)
+
+        else:
+            msg = ": Current Load Status: " + str(system_loaded)
+            LOG.info("Service " + serv_id + msg)
+
+
+        if system_loaded is None:
+            # error request
+            msg = 'Failed to get load information'
+            self.error_handling(serv_id,
+                                t.GK_CREATE,
+                                msg)
+
+            return
+        else:
+            LOG.info("Service " + serv_id + ": Scaling information received: Loaded-" + str(system_loaded))
+            if system_loaded:
+                # Dont start next task, give to wrapper
+                LOG.info("Service " + serv_id + ": The request is routed to one of the child MANOs")
+                return
+            else:
+                # start next task as usual
+                self.start_next_task(serv_id)
+
+
     def resp_place(self, ch, method, prop, payload):
         """
         This method handles a placement performed by an SSM.
@@ -966,6 +1012,32 @@ class ServiceLifecycleManager(ManoBasePlugin):
         self.manoconn.notify(self.services[serv_id]['topic'],
                              payload,
                              correlation_id=corr_id)
+
+    def req_load_info(self, serv_id):
+        """
+        This method requests the system load information.
+
+        :param serv_id: The instance uuid of the service.
+        """
+
+        corr_id = str(uuid.uuid4())
+        self.services[serv_id]['act_corr_id'] = corr_id
+
+        message['nap'] = {}
+
+        # Contact Scalability Plugin
+        payload = ""
+
+        msg = ": System Load Information Requested"
+        LOG.info("Service " + serv_id + msg)
+
+        self.manoconn.call_async(self.resp_place,
+                                 t.MANO_SCALING,
+                                 payload,
+                                 correlation_id=corr_id)
+
+        # Pause the chain of tasks to wait for response
+        self.services[serv_id]['pause_chain'] = True
 
     def request_topology(self, serv_id):
         """
