@@ -395,7 +395,7 @@ class ScalingPlugin(ManoBasePlugin):
 
         # The topic on which deploy requests are posted.
         topic = 'mano.service.scaling'
-        self.manoconn.subscribe(self.scaling_engine, topic)
+        self.manoconn.subscribe(self.scaling_request, topic)
 
         LOG.info("Subscribed to topic: " + str(topic))
 
@@ -455,11 +455,11 @@ class ScalingPlugin(ManoBasePlugin):
         
         if self.parent_mano_loaded:
             if self.child_mano_added:
-                response = {'system_loaded': True}
+                response = {'system_loaded': True, 'error': None}
             else:
-                response = {'system_loaded': False}
+                response = {'system_loaded': False, 'error': None}
         else:
-            response = {'system_loaded': False}
+            response = {'system_loaded': False, 'error': None}
 
         topic = 'mano.service.scaling'
         self.manoconn.notify(topic,

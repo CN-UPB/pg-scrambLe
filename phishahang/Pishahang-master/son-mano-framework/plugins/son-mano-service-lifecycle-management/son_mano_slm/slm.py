@@ -1023,15 +1023,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
         corr_id = str(uuid.uuid4())
         self.services[serv_id]['act_corr_id'] = corr_id
 
-        message['nap'] = {}
-
         # Contact Scalability Plugin
-        payload = ""
+        message = {}
+        message['serv_id'] = serv_id
+        payload = yaml.dump(message)
 
         msg = ": System Load Information Requested"
         LOG.info("Service " + serv_id + msg)
 
-        self.manoconn.call_async(self.resp_place,
+        self.manoconn.call_async(self.resp_scaling,
                                  t.MANO_SCALING,
                                  payload,
                                  correlation_id=corr_id)
