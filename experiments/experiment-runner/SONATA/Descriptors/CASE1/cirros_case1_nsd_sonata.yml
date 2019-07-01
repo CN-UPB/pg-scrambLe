@@ -1,12 +1,12 @@
 ---
 descriptor_version: '1.0'
 vendor: "pg-scramble"
-name: "stress_case1-{_id}"
+name: "cirros_case1-{_id}"
 version: '1.0'
 author: "pg-scramble"
-description: "Stress NS"  
+description: "Cirros NS"  
 network_functions:
-- vnf_id: "stress-image"
+- vnf_id: "cirros-image"
   vnf_vendor: "pg-scramble"
-  vnf_name: "stress-image"
+  vnf_name: "cirros-image"
   vnf_version: '1.0'
