@@ -24,4 +24,4 @@ virtual_deployment_units:
     interface: ipv4
     type: internal
 
-# Image name on openstack should be "pg-scramble_stress-image_1.0_stress-image"
+# Image name on openstack should be "pg-scramble_stress-image-1_1.0_stress-image-1"
