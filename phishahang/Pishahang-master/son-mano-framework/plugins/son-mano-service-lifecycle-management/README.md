@@ -26,7 +26,7 @@ sudo docker logs servicelifecyclemanagement -f
 sudo docker stop servicelifecyclemanagement
 sudo docker rm servicelifecyclemanagement
 sudo docker build -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile-dev .
-sudo docker run -d --name servicelifecyclemanagement --net=son-sp --network-alias=servicelifecyclemanagement servicelifecyclemanagement
+sudo docker run -d --name servicelifecyclemanagement --net=son-sp --network-alias=servicelifecyclemanagement -v $(pwd)/plugins/son-mano-service-lifecycle-management:/plugins/son-mano-service-lifecycle-management servicelifecyclemanagement
 
 sudo docker logs servicelifecyclemanagement -f
 ```

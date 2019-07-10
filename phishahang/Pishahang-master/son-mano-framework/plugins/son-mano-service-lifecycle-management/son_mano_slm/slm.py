@@ -801,6 +801,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         system_loaded = message['system_loaded']        
         error = message['error']
+        mano_instance = message['mano_instance']
 
         if error is not None:
             LOG.info("Service " + serv_id + ": Error from scaling: " + error)
@@ -824,6 +825,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
             if system_loaded:
                 # Dont start next task, give to wrapper
                 LOG.info("Service " + serv_id + ": The request is routed to one of the child MANOs")
+                tools.forward_instantiation_request(mano_instance=mano_instance, payload=self.services[serv_id]) 
+
                 return
             else:
                 # start next task as usual

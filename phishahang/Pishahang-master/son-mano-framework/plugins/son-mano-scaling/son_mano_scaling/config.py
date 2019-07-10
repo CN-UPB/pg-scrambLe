@@ -1,7 +1,7 @@
-PARENT_IP = "vm-hadik3r-08.cs.uni-paderborn.de"
+PARENT_IP = "sonatamano.cs.upb.de"
 NETDATA_PORT = 19999
 
-DUMMY_INSTANCE_IP = "vm-hadik3r-07.cs.uni-paderborn.de"
+DUMMY_INSTANCE_IP = "vm-hadik3r-08.cs.uni-paderborn.de"
 
 NS_TIMEOUT = 10
 

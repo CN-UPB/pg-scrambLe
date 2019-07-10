@@ -71,6 +71,7 @@ class ScalingPlugin(ManoBasePlugin):
         # broker and register the Scaling plugin to the plugin manger)
         ver = "0.1-dev"
         des = "Scaling plugin"
+        self.DEBUGMODE = True
         self.mano_manager = ManoManager()
         self.instantiating_mano_instance = False
         self.terminating_mano_instance = False
@@ -93,30 +94,31 @@ class ScalingPlugin(ManoBasePlugin):
                                              start_running=start_running)
 
     @run_async
-    def create_mano_instance(self, mano_type="osm"):
+    def create_mano_instance(self, mano_type="pishahang"):
         """
         Instantiate a new MANO instance
         """
         # TODO: 1) send instantiation request for new MANO Instance
         #       2) monitor and find if the instance is ready and get IP address
         #       3) add instance to the list
-        LOG.info("\nCreating MANO instance...")
+        LOG.info(">>>> \n Creating MANO instance...")
         self.instantiating_mano_instance = True
         
         if mano_type == "pishahang":
             mano_instance_meta = self.mano_manager.create_pishahang_instance()
+            LOG.info(mano_instance_meta)
             if not mano_instance_meta:
-                LOG.info("\n MANO could not be instantiated...")
+                LOG.info("!!! MANO could not be instantiated...")
                 self.instantiating_mano_instance = False
                 return False
         elif mano_type == "osm":
             mano_instance_meta = self.mano_manager.create_osm_instance()
             if not mano_instance_meta:
-                LOG.info("\n MANO could not be instantiated...")
+                LOG.info("!!! MANO could not be instantiated...")
                 self.instantiating_mano_instance = False
                 return False
         else:
-            LOG.info("\n MANO type not supported...")
+            LOG.info("!!! MANO type not supported...")
             self.instantiating_mano_instance = False
             return False
 
@@ -131,7 +133,7 @@ class ScalingPlugin(ManoBasePlugin):
         #     }
         # )
 
-        LOG.info("\n MANO instantiated with IP...".format(mano_instance_meta))
+        LOG.info("\n MANO instantiated with IP... {0}".format(mano_instance_meta))
 
         self.mano_instances.append(
             {
@@ -143,6 +145,7 @@ class ScalingPlugin(ManoBasePlugin):
             }
         )
 
+        # TODO: Add loop to get AUTH before going forward
         self.child_mano_added = True
         self.instantiating_mano_instance = False
         LOG.info("\nFinished creating MANO instance...")
@@ -292,7 +295,15 @@ class ScalingPlugin(ManoBasePlugin):
 
         return free_mem_percent
 
+
     def normalizeManoMetrics(self, manodata):
+
+        if self.DEBUGMODE:
+            with open("/plugins/son-mano-scaling/debugnorm", "r") as f:
+                # print(list(map(lambda x: float(x), f.read().rstrip().split(","))))                
+                
+                return list(map(lambda x: float(x), f.read().rstrip().split(",")))
+
         _load = self._getLoad(host=manodata["host_ip"], port=manodata["monitoring_port"])
         _mem = self._getMem(host=manodata["host_ip"], port=manodata["monitoring_port"])
         _cores = self._getCPUCoreCount(host=manodata["host_ip"], port=manodata["monitoring_port"])
@@ -325,17 +336,20 @@ class ScalingPlugin(ManoBasePlugin):
         # TODO: Termination of the instance when the laod on both the lower MANO and parent
         #       MANO are less than 0.7
         while True:
-            LOG.info("\n\n\n\nScaling run loop..")
-            self.mano_priority = []
-
+            LOG.info("\n\n ##################### \n\nScaling run loop..")
             LOG.info("Checking parent MANO")
             _parent_normal = self.normalizeManoMetrics(self.parent_mano)
+            LOG.info(_parent_normal)
             if _parent_normal:
                 self.parent_mano["priority"] = _parent_normal
 
-            self.mano_priority.append(self.parent_mano)
+            self.mano_priority = []
 
+            # self.mano_priority.append(self.parent_mano)
+            
+            # TODO: Use warning and critical values here
             if (float(_parent_normal[1]) > 0.7):
+                # TODO: Currently supports only one child mano. make this a numbered limit
                 if not self.child_mano_added:
                     LOG.info("Parent MANO is getting loaded loaded")
                     if not self.instantiating_mano_instance:
@@ -357,6 +371,7 @@ class ScalingPlugin(ManoBasePlugin):
                 else:
                     LOG.info("Child MANO not avalable!!")
 
+            # TODO: Better termination sequence
             if (float(_parent_normal[2]) < 0.5):
                 self.parent_mano_loaded = False
                 if self.child_mano_added:
@@ -373,11 +388,12 @@ class ScalingPlugin(ManoBasePlugin):
             LOG.info("\n \nChild Instance List")
             LOG.info(self.mano_instances)
 
-            LOG.info("\n \nPriority List")
-            LOG.info(self.mano_priority)
+            if self.mano_priority:
+                LOG.info("\n \nPriority List")
+                LOG.info(self.mano_priority)
             # _memory = dict(psutil.virtual_memory()._asdict())
             # LOG.info("CPU: {0}% | Memory: {0}%".format(psutil.cpu_percent(interval=1), _memory['percent']))
-            time.sleep(10)
+            time.sleep(3)
 
     def __del__(self):
         """
@@ -455,11 +471,13 @@ class ScalingPlugin(ManoBasePlugin):
         
         if self.parent_mano_loaded:
             if self.child_mano_added:
-                response = {'system_loaded': True, 'error': None}
+                # TODO: wait for a few seconds mano_priority to be filled
+                # TODO: Select the best mano from the list
+                response = {'system_loaded': True, 'error': None, 'mano_instance': self.mano_priority[0]}
             else:
-                response = {'system_loaded': False, 'error': None}
+                response = {'system_loaded': False, 'error': None, 'mano_instance': None}
         else:
-            response = {'system_loaded': False, 'error': None}
+            response = {'system_loaded': False, 'error': None, 'mano_instance': None}
 
         topic = 'mano.service.scaling'
         self.manoconn.notify(topic,

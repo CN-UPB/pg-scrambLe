@@ -27,6 +27,15 @@ import yaml
 import json
 import base64
 from Crypto.PublicKey import RSA
+import wrappers
+import logging
+
+SONATA_USERNAME = "sonata"
+SONATA_PASSWORD = '1234'
+
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger("plugin:slm_helpers")
+LOG.setLevel(logging.DEBUG)
 
 
 def convert_corr_id(corr_id):
@@ -757,3 +766,60 @@ def build_monitoring_message(service, functions, cloud_services, userdata):
                 # TODO Implement
 
     return message
+
+
+def forward_instantiation_request(mano_instance, payload):
+
+    sonata_auth = wrappers.SONATAClient.Auth(mano_instance['host_ip'])
+    sonata_nslcm = wrappers.SONATAClient.Nslcm(mano_instance['host_ip'])
+    sonata_vnfd = wrappers.SONATAClient.VnfPkgm(mano_instance['host_ip'])
+    sonata_nsd = wrappers.SONATAClient.Nsd(mano_instance['host_ip'])
+
+    _token = json.loads(sonata_auth.auth(
+                            username=SONATA_USERNAME, 
+                            password=SONATA_PASSWORD))
+    _token = json.loads(_token["data"])
+
+    for function in payload['function']:
+        vnf_id = function['id']
+        vnfd = function['vnfd']
+        LOG.debug("vnf_id")
+        LOG.debug(vnfd)
+        with open("/tmp/{}-vnfd.yml".format(vnf_id), 'w') as _vnfdFile:
+            yaml.dump(vnfd, _vnfdFile)
+
+        response = json.loads(sonata_vnfd.post_vnf_packages(
+                        token=_token["token"]["access_token"],
+                        package_path="/tmp/{}-vnfd.yml".format(vnf_id)))
+
+    if 'nsd' in payload['service']:
+        nsd = payload['service']['nsd']
+    else:
+        nsd = payload['service']['cosd']
+
+    LOG.debug("NSD")
+    LOG.debug(nsd)
+
+    with open("/tmp/{}-nsd.yml".format(nsd['name']), 'w') as _nsdFile:
+        yaml.dump(nsd, _nsdFile)
+
+    response = json.loads(sonata_nsd.post_ns_descriptors(
+                    token=_token["token"]["access_token"],
+                    package_path="/tmp/{}-nsd.yml".format(nsd['name'])))
+
+    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                            token=_token["token"]["access_token"], limit=1000))
+    _nsd_list = json.loads(_nsd_list["data"])
+
+    _ns = None
+    for _n in _nsd_list:
+        if nsd['name'] == _n['nsd']['name']:            
+            _ns = _n['uuid']
+
+    if _ns:
+        response = json.loads(
+                    sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
+                        token=_token["token"]["access_token"], nsInstanceId=_ns))
+        LOG.debug("NSD Handover Complete")
+        LOG.debug(response)
+        
