@@ -16,7 +16,7 @@ class MainEngineService:
 
     @rpc
     def hello_splitter(self, name):
-        message = self.splitter_rpc.hello(name)
+        message = self.splitter_rpc.split(name)
         return message
 
     @rpc

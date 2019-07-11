@@ -1,6 +1,6 @@
-from Sonata.SonataUtilityFunctions import Utility
+from SonataUtilityFunctions import Utility
 from nameko.rpc import rpc
-from Sonata.SonataSplitter import splitter
+from SonataSplitter import splitter
 
 class SplitterService:
     name = "splitter_service"
