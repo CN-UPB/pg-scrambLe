@@ -5,7 +5,6 @@ import json
 import pymongo
 from bson.objectid import ObjectId
 
-### @Arka
 class read_dict():
 
     def dict_parser(self,dictionary, key, level, lineage):
