@@ -8,7 +8,7 @@ from glob import glob
 from pathlib import Path
 import time
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/OSM Results_set1/Final/"
+_PATH = "/home/deeksha/Documents/pg-scrambLe/experiments/results/Pishahang Results/Pishahang 100 200"
 cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*0-CPU-Final-Results.csv'))]
 mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*0-MEM-Final-Results.csv'))]
 sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-CPU-Final-Results.csv'))]
@@ -19,53 +19,38 @@ sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-S
 start_time = time.time()
 
 
-# for _cpu_files in cpu_files:
-#     _title = (Path(_cpu_files).name).split("-CPU")[0]
-#     print(_title)
-#     print(_cpu_files)
+for _cpu_files in cpu_files:
+    _title = (Path(_cpu_files).name).split("-CPU")[0]
+    print(_title)
+    print(_cpu_files)
 
-#     df = pd.read_csv(_cpu_files)
-#     docker_col = df['Docker Container']
-#     value_col = df['CPU Mean']
-#     plt.figure(figsize=(14, 5))
-#     plt.title(_title)
-#     plt.pie(value_col,startangleplt.show()=45)
-#     plt.axis('equal')
-#     plt.legend(docker_col, loc="lower right", fontsize=10,labels=['%s - %1.1f %%' % (l, s) for l, s in zip(docker_col, value_col)])
-#     plt.savefig('{}.png'.format(_title))
+    df = pd.read_csv(_cpu_files)
+    docker_col = df['Docker Container']
+    value_col = df['CPU Mean']
+    plt.figure(figsize=(14, 5))
+    plt.title(_title)
+    plt.pie(value_col, startangle=90, frame=True)
+    plt.axis('equal')
+    plt.legend(docker_col, loc="lower right", bbox_to_anchor=(1,0),  bbox_transform=plt.gcf().transFigure, fontsize=10,labels=['%s - %1.1f %%' % (l, s) for l, s in zip(docker_col, value_col)])
+    plt.savefig('{}.png'.format(_title))
+    
 
-# for _mem_files in mem_files:
-#     _title = (Path(_mem_files).name).split("-MEM")[0]
-#     print(_title)
-#     print(_mem_files)
+for _mem_files in mem_files:
+    _title = (Path(_mem_files).name).split("-MEM")[0]
+    print(_title)
+    print(_mem_files)
 
-#     df = pd.read_csv(_mem_files)
-#     docker_col = df['Docker Container']
-#     value_col = df['MEM Mean']
-#     plt.figure(figsize=(14, 5))
-#     plt.title(_title)
-#     plt.pie(value_col,startangle=45)
-#     plt.axis('equal')
-#     plt.legend(docker_col, loc="lower right", fontsize=10,labels=['%s - %1.1f %%' % (l, s) for l, s in zip(docker_col, value_col)])
-#     plt.savefig('{}.png'.format(_title))
+    df = pd.read_csv(_mem_files)
+    docker_col = df['Docker Container']
+    value_col = df['MEM Mean']
+    plt.figure(figsize=(14, 5))
+    plt.title(_title)
+    plt.pie(value_col,startangle=90)
+    plt.axis('equal')
+    plt.legend(docker_col, loc="lower right", fontsize=10,labels=['%s - %1.1f %%' % (l, s) for l, s in zip(docker_col, value_col)])
+    plt.savefig('{}.png'.format(_title))
 
 
-# for _sys_files in sys_files:
-#     _title = (Path(_sys_files).name).split("-System")[0]
-#     print(_title)
-#     print(_sys_files)
-#     df = pd.read_csv(_sys_files)
-
-#     divisions = [_title]
-#     ylabel = df['CPU Mean']
-#     index = np.arange(9)
-#     width = 0.30
-
-#     plt.bar(index, ylabel, width=0.2, color='b', align='center', label = _title)
-#     plt.bar(index, ylabel, width=0.2, color='b', align='center', label = _title)
-#     plt.title(_title)
-
-#     plt.savefig('{}.png'.format(_title))
 
 
 #system CPU
@@ -128,7 +113,7 @@ plt.xticks(rotation=-30)
 plt.xticks(index+width/2, divisions)
 
 
-plt.legend(loc='best')
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 
 plt.savefig('{}.png'.format(_title) ,bbox_inches='tight',dpi=100)
@@ -185,7 +170,7 @@ plt.ylabel('System Load Mean', fontsize=20)
 plt.xlabel('Cases', fontsize=20)
 plt.xticks(rotation=-30)
 plt.xticks(index+width/2, divisions)
-plt.legend(loc='best')
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 plt.savefig('{}.png'.format(_title) ,bbox_inches='tight',dpi=100)
 print("Total time: {}".format(time.time() - start_time))
 
