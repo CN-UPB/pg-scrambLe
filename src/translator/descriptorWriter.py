@@ -5,7 +5,6 @@ import json
 import pymongo
 from bson.objectid import ObjectId
 
-### @Arka
 class write_dict():
 
     def getKey(self,item):
