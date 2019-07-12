@@ -11,14 +11,15 @@ import seaborn as sns
 
 DOCKER_CPU_PIE = True
 DOCKER_MEM_PIE = True
-SYSTEM_CPU_BAR = False
-SYSTEM_LOAD_BAR =False
-SYSTEM_RAM_BAR = False
+SYSTEM_CPU_BAR = True
+SYSTEM_LOAD_BAR = True
+SYSTEM_RAM_BAR = True
 
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Graphs"
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/New/Final"
-cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*0-CPU-Final-Results.csv'))]
-mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*0-MEM-Final-Results.csv'))]
+cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-CPU-Final-Results.csv')) if "System" not in y]
+mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-MEM-Final-Results.csv'))]
 sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-CPU-Final-Results.csv'))]
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
@@ -63,7 +64,8 @@ if DOCKER_CPU_PIE:
         #plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         # plt.axis('equal')
         # plt.legend(docker_col, loc='best', fontsize=10,labels=['%s - %f' % (l, s) for l, s in zip(docker_col, value_col)], bbox_to_anchor=(1, 1))
-        plt.savefig('{}-CPU.png'.format(cpu_title),bbox_inches='tight',dpi=100)
+        plt.savefig('{}/{}-CPU.png'.format(_OUT_PATH, cpu_title),bbox_inches='tight',dpi=100)
+        plt.close()
 
 ##############################################
 # Docker MEM Bar Chart 
@@ -85,15 +87,15 @@ if DOCKER_MEM_PIE:
         #df = df.round({'CPU Mean': 2})
         for p in a.patches:
              a.annotate("%.2f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                 ha='center', va='center', fontsize=11, color='blue',fontweight='bold', xytext=(0, 20),
+                 ha='center', va='center', fontsize=11, color='blue',fontweight='bold', xytext=(0, 15),
                  textcoords='offset points')
+        plt.xticks(rotation=-90)
         plt.title(mem_title,fontsize=25)
-        plt.title(cpu_title,fontsize=25)
         plt.xlabel("Dockers",fontsize=20)
-        plt.ylabel("CPU Mean",fontsize=20)
-        # plt.axis('equal')
-        # plt.legend(docker_col, loc="lower right", fontsize=10,labels=['%s - %f' % (l, s) for l, s in zip(docker_col, value_col)], bbox_to_anchor=(1, 1))
-        plt.savefig('{}-MEM.png'.format(mem_title),bbox_inches='tight',dpi=100)
+        plt.ylabel("MEM Mean",fontsize=20)
+
+        plt.savefig('{}/{}-MEM.png'.format(_OUT_PATH, mem_title),bbox_inches='tight',dpi=100)
+        plt.close()
 
 ##############################################
 # System CPU Bar Chart 
@@ -161,7 +163,8 @@ if SYSTEM_CPU_BAR:
     plt.legend(loc='best')
 
 
-    plt.savefig('{}.png'.format(_title) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/{}.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+    plt.close()
 
 
 ##############################################
@@ -221,7 +224,8 @@ if SYSTEM_LOAD_BAR:
     plt.xticks(rotation=-30)
     plt.xticks(index+width/2, divisions)
     plt.legend(loc='best')
-    plt.savefig('{}.png'.format(_title) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/{}.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+    plt.close()
 
 ##############################################
 # System RAM Bar Chart 
@@ -280,7 +284,8 @@ if SYSTEM_RAM_BAR:
     plt.xticks(rotation=-30)
     plt.xticks(index+width/2, divisions)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.savefig('{}.png'.format(_title) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/{}.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+    plt.close()
 
 
 #########################################

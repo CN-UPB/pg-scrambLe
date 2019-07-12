@@ -218,3 +218,6 @@ fabric.properties
 src/adaptor/docs/doc
 src/adaptor/docs/doclatex
 XDG_CACHE_HOME/*
+
+experiments/results/OSM Results
+experiments/results/Pishahang Results

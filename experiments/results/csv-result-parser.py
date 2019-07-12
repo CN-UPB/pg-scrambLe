@@ -10,6 +10,9 @@ import json
 import statistics
 import csv
 
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/data_csv"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
+
 def average_cpu (csv_filepath):
     # print(ntpath.basename(csv_filepath))
     df=pd.read_csv(csv_filepath)
@@ -82,41 +85,9 @@ def average_sys_ram(csv_filepath):
     print("MEM Mean: {} \t Min: {} \t Max: {} \n".format( _mean, _min, _max))
     return {"mean": float(_mean), "min": float(_min), "max": float(_max)} 
 
-# def average_cpu2 (csv_filepath):
-#     print(ntpath.basename(csv_filepath))
-#     with open(csv_filepath, "r") as f:
-#         reader = csv.reader(f)
-#         next(reader, None)
-#         row_count = 0
-#         cpu_running_sum = 0.0
-#         for row in reader:
-#             # print(row)
-#             cpu_running_sum += float(row[1]) + float(row[2])
-#             row_count += 1            
-
-#     print("CPU Average: {} \n".format(cpu_running_sum/row_count))
-
-#     return cpu_running_sum/row_count
-
-# def average_mem(csv_filepath):
-#     print(ntpath.basename(csv_filepath))
-#     with open(csv_filepath, "r") as f:
-#         reader = csv.reader(f)
-#         next(reader, None)
-#         row_count = 0
-#         mem_running_sum = 0.0
-#         for row in reader:
-#             # print(row)
-#             mem_running_sum += float(row[1])
-#             row_count += 1            
-
-#     print("MEM Average: {} \n".format(mem_running_sum/row_count))
-
-#     return mem_running_sum/row_count
 
 start_time = time.time()
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Pishahang Results/"
 cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
 mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-mem_usage.csv'))]
 sys_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], 'system-*.csv'))]
@@ -219,7 +190,7 @@ for _mem_file in mem_files:
 
 for _case, _caseValue in result_sys_cpu_dict.items():
     print(_case)
-    with open('{case}-System-CPU-Final-Results.csv'.format(case=_case), mode='w') as system_cpu_resultsfile:
+    with open('{outpath}/{case}-System-CPU-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_cpu_resultsfile:
         fieldnames = ['CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min']
         writer = csv.writer(system_cpu_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
@@ -242,7 +213,7 @@ for _case, _caseValue in result_sys_cpu_dict.items():
 
 for _case, _caseValue in result_sys_load_dict.items():
     print(_case)
-    with open('{case}-System-Load-Final-Results.csv'.format(case=_case), mode='w') as system_load_resultsfile:
+    with open('{outpath}/{case}-System-Load-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_load_resultsfile:
         fieldnames = ['Load1 Run1', 'Load5 Run1', 'Load15 Run1', 'Load1 Run2', 'Load5 Run2', 'Load15 Run2', 'Load1 Run3', 'Load5 Run3', 'Load15 Run3', 'Load1 Mean', 'Load1 SD', 'Load5 Mean', 'Load5 SD', 'Load15 Mean', 'Load15 SD','Load1 Max', 'Load1 Min','Load5 Max', 'Load5 Min','Load15 Max', 'Load15 Min']
         writer = csv.writer(system_load_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
@@ -278,7 +249,7 @@ for _case, _caseValue in result_sys_load_dict.items():
 
 for _case, _caseValue in result_sys_ram_dict.items():
     print(_case)
-    with open('{case}-System-RAM-Final-Results.csv'.format(case=_case), mode='w') as system_ram_resultsfile:
+    with open('{outpath}/{case}-System-RAM-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_ram_resultsfile:
         fieldnames = ['RAM Run1', 'RAM Run2', 'RAM Run3', 'RAM Mean', 'RAM SD', 'RAM Max', 'RAM Min']
         writer = csv.writer(system_ram_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
@@ -301,7 +272,7 @@ for _case, _caseValue in result_sys_ram_dict.items():
 
 for _case, _caseValue in result_cpu_dict.items():
     print(_case)
-    with open('{case}-CPU-Final-Results.csv'.format(case=_case), mode='w') as cpu_resultsfile:
+    with open('{outpath}/{case}-CPU-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as cpu_resultsfile:
         fieldnames = ['Docker Container', 'CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min']
         writer = csv.writer(cpu_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
@@ -324,7 +295,7 @@ for _case, _caseValue in result_cpu_dict.items():
 
 for _case, _caseValue in result_mem_dict.items():
     print(_case)
-    with open('{case}-MEM-Final-Results.csv'.format(case=_case), mode='w') as mem_resultsfile:
+    with open('{outpath}/{case}-MEM-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as mem_resultsfile:
         fieldnames = ['Docker Container', 'MEM Run1', 'MEM Run2', 'MEM Run3', 'MEM Mean', 'MEM SD', 'MEM Max', 'MEM Min']
         writer = csv.writer(mem_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
