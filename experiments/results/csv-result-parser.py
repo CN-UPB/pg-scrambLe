@@ -10,8 +10,8 @@ import json
 import statistics
 import csv
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/1000_2000/data_csv"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/1000_2000/Final"
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/data_csv"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/Final"
 
 def average_cpu (csv_filepath):
     # print(ntpath.basename(csv_filepath))
@@ -205,7 +205,7 @@ for _mem_file in mem_files:
 for _case, _caseValue in result_sys_cpu_dict.items():
     print(_case)
     with open('{outpath}/{case}-System-CPU-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_cpu_resultsfile:
-        fieldnames = ['CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min']
+        fieldnames = ['CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min', 'CPU Max SD']
         writer = csv.writer(system_cpu_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -213,22 +213,16 @@ for _case, _caseValue in result_sys_cpu_dict.items():
             _dockerName = _docker
             _meanofMeans = statistics.mean([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMax = statistics.mean([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMin = statistics.mean([_dockerValue["1"]["min"], _dockerValue["2"]["min"], _dockerValue["3"]["min"]])
 
-            # print(_dockerName)
-            # print(_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"])
-            # print(_meanofMeans)
-            # print(_stddevofMeans)
-            # print(_meanofMax)
-            # print(_meanofMin)
-
-            writer.writerow([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])
+            writer.writerow([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 for _case, _caseValue in result_sys_load_dict.items():
     print(_case)
     with open('{outpath}/{case}-System-Load-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_load_resultsfile:
-        fieldnames = ['Load1 Run1', 'Load5 Run1', 'Load15 Run1', 'Load1 Run2', 'Load5 Run2', 'Load15 Run2', 'Load1 Run3', 'Load5 Run3', 'Load15 Run3', 'Load1 Mean', 'Load1 SD', 'Load5 Mean', 'Load5 SD', 'Load15 Mean', 'Load15 SD','Load1 Max', 'Load1 Min','Load5 Max', 'Load5 Min','Load15 Max', 'Load15 Min']
+        fieldnames = ['Load1 Run1', 'Load5 Run1', 'Load15 Run1', 'Load1 Run2', 'Load5 Run2', 'Load15 Run2', 'Load1 Run3', 'Load5 Run3', 'Load15 Run3', 'Load1 Mean', 'Load1 SD', 'Load5 Mean', 'Load5 SD', 'Load15 Mean', 'Load15 SD','Load1 Max', 'Load1 Min','Load5 Max', 'Load5 Min','Load15 Max', 'Load15 Min', 'Load1 Max SD', 'Load5 Max SD', 'Load15 Max SD']
         writer = csv.writer(system_load_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -241,6 +235,9 @@ for _case, _caseValue in result_sys_load_dict.items():
             _stddevofMeans1 = statistics.pstdev([_dockerValue["1"]["mean1"], _dockerValue["2"]["mean1"], _dockerValue["3"]["mean1"]])
             _stddevofMeans5 = statistics.pstdev([_dockerValue["1"]["mean5"], _dockerValue["2"]["mean5"], _dockerValue["3"]["mean5"]])
             _stddevofMeans15 = statistics.pstdev([_dockerValue["1"]["mean15"], _dockerValue["2"]["mean15"], _dockerValue["3"]["mean15"]])
+            _stddevofMax1 = statistics.pstdev([_dockerValue["1"]["max1"], _dockerValue["2"]["max1"], _dockerValue["3"]["max1"]])
+            _stddevofMax5 = statistics.pstdev([_dockerValue["1"]["max5"], _dockerValue["2"]["max5"], _dockerValue["3"]["max5"]])
+            _stddevofMax15 = statistics.pstdev([_dockerValue["1"]["max15"], _dockerValue["2"]["max15"], _dockerValue["3"]["max15"]])
 
             _meanofMax1 = statistics.mean([_dockerValue["1"]["max1"], _dockerValue["2"]["max1"], _dockerValue["3"]["max1"]])
             _meanofMax5 = statistics.mean([_dockerValue["1"]["max5"], _dockerValue["2"]["max5"], _dockerValue["3"]["max5"]])
@@ -258,13 +255,14 @@ for _case, _caseValue in result_sys_load_dict.items():
             # print(_meanofMin)
 
             writer.writerow([_dockerValue["1"]["mean1"], _dockerValue["1"]["mean5"], _dockerValue["1"]["mean15"],_dockerValue["2"]["mean1"], _dockerValue["2"]["mean5"], _dockerValue["2"]["mean15"],_dockerValue["3"]["mean1"], _dockerValue["3"]["mean5"], _dockerValue["3"]["mean15"],_meanofMeans1, _stddevofMeans1,_meanofMeans5, _stddevofMeans5,_meanofMeans15, _stddevofMeans15,
-            _meanofMax1, _meanofMin1, _meanofMax5, _meanofMin5,_meanofMax15, _meanofMin15])
+            _meanofMax1, _meanofMin1, _meanofMax5, _meanofMin5,_meanofMax15, _meanofMin15, _stddevofMax1, _stddevofMax5, _stddevofMax15])
+            
             #_meanofMeans, _stddevofMeans, _meanofMax, _meanofMin,
 
 for _case, _caseValue in result_sys_ram_dict.items():
     print(_case)
     with open('{outpath}/{case}-System-RAM-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as system_ram_resultsfile:
-        fieldnames = ['RAM Run1', 'RAM Run2', 'RAM Run3', 'RAM Mean', 'RAM SD', 'RAM Max', 'RAM Min']
+        fieldnames = ['RAM Run1', 'RAM Run2', 'RAM Run3', 'RAM Mean', 'RAM SD', 'RAM Max', 'RAM Min', 'RAM Max SD']
         writer = csv.writer(system_ram_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -272,6 +270,7 @@ for _case, _caseValue in result_sys_ram_dict.items():
             _dockerName = _docker
             _meanofMeans = statistics.mean([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMax = statistics.mean([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMin = statistics.mean([_dockerValue["1"]["min"], _dockerValue["2"]["min"], _dockerValue["3"]["min"]])
 
@@ -282,12 +281,12 @@ for _case, _caseValue in result_sys_ram_dict.items():
             # print(_meanofMax)
             # print(_meanofMin)
 
-            writer.writerow([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])   
+            writer.writerow([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])   
 
 for _case, _caseValue in result_cpu_dict.items():
     print(_case)
     with open('{outpath}/{case}-CPU-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as cpu_resultsfile:
-        fieldnames = ['Docker Container', 'CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min']
+        fieldnames = ['Docker Container', 'CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min', 'CPU Max SD']
         writer = csv.writer(cpu_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -295,6 +294,7 @@ for _case, _caseValue in result_cpu_dict.items():
             _dockerName = _docker
             _meanofMeans = statistics.mean([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMax = statistics.mean([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMin = statistics.mean([_dockerValue["1"]["min"], _dockerValue["2"]["min"], _dockerValue["3"]["min"]])
 
@@ -305,12 +305,12 @@ for _case, _caseValue in result_cpu_dict.items():
             # print(_meanofMax)
             # print(_meanofMin)
 
-            writer.writerow([_dockerName, _dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])
+            writer.writerow([_dockerName, _dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 for _case, _caseValue in result_mem_dict.items():
     print(_case)
     with open('{outpath}/{case}-MEM-Final-Results.csv'.format(outpath=_OUT_PATH, case=_case), mode='w') as mem_resultsfile:
-        fieldnames = ['Docker Container', 'MEM Run1', 'MEM Run2', 'MEM Run3', 'MEM Mean', 'MEM SD', 'MEM Max', 'MEM Min']
+        fieldnames = ['Docker Container', 'MEM Run1', 'MEM Run2', 'MEM Run3', 'MEM Mean', 'MEM SD', 'MEM Max', 'MEM Min', 'MEM Max SD']
         writer = csv.writer(mem_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -319,6 +319,7 @@ for _case, _caseValue in result_mem_dict.items():
             _dockerName = _docker
             _meanofMeans = statistics.mean([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMax = statistics.mean([_dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"]])
             _meanofMin = statistics.mean([_dockerValue["1"]["min"], _dockerValue["2"]["min"], _dockerValue["3"]["min"]])
 
@@ -329,13 +330,13 @@ for _case, _caseValue in result_mem_dict.items():
             # print(_meanofMax)
             # print(_meanofMin)
 
-            writer.writerow([_dockerName, _dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])
+            writer.writerow([_dockerName, _dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 
 for _docker, _dockerValue in result_docker_cpu_dict.items():
     print(_docker)
     with open('{outpath}/{docker}-CPU-Docker-Final-Results.csv'.format(outpath=_OUT_PATH, docker=_docker), mode='w') as cpu_resultsfile:
-        fieldnames = ['Case', 'CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min']
+        fieldnames = ['Case', 'CPU Run1', 'CPU Run2', 'CPU Run3', 'CPU Mean', 'CPU SD', 'CPU Max', 'CPU Min', 'CPU Max SD']
         writer = csv.writer(cpu_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -343,16 +344,17 @@ for _docker, _dockerValue in result_docker_cpu_dict.items():
             _caseName = _case
             _meanofMeans = statistics.mean([_caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_caseValue["1"]["max"], _caseValue["2"]["max"], _caseValue["3"]["max"]])
             _meanofMax = statistics.mean([_caseValue["1"]["max"], _caseValue["2"]["max"], _caseValue["3"]["max"]])
             _meanofMin = statistics.mean([_caseValue["1"]["min"], _caseValue["2"]["min"], _caseValue["3"]["min"]])
 
-            writer.writerow([_caseName, _caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])
+            writer.writerow([_caseName, _caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 
 for _docker, _dockerValue in result_docker_mem_dict.items():
     print(_docker)
     with open('{outpath}/{docker}-MEM-Docker-Final-Results.csv'.format(outpath=_OUT_PATH, docker=_docker), mode='w') as mem_resultsfile:
-        fieldnames = ['Case', 'MEM Run1', 'MEM Run2', 'MEM Run3', 'MEM Mean', 'MEM SD', 'MEM Max', 'MEM Min']
+        fieldnames = ['Case', 'MEM Run1', 'MEM Run2', 'MEM Run3', 'MEM Mean', 'MEM SD', 'MEM Max', 'MEM Min', 'MEM Max SD']
         writer = csv.writer(mem_resultsfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(fieldnames)
 
@@ -360,10 +362,11 @@ for _docker, _dockerValue in result_docker_mem_dict.items():
             _caseName = _case
             _meanofMeans = statistics.mean([_caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"]])
             _stddevofMeans = statistics.pstdev([_caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"]])
+            _stddevofMax = statistics.pstdev([_caseValue["1"]["max"], _caseValue["2"]["max"], _caseValue["3"]["max"]])
             _meanofMax = statistics.mean([_caseValue["1"]["max"], _caseValue["2"]["max"], _caseValue["3"]["max"]])
             _meanofMin = statistics.mean([_caseValue["1"]["min"], _caseValue["2"]["min"], _caseValue["3"]["min"]])
 
-            writer.writerow([_caseName, _caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin])
+            writer.writerow([_caseName, _caseValue["1"]["mean"], _caseValue["2"]["mean"], _caseValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 
 
