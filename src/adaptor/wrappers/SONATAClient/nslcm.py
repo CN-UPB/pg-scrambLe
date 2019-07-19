@@ -6,7 +6,7 @@ import requests
 
 class Nslcm(CommonInterfaceNslcm):
     """
-    Lifecycle Management interface
+    Lifecycle Management Interface
     """
     def __init__(self, host, port=32001, repositories_port=4002):
         self._host = host
@@ -16,7 +16,7 @@ class Nslcm(CommonInterfaceNslcm):
         self._repositories_base_path = 'http://{0}:{1}/'
         
     def get_ns_instances(self, token, offset=None, limit=None, host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         NS instances
 
         /ns_instances:
@@ -71,7 +71,7 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)   
 
     def get_ns_instances_nsinstanceid(self, token, nsInstanceId ,host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         Individual NS instance
 
         /ns_instances_nsinstanceid:
@@ -105,8 +105,46 @@ class Nslcm(CommonInterfaceNslcm):
         result['data'] = r.text
         return json.dumps(result)
 
+    def get_ns_instances_request_status(self, token, nsInstanceId="", offset=None, limit=None, host=None, port=None):
+        """  NS Lifecycle Management Interface -
+        Get information 
+            GET - Fetch information about the requests.
+        :param token: auth token retrieved by the auth call
+        :param nsInstanceId: id of the NS instance
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json",
+                    "accept": "application/json",
+                    "Authorization": 'Bearer {}'.format(token)}
+
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
+
+        _endpoint = "{0}/requests/{1}?offset={2}&limit={3}".format(base_path, nsInstanceId, offset, limit)
+
+        try:
+            r = requests.get(_endpoint, params=None, verify=False,
+                                headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.created:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
     def get_vnf_instances(self, token, offset=None, limit=None, host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         VNF instances - *NON ETSI
 
         GET - Query multiple VNF instances.
@@ -161,7 +199,7 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)   
 
     def get_vnf_instances_vnfinstanceid(self, token, vnfInstanceId ,host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         Individual VNF instance - *NON ETSI
 
         GET - Read an individual VNF instance resource.
@@ -196,7 +234,7 @@ class Nslcm(CommonInterfaceNslcm):
 
 
     def post_ns_instances_nsinstanceid_instantiate(self, token, nsInstanceId, egresses=[], ingresses=[], host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         Instantiate NS task
 
         /ns_instances_nsinstanceid_instantiate:
@@ -262,7 +300,7 @@ class Nslcm(CommonInterfaceNslcm):
         return json.dumps(result)
 
     def post_ns_instances_nsinstanceid_terminate(self, token, nsInstanceId, host=None, port=None):
-        """  NS Lifecycle Management interface - 
+        """  NS Lifecycle Management Interface - 
         Terminate NS task
 
         /ns_instances_nsinstanceid_terminate:

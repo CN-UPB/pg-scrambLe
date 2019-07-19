@@ -5,6 +5,10 @@ def auth_keys():
     return ['username', 'session_began_at', 'token']
 
 @fixture
+def get_ns_instances_request_status_keys():
+    return ['id', 'created_at', 'updated_at', 'service_uuid', 'status', 'request_type', 'service_instance_uuid', 'began_at', 'callback']
+
+@fixture
 def get_vnf_packages_keys():
     return ['created_at', 'md5', 'signature', 'status', 'updated_at', 'username', 'vnfd', 'uuid']
 
