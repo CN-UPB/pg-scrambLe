@@ -1,0 +1,28 @@
+#cloud-config
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDjvJ18S9BybR/dDkzhlJ3Avqqp+h04YDvvzosaoPsObDb4s2NyfAh86NkqyCiD6zn6yJO8k0yHJIsiJiLZmFKfVRAhx0nWxYtEkHlWHrBDUGTNBdgQtJ9PHni22q6pwEUy1DaJQ9KTmK/UJdLb6AAO8lkmIOFFpgh10kNp+MTdL6H2N2itNeq+87zQA4OxJqTh7FNB4nkhFdZhdayoXtZ6RKY6StcL73vUz772BgXuT9HCccZFukKfMY0p4l8mQEX2weYWq0WsZR9RxUiajTb7UtEd6fvJLIWwd0qWtJ4uGzEEq0n8Xlcu4t8saMb2Yr+7KHrBfcu+v/MzEDbpR1qZ stack@vm-hadik3r-14
+
+write_files:
+  - path: /home/ubuntu/multinic.sh
+    content: |
+      #!/bin/bash
+      hname=$(hostname)
+      cat /etc/hosts | grep $hname >> /dev/null
+      if [ $? -ne 0 ];then
+      sudo bash -c "echo '127.0.0.1 $hname' >> /etc/hosts"
+      fi
+      netfile=$(find /etc/network/interfaces.d -name "*.cfg")
+      for interface in $(ls -1 /sys/class/net | grep ens) ;do
+        cat $netfile | grep $interface >> /dev/null
+        if [ $? -ne 0 ];then
+          sudo bash -c "echo 'auto $interface' >> ${netfile}"
+          sudo bash -c "echo 'iface $interface inet dhcp' >> ${netfile}"
+          sudo ifup $interface
+        fi
+      done
+      
+runcmd:
+  - [ "chown", "ubuntu:ubuntu", "/home/ubuntu/multinic.sh" ]
+  - [ "chmod", "+x", "/home/ubuntu/multinic.sh" ]      
+  - [ "/home/ubuntu/multinic.sh" ]     

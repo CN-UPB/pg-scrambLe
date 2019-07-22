@@ -10,8 +10,8 @@ import json
 import statistics
 import csv
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/data_csv"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/Final"
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/data_csv"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
 
 def average_cpu (csv_filepath):
     # print(ntpath.basename(csv_filepath))
@@ -305,7 +305,7 @@ for _case, _caseValue in result_cpu_dict.items():
             # print(_meanofMax)
             # print(_meanofMin)
 
-            writer.writerow([_dockerName, _dockerValue["1"]["mean"], _dockerValue["2"]["mean"], _dockerValue["3"]["mean"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
+            writer.writerow([_dockerName, _dockerValue["1"]["max"], _dockerValue["2"]["max"], _dockerValue["3"]["max"], _meanofMeans, _stddevofMeans, _meanofMax, _meanofMin, _stddevofMax])
 
 for _case, _caseValue in result_mem_dict.items():
     print(_case)

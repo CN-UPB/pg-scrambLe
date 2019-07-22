@@ -9,19 +9,25 @@ from pathlib import Path
 import time
 import seaborn as sns
 
-DOCKER_CPU_BAR = True
-DOCKER_MEM_BAR = True
-DOCKER_CASE_CPU_BAR = True
-DOCKER_CASE_MEM_BAR = True
-SYSTEM_CPU_BAR = True
-SYSTEM_LOAD_BAR = True
-SYSTEM_RAM_BAR = True
+from scipy.stats import t # sudo pip3 install scipy
+from math import sqrt
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/Final"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/2_16/Graphs"
+DOCKER_CPU_BAR = True
+DOCKER_MEM_BAR = False
+DOCKER_CASE_CPU_BAR = False
+DOCKER_CASE_MEM_BAR = False
+SYSTEM_CPU_BAR = False
+SYSTEM_LOAD_BAR = False
+SYSTEM_RAM_BAR = False
+
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Graphs"
 
 RUNS = 3 # Not fully supported
 CASES = 3 # Not fully supported
+
+CONFIDENCE = 0.95
+T_BOUNDS = t.interval(CONFIDENCE, RUNS - 1)
 
 cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-CPU-Final-Results.csv')) if "System" not in y]
 mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-MEM-Final-Results.csv'))]
@@ -357,17 +363,25 @@ if DOCKER_CPU_BAR:
 
         df = pd.read_csv(_cpu_files)
         df = df.sort_values('CPU Max')
+        # df = df[-5:]
         docker_col = df['Docker Container']
         value_col = df['CPU Mean']
         value_col_max = df['CPU Max']
         value_col_max_sd = df['CPU Max SD']
         value_sd_col = df['CPU SD']
 
+        # sum mean to the confidence interval
+        df['CPU Mean T'] = abs(T_BOUNDS[1] * df['CPU SD'] / sqrt(RUNS))
+        df['CPU Max T'] = abs(T_BOUNDS[1] * df['CPU Max SD'] / sqrt(RUNS))
+
+        value_col_t_mean = df['CPU Mean T']
+        value_col_t_max = df['CPU Max T']
+
         width = 0.30
         plt.figure(figsize=(10,6))
 
-        a2=plt.bar(docker_col, value_col_max, yerr=value_col_max_sd, alpha=0.6, ecolor='black', capsize=5, color='red')
-        a=plt.bar(docker_col, value_col, yerr=value_sd_col, alpha=0.6, ecolor='black', capsize=5, color='blue')
+        a2=plt.bar(docker_col, value_col_max, yerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=5, color='red')
+        a=plt.bar(docker_col, value_col, yerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=5, color='blue')
 
         for p in a2.patches:
             plt.annotate("%.2f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
