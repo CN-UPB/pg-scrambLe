@@ -26,7 +26,7 @@ HOST_URL = "sonatamano.cs.upb.de"
 
 IMAGES = ["cirros", "stress"]
 INSTANCES = [100, 200]
-CASES = 3
+CASES = [1, 2, 3]
 RUNS = 3
 
 
@@ -99,7 +99,7 @@ print("""
 """)
 
 for _image in IMAGES:
-    for _case in range(1, CASES+1):
+    for _case in CASES:
         for _instances in INSTANCES:
             for _run in range(1, RUNS+1):
                 print("{image}_case{case}_{instances}_Run{run}".format(image=_image, case=_case, instances=_instances, run=_run))
@@ -109,8 +109,7 @@ for _image in IMAGES:
 
                 NSD_PATH = "/app/SONATA/Descriptors/CASE{case}/{image}_case{case}_nsd_sonata.yml".format(image=_image, case=_case)
                 # VNFD_PATHS = ["/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.1.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.2.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.3.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.4.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.5.yml".format(image=_image, case=_case)]
-                VNFD_PATH = "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.yml".format(image=_image, case=_case)
-
+for _c in range(1, 5):
                 with open(NSD_PATH, 'r') as file:
                     nsd_data = file.read()
 
@@ -131,11 +130,14 @@ for _image in IMAGES:
                                 password=PASSWORD))
                 _token = json.loads(_token["data"])
 
-                # for _vnfd in VNFD_PATHS:
-                _res = sonata_vnfpkgm.post_vnf_packages(token=_token,
-                    package_path=VNFD_PATH)
-                print(_res)
-                time.sleep(0.5)
+
+                for _c in range(1, 6):
+                    # for _vnfd in VNFD_PATHS:
+                    VNFD_PATH = "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd_{vnfid}.yml".format(image=_image, case=_case, vnfid=_c)
+                    _res = sonata_vnfpkgm.post_vnf_packages(token=_token,
+                        package_path=VNFD_PATH)
+                    print(_res)
+                    time.sleep(0.5)
 
                 for i in range(0, NO_INSTANCES):
 

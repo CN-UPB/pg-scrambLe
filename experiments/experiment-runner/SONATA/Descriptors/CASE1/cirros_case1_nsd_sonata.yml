@@ -6,9 +6,9 @@ version: '1.0'
 author: "pg-scramble"
 description: "Cirros NS"  
 network_functions:
-  - vnf_id: "cirros-image"
+  - vnf_id: "cirros-image1"
     vnf_vendor: "pg-scramble"
-    vnf_name: "cirros-image"
+    vnf_name: "cirros-image-1"
     vnf_version: '1.0'
 
 connection_points:
@@ -19,7 +19,7 @@ virtual_links:
   - id: "mgmtnet"
     connectivity_type: "E-LAN"
     connection_points_reference:
-      - "cirros-image:mgmtnet"
+      - "cirros-image1:mgmtnet"
       - "vnf-cp0"
       
       

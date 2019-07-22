@@ -8,23 +8,23 @@ description: "stress NS"
 network_functions:
   - vnf_id: "stress-image1"
     vnf_vendor: "pg-scramble"
-    vnf_name: "stress-image"
+    vnf_name: "stress-image-1"
     vnf_version: '1.0'
   - vnf_id: "stress-image2"
     vnf_vendor: "pg-scramble"
-    vnf_name: "stress-image"
+    vnf_name: "stress-image-2"
     vnf_version: '1.0'
   - vnf_id: "stress-image3"
     vnf_vendor: "pg-scramble"
-    vnf_name: "stress-image"
+    vnf_name: "stress-image-3"
     vnf_version: '1.0'
   - vnf_id: "stress-image4"
     vnf_vendor: "pg-scramble"
-    vnf_name: "stress-image"
+    vnf_name: "stress-image-4"
     vnf_version: '1.0'
   - vnf_id: "stress-image5"
     vnf_vendor: "pg-scramble"
-    vnf_name: "stress-image"
+    vnf_name: "stress-image-5"
     vnf_version: '1.0'
 
 connection_points:

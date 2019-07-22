@@ -8,15 +8,15 @@ description: "Cirros NS"
 network_functions:
   - vnf_id: "cirros-image1"
     vnf_vendor: "pg-scramble"
-    vnf_name: "cirros-image"
+    vnf_name: "cirros-image-1"
     vnf_version: '1.0'
   - vnf_id: "cirros-image2"
     vnf_vendor: "pg-scramble"
-    vnf_name: "cirros-image"
+    vnf_name: "cirros-image-2"
     vnf_version: '1.0'
   - vnf_id: "cirros-image3"
     vnf_vendor: "pg-scramble"
-    vnf_name: "cirros-image"
+    vnf_name: "cirros-image-3"
     vnf_version: '1.0'
 
 connection_points:

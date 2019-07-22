@@ -28,7 +28,7 @@ PASSWORD = "admin"
 
 IMAGES = ["cirros", "stress"]
 INSTANCES = [100, 200]
-CASES = 3
+CASES = [1, 2, 3]
 RUNS = 3
 
 HOST_URL = "osmmano.cs.upb.de"
@@ -71,7 +71,7 @@ print("""
 """)
 
 for _image in IMAGES:
-    for _case in range(1, CASES+1):
+    for _case in CASES:
         for _instances in INSTANCES:
             for _run in range(1, RUNS+1):
                 print("{image}_case{case}_{instances}_Run{run}".format(image=_image, case=_case, instances=_instances, run=_run))
