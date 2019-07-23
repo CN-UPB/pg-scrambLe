@@ -14,6 +14,11 @@ from urllib.request import urlopen
 import csv
 import os
 import docker
+from keystoneauth1.identity import v3
+from keystoneauth1 import session
+from heatclient import client
+
+
 client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
 DOCKER_EXCLUDE = ['experiment-runner']
@@ -23,6 +28,10 @@ NS_TERMINATION_SLEEP = 2
 USERNAME = "sonata"
 PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
+
+AUTH_URL = "http://131.234.29.169/identity/v3"
+USERNAME = "scale-user"
+PASSWORD = "1234"
 
 IMAGES = ["cirros", "stress"]
 INSTANCES = [100, 200]
@@ -70,6 +79,20 @@ def sonata_cleanup():
     time.sleep(5)
 
 
+def delete_stacks():
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=USERNAME,
+                    password=PASSWORD,
+                    project_name='scale',
+                    user_domain_id='default',
+                    project_domain_id='default')
+
+    sess = session.Session(auth=auth)
+
+    heat = client.Client('1', session=sess)
+
+    for s in heat.stacks.list():
+        s.delete()
 
 # http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
 print("""
@@ -109,7 +132,6 @@ for _image in IMAGES:
 
                 NSD_PATH = "/app/SONATA/Descriptors/CASE{case}/{image}_case{case}_nsd_sonata.yml".format(image=_image, case=_case)
                 # VNFD_PATHS = ["/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.1.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.2.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.3.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.4.yml".format(image=_image, case=_case), "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd.5.yml".format(image=_image, case=_case)]
-for _c in range(1, 5):
                 with open(NSD_PATH, 'r') as file:
                     nsd_data = file.read()
 
@@ -320,4 +342,5 @@ for _c in range(1, 5):
                 print("\nhttp://{host}:9000/interactive?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))
 
                 print("\n\n\n\n\n\n ENDED \n\n\n\n\n\n")
+                delete_stacks()
                 time.sleep(60)

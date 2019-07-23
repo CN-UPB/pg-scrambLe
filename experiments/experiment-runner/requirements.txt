@@ -3,3 +3,4 @@ Flask
 python-mano-wrappers
 watchdog
 docker
+openstack-heat
