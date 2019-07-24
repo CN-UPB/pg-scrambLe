@@ -16,29 +16,33 @@ import os
 import docker
 from keystoneauth1.identity import v3
 from keystoneauth1 import session
-from heatclient import client
+from heatclient import client as hclient
+from novaclient import client as nvclient
 
-
-client = docker.DockerClient(base_url='unix://container/path/docker.sock')
+docker_client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
 DOCKER_EXCLUDE = ['experiment-runner']
 
 IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 2
+NS_TERMINATION_SLEEP = 15
 USERNAME = "sonata"
 PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
 
 AUTH_URL = "http://131.234.29.169/identity/v3"
-USERNAME = "scale-user"
-PASSWORD = "1234"
+OS_USERNAME = "demo"
+OS_PASSWORD = "1234"
 
-IMAGES = ["cirros", "stress"]
-INSTANCES = [100, 200]
+IMAGES = ["cirros"]
+INSTANCES = [2, 10]
 CASES = [1, 2, 3]
 RUNS = 3
 
-
+cases_vnfs = {
+    1: 1,
+    2: 3,
+    3: 5
+}
 
 def sonata_cleanup():
 
@@ -81,18 +85,44 @@ def sonata_cleanup():
 
 def delete_stacks():
     auth = v3.Password(auth_url=AUTH_URL,
-                    username=USERNAME,
-                    password=PASSWORD,
-                    project_name='scale',
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
                     user_domain_id='default',
                     project_domain_id='default')
 
     sess = session.Session(auth=auth)
 
-    heat = client.Client('1', session=sess)
+    heat = hclient.Client('1', session=sess)
 
     for s in heat.stacks.list():
         s.delete()
+
+
+def get_count():
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
+                    user_domain_id='default',
+                    project_domain_id='default')
+
+    sess = session.Session(auth=auth)
+
+    nova = nvclient.Client('2', session=sess)
+
+    _servers = nova.servers.list()
+
+    active_count = 0
+    error_count = 0
+
+    for _s in _servers:
+        if _s.status == "ACTIVE":
+            active_count += 1
+        else:
+            error_count += 1
+
+    return active_count, error_count
 
 # http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
 print("""
@@ -158,7 +188,7 @@ for _image in IMAGES:
                     VNFD_PATH = "/app/SONATA/Descriptors/CASE{case}/{image}_vnfd_{vnfid}.yml".format(image=_image, case=_case, vnfid=_c)
                     _res = sonata_vnfpkgm.post_vnf_packages(token=_token,
                         package_path=VNFD_PATH)
-                    print(_res)
+                    # print(_res)
                     time.sleep(0.5)
 
                 for i in range(0, NO_INSTANCES):
@@ -168,9 +198,15 @@ for _image in IMAGES:
 
                     _res = sonata_nsd.post_ns_descriptors(token=_token,
                         package_path="/tmp/" + NSNAME.format(_id=str(i), image=_image, case=_case) + "nsd.yml")
-                    print(_res)
+                    # print(_res)
                     time.sleep(0.5)
 
+                try:
+                    ACTIVE_OFFSET, ERROR_OFFSET = get_count()
+                except Exception as e:
+                    ACTIVE_OFFSET, ERROR_OFFSET = 0, 0
+                    print(e)
+                    print("ERROR OpenStack")
 
                 print("PHASE 1 : Recording idle metrics...")
                 experiment_timestamps["start_time"] = int(time.time())
@@ -194,29 +230,40 @@ for _image in IMAGES:
                     for _n in _nsd_list:
                         if NSNAME.format(_id=str(i), image=_image, case=_case) == _n['nsd']['name']:            
                             _ns = _n['uuid']
-                            print("UUID")
-                            print(_ns)
+                            # print("UUID")
+                            # print(_ns)
                             continue
 
                     if _ns:
                         response = json.loads(
                                     sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
                                         token=_token["token"]["access_token"], nsInstanceId=_ns))
-                        print("response")
-                        print(response)
+                        # print("response")
+                        # print(response)
                         if response["error"]:
                             print("ERROR - no ns uuid")
                     else:
                         print("ERROR - no ns uuid")
                     #print(response)
                     # time.sleep(0.1) - 0.1 sleep not working with pishahang                    
-                    time.sleep(0.2)
+                    time.sleep(1)
 
                 # Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
                 experiment_timestamps["ns_inst_end_time"] = int(time.time())
 
                 print("PHASE 2 : Recording Metrics Post NS instantiation...")
                 time.sleep(60*NS_TERMINATION_SLEEP)
+
+                try:
+                    ACTIVE_INSTANCES, ERROR_INSTANCES = get_count()
+                except Exception as e:
+                    print(e)
+                    print("ERROR OpenStack")
+
+                print("Success Ratio: Total-{total} \t Active-{active} \t Error-{error}".format(
+                            total=(cases_vnfs[_case]*_instances), 
+                            active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
+                            error=(ERROR_INSTANCES-ERROR_OFFSET)))
 
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
@@ -300,7 +347,7 @@ for _image in IMAGES:
                     }
 
                 docker_list = {}
-                for _container in client.containers.list():        
+                for _container in docker_client.containers.list():        
                     if not _container.attrs["Name"][1:] in DOCKER_EXCLUDE:
                             _charts["{0}-{1}".format(_container.attrs["Name"][1:], "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
                             _charts["{0}-{1}".format(_container.attrs["Name"][1:], "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
@@ -343,4 +390,4 @@ for _image in IMAGES:
 
                 print("\n\n\n\n\n\n ENDED \n\n\n\n\n\n")
                 delete_stacks()
-                time.sleep(60)
+                time.sleep(300)

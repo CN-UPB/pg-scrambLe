@@ -18,9 +18,6 @@ sudo docker logs experiment-runner -f
 # Attach shell
 sudo docker exec -it experiment-runner bash
 
-import docker
-client = docker.DockerClient(base_url='unix://container/path/docker.sock')
-client.containers.list()
-
-client.containers.list()[0].attrs["Id"]
-client.containers.list()[0].attrs["Name"]
+# Background Run 
+nohup python -u ./run-experiment-osm.py > experiment.log &
+nohup python -u ./run-experiment-sonata.py > experiment.log &

@@ -14,28 +14,69 @@ from urllib.request import urlopen
 import csv
 import os
 import docker
-client = docker.DockerClient(base_url='unix://container/path/docker.sock')
+
+from keystoneauth1.identity import v3
+from keystoneauth1 import session
+from novaclient import client as nvclient
+
+client_docker = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
 DOCKER_EXCLUDE = ['experiment-runner']
 
 
 IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 2
+NS_TERMINATION_SLEEP = 15
 # NO_INSTANCES = 1
 
 USERNAME = "admin"
 PASSWORD = "admin"
 
+AUTH_URL = "http://131.234.29.168/identity/v3"
+OS_USERNAME = "demo"
+OS_PASSWORD = "123"
+
 IMAGES = ["cirros", "stress"]
-INSTANCES = [100, 200]
+INSTANCES = [2, 10]
 CASES = [1, 2, 3]
 RUNS = 3
+
+cases_vnfs = {
+    1: 1,
+    2: 3,
+    3: 5
+}
 
 HOST_URL = "osmmano.cs.upb.de"
 # NSNAME = "stress_case1"
 # NSDESCRIPTION = "case1-100_NS"
 # nsdId = "stress_case1-ns"
 VIMACCOUNTID = "6c74d590-aaad-4951-9200-5f1b6d8b0588"
+
+def get_count():
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
+                    user_domain_id='default',
+                    project_domain_id='default')
+
+    sess = session.Session(auth=auth)
+
+    nova = nvclient.Client('2', session=sess)
+
+    _servers = nova.servers.list()
+
+    active_count = 0
+    error_count = 0
+
+    for _s in _servers:
+        if _s.status == "ACTIVE":
+            active_count += 1
+        else:
+            error_count += 1
+
+    return active_count, error_count
+
 
 osm_nsd = OSMClient.Nsd(HOST_URL)
 osm_nslcm = OSMClient.Nslcm(HOST_URL) 
@@ -80,9 +121,14 @@ for _image in IMAGES:
                 nsdId = "{image}_case{case}-ns".format(image=_image, case=_case)
                 NSDESCRIPTION = "{image}_case{case}_{instances}_Run{run}_NS".format(image=_image, case=_case, instances=_instances, run=_run)
 
+                try:
+                    ACTIVE_OFFSET, ERROR_OFFSET = get_count()
+                except Exception as e:
+                    ACTIVE_OFFSET, ERROR_OFFSET = 0, 0
+                    print(e)
+                    print("ERROR OpenStack")
 
-
-                print("PHASE 1 : Recording 5 min of idle metrics...")
+                print("PHASE 1 : Recording idle metrics...")
                 experiment_timestamps["start_time"] = int(time.time())
 
                 time.sleep(60*IDLE_SLEEP)
@@ -108,14 +154,25 @@ for _image in IMAGES:
                                     nsName=NSNAME, 
                                     nsdId=_nsd, 
                                     vimAccountId=VIMACCOUNTID))
-                    print(response)
-                    time.sleep(0.1)
+                    # print(response)
+                    time.sleep(1)
 
                 # Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
                 experiment_timestamps["ns_inst_end_time"] = int(time.time())
 
                 print("PHASE 2 : Recording Metrics Post NS instantiation...")
                 time.sleep(60*NS_TERMINATION_SLEEP)
+
+                try:
+                    ACTIVE_INSTANCES, ERROR_INSTANCES = get_count()
+                except Exception as e:
+                    print(e)
+                    print("ERROR OpenStack")
+
+                print("Success Ratio: Total-{total} \t Active-{active} \t Error-{error}".format(
+                            total=(cases_vnfs[_case]*_instances), 
+                            active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
+                            error=(ERROR_INSTANCES-ERROR_OFFSET)))
 
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
@@ -136,7 +193,7 @@ for _image in IMAGES:
                                 response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
                                                         token=_token["id"], 
                                                         nsInstanceId=_ns))
-                                print(response)
+                                # print(response)
                     except Exception as e:
                         pass
 
@@ -194,7 +251,7 @@ for _image in IMAGES:
                     }
 
                 docker_list = {}
-                for _container in client.containers.list():        
+                for _container in client_docker.containers.list():        
                     if not _container.attrs["Name"][1:] in DOCKER_EXCLUDE:
                             _charts["{0}-{1}".format(_container.attrs["Name"][1:], "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
                             _charts["{0}-{1}".format(_container.attrs["Name"][1:], "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
@@ -235,7 +292,7 @@ for _image in IMAGES:
                 print("\nhttp://{host}:9000/interactive?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))
 
                 print("\n\n\n\n\n\n ENDED \n\n\n\n\n\n")
-                time.sleep(60)
+                time.sleep(300)
 
 
 
