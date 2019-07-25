@@ -12,16 +12,20 @@ import seaborn as sns
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
-DOCKER_CPU_BAR = True
-DOCKER_MEM_BAR = False
-DOCKER_CASE_CPU_BAR = False
-DOCKER_CASE_MEM_BAR = False
+DOCKER_CPU_BAR = False
+DOCKER_CASE_CPU_BAR = True
 SYSTEM_CPU_BAR = False
+
 SYSTEM_LOAD_BAR = False
+
+DOCKER_MEM_BAR = False
+DOCKER_CASE_MEM_BAR = False
 SYSTEM_RAM_BAR = False
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Graphs"
+LIMIT_DOCKERS_IN_GRAPH = -10
+
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/Combined"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Pishahang Results/Combined/Graphs"
 
 RUNS = 3 # Not fully supported
 CASES = 3 # Not fully supported
@@ -362,8 +366,8 @@ if DOCKER_CPU_BAR:
         print(_cpu_files)
 
         df = pd.read_csv(_cpu_files)
-        df = df.sort_values('CPU Max')
-        # df = df[-5:]
+        df = df.sort_values('CPU Mean')
+        df = df[LIMIT_DOCKERS_IN_GRAPH:]
         docker_col = df['Docker Container']
         value_col = df['CPU Mean']
         value_col_max = df['CPU Max']
@@ -380,15 +384,23 @@ if DOCKER_CPU_BAR:
         width = 0.30
         plt.figure(figsize=(10,6))
 
-        a2=plt.bar(docker_col, value_col_max, yerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=5, color='red')
-        a=plt.bar(docker_col, value_col, yerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=5, color='blue')
+        a2=plt.barh(docker_col, value_col_max, xerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=2, color='red')
+        a=plt.barh(docker_col, value_col, xerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=2, color='blue')
 
-        for p in a2.patches:
-            plt.annotate("%.2f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                ha='right', va='bottom', fontsize=9, color='black',fontweight='bold', xytext=(-4, 3),
-                textcoords='offset points')
+        for rect in a.patches:
+            width = rect.get_width()
+            plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+                    '%d' % int(width),
+                    ha='center', va='center', fontsize=9, color='black',fontweight='bold')
 
-        plt.xticks(rotation=-90)
+        for rect in a2.patches:
+            width = rect.get_width()
+            plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+                    '%d' % int(width),
+                    ha='center', va='center', fontsize=9, color='black',fontweight='bold')
+
+
+        # plt.xticks(rotation=-90)
         plt.title("CPU -- {}".format(cpu_title), fontsize=25)
         plt.xlabel("Dockers", fontsize=20)
         plt.ylabel("CPU Mean", fontsize=20)
