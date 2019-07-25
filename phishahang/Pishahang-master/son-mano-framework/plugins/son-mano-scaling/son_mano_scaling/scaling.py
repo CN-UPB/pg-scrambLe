@@ -40,8 +40,6 @@ from son_mano_scaling.config import *
 from sonmanobase.plugin import ManoBasePlugin
 from son_mano_scaling.mano_manager import ManoManager
 
-# TODO: Make NSD/VNFD for scaling instances
-
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("plugin:scaling")
 LOG.setLevel(logging.INFO)
@@ -160,6 +158,31 @@ class ScalingPlugin(ManoBasePlugin):
         LOG.info("\nTerminating MANO instance...")
         self.terminating_mano_instance = True
         time.sleep(5)
+
+        # FIX ME! Termination not working in pishahang
+
+        # collect all vnfr, nsr and dump as a file
+        sonata_nslcm = wrappers.SONATAClient.Nslcm(host_ip)
+        sonata_auth = wrappers.SONATAClient.Auth(host_ip)
+        sonata_nsd = wrappers.SONATAClient.Nsd(host_ip)
+        sonata_vnfpkgm = wrappers.SONATAClient.VnfPkgm(host_ip)
+
+        _token = json.loads(sonata_auth.auth(username=PISHAHANG_DEFAULT_USERNAME, password=PISHAHANG_DEFAULT_PASSWORD))
+        _token = json.loads(_token["data"])
+
+        nsr_payload = json.loads(sonata_nslcm.get_ns_instances(token=_token["token"]["access_token"], limit=1000))
+        nsr_payload = json.loads(nsr_payload["data"])
+
+        vnfr_payload = json.loads(sonata_nslcm.get_vnf_instances(token=_token["token"]["access_token"], limit=1000))
+        vnfr_payload = json.loads(vnfr_payload["data"]) 
+        
+        _time_now = str( int(time.time()) )
+
+        with open('{timestamp}-vnfr-backup-{ip}.json'.format(timestamp=_time_now, ip=host_ip), 'w') as outfile:
+            json.dump(vnfr_payload, outfile)
+
+        with open('{timestamp}-nsr-backup-{ip}.json'.format(timestamp=_time_now, ip=host_ip), 'w') as outfile:
+            json.dump(nsr_payload, outfile)
 
         for instance in self.mano_instances:
             if instance['host_ip'] == host_ip:
@@ -330,10 +353,10 @@ class ScalingPlugin(ManoBasePlugin):
         """
         To be overwritten by subclass
         """
-        # TODO: fetch CPU information from all the instances
-        # TODO: if 5min aveerage crosses threshold 0.7 then start creating an instances 
+        # 1. fetch CPU information from all the instances
+        # 2. if 5min aveerage crosses threshold 0.7 then start creating an instances 
         #       and when 15min average crosses threshold 0.7 add it to the priority list
-        # TODO: Termination of the instance when the laod on both the lower MANO and parent
+        # 3. Termination of the instance when the laod on both the lower MANO and parent
         #       MANO are less than 0.7
         while True:
             LOG.info("\n\n ##################### \n\nScaling run loop..")
