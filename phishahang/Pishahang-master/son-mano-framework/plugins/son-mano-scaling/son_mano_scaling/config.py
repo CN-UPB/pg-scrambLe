@@ -1,7 +1,9 @@
-PARENT_IP = "sonatamano.cs.upb.de"
-NETDATA_PORT = 19999
+import os
 
-DUMMY_INSTANCE_IP = "vm-hadik3r-08.cs.uni-paderborn.de"
+PARENT_IP = os.environ['PARENT_IP']
+DUMMY_INSTANCE_IP = os.environ['DUMMY_INSTANCE_IP']
+
+NETDATA_PORT = 19999
 
 NS_TIMEOUT = 10
 

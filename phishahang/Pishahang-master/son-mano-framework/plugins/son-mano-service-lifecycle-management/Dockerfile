@@ -33,6 +33,18 @@ ENV url_nsr_repository http://son-catalogue-repos:4011/records/nsr/
 ENV url_vnfr_repository http://son-catalogue-repos:4011/records/vnfr/
 ENV url_monitoring_server http://son-monitor-manager:8000/api/v1/
 
+# Environment variables
+ENV splitter_url=http://131.234.250.202:8000/Main_splitter/hello
+ENV translator_url=http://131.234.250.202:8000/translator/hello
+ENV username_osm=admin
+ENV password_osm=admin
+ENV host_5=vm-hadik3r-05.cs.uni-paderborn.de
+ENV username_pish2=sonata
+ENV password_pish2=1234
+ENV host_10=vm-hadik3r-10.cs.uni-paderborn.de
+ENV host_6=vm-hadik3r-06.cs.uni-paderborn.de
+ENV host_8=vm-hadik3r-08.cs.uni-paderborn.de
+
 RUN apt-get update && apt-get install -y gcc
 
 # add generic project files
@@ -46,6 +58,7 @@ RUN python setup.py install
 # add plugin related files
 WORKDIR /
 ADD plugins/${PLUGIN_BASE} /plugins/${PLUGIN_BASE}
+RUN chmod +x /plugins/${PLUGIN_BASE}/son_mano_slm/generate_descriptor_pkg.sh
 
 # install actual plugin
 WORKDIR /plugins/${PLUGIN_BASE}
