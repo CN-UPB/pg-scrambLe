@@ -8,6 +8,7 @@ RUN apt-get -yq update && \
     apt-get -yq install bash sudo git bzip2 jvm-7-avian-jre 
     #openjdk-7-jdk
 
+# RUN git config --global url."https://".insteadOf git://
 # Install Bower & Grunt
 RUN npm install -g --silent bower@1.7.6 grunt@1.0.1 grunt-ng-constant@2.0.1
 
