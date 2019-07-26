@@ -10,7 +10,6 @@
 - include: gtk/fnct.yml
 - include: gtk/rec.yml
 - include: gtk/vim.yml
-- include: gtk/mano.yml
 - include: gtk/api.yml
 - include: gtk/lic.yml
 - include: gtk/kpi.yml

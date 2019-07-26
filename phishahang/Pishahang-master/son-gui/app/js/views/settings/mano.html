@@ -1,56 +1,30 @@
- <!--
-Copyright (c) 2015 SONATA-NFV [, ANY ADDITIONAL AFFILIATION]
-ALL RIGHTS RESERVED.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-Neither the name of the SONATA-NFV [, ANY ADDITIONAL AFFILIATION]
-nor the names of its contributors may be used to endorse or promote 
-products derived from this software without specific prior written 
-permission.
-
-This work has been performed in the framework of the SONATA project,
-funded by the European Commission under Grant number 671517 through 
-the Horizon 2020 and 5G-PPP programmes. The authors would like to 
-acknowledge the contributions of their colleagues of the SONATA 
-partner consortium (www.sonata-nfv.eu).
--->
-
 <div class="row" ng-init="init()" ng-controller="ManoSettingsController">
 
+               
   <div class="col s12">
     <div class="card-panel">
       <div class="card-content">
-            <h5>Mano</h5>
+          <h5>MANOs</h5>
+
             <div class="row">
               <div class="col s12">
-                <a class="waves-effect blue-grey darken-3 btn right" ng-click="regetmano()"><i class="material-icons left">replay</i>Refresh</a>
-                <a class="modal-trigger waves-effect waves-light btn right" href="#new_mano" style="margin-right: 5px"><i class="material-icons left">library_add</i>Add a 
-                Mano</a>
+                  <a class="waves-effect blue-grey darken-3 btn right m-l" ng-click="regetWims()"><i class="material-icons left">replay</i>Refresh</a>
+                  <a class="modal-trigger waves-effect waves-light btn right m-l" href="#new_mano" style="margin-right: 5px"><i class="material-icons left">library_add</i>Add a MANO</a>
+
               </div>
             </div>
             <div class="row">
-            <table class="bordered responsive-table">
+            <table class="bordered responsive-table">          
                <thead>
                 <tr>
-                  <th data-field="uuid">Uuid</th>
                   <th data-field="name">Name</th>
-				  <th data-field="vendor">Vendor</th>
+                  <th data-field="uuid">id</th>
                   <th data-field="actions"></th>
                 </tr>
                 </thead>
+
                 <tbody>
-                  <tr ng-show="loading">
+                 <tr ng-show="loading_wims">
                     <td colspan="6" class="text-center center">
                       <div class="preloader-wrapper small active">
                         <div class="spinner-layer spinner-green-only">
@@ -65,22 +39,20 @@ partner consortium (www.sonata-nfv.eu).
                       </div>
                     </td>
                   </tr>
-
-                  <tr ng-repeat="mano in manos" ng-show="!loading">
-                    <td>{{mano.mano_uuid}}</td>
-					<td>{{mano.mano_name}}</td>
-                    <td>{{mano.mano_vendor}}</td>
-                      <td>
-                          <a ng-click="getManoDetails(mano)" class="modal-trigger waves-effect waves-light">
-                              <i class="material-icons left">visibility</i>
-                          </a>
-                          <a ng-click="deleteMano(mano)" class="modal-trigger waves-effect waves-light">
-                              <i class="material-icons">delete_forever</i>
-                          </a>
-                      </td>
+                  <tr ng-repeat="mano in manos" ng-show="manos.length>0 && !loading_manos" >                    
+                    <td>{{mano.name}}</td>
+                    <td>{{mano.uuid}}</td>
+                    <td>
+                      <a ng-click="getManoDetails(mano)" class="modal-trigger waves-effect waves-light">
+                          <i class="material-icons left">visibility</i>
+                      </a>
+                      <a ng-click="deleteWim(vim)" class="modal-trigger waves-effect waves-light">
+                            <i class="material-icons">delete_forever</i>
+                        </a>
+                    </td>
                   </tr>
-                   <tr ng-show="zero_mano">
-                    <td colspan="6" class="center" ng-show="zero_manos">There are no manos</td>
+                  <tr ng-hide="manoss.length>0">
+                    <td colspan="3" class="center" ng-show="!zero_manos">There are no manos</td>
                   </tr>
                 </tbody>
             </table>
@@ -88,14 +60,22 @@ partner consortium (www.sonata-nfv.eu).
       </div>
     </div>
   </div>
+      
 
 <div id="mano_details" class="modal modal-fixed-footer">
   <div class="modal-content">
   <h4>{{selected_mano.name}}</h4>
   <div class="row">
-      <div class="col s12"><strong>Mano City:</strong> {{selected_mano.mano_city}}</div>
-      <div class="col s12"><strong>Mano Name:</strong> {{selected_mano.mano_name}}</div>
-      <div class="col s12"><strong>Mano UUID:</strong> {{selected_mano.mano_uuid}}</div>
+      <div class="col s12">UUID:{{selected_mano.uuid}}</div>
+      <div class="col s12">
+          <div class="row">
+            <strong>Attached Vims</strong>
+            <ul>
+              <li ng-repeat="as in selected_wim.attached_vims">{{as}}</li>
+            </ul>
+          </div>          
+      </div>
+
   </div>
 
   </div>
@@ -104,89 +84,75 @@ partner consortium (www.sonata-nfv.eu).
     </div>
 </div>
 
- <div id="new_mano" class="modal modal-fixed-footer">
-  
+
+<div id="new_mano" class="modal modal-fixed-footer">  
   <div class="modal-content">
-  <h4>New Mano</h4>
-   <div class="row">
-    <form>
+      <h4>New MANO</h4>
       <div class="row">
-      <div class="col s12">
-        <h6>General Configuration</h6>
-          
+        <form class="col s12">
           <div class="row">
-            <div class="input-field col s12 m4">
-              <input id="new_mano.name" ng-model="new_mano.name" type="text" class="validate">
-              <label for="new_mano.name">Mano Name</label>
+            
+            <div class="input-field col s6">
+              <input id="name" ng-model="new_mano.name" type="text" class="validate">                 
+              <label for="name">MANO Name</label>
             </div>
+
+            <div class="input-field col s6">
+              <select id="MANO_type" ng-model="new_mano.MANO_type" material-select watch>
+                <option value="OSM">OSM</option>
+                <option value="SONATA">SONATA</option>
+              </select>                 
+              <label for="MANO_type">MANO type</label>
+            </div>
+            <div class="input-field col s6">
+                 <input id="MANO_version" ng-model="new_mano.MANO_version" type="text" class="validate">
+              <label for="MANO_version">MANO version</label>
+            </div>
+            <div class="input-field col s6">
+                 <input id="username" ng-model="new_mano.username" type="text" class="validate">
+              <label for="username">Username</label>
+            </div>
+            <div class="input-field col s6">
+                 <input id="manourl" ng-model="new_mano.manourl" type="text" class="validate">
+              <label for="manourl">MANO URL/IP</label>
+            </div>
+
+            <div class="input-field col s6">
+                 <input id="pass" ng-model="new_mano.pass" type="password" class="validate">
+              <label for="pass">Password</label>
+            </div>
+
           </div>
-          <div class="input-field col s12 m4">
-            <input id="country" ng-model="new_mano.country" type="text" class="validate">
-            <label for="country">Country</label>
-          </div> 
-          <div class="input-field col s12 m4">
-            <input id="city" ng-model="new_mano.city" type="text" class="validate">
-            <label for="city">City</label>
-          </div> 
+        </form>     
       </div>
-      </div>
-      <div class="row">
-          <div class="col s12 m6">
-              <div class="input-field col s12">
-                  <select class="" id="compute_mano_type" ng-model="new_mano.mano_type"
-                          material-select watch>
-                      <option value="">Select Mano vendor</option>
-                      <option value="Opensourcemano">Open Source Mano</option>
-                      <option value="Sonata">Sonata</option>
-                  </select>
-                  <label for="compute_mano_type">Mano Vendor</label>
-              </div>
-
-              <div>
-
-                  <div class="input-field col s6">
-                      <input id="compute_configurationmano_address"
-                             ng-model="new_mano.compute_configuration.mano_address" type="text"
-                             class="validate">
-                      <label for="compute_configurationmano_address">Mano URL</label>
-                  </div>
-
-                  <div class="input-field col s6">
-                      <input id="compute_configurationusername"
-                             ng-model="new_mano.compute_configuration.username" type="text" class="validate">
-                      <label for="compute_configurationusername">Username</label>
-                  </div>
-
-                  <div class="input-field col s6">
-                      <input id="compute_configurationpassword" ng-model="new_mano.compute_configuration.pass"
-                             type="password" class="validate">
-                      <label for="compute_configurationpassword">Password</label>
-                  </div>
-              </div>
-          </div>
-      </div> 
-    </form>
   </div>
- </div>
     <div class="modal-footer">
       <a href="javascript:void(0)" ng-click="post_a_mano()" class="modal-action modal-close waves-effect waves-green btn-flat ">Save</a>
       <a href="javascript:void(0)" class=" modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
       
     </div>
-  </div>
+</div>
 
 
- <div id="new_mano_installed" class="modal modal-fixed-footer">
+
+
+
+
+
+
+
+
+
+  <div id="new_mano_installed" class="modal modal-fixed-footer">
     <div class="modal-content" style="    background: #80C383;">
-      <h5 style="text-align: center; color: white; padding: 10px;">The new Mano has been added!</h5>
+      <h5 style="text-align: center; color: white; padding: 10px;">The new WIM has been added!</h5>
       <h6 style="text-align: center;color: white"></h6>
   </div>
 
     <div class="modal-footer">
-      <a href="javascript:void(0)" ng-click="getmanos()" class="modal-action modal-close waves-effect waves-green btn-flat ">Ok</a>
+      <a href="javascript:void(0)" ng-click="getManos()" class="modal-action modal-close waves-effect waves-green btn-flat ">Ok</a>
     </div>
   </div>
-
 
 </div>
 
