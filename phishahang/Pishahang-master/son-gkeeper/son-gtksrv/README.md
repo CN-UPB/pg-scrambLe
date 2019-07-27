@@ -50,3 +50,12 @@ This command will result in a list of `10`values (the `limit`) of the first page
 
 ## Tests
 At the module level, we only do **automated unit tests**, using the `RSpec` framework (see the `./spec/`folder). For the remaining tests please see the repositorie's [`README`](https://github.com/sonata-nfv/son-gkeeper/blob/master/README.md) file.
+               
+
+sudo docker stop son-gtksrv
+sudo docker rm son-gtksrv
+sudo docker build -t son-gtksrv -f Dockerfile .
+
+sudo docker run -d --name son-gtksrv --net=son-sp --network-alias=son-gtksrv -p 5300:5300 son-gtksrv
+
+sudo docker logs son-gtksrv -f

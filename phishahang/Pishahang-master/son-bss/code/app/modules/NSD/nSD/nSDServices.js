@@ -40,7 +40,7 @@
             return defer.promise;
         },
 
-        instantiateScramble:function(id, ingresses, egresses, ENV){				
+        instantiateScramble:function(id, ingresses, egresses, ENV, selectedmanos){				
             var defer=$q.defer();
 
             /* check for empty ingress/egress */
@@ -59,7 +59,7 @@
                 }
             }
 
-            var data={"service_uuid":id, "ingresses": ingresses, "egresses":egresses, "scramble":true};
+            var data={"service_uuid":id, "ingresses": ingresses, "egresses":egresses, "scramble":true, "selectedmanos":selectedmanos};
             $http.post(ENV.apiEndpoint+"/requests",data)
             .then(function successCallback(result){defer.resolve(result)})
             .catch(function errorCallback(error){defer.reject(error)});

@@ -451,6 +451,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
         # Start handling the request
         message = yaml.load(payload)
 
+        LOG.info("Scramble Message Debug ")
+        LOG.info(message)
+
         # Add the service to the ledger
         serv_id = self.add_service_to_ledger(message, corr_id)
 
