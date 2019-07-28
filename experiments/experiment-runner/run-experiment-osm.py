@@ -25,7 +25,7 @@ DOCKER_EXCLUDE = ['experiment-runner']
 
 
 IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 15
+NS_TERMINATION_SLEEP = 2
 # NO_INSTANCES = 1
 
 USERNAME = "admin"
@@ -35,10 +35,10 @@ AUTH_URL = "http://131.234.29.168/identity/v3"
 OS_USERNAME = "demo"
 OS_PASSWORD = "123"
 
-IMAGES = ["cirros", "stress"]
-INSTANCES = [2, 10]
-CASES = [1, 2, 3]
-RUNS = 3
+IMAGES = ["cirros", "cirros"]
+INSTANCES = [1]
+CASES = [1]
+RUNS = 1
 
 cases_vnfs = {
     1: 1,
@@ -174,6 +174,11 @@ for _image in IMAGES:
                             active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
                             error=(ERROR_INSTANCES-ERROR_OFFSET)))
 
+                _successratio = "Total-{total}, Active-{active}, Error-{error}".format(
+                                    total=(cases_vnfs[_case]*_instances), 
+                                    active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
+                                    error=(ERROR_INSTANCES-ERROR_OFFSET))
+
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
 
@@ -283,8 +288,14 @@ for _image in IMAGES:
                     _file.write("Termination Start Time {0}\n".format(experiment_timestamps["ns_term_start_time"]))
                     _file.write("Termination End Time {0}\n".format(experiment_timestamps["ns_term_end_time"]))
                     _file.write("Experiment End Time {0}\n".format(experiment_timestamps["end_time"]))
-                    _file.write("\n\nhttp://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))
+                    _file.write("\nhttp://{host}:9000/interactive?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))
 
+                with open('./{nit}/success-ratio.csv'.format(nit=nit), 'w') as _file:
+                    _file.write(_successratio)
+                    
+
+                   
+                
                 print("Metrics saved in folder ./{nit}".format(nit=nit))
 
                 print("\nhttp://{host}:9000/?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))
