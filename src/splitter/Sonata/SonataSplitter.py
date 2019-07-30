@@ -1,5 +1,5 @@
 import logging
-import SonataSchema
+import Sonata.SonataSchema as SonataSchema 
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("scramble:splitter")
@@ -48,8 +48,8 @@ class splitter():
     # returns type of connection point (external, management)
     def get_connection_point_type(self, connection_point_id):
         for connection_point in self.utilityFunctions.list_connection_points:
-            if connection_point.id == connection_point_id:
-                return connection_point.type
+            if connection_point._id == connection_point_id:
+                return connection_point._type
         return "not_external"
 
     """
@@ -149,7 +149,7 @@ class splitter():
     This method creates virtual link class object with all properties set and returns the same.
     """
     def handle_elan_links(self, virtual_link_elan, nsd_vl):
-        virtual_link_inner = SonataSchema.VirtualLink(virtual_link_elan.id, virtual_link_elan.connectivity_type, [])
+        virtual_link_inner = SonataSchema.VirtualLink(virtual_link_elan._id, virtual_link_elan.connectivity_type, [])
         for nf in nsd_vl.networkFunctions:
             for connection_point_ref in virtual_link_elan.connection_points_reference:
                 if connection_point_ref in nf.connection_point_refs:
@@ -157,7 +157,7 @@ class splitter():
                 else:
                     if connection_point_ref not in virtual_link_inner.connection_points_reference:
                         for connection_point in nsd_vl.connectionPoints:
-                            if connection_point_ref == connection_point.id:
+                            if connection_point_ref == connection_point._id:
                                 virtual_link_inner.connection_points_reference.append(str(connection_point_ref))
         return virtual_link_inner
 
@@ -196,7 +196,7 @@ class splitter():
                     virtual_link_inner = self.handle_elan_links(virtual_link, nsd_vl)
                     nsd_vl.virtualLinks.append(virtual_link_inner)
                 if virtual_link.connectivity_type == "E-Line":
-                    virtual_link_inner = SonataSchema.VirtualLink(virtual_link.id, virtual_link.connectivity_type, [])
+                    virtual_link_inner = SonataSchema.VirtualLink(virtual_link._id, virtual_link.connectivity_type, [])
                     cp_0 = virtual_link.connection_points_reference[0]
                     cp_1 = virtual_link.connection_points_reference[1]
                     found_0 = 0
@@ -206,7 +206,7 @@ class splitter():
                         found_0 = 1
                     else:
                         for connection_point in nsd_vl.connectionPoints:
-                            if cp_0 == connection_point.id:
+                            if cp_0 == connection_point._id:
                                 virtual_link_inner.connection_points_reference.append(str(cp_0))
                                 found_0 = 1
                     if found_0 == 0:
@@ -218,7 +218,7 @@ class splitter():
                         found_1 = 1
                     else:
                         for connection_point in self.NSDs[i].connectionPoints:
-                            if cp_1 == connection_point.id:
+                            if cp_1 == connection_point._id:
                                 virtual_link_inner.connection_points_reference.append(str(cp_1))
                                 found_1 = 1
                     if found_1 == 0:
@@ -232,8 +232,8 @@ class splitter():
                             str1[0] = str1[0].replace("vnf_", "")
                         if len(str2) == 2:
                             str2[0] = str2[0].replace("vnf_", "")
-                        virtual_link_inner.id = str1[0] + "-2-" + str2[0]
-                        self.old_new_link_mapping.append([virtual_link.id, virtual_link_inner.id])
+                        virtual_link_inner._id = str1[0] + "-2-" + str2[0]
+                        self.old_new_link_mapping.append([virtual_link._id, virtual_link_inner._id])
                     if found_0 == 1 and found_1 == 1:
                         _connection_point_type_0 = self.get_connection_point_type(
                             virtual_link_inner.connection_points_reference[0])
@@ -251,12 +251,12 @@ class splitter():
         constituent_vl = []
         for vl in nsd.virtualLinks:
             for virtual_links in fg.constituent_virtual_links:
-                if vl.id == virtual_links:
-                    constituent_vl.append(str(vl.id))
+                if vl._id == virtual_links:
+                    constituent_vl.append(str(vl._id))
                     break
                 else:
                     for old_new_mapping in self.old_new_link_mapping:
-                        if vl.id == old_new_mapping[1] and virtual_links == old_new_mapping[0]:
+                        if vl._id == old_new_mapping[1] and virtual_links == old_new_mapping[0]:
                             constituent_vl.append(str(old_new_mapping[1]))
                             break
         return list(set(constituent_vl))
@@ -294,7 +294,7 @@ class splitter():
                 x = x + 1
             else:
                 for connection_point in nsd_fg.connectionPoints:
-                    if cp.connection_point_ref == connection_point.id:
+                    if cp.connection_point_ref == connection_point._id:
                         point = SonataSchema.ConnectionPointsGraph(cp.connection_point_ref, x)
                         path_inner.connection_points.append(point)
                         x = x + 1
@@ -328,7 +328,7 @@ class splitter():
                                         self.processed_connection_point_path.append([cp.connection_point_ref, 1])
                                     else:
                                         for connection_point in nsd_fg.connectionPoints:
-                                            if cp.connection_point_ref == connection_point.id:
+                                            if cp.connection_point_ref == connection_point._id:
                                                 x = x + 1
                                                 point = SonataSchema.ConnectionPointsGraph(cp.connection_point_ref, x)
                                                 path_inner.connection_points.append(point)
@@ -379,15 +379,15 @@ class splitter():
             data['connection_points'] = []
             for connection_point in self.NSDs[i].connectionPoints:
                 data['connection_points'].append({
-                    "id": str(connection_point.id),
+                    "id": str(connection_point._id),
                     "interface": str(connection_point.interface),
-                    "type": str(connection_point.type)
+                    "type": str(connection_point._type)
                 })
 
             data['virtual_links'] = []
             for virtual_link in self.NSDs[i].virtualLinks:
                 data['virtual_links'].append({
-                    "id": str(virtual_link.id),
+                    "id": str(virtual_link._id),
                     "connectivity_type": str(virtual_link.connectivity_type),
                     "connection_points_reference": virtual_link.connection_points_reference
                 })
