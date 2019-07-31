@@ -8,19 +8,23 @@ from glob import glob
 from pathlib import Path
 import time
 import seaborn as sns
+import matplotlib.dates as mdates
+import datetime as dt
+
 
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
-DOCKER_CPU_BAR = True
-DOCKER_CASE_CPU_BAR = True
-SYSTEM_CPU_BAR = True
+DOCKER_CPU_BAR = False
+DOCKER_CASE_CPU_BAR = False
+SYSTEM_CPU_BAR = False
 
-SYSTEM_LOAD_BAR = True
+SYSTEM_LOAD_BAR = False
 
-DOCKER_MEM_BAR = True
-DOCKER_CASE_MEM_BAR = True
-SYSTEM_RAM_BAR = True
+DOCKER_MEM_BAR = False
+DOCKER_CASE_MEM_BAR = False
+SYSTEM_RAM_BAR = False
+SUCCESS_RATIO_LINE = True
 
 CPU_MAX_SCALE = 100
 LIMIT_DOCKERS_IN_GRAPH = -10
@@ -43,7 +47,7 @@ docker_mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '
 sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-CPU-Final-Results.csv'))]
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
-
+success_ratio_file = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
 start_time = time.time()
 
 ##############################################
@@ -1003,9 +1007,61 @@ if SYSTEM_RAM_BAR:
 
     plt.savefig('{}/{}-Max.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
     plt.close()
+
+##############################################
+# Success ratio Line Chart 
+##############################################
+
+
+
+if SUCCESS_RATIO_LINE:
+    for _success_ration_file in success_ratio_file:
+        _title = (Path(_success_ration_file).name).split("-success-ratio")[0]
+        df = pd.read_csv(_success_ration_file)
+
+
+unix_time = pd.to_datetime(df['Time'],unit = 's')
+
+total = df['Total']
+active = df['Active']
+build = df['Build']
+error = df['Error']
+
+
+fig = plt.figure()
+plt.figure(figsize=(11,6))
+plt.suptitle('success-ratio', fontsize=22)
+ax = fig.add_subplot(1,1,1)  
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+plt.plot(unix_time, total,label = 'Total')
+plt.plot(unix_time, active, label = 'Active')
+plt.plot(unix_time, build, label = 'Build')
+plt.plot(unix_time, error,label = 'Error')
+
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+
+plt.xticks(rotation=-45)
+
+ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=2))   #to get a tick every 15 minutes
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+plt.savefig('output.png')
+
+
+
+
+
+
+
+
+
 #########################################
 # END
 #########################################
+
+
+
 
 print("Total time: {}".format(time.time() - start_time))
 
