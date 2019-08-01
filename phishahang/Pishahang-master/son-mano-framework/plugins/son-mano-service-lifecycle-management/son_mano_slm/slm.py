@@ -483,7 +483,14 @@ class ServiceLifecycleManager(ManoBasePlugin):
         if 'placement' in self.services[serv_id]['service']['ssm'].keys():
             add_schedule.append('req_placement_from_ssm')
         else:
-            add_schedule.append('SLM_mapping')
+            if 'scramble' in self.services[serv_id]['payload'].keys():
+                add_schedule.append('SLM_mapping_scramble')            
+            else:
+                add_schedule.append('SLM_mapping')
+                
+            # LOG.info("SCRAMBLE CHECKING")
+            # LOG.info(self.services[serv_id]['payload'].keys())
+
 
         add_schedule.append('ia_prepare')
         add_schedule.append('vnf_deploy')
@@ -2898,8 +2905,52 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
             return [[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]
         
-        
     def SLM_mapping(self, serv_id):
+        """
+        This method is used if the SLM is responsible for the placement.
+        :param serv_id: The instance uuid of the service
+        """
+        corr_id = str(uuid.uuid4())
+        self.services[serv_id]['act_corr_id'] = corr_id
+
+        LOG.info("Service " + serv_id + ": Calculating the placement")
+        topology = self.services[serv_id]['infrastructure']['topology']
+        if 'nsd' in self.services[serv_id]['service']:
+            NSD = self.services[serv_id]['service']['nsd']
+            functions = self.services[serv_id]['function']
+
+            content = {'nsd': NSD,
+                       'functions': functions,
+                       'topology': topology,
+                       'serv_id': serv_id}
+        else:
+            COSD = self.services[serv_id]['service']['cosd']
+            functions = self.services[serv_id]['function']
+            cloud_services = self.services[serv_id]['cloud_service']
+
+            content = {'cosd': COSD,
+                       'functions': functions,
+                       'cloud_services': cloud_services,
+                       'topology': topology,
+                       'serv_id': serv_id}
+
+        content['nap'] = {}
+
+        if self.services[serv_id]['ingress'] is not None:
+            content['nap']['ingresses'] = self.services[serv_id]['ingress']
+        if self.services[serv_id]['egress'] is not None:
+            content['nap']['egresses'] = self.services[serv_id]['egress']
+
+        self.manoconn.call_async(self.resp_mapping,
+                                 t.MANO_PLACE,
+                                 yaml.dump(content),
+                                 correlation_id=corr_id)
+
+        self.services[serv_id]['pause_chain'] = True
+        LOG.info("Service " + serv_id + ": Placement request sent")
+
+
+    def SLM_mapping_scramble(self, serv_id):
         """
         This method is used if the SLM is responsible for the placement.
 
