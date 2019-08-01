@@ -14,6 +14,7 @@ from urllib.request import urlopen
 import csv
 import os
 import docker
+from dateutil import parser
 
 from keystoneauth1.identity import v3
 from keystoneauth1 import session
@@ -25,7 +26,8 @@ DOCKER_EXCLUDE = ['experiment-runner']
 
 
 IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 15
+NS_TERMINATION_SLEEP = 30
+REQUESTS_PER_MINUTE = 30
 # NO_INSTANCES = 1
 
 USERNAME = "admin"
@@ -35,10 +37,12 @@ AUTH_URL = "http://131.234.29.168/identity/v3"
 OS_USERNAME = "demo"
 OS_PASSWORD = "123"
 
-IMAGES = ["cirros", "stress"]
-INSTANCES = [2, 10]
+IMAGES = ["cirros"]
+INSTANCES = [15, 90, 180]
 CASES = [1, 2, 3]
 RUNS = 3
+
+IS_EXPERIMENT_VNF_INSTANCES_BASED = True
 
 cases_vnfs = {
     1: 1,
@@ -50,9 +54,9 @@ HOST_URL = "osmmano.cs.upb.de"
 # NSNAME = "stress_case1"
 # NSDESCRIPTION = "case1-100_NS"
 # nsdId = "stress_case1-ns"
-VIMACCOUNTID = "6c74d590-aaad-4951-9200-5f1b6d8b0588"
+VIMACCOUNTID = "a94aa0af-e03b-4a8c-8208-a6fb5cc223ea"
 
-def get_count():
+def get_count(init_time):
     auth = v3.Password(auth_url=AUTH_URL,
                     username=OS_USERNAME,
                     password=OS_PASSWORD,
@@ -67,15 +71,44 @@ def get_count():
     _servers = nova.servers.list()
 
     active_count = 0
+    build_count = 0
     error_count = 0
 
     for _s in _servers:
-        if _s.status == "ACTIVE":
-            active_count += 1
-        else:
-            error_count += 1
+        server_created = parser.parse(_s.created)
+        if int(server_created.strftime("%s")) > int(init_time) :
+            if _s.status == "ACTIVE":
+                active_count += 1
+            elif _s.status == "BUILD":
+                build_count += 1
+            elif _s.status == "ERROR":
+                error_count += 1
+            else:
+                print("Other Status")
+                print(_s.status)
 
-    return active_count, error_count
+    return active_count, build_count, error_count
+
+
+def delete_instances():
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
+                    user_domain_id='default',
+                    project_domain_id='default')
+
+    sess = session.Session(auth=auth)
+
+    nova = nvclient.Client('2', session=sess)
+
+    _servers = nova.servers.list()
+
+    for _s in _servers:
+        try:
+            _s.delete()
+        except Exception as e:
+            print(e)
 
 
 osm_nsd = OSMClient.Nsd(HOST_URL)
@@ -116,17 +149,10 @@ for _image in IMAGES:
         for _instances in INSTANCES:
             for _run in range(1, RUNS+1):
                 print("{image}_case{case}_{instances}_Run{run}".format(image=_image, case=_case, instances=_instances, run=_run))
-                NO_INSTANCES = _instances
+                # NO_INSTANCES = _instances
                 NSNAME = "{image}_case{case}".format(image=_image, case=_case)
                 nsdId = "{image}_case{case}-ns".format(image=_image, case=_case)
-                NSDESCRIPTION = "{image}_case{case}_{instances}_Run{run}_NS".format(image=_image, case=_case, instances=_instances, run=_run)
-
-                try:
-                    ACTIVE_OFFSET, ERROR_OFFSET = get_count()
-                except Exception as e:
-                    ACTIVE_OFFSET, ERROR_OFFSET = 0, 0
-                    print(e)
-                    print("ERROR OpenStack")
+                NSDESCRIPTION = "{image}_case{case}_{instances}_Run{run}".format(image=_image, case=_case, instances=_instances, run=_run)
 
                 print("PHASE 1 : Recording idle metrics...")
                 experiment_timestamps["start_time"] = int(time.time())
@@ -147,32 +173,72 @@ for _image in IMAGES:
                 for _n in _nsd_list:
                     if nsdId == _n['id']:            
                         _nsd = _n['_id']
+                
+                # TODO: Calculate
+                if IS_EXPERIMENT_VNF_INSTANCES_BASED:
+                    no_instantiate = int(_instances/cases_vnfs[_case])
+                else:
+                    no_instantiate = _instances
 
-                for i in range(0, NO_INSTANCES):
+                print("Instantiating {0} NS instances".format(no_instantiate))
+                for i in range(0, no_instantiate):
                     response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
                                     nsDescription=NSDESCRIPTION, 
                                     nsName=NSNAME, 
                                     nsdId=_nsd, 
                                     vimAccountId=VIMACCOUNTID))
                     # print(response)
-                    time.sleep(1)
+                    time.sleep(60/REQUESTS_PER_MINUTE)
 
                 # Helpers._delete_test_nsd("test_osm_cirros_2vnf_nsd")
                 experiment_timestamps["ns_inst_end_time"] = int(time.time())
 
                 print("PHASE 2 : Recording Metrics Post NS instantiation...")
-                time.sleep(60*NS_TERMINATION_SLEEP)
+                TIME_OUT = 60*NS_TERMINATION_SLEEP
+                QUERY_FREQUENCY = 10
+                COUNTER = 0
 
-                try:
-                    ACTIVE_INSTANCES, ERROR_INSTANCES = get_count()
-                except Exception as e:
-                    print(e)
-                    print("ERROR OpenStack")
+                def createFolder(directory):
+                    try:
+                        if not os.path.exists(directory):
+                            os.makedirs(directory)
+                    except OSError:
+                        print ('Error: Creating directory. ' + directory)
 
-                print("Success Ratio: Total-{total} \t Active-{active} \t Error-{error}".format(
-                            total=(cases_vnfs[_case]*_instances), 
-                            active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
-                            error=(ERROR_INSTANCES-ERROR_OFFSET)))
+                nit = "{0}-{1}".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
+                createFolder("./{nit}/".format(nit=nit))
+
+                with open('./{nit}/success-ratio.csv'.format(nit=nit), 'w') as _file:
+                    _file.write("Time,Total,Active,Build,Error\n")
+                    if IS_EXPERIMENT_VNF_INSTANCES_BASED:
+                        TOTAL_INSTANCES = _instances
+                    else:
+                        TOTAL_INSTANCES = int(cases_vnfs[_case]*_instances)
+                    while(COUNTER < TIME_OUT):
+                        try:
+                            ACTIVE_INSTANCES, BUILD_INSTANCES, ERROR_INSTANCES = get_count(experiment_timestamps["ns_inst_time"])
+                            _successratio = "{time},{total},{active},{build},{error}\n".format(
+                                                time=(int(time.time())),
+                                                total=(max(0, TOTAL_INSTANCES)),
+                                                active=(max(0, ACTIVE_INSTANCES)),
+                                                build=(max(0, BUILD_INSTANCES)),
+                                                error=(max(0, ERROR_INSTANCES)))
+
+                            print(_successratio)
+                            _file.write(_successratio)
+
+                            if (ACTIVE_INSTANCES + ERROR_INSTANCES) == TOTAL_INSTANCES:
+                                experiment_timestamps["end_to_end_lifecycle_time"] = int(time.time())-int(experiment_timestamps["ns_inst_time"])
+                                print("END-TO-END Time {enetime}".format( enetime=experiment_timestamps["end_to_end_lifecycle_time"]))
+                                break
+                                
+
+                        except Exception as e:
+                            print(e)
+                            print("ERROR OpenStack")
+
+                        time.sleep(QUERY_FREQUENCY)
+                        COUNTER += QUERY_FREQUENCY
 
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
@@ -184,11 +250,18 @@ for _image in IMAGES:
                 _ns_list = json.loads(_ns_list["data"])
 
                 _ns = None
+                print("Printing Status Of Instances...")
                 for _n in _ns_list:
                     try:
                         if nsdId == _n['nsd']['id']:            
                             _ns = _n['_id']
                             response = None
+
+                            if "detailed-status" in _n:
+                                print(_n["detailed-status"])
+                            else:
+                                print("detailed-status not available")
+
                             if _ns:
                                 response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_terminate(
                                                         token=_token["id"], 
@@ -222,15 +295,6 @@ for _image in IMAGES:
 
                 print("PHASE 4 : Saving Metrics  ...")
 
-                def createFolder(directory):
-                    try:
-                        if not os.path.exists(directory):
-                            os.makedirs(directory)
-                    except OSError:
-                        print ('Error: Creating directory. ' + directory)
-
-                nit = "{0}-{1}".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
-                createFolder("./{nit}/".format(nit=nit))
 
                 _charts = {
                     "system-cpu" : { 
@@ -283,7 +347,10 @@ for _image in IMAGES:
                     _file.write("Termination Start Time {0}\n".format(experiment_timestamps["ns_term_start_time"]))
                     _file.write("Termination End Time {0}\n".format(experiment_timestamps["ns_term_end_time"]))
                     _file.write("Experiment End Time {0}\n".format(experiment_timestamps["end_time"]))
-                    _file.write("\n\nhttp://{host}:9000/?host={host}&after={after}&before={before}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"]))
+                    _file.write("\nhttp://{host}:9000/interactive?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))
+
+                with open('./{nit}/end-to-end-time.csv'.format(nit=nit), 'w') as _file:
+                    _file.write("end-to-end-time\n{0}".format(experiment_timestamps["end_to_end_lifecycle_time"]))
 
                 print("Metrics saved in folder ./{nit}".format(nit=nit))
 
@@ -293,6 +360,7 @@ for _image in IMAGES:
 
                 print("\n\n\n\n\n\n ENDED \n\n\n\n\n\n")
                 time.sleep(300)
+                delete_instances()
 
 
 

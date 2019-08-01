@@ -1,5 +1,7 @@
 FROM python:3.6
 
+ENV PYTHONWARNINGS="ignore:Unverified HTTPS request"
+
 RUN apt-get update && apt-get -y install netcat build-essential && apt-get clean
 
 COPY app ./app
