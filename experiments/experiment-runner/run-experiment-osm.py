@@ -38,9 +38,9 @@ OS_USERNAME = "demo"
 OS_PASSWORD = "123"
 
 IMAGES = ["cirros"]
-INSTANCES = [15, 90, 180]
-CASES = [1, 2, 3]
-RUNS = 3
+INSTANCES = [90, 180]
+CASES = [1, 2]
+RUNS = 1
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
 
@@ -239,11 +239,6 @@ for _image in IMAGES:
 
                         time.sleep(QUERY_FREQUENCY)
                         COUNTER += QUERY_FREQUENCY
-
-                _successratio = "Total-{total}, Active-{active}, Error-{error}".format(
-                                    total=(cases_vnfs[_case]*_instances), 
-                                    active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
-                                    error=(ERROR_INSTANCES-ERROR_OFFSET))
 
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
