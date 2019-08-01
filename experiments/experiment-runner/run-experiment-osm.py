@@ -240,6 +240,11 @@ for _image in IMAGES:
                         time.sleep(QUERY_FREQUENCY)
                         COUNTER += QUERY_FREQUENCY
 
+                _successratio = "Total-{total}, Active-{active}, Error-{error}".format(
+                                    total=(cases_vnfs[_case]*_instances), 
+                                    active=(ACTIVE_INSTANCES-ACTIVE_OFFSET), 
+                                    error=(ERROR_INSTANCES-ERROR_OFFSET))
+
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
 
@@ -352,6 +357,8 @@ for _image in IMAGES:
                 with open('./{nit}/end-to-end-time.csv'.format(nit=nit), 'w') as _file:
                     _file.write("end-to-end-time\n{0}".format(experiment_timestamps["end_to_end_lifecycle_time"]))
 
+                   
+                
                 print("Metrics saved in folder ./{nit}".format(nit=nit))
 
                 print("\nhttp://{host}:9000/?host={host}&after={after}&before={before}&start_time={start_time}&ns_inst_time={ns_inst_time}&ns_inst_end_time={ns_inst_end_time}&ns_term_start_time={ns_term_start_time}&ns_term_end_time={ns_term_end_time}&end_time={end_time}&exp_description={exp_description}".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"],start_time=experiment_timestamps["start_time"],ns_inst_time=experiment_timestamps["ns_inst_time"],ns_inst_end_time=experiment_timestamps["ns_inst_end_time"],ns_term_start_time=experiment_timestamps["ns_term_start_time"],ns_term_end_time=experiment_timestamps["ns_term_end_time"],end_time=experiment_timestamps["end_time"],exp_description=NSDESCRIPTION))

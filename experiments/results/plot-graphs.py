@@ -8,20 +8,31 @@ from glob import glob
 from pathlib import Path
 import time
 import seaborn as sns
+import matplotlib.dates as mdates
+import datetime as dt
+
 
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
-DOCKER_CPU_BAR = True
-DOCKER_MEM_BAR = False
+DOCKER_CPU_BAR = False
 DOCKER_CASE_CPU_BAR = False
-DOCKER_CASE_MEM_BAR = False
 SYSTEM_CPU_BAR = False
-SYSTEM_LOAD_BAR = False
-SYSTEM_RAM_BAR = False
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Final"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/2_16/Graphs"
+SYSTEM_LOAD_BAR = False
+
+DOCKER_MEM_BAR = False
+DOCKER_CASE_MEM_BAR = False
+SYSTEM_RAM_BAR = False
+SUCCESS_RATIO_LINE = True
+
+CPU_MAX_SCALE = 100
+LIMIT_DOCKERS_IN_GRAPH = -10
+
+_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/2_10/Final"
+_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/2_10/Graphs"
+
+
 
 RUNS = 3 # Not fully supported
 CASES = 3 # Not fully supported
@@ -36,7 +47,7 @@ docker_mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '
 sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-CPU-Final-Results.csv'))]
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
-
+success_ratio_file = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
 start_time = time.time()
 
 ##############################################
@@ -94,12 +105,20 @@ if DOCKER_CASE_CPU_BAR:
                 cpu_cirros_sd = df['CPU cirros sd']
                 cpu_stress = df['CPU stress mean']
                 cpu_stress_sd = df['CPU stress sd']
+
+                df['CPU cirros mean T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
+                df['CPU stress mean T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+
+                cirros_t_mean = df['CPU cirros mean T']
+                stress_t_mean = df['CPU stress mean T']
+
         
                 index = np.arange(len(data))
                 width = 0.30
+                
 
-                axs[_count].bar(index, cpu_cirros, width, yerr=cpu_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, cpu_stress, width,yerr=cpu_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+                axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -113,7 +132,7 @@ if DOCKER_CASE_CPU_BAR:
         plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
         plt.grid(False)
 
-        plt.ylabel('CPU Mean', fontsize=20)
+        plt.ylabel('CPU Mean (percentage)', fontsize=20)
         plt.xlabel('Cases', fontsize=20)
 
         plt.savefig('{}/{}-Mean-CPU-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -170,12 +189,18 @@ if DOCKER_CASE_CPU_BAR:
                 cpu_cirros_sd = df['CPU cirros sd']
                 cpu_stress = df['CPU stress max']
                 cpu_stress_sd = df['CPU stress sd']
+
+                df['CPU cirros max T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
+                df['CPU stress max T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+
+                cirros_t_max = df['CPU cirros max T']
+                stress_t_max = df['CPU stress max T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
-                axs[_count].bar(index, cpu_cirros, width, yerr=cpu_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, cpu_stress, width,yerr=cpu_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+                axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -189,7 +214,7 @@ if DOCKER_CASE_CPU_BAR:
         plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
         plt.grid(False)
 
-        plt.ylabel('CPU Max', fontsize=20)
+        plt.ylabel('CPU Max (percentage)', fontsize=20)
         plt.xlabel('Cases', fontsize=20)
 
         plt.savefig('{}/{}-Max-CPU-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -250,12 +275,18 @@ if DOCKER_CASE_MEM_BAR:
                 mem_cirros_sd = df['MEM cirros sd']
                 mem_stress = df['MEM stress mean']
                 mem_stress_sd = df['MEM stress sd']
+
+                df['MEM cirros mean T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
+                df['MEM stress mean T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+
+                cirros_t_mean = df['MEM cirros mean T']
+                stress_t_mean = df['MEM stress mean T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
-                axs[_count].bar(index, mem_cirros, width, yerr=mem_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, mem_stress, width,yerr=mem_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+                axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -269,7 +300,7 @@ if DOCKER_CASE_MEM_BAR:
         plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
         plt.grid(False)
 
-        plt.ylabel('MEM Mean', fontsize=20)
+        plt.ylabel('MEM Mean (MiB)', fontsize=20)
         plt.xlabel('Cases', fontsize=20)
 
         plt.savefig('{}/{}-Mean-MEM-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -326,12 +357,18 @@ if DOCKER_CASE_MEM_BAR:
                 mem_cirros_sd = df['MEM cirros sd']
                 mem_stress = df['MEM stress max']
                 mem_stress_sd = df['MEM stress sd']
+
+                df['MEM cirros max T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
+                df['MEM stress max T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+
+                cirros_t_max = df['MEM cirros max T']
+                stress_t_max = df['MEM stress max T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
-                axs[_count].bar(index, mem_cirros, width, yerr=mem_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, mem_stress, width,yerr=mem_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+                axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -345,7 +382,7 @@ if DOCKER_CASE_MEM_BAR:
         plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
         plt.grid(False)
 
-        plt.ylabel('MEM Max', fontsize=20)
+        plt.ylabel('MEM Max (MiB)', fontsize=20)
         plt.xlabel('Cases', fontsize=20)
 
         plt.savefig('{}/{}--Max-MEM-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -360,10 +397,11 @@ if DOCKER_CPU_BAR:
         cpu_title = (Path(_cpu_files).name).split("-CPU")[0]
         print(cpu_title)
         print(_cpu_files)
+        header = ['Max', 'Mean']
 
         df = pd.read_csv(_cpu_files)
-        df = df.sort_values('CPU Max')
-        # df = df[-5:]
+        df = df.sort_values('CPU Mean')
+        df = df[LIMIT_DOCKERS_IN_GRAPH:]
         docker_col = df['Docker Container']
         value_col = df['CPU Mean']
         value_col_max = df['CPU Max']
@@ -379,20 +417,29 @@ if DOCKER_CPU_BAR:
 
         width = 0.30
         plt.figure(figsize=(10,6))
+        plt.xlim([0, CPU_MAX_SCALE])
 
-        a2=plt.bar(docker_col, value_col_max, yerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=5, color='red')
-        a=plt.bar(docker_col, value_col, yerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=5, color='blue')
+        a2=plt.barh(docker_col, value_col_max, xerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=2, color='red')
+        a=plt.barh(docker_col, value_col, xerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=2, color='blue')
 
-        for p in a2.patches:
-            plt.annotate("%.2f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                ha='right', va='bottom', fontsize=9, color='black',fontweight='bold', xytext=(-4, 3),
-                textcoords='offset points')
+        # for rect in a.patches:
+        #     width = rect.get_width()
+        #     plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+        #             '%d' % int(width),
+        #             ha='center', va='center', fontsize=9, color='black',fontweight='bold')
 
-        plt.xticks(rotation=-90)
+        # for rect in a2.patches:
+        #     width = rect.get_width()
+        #     plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+        #             '%d' % int(width),
+        #             ha='center', va='center', fontsize=9, color='black',fontweight='bold')
+
+
+        # plt.xticks(rotation=-90)
         plt.title("CPU -- {}".format(cpu_title), fontsize=25)
-        plt.xlabel("Dockers", fontsize=20)
-        plt.ylabel("CPU Mean", fontsize=20)
-
+        plt.xlabel("CPU Mean (percentage)", fontsize=20)
+        plt.ylabel("Dockers", fontsize=20)
+        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='center left', bbox_to_anchor=(1, 0.5))
         plt.savefig('{}/{}-CPU.png'.format(_OUT_PATH, cpu_title),bbox_inches='tight', dpi=100)
         plt.close()
 
@@ -405,31 +452,48 @@ if DOCKER_MEM_BAR:
         mem_title = (Path(_mem_files).name).split("-MEM")[0]
         print(mem_title)
         print(_mem_files)
+        header = ['Max','Mean']
 
         df = pd.read_csv(_mem_files)
         df = df.sort_values('MEM Max')
+        df = df[LIMIT_DOCKERS_IN_GRAPH:]
         docker_col = df['Docker Container']
         value_col = df['MEM Mean']
         value_col_max = df['MEM Max']
         value_col_max_sd = df['MEM Max SD']
         value_sd_col = df['MEM SD']
 
+        # sum mean to the confidence interval
+        df['MEM Mean T'] = abs(T_BOUNDS[1] * df['MEM SD'] / sqrt(RUNS))
+        df['MEM Max T'] = abs(T_BOUNDS[1] * df['MEM Max SD'] / sqrt(RUNS))
+
+        value_col_t_mean = df['MEM Mean T']
+        value_col_t_max = df['MEM Max T']
+
         width = 0.30
         plt.figure(figsize=(10,6))
 
-        a2=plt.bar(docker_col, value_col_max, yerr=value_col_max_sd, alpha=0.6, ecolor='black', capsize=5, color='red')
-        a=plt.bar(docker_col, value_col, yerr=value_sd_col, alpha=0.6, ecolor='black', capsize=5, color='blue')
+        a2=plt.barh(docker_col, value_col_max, xerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=5, color='red')
+        a=plt.barh(docker_col, value_col, xerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=5, color='blue')
 
-        for p in a2.patches:
-            plt.annotate("%.2f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                ha='right', va='bottom', fontsize=9, color='black',fontweight='bold', xytext=(-4, 3),
-                textcoords='offset points')
+        # for rect in a.patches:
+        #     width = rect.get_width()
+        #     plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+        #             '%d' % int(width),
+        #             ha='center', va='center', fontsize=9, color='black',fontweight='bold')
 
-        plt.xticks(rotation=-90)
+        # for rect in a2.patches:
+        #     width = rect.get_width()
+        #     plt.text(1.05*rect.get_width(), rect.get_y()+0.75*rect.get_height(),
+        #             '%d' % int(width),
+        #             ha='center', va='center', fontsize=9, color='black',fontweight='bold')
+
+
+        # plt.xticks(rotation=-90)
         plt.title("MEM -- {}".format(mem_title),fontsize=25)
-        plt.xlabel("Dockers",fontsize=20)
-        plt.ylabel("MEM Mean",fontsize=20)
-
+        plt.xlabel("MEM Mean (MiB)",fontsize=20)
+        plt.ylabel("Dockers",fontsize=20)
+        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='center left', bbox_to_anchor=(1, 0.5))
         plt.savefig('{}/{}-MEM.png'.format(_OUT_PATH, mem_title),bbox_inches='tight',dpi=100)
         plt.close()
 
@@ -482,18 +546,25 @@ if SYSTEM_CPU_BAR:
             df = df.sort_values('case')
             
             divisions = df['case']
+            df = df[LIMIT_DOCKERS_IN_GRAPH:]
             cpu_cirros = df['CPU cirros mean']
             cpu_cirros_sd = df['CPU cirros sd']
             cpu_stress = df['CPU stress mean']
             cpu_stress_sd = df['CPU stress sd']
+
+            df['CPU cirros mean T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
+            df['CPU stress mean T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+
+            cirros_t_mean = df['CPU cirros mean T']
+            stress_t_mean = df['CPU stress mean T']
 
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-CPU"
 
-            axs[_count].bar(index, cpu_cirros, width, yerr=cpu_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, cpu_stress, width,yerr=cpu_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -507,7 +578,7 @@ if SYSTEM_CPU_BAR:
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
 
-    plt.ylabel('System CPU Mean', fontsize=20)
+    plt.ylabel('System CPU Mean (percentage)', fontsize=20)
     plt.xlabel('Cases', fontsize=20)
 
     plt.savefig('{}/{}-Mean.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -548,9 +619,9 @@ if SYSTEM_CPU_BAR:
             for _instances, _instances_data in sorted(_data.items()):
                 data.append({
                     'case': int(_instances), 
-                    'CPU cirros mean': _instances_data['cirros']["max"],
+                    'CPU cirros max': _instances_data['cirros']["max"],
                     'CPU cirros sd': _instances_data['cirros']["sd"],
-                    'CPU stress mean': _instances_data['stress']["max"],
+                    'CPU stress max': _instances_data['stress']["max"],
                     'CPU stress sd': _instances_data['stress']["sd"]
                 })
         
@@ -558,18 +629,24 @@ if SYSTEM_CPU_BAR:
             df = df.sort_values('case')
             
             divisions = df['case']
-            cpu_cirros = df['CPU cirros mean']
+            cpu_cirros = df['CPU cirros max']
             cpu_cirros_sd = df['CPU cirros sd']
-            cpu_stress = df['CPU stress mean']
+            cpu_stress = df['CPU stress max']
             cpu_stress_sd = df['CPU stress sd']
+
+            df['CPU cirros max T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
+            df['CPU stress max T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+
+            cirros_t_max = df['CPU cirros max T']
+            stress_t_max = df['CPU stress max T']
 
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-CPU"
 
-            axs[_count].bar(index, cpu_cirros, width, yerr=cpu_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, cpu_stress, width,yerr=cpu_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -583,7 +660,7 @@ if SYSTEM_CPU_BAR:
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
 
-    plt.ylabel('System CPU Max', fontsize=20)
+    plt.ylabel('System CPU Max (percentage)', fontsize=20)
     plt.xlabel('Cases', fontsize=20)
 
     plt.savefig('{}/{}-Max.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -644,13 +721,19 @@ if SYSTEM_LOAD_BAR:
             load1_stress = df['Load1 stress mean']
             load1_stress_sd = df['Load1 stress sd']
 
+            df['Load1 cirros mean T'] = abs(T_BOUNDS[1] * df['Load1 cirros sd'] / sqrt(RUNS))
+            df['Load1 stress mean T'] = abs(T_BOUNDS[1] * df['Load1 stress sd'] / sqrt(RUNS))
+
+            cirros_t_mean = df['Load1 cirros mean T']
+            stress_t_max = df['Load1 stress mean T']
+
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-Load1"
 
-            axs[_count].bar(index, load1_cirros, width, yerr=load1_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, load1_stress, width,yerr=load1_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, load1_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, load1_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -707,9 +790,9 @@ if SYSTEM_LOAD_BAR:
             for _instances, _instances_data in sorted(_data.items()):
                 data.append({
                     'case': int(_instances),
-                    'Load1 cirros mean': _instances_data['cirros']["max"],
+                    'Load1 cirros max': _instances_data['cirros']["max"],
                     'Load1 cirros sd': _instances_data['cirros']["sd"],
-                    'Load1 stress mean': _instances_data['stress']["max"],
+                    'Load1 stress max': _instances_data['stress']["max"],
                     'Load1 stress sd': _instances_data['stress']["sd"]
                 })
 
@@ -717,18 +800,24 @@ if SYSTEM_LOAD_BAR:
             df = df.sort_values('case')
 
             divisions = df['case']    
-            load1_cirros = df['Load1 cirros mean']
+            load1_cirros = df['Load1 cirros max']
             load1_cirros_sd = df['Load1 cirros sd']
-            load1_stress = df['Load1 stress mean']
+            load1_stress = df['Load1 stress max']
             load1_stress_sd = df['Load1 stress sd']
+
+            df['Load1 cirros max T'] = abs(T_BOUNDS[1] * df['Load1 cirros sd'] / sqrt(RUNS))
+            df['Load1 stress max T'] = abs(T_BOUNDS[1] * df['Load1 stress sd'] / sqrt(RUNS))
+
+            cirros_t_max = df['Load1 cirros max T']
+            stress_t_max = df['Load1 stress max T']
 
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-Load1"
 
-            axs[_count].bar(index, load1_cirros, width, yerr=load1_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, load1_stress, width,yerr=load1_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, load1_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, load1_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -743,7 +832,7 @@ if SYSTEM_LOAD_BAR:
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
 
-    plt.ylabel('System Load', fontsize=20)
+    plt.ylabel('System Load Max', fontsize=20)
     plt.xlabel('Cases', fontsize=20)
 
     plt.savefig('{}/{}-Max.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -804,13 +893,19 @@ if SYSTEM_RAM_BAR:
             mem_stress = df['MEM stress mean']
             mem_stress_sd = df['MEM stress sd']
 
+            df['MEM cirros mean T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
+            df['MEM stress mean T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+
+            cirros_t_mean = df['MEM cirros mean T']
+            stress_t_mean = df['MEM stress mean T']
+
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-MEM"
 
-            axs[_count].bar(index, mem_cirros, width, yerr=mem_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, mem_stress, width,yerr=mem_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -824,7 +919,7 @@ if SYSTEM_RAM_BAR:
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
 
-    plt.ylabel('System RAM', fontsize=20)
+    plt.ylabel('System RAM (MiB)', fontsize=20)
     plt.xlabel('Cases', fontsize=20)
 
     plt.savefig('{}/{}-Mean.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
@@ -866,9 +961,9 @@ if SYSTEM_RAM_BAR:
             for _instances, _instances_data in sorted(_data.items()):
                 data.append({
                     'case': int(_instances),
-                    'MEM cirros mean': _instances_data['cirros']["max"],
+                    'MEM cirros max': _instances_data['cirros']["max"],
                     'MEM cirros sd': _instances_data['cirros']["sd"],
-                    'MEM stress mean': _instances_data['stress']["max"],
+                    'MEM stress max': _instances_data['stress']["max"],
                     'MEM stress sd': _instances_data['stress']["sd"]
                 })
     
@@ -876,18 +971,24 @@ if SYSTEM_RAM_BAR:
             df = df.sort_values('case')
     
             divisions = df['case']
-            mem_cirros = df['MEM cirros mean']
+            mem_cirros = df['MEM cirros max']
             mem_cirros_sd = df['MEM cirros sd']
-            mem_stress = df['MEM stress mean']
+            mem_stress = df['MEM stress max']
             mem_stress_sd = df['MEM stress sd']
+
+            df['MEM cirros max T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
+            df['MEM stress max T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+
+            cirros_t_max = df['MEM cirros max T']
+            stress_t_max = df['MEM stress max T']
 
             index = np.arange(len(data))
             width = 0.30
 
             _title = "System-MEM"
 
-            axs[_count].bar(index, mem_cirros, width, yerr=mem_cirros_sd, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, mem_stress, width,yerr=mem_stress_sd, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
+            axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -901,14 +1002,66 @@ if SYSTEM_RAM_BAR:
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
 
-    plt.ylabel('System RAM', fontsize=20)
+    plt.ylabel('System RAM (MiB)', fontsize=20)
     plt.xlabel('Cases', fontsize=20)
 
     plt.savefig('{}/{}-Max.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
     plt.close()
+
+##############################################
+# Success ratio Line Chart 
+##############################################
+
+
+
+if SUCCESS_RATIO_LINE:
+    for _success_ration_file in success_ratio_file:
+        _title = (Path(_success_ration_file).name).split("-success-ratio")[0]
+        df = pd.read_csv(_success_ration_file)
+
+
+unix_time = pd.to_datetime(df['Time'],unit = 's')
+
+total = df['Total']
+active = df['Active']
+build = df['Build']
+error = df['Error']
+
+
+fig = plt.figure()
+plt.figure(figsize=(11,6))
+plt.suptitle('success-ratio', fontsize=22)
+ax = fig.add_subplot(1,1,1)  
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+plt.plot(unix_time, total,label = 'Total')
+plt.plot(unix_time, active, label = 'Active')
+plt.plot(unix_time, build, label = 'Build')
+plt.plot(unix_time, error,label = 'Error')
+
+plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+
+plt.xticks(rotation=-45)
+
+ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=2))   #to get a tick every 15 minutes
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+plt.savefig('output.png')
+
+
+
+
+
+
+
+
+
 #########################################
 # END
 #########################################
+
+
+
 
 print("Total time: {}".format(time.time() - start_time))
 
