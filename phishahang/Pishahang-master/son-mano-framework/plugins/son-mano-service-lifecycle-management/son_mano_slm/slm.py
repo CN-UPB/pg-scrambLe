@@ -2869,41 +2869,53 @@ class ServiceLifecycleManager(ManoBasePlugin):
         return [list_vnf_id,list_vnf_nm]
         
         
-    def random_combination(self,vnf,mano=['OSM','PISHAHANG','MAIN_PISHAHANG']):
+    def random_combination(self,vnf,mano):
         '''
             generate a random set of function ids and MANOs. 
         '''
     
-        vnf_ids = vnf[0] # get the list of vnf ids
-        vnf_nm = vnf[1]  # get the list of vnf names
+        vnf_ids = vnf[0]                                           # get the list of vnf ids
+        vnf_nm = vnf[1]                                            # get the list of vnf names
         
-        mano_len = len(mano) # no.of MANOs
-        vnf_len = len(vnf_ids) # no.of vnfs
+        mano_len = len(mano)                                       # no.of MANOs
+        vnf_len = len(vnf_ids)                                     # no.of vnfs
 
         
-        if vnf_len == 1:
-            rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
-
-            vnf_set1 = vnf_ids # storing the only single vnf-id
-            vnf_nm_set1 = vnf_nm  # storing the only single vnf-name               
-            mano_set1 = [mano[rand_int_mano[0]]]# storing 1st set of MANO
+        if mano_len == 1:
             
-            return [[vnf_set1,vnf_nm_set1,mano_set1 ]]
+            vnf_set1 = vnf_ids                                     # storing the only single vnf-id
+            vnf_nm_set1 = vnf_nm                                   # storing the only single vnf-name               
+            mano_set1 = [mano[0]]                                  # storing the MANO
+            
+            return [[vnf_set1, vnf_nm_set1, mano_set1]]
             
         else:
-            rand_int = random.randint(0, vnf_len-1)
-            rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
-
-            vnf_set1 = [vnf_ids[rand_int]] # storing 1st set of vnf-ids
-            vnf_nm_set1 = [vnf_nm[rand_int]]  # storing 1st set of vnf-names                
-            mano_set1 = [mano[rand_int_mano[0]]]# storing 1st MANO
             
-            vnf_set2 = list(set(vnf_ids) - set(vnf_set1)) # storing 2nd set of vnf-ids
-            vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
-            mano_set2 = [mano[rand_int_mano[1]]]# storing 2nd MANO
-        
-        
-            return [[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]
+            if vnf_len > 1:
+            
+                rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
+                rand_int = random.randint(0, vnf_len-1)            # random selection of vnf indexes
+                
+                vnf_set1 = [vnf_ids[rand_int]]                     # storing 1st set of vnf-ids
+                vnf_nm_set1 = [vnf_nm[rand_int]]                   # storing 1st set of vnf-names                
+                mano_set1 = [mano[rand_int_mano[0]]]               # storing 1st MANO
+                
+                vnf_set2 = list(set(vnf_ids) - set(vnf_set1))      # storing 2nd set of vnf-ids
+                vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
+                mano_set2 = [mano[rand_int_mano[1]]]               # storing 2nd MANO
+                    
+                return [[vnf_set1,vnf_nm_set1,mano_set1 ],[vnf_set2,vnf_nm_set2,mano_set2]]
+            
+            else:
+                
+                rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
+                
+                vnf_set1 = vnf_ids                                 # storing the only single vnf-id
+                vnf_nm_set1 = vnf_nm                               # storing the only single vnf-name               
+                mano_set1 = [mano[rand_int_mano[0]]]               # storing the MANO
+                
+                return [[vnf_set1,vnf_nm_set1,mano_set1 ]]
+                
         
     def SLM_mapping(self, serv_id):
         """
@@ -2959,8 +2971,22 @@ class ServiceLifecycleManager(ManoBasePlugin):
         corr_id = str(uuid.uuid4())
         self.services[serv_id]['act_corr_id'] = corr_id
 
-        LOG.info("Service " + serv_id + ": Calculating the placement " + str(self.services[serv_id]['service']))
+        LOG.info("Service " + serv_id + ": Calculating the placement ")
         topology = self.services[serv_id]['infrastructure']['topology']
+        
+        # setting the manos list recieved from the BSS gui
+        LOG.info("Printing scramble msg {}".format(str(self.services[serv_id]['payload']['selectedmanos'])))
+        
+        mano_dict = self.services[serv_id]['payload']['selectedmanos']
+        mano_list = []
+        for key, val in mano_dict.items():
+            if key == 'Parent' and val == True:
+                mano_list.append('MAIN_PISHAHANG')
+            elif key == 'MANO1' and val == True:
+                mano_list.append('PISHAHANG')
+            elif key == 'MANO2' and val == True:
+                mano.list.append('OSM')
+                
         
         if 'nsd' in self.services[serv_id]['service']:
             
@@ -2976,7 +3002,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             LOG.info("\nRandomly assigning VNFs to existing MANO Frameworks...\n" )
             
             function_list = self.get_network_functions(descriptor)
-            rndm_sets = self.random_combination(function_list)
+            rndm_sets = self.random_combination(function_list, mano_list)
             
             if(len(rndm_sets) != 1):
                 vnfid_set = [rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
@@ -3101,7 +3127,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 # connecting to OSM MANO to send the NS package
                 username_osm = os.environ['username_osm']
                 password_osm = os.environ['password_osm']
-                host_osm = os.environ['host_5']
+                host_osm = os.environ['host_osm']
                 
 
                 LOG.info("Connecting to OSM MANO..." )
@@ -3158,7 +3184,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 username_pish = os.environ['username_pish2']
                 password_pish = os.environ['password_pish2']
-                host_pish = os.environ['host_3']
+                host_pish = os.environ['host_pishahang']
                 
                 son_auth = wrappers.SONATAClient.Auth(host_pish)
                 token = json.loads(son_auth.auth(username =username_pish , password= password_pish))
