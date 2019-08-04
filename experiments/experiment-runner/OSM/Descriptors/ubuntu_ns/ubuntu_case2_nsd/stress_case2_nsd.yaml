@@ -1,0 +1,32 @@
+nsd:nsd-catalog:
+  nsd:
+  - constituent-vnfd:
+    - member-vnf-index: '1'
+      vnfd-id-ref: ubuntu-vnf
+    - member-vnf-index: '2'
+      vnfd-id-ref: ubuntu-vnf
+    - member-vnf-index: '3'
+      vnfd-id-ref: ubuntu-vnf
+    description: Simple NS with three VNFs and a single VL
+    id: ubuntu_case2-ns
+    logo: osm.png
+    name: ubuntu_case2
+    short-name: ubuntu_case2
+    version: '1.0'
+    vld:
+    - id: mgmtnet
+      mgmt-network: 'true'
+      name: mgmtnet
+      short-name: mgmtnet
+      type: ELAN
+      vim-network-name: large-priv
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: vnf-cp0
+        vnfd-id-ref: ubuntu-vnf
+      - member-vnf-index-ref: '2'
+        vnfd-connection-point-ref: vnf-cp0
+        vnfd-id-ref: ubuntu-vnf
+      - member-vnf-index-ref: '3'
+        vnfd-connection-point-ref: vnf-cp0
+        vnfd-id-ref: ubuntu-vnf

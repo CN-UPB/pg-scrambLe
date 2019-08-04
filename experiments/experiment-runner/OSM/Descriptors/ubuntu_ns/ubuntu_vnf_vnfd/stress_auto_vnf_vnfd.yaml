@@ -1,0 +1,29 @@
+vnfd:vnfd-catalog:
+  vnfd:
+  - connection-point:
+    - name: vnf-cp0
+      type: VPORT
+    description: A basic VNF descriptor with ubuntu-cloud image and one VDU
+    id: ubuntu-vnf
+    logo: osm.png
+    mgmt-interface:
+      cp: vnf-cp0
+    name: ubuntu
+    short-name: ubuntu
+    vdu:
+    - count: '1'
+      id: ubuntu-VM
+      image: ubuntu-cloud
+      interface:
+      - external-connection-point-ref: vnf-cp0
+        name: vdu-eth0
+        type: EXTERNAL
+        virtual-interface:
+          type: PARAVIRT
+      name: ubuntu-VM
+      vm-flavor:
+        memory-mb: '512'
+        storage-gb: '3'
+        vcpu-count: '1'
+    version: '1.0'
+

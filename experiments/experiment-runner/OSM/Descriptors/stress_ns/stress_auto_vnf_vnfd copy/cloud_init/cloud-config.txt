@@ -1,0 +1,10 @@
+#cloud-config
+apt_update: true
+packages:
+  - stress
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhl0ngbfJjCjo/6dD+J7IkZG++Q1Xk74Q5+pMnG3e/2KfJS43lBhFMC7dvTvuaiNbrxM9hi837HRw64WcEWwVLzatl6kMWDhGsy+e7WfJ96JbzrcIMukZwfNLBdPrpXfau5OFauKHsFxgnIocApyJjruN6IeV7WX7R9CvxgAyI8tOn6yg4Ac6sN2DamlMfalmar+Kvzzw8Yrm8LbHXC4zqlLSDsBQcKSuhhDiNvouS+OmBEE0YgSHut4GX10kogJFA4SWfM3IZoaoVLzTvYH68VSkdtpM96A2dtmfGIyC5KbhImoKdyDVeQDtGW+PNdFRj/PplYGJKgxrCtukVG3T5 vm6@vm6-virtual-machine
+
+runcmd:
+  - [ stress -c 1 -m 2 --vm-bytes 50M -d 2 --hdd-bytes 50M ]

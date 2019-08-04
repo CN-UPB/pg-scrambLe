@@ -1,0 +1,30 @@
+vnfd:vnfd-catalog:
+  vnfd:
+  - connection-point:
+    - name: vnf-cp0
+      type: VPORT
+    description: A basic VNF descriptor with load generator and one VDU
+    id: stress-vnf
+    logo: osm.png
+    mgmt-interface:
+      cp: vnf-cp0
+    name: stress
+    short-name: stress
+    vdu:
+    - cloud-init-file: cloud-config.txt
+      count: '1'
+      id: stress-VM
+      image: ubuntu-cloud
+      interface:
+      - external-connection-point-ref: vnf-cp0
+        name: vdu-eth0
+        type: EXTERNAL
+        virtual-interface:
+          type: PARAVIRT
+      name: stress-VM
+      vm-flavor:
+        memory-mb: '512'
+        storage-gb: '3'
+        vcpu-count: '1'
+    version: '1.0'
+

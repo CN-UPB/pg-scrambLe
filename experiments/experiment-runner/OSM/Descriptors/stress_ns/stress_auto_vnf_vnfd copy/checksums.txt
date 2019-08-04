@@ -1,0 +1,3 @@
+84695c797ed75fc15287eac706b48b8b  stress_auto_vnf_vnfd.yaml
+747ff9834e6e0e07c91d73bfb53306f6  cloud_init/cloud-config.txt
+bc681c5a4c3cdc09c013df2d2239f3d2  icons/osm.png
