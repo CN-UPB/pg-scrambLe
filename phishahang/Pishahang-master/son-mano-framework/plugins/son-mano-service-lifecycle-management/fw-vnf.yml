@@ -1,4 +1,4 @@
-author: George Xilouris, NCSRD
+author: Steven Van Rossem, Ghent University, steven.vanrossem@intec.ugent.be
 connection_points:
 - id: mgmt
   interface: ipv4
@@ -9,10 +9,8 @@ connection_points:
 - id: output
   interface: ipv4
   type: external
-description: '"Virtual traffic classifier (vTC) descriptor file. vTC uses ndpi library
-  for the implementation of the vTC"
-
-  '
+description: 'A firewall based on Ryu Openflow controller + openvswitch (2 ports:
+  input+output) in a single VNF'
 descriptor_version: vnfd-schema-01
 monitoring_rules:
 - condition: vdu01:vm_cpu_perc > 85
@@ -23,10 +21,10 @@ monitoring_rules:
   notification:
   - name: notification01
     type: rabbitmq_message
-name: vtc-vnf
-uuid: d64f9a5c-c201-490c-a05e-7fea3a52a7f3
+name: fw-vnf
+uuid: 0fad576a-bb4e-4174-a064-da06d732effe
 vendor: eu.sonata-nfv
-version: '0.1'
+version: '0.2'
 virtual_deployment_units:
 - connection_points:
   - id: eth0
@@ -38,7 +36,6 @@ virtual_deployment_units:
   - id: eth2
     interface: ipv4
     type: internal
-  description: VNFC for the dashboard and the time-series database
   id: vdu01
   monitoring_parameters:
   - name: vm_cpu_perc
@@ -58,24 +55,21 @@ virtual_deployment_units:
     storage:
       size: 1
       size_unit: GB
-  vm_image: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+  vm_image: cirros034
   vm_image_format: qcow2
 virtual_links:
 - connection_points_reference:
   - vdu01:eth0
   - mgmt
   connectivity_type: E-LAN
-  dhcp: true
   id: mgmt
 - connection_points_reference:
   - vdu01:eth1
   - input
   connectivity_type: E-Line
-  dhcp: true
   id: input
 - connection_points_reference:
   - vdu01:eth2
   - output
   connectivity_type: E-Line
-  dhcp: true
   id: output
