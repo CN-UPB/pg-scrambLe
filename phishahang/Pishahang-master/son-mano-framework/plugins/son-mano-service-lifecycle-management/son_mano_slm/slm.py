@@ -2884,9 +2884,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         if mano_len == 1:
             
+<<<<<<< HEAD
             vnf_set1 = vnf_ids                                     # storing the vnf-ids
             vnf_nm_set1 = vnf_nm                                   # storing the vnf-names          
             mano_set1 = [mano[0]]                                  # storing the only MANO
+=======
+            vnf_set1 = vnf_ids                                     # storing the only single vnf-id
+            vnf_nm_set1 = vnf_nm                                   # storing the only single vnf-name               
+            mano_set1 = [mano[0]]                                  # storing the MANO
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
             
             return [[vnf_set1, vnf_nm_set1, mano_set1]]
             
@@ -2911,8 +2917,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
                 
+<<<<<<< HEAD
                 vnf_set1 = vnf_ids                                 # storing the single vnf-id
                 vnf_nm_set1 = vnf_nm                               # storing the single vnf-name               
+=======
+                vnf_set1 = vnf_ids                                 # storing the only single vnf-id
+                vnf_nm_set1 = vnf_nm                               # storing the only single vnf-name               
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
                 mano_set1 = [mano[rand_int_mano[0]]]               # storing the MANO
                 
                 return [[vnf_set1,vnf_nm_set1,mano_set1 ]]
@@ -2974,7 +2985,6 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         LOG.info("Service " + serv_id + ": Calculating the placement ")
         topology = self.services[serv_id]['infrastructure']['topology']
-        
         
         # setting the manos list recieved from the BSS gui
         LOG.info("Printing scramble msg {}".format(str(self.services[serv_id]['payload']['selectedmanos'])))

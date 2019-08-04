@@ -36,7 +36,10 @@ network_functions:
   vnf_name: fw-vnf
   vnf_vendor: eu.sonata-nfv
   vnf_version: '0.2'
+<<<<<<< HEAD
 uuid: e2869639-aeb9-4805-a013-0c131e829ab9
+=======
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
 vendor: eu.sonata-nfv.service-descriptor
 version: '0.2'
 virtual_links:

@@ -46,7 +46,6 @@ ENV username_pish2=sonata
 ENV password_pish2=1234
 ENV host_pishahang=$HOST_PISHAHANG
 
-
 RUN apt-get update && apt-get install -y gcc
 
 # add generic project files

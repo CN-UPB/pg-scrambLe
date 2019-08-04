@@ -22,7 +22,11 @@ monitoring_rules:
   - name: notification01
     type: rabbitmq_message
 name: fw-vnf
+<<<<<<< HEAD
 uuid: 0fad576a-bb4e-4174-a064-da06d732effe
+=======
+uuid: 9a815202-6fde-4dd5-8c0c-956d4129af7a
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
 vendor: eu.sonata-nfv
 version: '0.2'
 virtual_deployment_units:
@@ -55,7 +59,11 @@ virtual_deployment_units:
     storage:
       size: 1
       size_unit: GB
+<<<<<<< HEAD
   vm_image: cirros034
+=======
+  vm_image: http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
   vm_image_format: qcow2
 virtual_links:
 - connection_points_reference:

@@ -2,6 +2,8 @@
 
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
+# IP_BSS="131.234.29.102"
+
 echo "$dir"
 
 echo "Starting Scramble SRV.."
