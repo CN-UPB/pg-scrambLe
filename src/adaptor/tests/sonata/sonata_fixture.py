@@ -122,3 +122,27 @@ def get_vnf_instances_keys():
 @fixture
 def get_vnf_instances_vnfinstanceid_keys():
     return ['created_at', 'descriptor_reference', 'descriptor_version', 'status', 'updated_at', 'version', 'virtual_deployment_units', 'uuid']
+
+@fixture
+def get_services_keys():
+    return ['created_at', 'md5', 'nsd', 'signature', 'status', 'updated_at', 'username', 'uuid', 'user_license']
+
+@fixture
+def get_services_serviceId_keys():
+    return ['created_at', 'md5', 'nsd', 'signature', 'status', 'updated_at', 'username', 'uuid']
+
+@fixture
+def get_vims_requestId_keys():
+    return ['core_total', 'core_used', 'memory_total', 'memory_used', 'vim_city', 'vim_domain', 'vim_endpoint', 'vim_name', 'vim_uuid', 'vim_type']
+
+@fixture	
+def get_ns_records_keys():
+    return ['']
+	
+@fixture	
+def get_services_records_keys():
+    return ['']
+	
+@fixture	
+def get_vnfr_records_keys():
+    return ['']

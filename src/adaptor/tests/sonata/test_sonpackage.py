@@ -81,4 +81,28 @@ def test_post_son_packages(post_son_packages_keys):
     assert response['error'] == True
     assert response['data'] == ''
 
+def test_put_son_packages_PackageId():
+    sonata_package = SONATAClient.Package(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    Helpers._upload_test_package(_token=_token["token"]["access_token"])
+	
+    _package_list = json.loads(sonata_package.get_son_packages(
+                                token=_token["token"]["access_token"]))
+    _package_list = json.loads(_package_list["data"])
 
+    _package = None
+    for _p in _package_list:
+        if "sonata_example.son" == _p['grid_fs_name']:
+            _package = _p['uuid']
+			
+    response = json.loads(sonata_package.put_son_packages_PackageId(
+                        token=_token["token"]["access_token"], data_path="tests/samples/Sonata/sonata_simple_package.json",
+                        id=_package))
+						
+    Helpers._delete_test_package("sonata_example.son")
+    if response["error"]:
+        return True
+    else:
+        return False

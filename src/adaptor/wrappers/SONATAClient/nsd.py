@@ -153,6 +153,40 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text        
         return json.dumps(result)        
 
+    def put_ns_descriptors_nsdinfoid(self, token, data_path, nsdinfoid, host=None, port=None):
+        """ NSD Management Interface - Individual NS Descriptor
+
+        /ns_descriptors/{nsdInfoId}:
+            PUT - Update the content of NSD
+
+        :param token: auth token retrieved by the auth call
+        :param nsdinfoid: id of the individual NSD
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, nsdinfoid)
+        
+        try:
+            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text        
+        return json.dumps(result)	
+		
+		
     def get_ns_descriptors_nsdinfoid(self, token, nsdinfoid, host=None, port=None):
         """ NSD Management Interface -  Individual NS Descriptor
 

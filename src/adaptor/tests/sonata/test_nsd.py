@@ -109,3 +109,33 @@ def test_delete_ns_descriptors_nsdinfoid(delete_ns_descriptors_nsdinfoid_keys):
                         token=_token["token"]["access_token"], vnfPkgId=_vnfd))
         assert isinstance(response, dict)
         assert response["data"] == ""
+		
+		
+def test_put_ns_descriptors_nsdinfoid():
+    sonata_nsd = SONATAClient.Nsd(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    		
+    Helpers._upload_test_nsd(_token=_token["token"]["access_token"])
+    
+    _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                        token=_token["token"]["access_token"]))
+    _nsd_list = json.loads(_nsd_list["data"])
+    
+    _nsd = None
+    for _n in _nsd_list:
+        if "sonata-demo" == _n['nsd']['name']:
+            _nsd = _n['uuid']
+			
+    response = json.loads(sonata_nsd.put_ns_descriptors_nsdinfoid(
+                        token=_token["token"]["access_token"], data_path="tests/samples/Sonata/sonata_simple_nsd.json",
+                        nsdinfoid=_nsd))
+                        
+    Helpers._delete_test_nsd("sonata-demo")
+    if response["error"]:
+        return True
+    else:
+        return False
+
+		

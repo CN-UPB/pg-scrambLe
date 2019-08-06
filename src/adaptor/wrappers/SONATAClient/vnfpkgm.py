@@ -171,6 +171,40 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
 
         result['data'] = r.text
         return json.dumps(result)
+		
+    def put_vnf_packages_vnfpkgid(self, token, data_path, vnfPkgId, host=None, port=None):
+        """ VNF Package Management Interface - 
+        Individual VNF package
+
+        /vnf_packages/{vnfPkgId}:
+            PUT - Update an individual VNF package
+
+        :param token: auth token retrieved by the auth call
+        :param vnfPkgId: id of the vnf package to fetch
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
+
+        _endpoint = "{0}/catalogues/api/v2/vnfs/{1}".format(base_path, vnfPkgId)
+
+        try:
+            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
 
     def get_vnf_packages_vnfpkgid_vnfd(self, vnfPkgId):
         result = {'error': True, 'data': 'Method not implemented in target MANO'}

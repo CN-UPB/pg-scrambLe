@@ -81,6 +81,28 @@ class Package(CommonInterfaceSonPackage):
         result['data'] = r.text        
         return json.dumps(result)        
 
+    def put_son_packages_PackageId(self, token, data_path, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/catalogues/api/v2/son-packages/{1}".format(base_path, id)
+        
+        try:
+            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text        
+        return json.dumps(result)
+	
     def get_son_packages_PackageId(self, token, id, host=None, port=None):
         if host is None:
             base_path = "http://{0}:{1}".format(self._host, self._port)

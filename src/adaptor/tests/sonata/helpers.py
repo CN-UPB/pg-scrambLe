@@ -115,3 +115,21 @@ class Helpers():
             response = json.loads(sonata_package.delete_son_packages_PackageId(
                                     token=_token,
                                     id=_package))
+
+									
+    def _upload_reference_vnfd_for_nsd(_referencevnfdname="sonata-demo"):
+        time.sleep(5)
+        sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+        sonata_nsd = Nsd(HOST_URL)
+    
+        _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(token=_token))
+        _nsd_list = json.loads(_nsd_list["data"])
+		
+        if _referencevnfdname:
+            response = json.loads(sonata_vnfpkgm.post_vnf_packages(token=_token,
+                            package_path="tests/samples/vnfd_example.yml"))
+        
+        if response["error"]:
+            return True
+        else:
+            return False
