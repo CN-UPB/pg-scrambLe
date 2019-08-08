@@ -31,7 +31,7 @@ def delete_replication_controller():
       body = client.V1DeleteOptions()
       api_response = api_instance.delete_namespaced_replication_controller(i.metadata.name, i.metadata.namespace, body=body)
 
-def delete_replication_pod():
+def delete_pod():
 
     v1 = client.CoreV1Api(aApiClient)
     print("Listing pods with their IPs:")
@@ -45,8 +45,32 @@ def delete_replication_pod():
       body = client.V1DeleteOptions()
       api_response = api_instance.delete_namespaced_pod(i.metadata.name, i.metadata.namespace, body=body)
 
+def get_count(init_time):
+
+    v1 = client.CoreV1Api(aApiClient)
+    print("Listing pods with their IPs:")
+    _servers = v1.list_namespaced_pod(namespace='default', watch=False)
+
+    active_count = 0
+    build_count = 0
+    error_count = 0
+
+    for _s in _servers:
+        server_created = parser.parse(_s.created)
+        if int(server_created.strftime("%s")) > int(init_time) :
+            if _s.status == "ACTIVE":
+                active_count += 1
+            elif _s.status == "BUILD":
+                build_count += 1
+            elif _s.status == "ERROR":
+                error_count += 1
+            else:
+                print("Other Status")
+                print(_s.status)
+
+    return active_count, build_count, error_count
 
 
 if __name__ == '__main__':
-    delete_replication_controller()
-    delete_replication_pod()
+#     delete_replication_controller()
+#     delete_replication_pod()

@@ -1,0 +1,21 @@
+---
+descriptor_version: "2.0"
+vendor: "eu.sonata-nfv.cloud-service-descriptor"
+name: "ubuntu-image-5"
+version: "0.2"
+author: pg-scramble
+description: "Deploy a ubuntu docker image"
+virtual_deployment_units:
+- id: "ubuntu-image-5"
+  name: "ubuntu-image-5"
+  service_image: "ubuntu"
+  service_type: "LoadBalancer"
+  service_ports:
+  - name: "ssh"
+    protocol: "TCP"
+    port: 22
+    target_port: 22
+  resource_requirements:
+    memory:
+      size: 32
+      size_unit: "Mi"
