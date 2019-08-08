@@ -146,3 +146,28 @@ def get_services_records_keys():
 @fixture	
 def get_vnfr_records_keys():
     return ['']
+
+@fixture	
+def get_csd_descriptors_keys():
+    return ['created_at', 'csd', 'md5', 'signature', 'status', 'updated_at', 'username', 'uuid']
+
+@fixture	
+def post_csd_descriptors_keys():
+    return ['']
+
+@fixture	
+def get_cosd_descriptors_keys():
+    return ['cosd', 'created_at', 'md5', 'signature', 'status', 'updated_at', 'username', 'uuid']
+
+@fixture	
+def post_cosd_descriptors_keys():
+    return ['']
+
+@fixture	
+def post_cs_instances_nsinstanceid_instantiate_keys():
+    return ['']
+
+@fixture	
+def post_cs_instances_nsinstanceid_terminate_keys():
+    return ['']
+    

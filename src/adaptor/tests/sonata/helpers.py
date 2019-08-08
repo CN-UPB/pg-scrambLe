@@ -36,6 +36,47 @@ class Helpers():
                                     token=_token,
                                     vnfPkgId=_vnfd))
 
+    def _delete_test_csds(_token, csdname="scramble-csd"):
+        time.sleep(1)
+        sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
+        sonata_pishahang = SONATAClient.Pishahang(HOST_URL)
+
+
+        _csd_list = json.loads(sonata_pishahang.get_csd_descriptors(
+                        token=_token, limit=1000))
+        _csd_list = json.loads(_csd_list["data"])
+
+        _csd = None
+        for _v in _csd_list:
+            if "scramble-csd" == _v['csd']['name']:            
+                _csd = _v['uuid']
+
+        response = None
+        if _csd:
+            response = json.loads(sonata_pishahang.delete_csd_descriptors_csdpkgid(
+                                    token=_token,
+                                    csdpkgid=_csd))
+
+    def _delete_test_cosds(_token, cosdname="scramble-cosd"):
+        time.sleep(1)
+        sonata_pishahang = SONATAClient.Pishahang(HOST_URL)
+
+        _cosd_list = json.loads(sonata_pishahang.get_cosd_descriptors(
+                        token=_token, limit=1000))
+        _cosd_list = json.loads(_cosd_list["data"])
+
+        _cosd = None
+        for _v in _cosd_list:
+            if "scramble-cosd" == _v['cosd']['name']:            
+                _cosd = _v['uuid']
+
+        response = None
+        if _cosd:
+            response = json.loads(sonata_pishahang.delete_cosd_descriptors_cosdpkgid(
+                                    token=_token,
+                                    cosdpkgid=_cosd))
+
+
     def _upload_test_nsd(_token):
         time.sleep(5)
         sonata_vnfpkgm = SONATAClient.VnfPkgm(HOST_URL)
