@@ -64,6 +64,7 @@ def test_get_nsinstances_records_instanceId(get_nsinstances_records_instanceId_k
     _nsr_list = json.loads(sonata_admin.get_nsinstances_records(token=_token["token"]["access_token"]))
     _nsr_list = json.loads(_nsr_list["data"])
     
+    _nsr = None
     for _n in _nsr_list:
         if "nsr-schema-01" == _n['descriptor_version']:         
             _nsr = _n['uuid']
@@ -87,6 +88,33 @@ def test_get_vims_list(get_vims_list_keys):
     if len(response) > 0:
          assert set(get_vims_list_keys).issubset(
                     response.keys()), "All keys should be in the response"
+
+def test_get_vims_requestId(get_vims_requestId_keys):
+    time.sleep(2) #Wait 
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_admin.get_vims_list(token=_token["token"]["access_token"]))
+    response = json.loads(response["data"])
+
+
+    _v_list = json.loads(sonata_admin.get_vims_list(token=_token["token"]["access_token"]))
+    _v_list = json.loads(_v_list["data"])
+
+    _vim = None
+    for _v in _v_list:
+        if 1 in _v_list:            
+            _vim = _v['items']['request_uuid']
+
+    response = json.loads(sonata_admin.get_vims_requestId(token=_token["token"]["access_token"], id=_vim))
+
+    if response["error"]:
+            return True
+    else:
+            return False
+
+   
 
 
 def test_get_instantions_requests(get_instantions_requests_keys):
@@ -145,26 +173,99 @@ def test_get_functions_functionId(get_functions_functionId_keys):
     sonata_auth = SONATAClient.Auth(HOST_URL)
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
-
     _f_list = json.loads(sonata_admin.get_functions(token=_token["token"]["access_token"]))
     _f_list = json.loads(_f_list["data"])
 
+    _fun = None
     for _f in _f_list:
         if "dummy-vnf" == _f['vnfd']['name']:            
             _fun = _f['uuid']
 
     response = json.loads(sonata_admin.get_functions_functionId(token=_token["token"]["access_token"], id=_fun))
+
+    if response["error"]:
+            return True
+    else:
+            return False
   
-# def test_get_packages(get_packages_keys):
-#     sonata_admin = SONATAClient.Admin(HOST_URL)
-#     sonata_auth = SONATAClient.Auth(HOST_URL)
-#     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-#     _token = json.loads(_token["data"])
-#     response = json.loads(sonata_admin.get_packages(token=_token["token"]["access_token"]))
-#     response = json.loads(response["data"])
+def test_get_packages(get_packages_keys):
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_admin.get_packages(token=_token["token"]["access_token"]))
+    response = json.loads(response["data"])
     
-#     assert isinstance(response, list)
-#     if len(response) > 0:
-#          assert set(get_packages_keys).issubset(
-#                     response[0].keys()), "All keys should be in the response"
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_packages_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
+
+def test_get_services(get_services_keys):
+    time.sleep(2) #Wait
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_admin.get_services(token=_token["token"]["access_token"]))
+    response = json.loads(response["data"])
+    
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_services_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
+
+def test_get_services_serviceId(get_services_serviceId_keys):
+    time.sleep(2) #Wait
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _s_list = json.loads(sonata_admin.get_services(token=_token["token"]["access_token"]))
+    _s_list = json.loads(_s_list["data"])
+
+    _ser = None
+    for _s in _s_list:
+        if "Pishahang-Service" == _s['nsd']['name']:            
+            _ser = _s['uuid']
+
+    response = json.loads(sonata_admin.get_services_serviceId(token=_token["token"]["access_token"], id=_ser))
+
+    if response["error"]:
+            return True
+    else:
+            return False
+
+def test_get_ns_records(get_ns_records_keys):
+    time.sleep(2) #Wait 
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_admin.get_ns_records(token=_token["token"]["access_token"]))
+    
+    
+    if response["error"]:
+            return True
+    else:
+            return False 
+   
+
+def test_get_services_records(get_services_records_keys):
+    time.sleep(2) #Wait 
+    sonata_admin = SONATAClient.Admin(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_admin.get_services_records(token=_token["token"]["access_token"]))
+    print(response)
+    response = json.loads(response["data"])
+    
+    assert isinstance(response, list)
+    if len(response) > 0:
+         assert set(get_nsinstances_records_keys).issubset(
+                    response[0].keys()), "All keys should be in the response"
+
+
 

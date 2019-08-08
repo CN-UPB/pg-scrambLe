@@ -1,0 +1,15 @@
+{
+  "descriptor_version": "1.0",
+  "vendor": "eu.sonata-nfv.service-descriptor",
+  "name": "scramble-cosd",
+  "version": "0.2",
+  "author": "T3-Scramble",
+  "cloud_services": [
+    {
+      "service_id": "scramble-csd",
+      "service_vendor": "eu.sonata-nfv.cloud-service-descriptor",
+      "service_name": "scramble-csd",
+      "service_version": "0.2"
+    }
+  ]
+}

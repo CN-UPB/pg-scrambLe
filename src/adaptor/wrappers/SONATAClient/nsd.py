@@ -13,7 +13,7 @@ class Nsd(CommonInterfaceNsd):
         self._base_path = 'http://{0}:{1}'
         self._user_endpoint = '{0}'
 
-    def get_ns_descriptors(self, token, _filter=None, host=None, port=None):
+    def get_ns_descriptors(self, token, offset=None, limit=None, host=None, port=None):
         """ NSD Management Interface - NS Descriptors
 
         /ns_descriptors:
@@ -21,7 +21,8 @@ class Nsd(CommonInterfaceNsd):
             NS descriptor resources.
 
         :param token: auth token retrieved by the auth call
-        :param _filter: content query filter 
+        :param offset: offset index while returning
+        :param limit: limit records while returning
         :param host: host url
         :param port: port where the MANO API can be accessed
 
@@ -46,11 +47,12 @@ class Nsd(CommonInterfaceNsd):
         else:
             base_path = "http://{0}:{1}".format(host, port)
 
-        query_path = ''
-        if _filter:
-            query_path = '?_admin.type=' + _filter
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
 
-        _endpoint = "{0}/catalogues/api/v2/network-services{1}".format(base_path, query_path)
+        _endpoint = "{0}/catalogues/api/v2/network-services?offset={1}&limit={2}".format(base_path, offset, limit)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
@@ -151,6 +153,40 @@ class Nsd(CommonInterfaceNsd):
         result['data'] = r.text        
         return json.dumps(result)        
 
+    def put_ns_descriptors_nsdinfoid(self, token, data_path, nsdinfoid, host=None, port=None):
+        """ NSD Management Interface - Individual NS Descriptor
+
+        /ns_descriptors/{nsdInfoId}:
+            PUT - Update the content of NSD
+
+        :param token: auth token retrieved by the auth call
+        :param nsdinfoid: id of the individual NSD
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/x-yaml", "accept": "application/json",
+                    'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/catalogues/api/v2/network-services/{1}".format(base_path, nsdinfoid)
+        
+        try:
+            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text        
+        return json.dumps(result)	
+		
+		
     def get_ns_descriptors_nsdinfoid(self, token, nsdinfoid, host=None, port=None):
         """ NSD Management Interface -  Individual NS Descriptor
 

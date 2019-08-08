@@ -1,5 +1,7 @@
 # Adaptor
 
+Documentation is available here - [ReadtheDocs](https://python-mano-wrappers.readthedocs.io/en/adaptor/).
+
 ## Structure
 
 + `adaptor.py` - Entry point for utilizing the underlying wrappers

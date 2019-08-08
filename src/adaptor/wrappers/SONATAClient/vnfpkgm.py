@@ -13,14 +13,15 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         self._base_path = 'http://{0}:{1}'
         self._user_endpoint = '{0}'
 
-    def get_vnf_packages(self, token, _filter=None, host=None, port=None):
+    def get_vnf_packages(self, token, offset=None, limit=None, host=None, port=None):
         """ VNF Package Management Interface - VNF packages
 
         /vnf_packages:
             GET - Query VNF packages information
 
         :param token: auth token retrieved by the auth call
-        :param _filter: content query filter 
+        :param offset: offset index while returning
+        :param limit: limit records while returning
         :param host: host url
         :param port: port where the MANO API can be accessed
 
@@ -30,11 +31,13 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         else:
             base_path = self._base_path.format(host, port)
 
-        query_path = ''
-        if _filter:
-            query_path = '?_admin.type='+_filter
+        if not offset:
+            offset = 0
+        if not limit:
+            limit = 10
 
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path,query_path)
+        _endpoint = "{0}/catalogues/api/v2/vnfs?offset={1}&limit={2}".format(base_path, offset, limit)
+
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
 
@@ -156,7 +159,41 @@ class VnfPkgm(CommonInterfaceVnfPkgm):
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
 
-        _endpoint = "{0}/catalogues/api/v2/vnfs{1}".format(base_path, vnfPkgId)
+        _endpoint = "{0}/catalogues/api/v2/vnfs/{1}".format(base_path, vnfPkgId)
+
+        try:
+            r = requests.delete(_endpoint, params=None, verify=False, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+        if r.status_code == requests.codes.no_content:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+		
+    def put_vnf_packages_vnfpkgid(self, token, data_path, vnfPkgId, host=None, port=None):
+        """ VNF Package Management Interface - 
+        Individual VNF package
+
+        /vnf_packages/{vnfPkgId}:
+            PUT - Update an individual VNF package
+
+        :param token: auth token retrieved by the auth call
+        :param vnfPkgId: id of the vnf package to fetch
+        :param host: host url
+        :param port: port where the MANO API can be accessed
+
+        """
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/x-yaml", 'Authorization': 'Bearer {}'.format(token)}
+
+        _endpoint = "{0}/catalogues/api/v2/vnfs/{1}".format(base_path, vnfPkgId)
 
         try:
             r = requests.delete(_endpoint, params=None, verify=False, headers=headers)

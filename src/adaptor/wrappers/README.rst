@@ -7,7 +7,7 @@ unify the REST API of various MANOs by enforcing the ETSI SOL005 standard
 on API calls. This project is developed as part of the project group SCrAMbLE
 at the University of Paderborn for the 5G-PICTURE project.  
 
-Documentation is available here - `ReadtheDocs <https://python-mano-wrappers.readthedocs.io/en/latest/>`_.
+Documentation is available here - `ReadtheDocs <https://python-mano-wrappers.readthedocs.io/en/adaptor/>`_.
 
 **Example usage:**
 
@@ -19,7 +19,7 @@ Documentation is available here - `ReadtheDocs <https://python-mano-wrappers.rea
     password = "admin"
     mano = "osm"
     # mano = "sonata"
-    host = "vm-hadik3r-05.cs.uni-paderborn.de"
+    host = "manosonatademo.com"
 
     if mano == "osm":
         _client = wrappers.OSMClient.Auth(host)
