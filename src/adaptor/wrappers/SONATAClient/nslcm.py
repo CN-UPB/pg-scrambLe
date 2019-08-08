@@ -184,7 +184,6 @@ class Nslcm(CommonInterfaceNslcm):
             limit = 10
 
         _endpoint = "{0}/records/vnfr/vnf-instances?offset={1}&limit={2}".format(base_path, offset, limit)
-
         try:
             r = requests.get(_endpoint, params=None, verify=False, 
                                 headers=headers)

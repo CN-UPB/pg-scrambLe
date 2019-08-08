@@ -170,4 +170,3 @@ def post_cs_instances_nsinstanceid_instantiate_keys():
 @fixture	
 def post_cs_instances_nsinstanceid_terminate_keys():
     return ['']
-    
