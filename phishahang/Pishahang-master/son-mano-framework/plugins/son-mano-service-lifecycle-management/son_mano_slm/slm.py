@@ -3139,7 +3139,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                                                  password = password_osm))
                 _token = json.loads(token["data"])
                 
-                osm_admin = wrappers.OSMClient.Admin(host)
+                osm_admin = wrappers.OSMClient.Admin(host_osm)
                 osm_nsd_client = wrappers.OSMClient.Nsd(host_osm)
                 osm_nslcm = wrappers.OSMClient.Nslcm(host_osm) 
                 osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host_osm)
@@ -3172,7 +3172,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 _vim_list = json.loads(osm_admin.get_vim_list(token=_token["id"]))
                 _vim_list = json.loads(_vim_list['data'])
-                _vim_ids = [vim['_id'] for vim in response 
+                _vim_ids = [vim['_id'] for vim in _vim_list 
                                         if (vim['_admin']['operationalState'] == 'ENABLED' 
                                             and vim['_admin']['detailed-status'] == 'Done')]
                 VIMACCOUNTID = _vim_ids[0]
@@ -3249,7 +3249,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             # remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
             NSD = main_pish_nsd
             functions = function_pish
-            LOG.info('NSD for the parent MNAO'+str(NSD) )
+            LOG.info('NSD for the parent MANO'+str(NSD) )
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
