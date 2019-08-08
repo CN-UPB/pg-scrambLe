@@ -2,6 +2,6 @@
 
  angular.module('config', [])
 
-.constant('ENV', {name:'development',apiEndpoint:['http://localhost:1338/mock'],userManagementEnabled:[null],licenseManagementEnabled:[null]})
+.constant('ENV', {name:'integration',apiEndpoint:['http://192.168.122.223/api/v2'],userManagementEnabled:[true],licenseManagementEnabled:[true]})
 
 ;

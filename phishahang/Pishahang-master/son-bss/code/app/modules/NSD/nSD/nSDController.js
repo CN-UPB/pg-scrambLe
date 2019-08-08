@@ -36,6 +36,25 @@
   $scope.limit = 10;
   $scope.ingresses = [{}];
   $scope.egresses = [{}];
+  $scope.manos = [{'name':'Parent'}, {'name':'MANO1'}, {'name':'MANO2'}];
+
+  var selectedmanos = {
+    Parent: true
+  };
+  
+  $scope.formData = {
+    selectedmanos: selectedmanos
+  };
+
+  var calculateSomeSelected = function() {
+    $scope.someSelected = Object.keys(selectedmanos).some(function (key) {
+      return selectedmanos[key];
+    });
+  };
+
+  $scope.checkboxChanged = calculateSomeSelected;
+  
+  calculateSomeSelected();
 
   // retrieve NSD to server
   $scope.retrieveNSDs = (function(offset) {    
@@ -101,7 +120,7 @@
 
 
  $scope.instantiateNSD = function() {
-   //console.log("$scope.currentNSD.uuid: "+$scope.currentNSD.uuid);
+  //  console.log("$scope.currentNSD.uuid: "+$scope.currentNSD.uuid);
    NSDServices.instantiateNSD($scope.currentNSD.uuid, $scope.ingresses, $scope.egresses, ENV)
    .then(function(result) {
      $('#instantiateNSD.modal').modal('hide');	 
@@ -115,6 +134,22 @@
    $scope.cleanInstantiationIngressEgress();
 
  }
+
+ $scope.instantiateScramble = function() {
+  console.log("MANOS"+ $scope.formData.selectedmanos);
+  NSDServices.instantiateScramble($scope.currentNSD.uuid, $scope.ingresses, $scope.egresses, ENV, $scope.formData.selectedmanos)
+  .then(function(result) {
+    $('#instantiateNSD.modal').modal('hide');	 
+    $scope.instantiateRequest = result.data;
+    $('#instantiateRequest.modal').modal('show');    
+  }, function(error) {
+    $scope.error = angular.copy(JSON.stringify(error.data.message));
+    $('#error.modal').modal('show');   
+  })
+
+  $scope.cleanInstantiationIngressEgress();
+
+}
 
  $scope.emptyNSD = function() {
    $scope.currentNSD = {};

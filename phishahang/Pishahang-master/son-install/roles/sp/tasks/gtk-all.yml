@@ -14,5 +14,4 @@
 - include: gtk/usr.yml
 - include: gtk/rlt.yml
 - include: gtk/api.yml
-- include: gtk/mano.yml
 

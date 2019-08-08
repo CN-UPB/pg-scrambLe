@@ -1,4 +1,4 @@
-import OsmSchema
+import OSM.OsmSchema
 
 class osm_splitter():
 

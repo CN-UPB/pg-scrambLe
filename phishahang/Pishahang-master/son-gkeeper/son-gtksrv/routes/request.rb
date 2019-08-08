@@ -132,7 +132,10 @@ class GtkSrv < Sinatra::Base
       start_request['user_data'] = user_data
 
       if params['scramble'] == true
-        start_request['scramble'] = true        
+        logger.debug(log_msg) {"SScramble"}
+        start_request['scramble'] = true 
+        start_request['selectedmanos'] = params['selectedmanos'] 
+               
       end
 
       start_request_yml = YAML.dump(start_request.deep_stringify_keys)

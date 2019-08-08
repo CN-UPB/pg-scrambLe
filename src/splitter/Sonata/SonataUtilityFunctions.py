@@ -1,4 +1,4 @@
-import SonataSchema
+import Sonata.SonataSchema as SonataSchema
 
 
 class Utility:

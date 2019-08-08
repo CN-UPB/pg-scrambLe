@@ -28,13 +28,15 @@ ENV PLUGIN_BASE son-mano-scaling
 ENV broker_host amqp://guest:guest@son-broker:5672/%2F
 ENV broker_exchange son-kernel
 
+# FIXME: Someother way to change this
+ENV PARENT_IP vm-hadik3r-08.cs.uni-paderborn.de
+ENV DUMMY_INSTANCE_IP sonatamano.cs.upb.de
+
 # add generic project files
 ADD son-mano-base /son-mano-base
 
 # add plugin related files
 ADD plugins/${PLUGIN_BASE} /plugins/${PLUGIN_BASE}
-
-
 
 # install son-mano-base to be able to use the plugin base class etc.
 WORKDIR /son-mano-base

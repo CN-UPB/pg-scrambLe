@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div>
-                    <h2 class="modal-title kpiCustomHeading">Instantiate {{currentNSD.nsd.name}} Network Service</h2>
+                    <h2 class="modal-title kpiCustomHeading">Instantiate {{currentNSD.nsd.name}} Network Service</h2>                    
                 </div>
             </div>            
             <div class="modal-body">
@@ -46,6 +46,17 @@
                             </fieldset>                                                                           
                         </div>
                         <div class="col-md-4">
+    
+                            <h3>Select MANOs</h3>
+                                    <form class="Scroller-Container" name="multipleCheckbox" novalidate="">
+                                      <div ng-repeat="mano in manos">
+                                        <input type="checkbox" ng-model="formData.selectedmanos[mano.name]" ng-change="checkboxChanged()" ng-required="!someSelected" /> {{mano.name}}
+                                      </div>
+                                      <p style="color: red;" ng-show="multipleCheckbox.$error.required">You must choose one mano</p>
+                                    </form>
+                                    <!-- <pre>manos model:
+                              {{formData.selectedmanos | json}}</pre> -->
+
                         </div>                                        
                         <div class="col-md-4">                         
                             <fieldset  data-ng-repeat="egress in egresses">

@@ -12,7 +12,6 @@ services:
      - SERVICE_MANAGEMENT_URL=http://son-gtksrv:5300 # OK
      - FUNCTION_MANAGEMENT_URL=http://son-gtkfnct:5500 # OK
      - VIM_MANAGEMENT_URL=http://son-gtkvim:5700 # OK
-     - MANO_MANAGEMENT_URL=http://son-gtkmano:8001 # OK
      - RECORD_MANAGEMENT_URL=http://son-gtkrec:5800 # OK
      - KPI_MANAGEMENT_URL=http://son-gtkkpi:5400 # OK
      - LICENCE_MANAGEMENT_URL=http://son-gtklic:5900 # 6000?
@@ -101,25 +100,6 @@ services:
       driver: gelf
       options:
         gelf-address: "udp://logs.sonata-nfv.eu:12900"
-
-  son-gtkmano:
-    build:
-      context: son-gtkmano
-    links:
-     - broker
-     - postgres
-    ports:
-      - "8001"
-    restart: always
-    environment:
-     - POSTGRES_PASSWORD=sonata
-     - POSTGRES_USER=sonatatest
-     - RACK_ENV=integration
-     - DATABASE_HOST=postgres
-     - DATABASE_PORT=5432
-     - MQSERVER=amqp://guest:guest@broker:5672
-    depends_on:
-     - postgres
 
   son-gtkrec:
     image: registry.sonata-nfv.eu:5000/son-gtkrec

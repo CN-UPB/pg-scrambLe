@@ -46,11 +46,6 @@
       name: son-gtkvim
       state: started
 
-  - name: GATEKEEPER MANO - starting
-    docker_container:
-      name: son-gtkmano
-      state: started
-
   - name: GATEKEEPER API - starting
     docker_container:
       name: son-gtkapi

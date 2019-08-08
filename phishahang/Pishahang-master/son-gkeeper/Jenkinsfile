@@ -91,15 +91,6 @@ pipeline {
             
           }
         }
-	 stage('son-gtkmano') {
-          steps {
-            dir(path: 'tests/integration/build') {
-              sh './gtkmano.sh'
-            }
-            
-          }
-        }
-
         stage('son-sec-gw') {
           steps {
             dir(path: 'tests/integration/build') {
