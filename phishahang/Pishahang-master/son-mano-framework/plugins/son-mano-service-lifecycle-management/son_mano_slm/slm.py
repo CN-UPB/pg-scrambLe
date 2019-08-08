@@ -2856,7 +2856,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         list_vnf_id = []
         list_vnf_nm = []
-		
+        
         for keyss in network_functions.keys():
             if keyss == 'network_functions':
                 network_functions_data = network_functions[keyss]
@@ -2884,15 +2884,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         if mano_len == 1:
             
-<<<<<<< HEAD
-            vnf_set1 = vnf_ids                                     # storing the vnf-ids
-            vnf_nm_set1 = vnf_nm                                   # storing the vnf-names          
-            mano_set1 = [mano[0]]                                  # storing the only MANO
-=======
             vnf_set1 = vnf_ids                                     # storing the only single vnf-id
             vnf_nm_set1 = vnf_nm                                   # storing the only single vnf-name               
             mano_set1 = [mano[0]]                                  # storing the MANO
->>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
             
             return [[vnf_set1, vnf_nm_set1, mano_set1]]
             
@@ -2917,13 +2911,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
                 
-<<<<<<< HEAD
-                vnf_set1 = vnf_ids                                 # storing the single vnf-id
-                vnf_nm_set1 = vnf_nm                               # storing the single vnf-name               
-=======
                 vnf_set1 = vnf_ids                                 # storing the only single vnf-id
                 vnf_nm_set1 = vnf_nm                               # storing the only single vnf-name               
->>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
                 mano_set1 = [mano[rand_int_mano[0]]]               # storing the MANO
                 
                 return [[vnf_set1,vnf_nm_set1,mano_set1 ]]
@@ -3149,7 +3138,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 token = json.loads(osm_auth.auth(username = username_osm, 
                                                  password = password_osm))
                 _token = json.loads(token["data"])
-
+                
+                osm_admin = wrappers.OSMClient.Admin(host)
                 osm_nsd_client = wrappers.OSMClient.Nsd(host_osm)
                 osm_nslcm = wrappers.OSMClient.Nslcm(host_osm) 
                 osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host_osm)
@@ -3179,7 +3169,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
                 NSDESCRIPTION = 'SCRAMBLE' 
                 NSNAME = _nsd
-                VIMACCOUNTID = 'fad92665-14d1-4047-baeb-052b595d6b63'# TODO : how to get this ??
+                
+                _vim_list = json.loads(osm_admin.get_vim_list(token=_token["id"]))
+                _vim_list = json.loads(_vim_list['data'])
+                _vim_ids = [vim['_id'] for vim in response 
+                                        if (vim['_admin']['operationalState'] == 'ENABLED' 
+                                            and vim['_admin']['detailed-status'] == 'Done')]
+                VIMACCOUNTID = _vim_ids[0]
                 
                 response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
                                     nsDescription=NSDESCRIPTION, 
@@ -3253,7 +3249,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             # remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
             NSD = main_pish_nsd
             functions = function_pish
-            LOG.info('NSD for the parent MNAO'+str(NSD)	)
+            LOG.info('NSD for the parent MNAO'+str(NSD) )
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
