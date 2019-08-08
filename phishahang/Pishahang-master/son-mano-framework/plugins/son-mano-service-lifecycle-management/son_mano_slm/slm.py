@@ -2851,11 +2851,12 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
     def get_network_functions(self,network_functions):
         '''
-            extract the list of function ids.
+            extract the list of function ids and names.
         '''
 
         list_vnf_id = []
         list_vnf_nm = []
+		
         for keyss in network_functions.keys():
             if keyss == 'network_functions':
                 network_functions_data = network_functions[keyss]
@@ -2883,9 +2884,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         if mano_len == 1:
             
+<<<<<<< HEAD
+            vnf_set1 = vnf_ids                                     # storing the vnf-ids
+            vnf_nm_set1 = vnf_nm                                   # storing the vnf-names          
+            mano_set1 = [mano[0]]                                  # storing the only MANO
+=======
             vnf_set1 = vnf_ids                                     # storing the only single vnf-id
             vnf_nm_set1 = vnf_nm                                   # storing the only single vnf-name               
             mano_set1 = [mano[0]]                                  # storing the MANO
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
             
             return [[vnf_set1, vnf_nm_set1, mano_set1]]
             
@@ -2910,8 +2917,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
                 
+<<<<<<< HEAD
+                vnf_set1 = vnf_ids                                 # storing the single vnf-id
+                vnf_nm_set1 = vnf_nm                               # storing the single vnf-name               
+=======
                 vnf_set1 = vnf_ids                                 # storing the only single vnf-id
                 vnf_nm_set1 = vnf_nm                               # storing the only single vnf-name               
+>>>>>>> aabad36ebd6a1f17731977ee4588392e1664ba70
                 mano_set1 = [mano[rand_int_mano[0]]]               # storing the MANO
                 
                 return [[vnf_set1,vnf_nm_set1,mano_set1 ]]
@@ -3004,7 +3016,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             function_list = self.get_network_functions(descriptor)
             rndm_sets = self.random_combination(function_list, mano_list)
             
-            if(len(rndm_sets) != 1):
+            if(len(rndm_sets) > 1): # if there are more than 1 MANOs, SCRAMBLE-splitter is called to split the NSD
                 vnfid_set = [rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
                                 
                 LOG.info("\nvnf splits : "+str(rndm_sets)+"\n")
@@ -3029,7 +3041,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             # logic to check which vnf is to be send to which MANO
             
             function_pish =[] # list to store vnfs for MAIN_PISHAHANG
-            function_pish2 =[] # list to store vnfs for PISHAHANG2
+            function_pish2 =[] # list to store vnfs for other PISHAHANG
             function_osm = [] # list to store vnfs for OSM
             main_pish_nsd = '' 
             
@@ -3241,7 +3253,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             # remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
             NSD = main_pish_nsd
             functions = function_pish
-            LOG.info(NSD)
+            LOG.info('NSD for the parent MNAO'+str(NSD)	)
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
