@@ -2985,7 +2985,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             elif key == 'MANO1' and val == True:
                 mano_list.append('PISHAHANG')
             elif key == 'MANO2' and val == True:
-                mano.list.append('OSM')
+                mano_list.append('OSM')
                 
         
         if 'nsd' in self.services[serv_id]['service']:

@@ -24,7 +24,7 @@ sudo docker stop son-bss
 sudo docker rm son-bss
 sudo docker build -t son-bss -f Dockerfile .
 
-sudo docker run -d --name son-bss --net=son-sp --network-alias=son-bss -p 25001:1337 -p 25002:1338 -v $(pwd)/code/app/modules:/usr/local/bss/code/app/modules son-bss grunt serve:integration --gkApiUrl=http://131.234.29.102/api/v2 --hostname=0.0.0.0 --userManagementEnabled=true --licenseManagementEnabled=true --debug
+sudo docker run -d --name son-bss --net=son-sp --network-alias=son-bss -p 25001:1337 -p 25002:1338 -v $(pwd)/code/app/modules:/usr/local/bss/code/app/modules son-bss grunt serve:integration --gkApiUrl=http://$1/api/v2 --hostname=0.0.0.0 --userManagementEnabled=true --licenseManagementEnabled=true --debug
 
 echo "##############################################"
 echo "##############################################"
@@ -36,7 +36,7 @@ echo "Starting Scramble SLM.."
 
 sudo docker stop servicelifecyclemanagement
 sudo docker rm servicelifecyclemanagement
-sudo docker build -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile-dev .
+sudo docker build --build-arg HOST=$1 --build-arg HOST_PISHAHANG=$2 --build-arg HOST_OSM=$3 -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile-dev .
 sudo docker run -d --name servicelifecyclemanagement --net=son-sp --network-alias=servicelifecyclemanagement -v $(pwd)/plugins/son-mano-service-lifecycle-management:/plugins/son-mano-service-lifecycle-management servicelifecyclemanagement 
 
 

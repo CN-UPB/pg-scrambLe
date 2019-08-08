@@ -24,7 +24,7 @@ monitoring_rules:
   - name: notification01
     type: rabbitmq_message
 name: vtc-vnf
-uuid: e52fdad4-23f1-4116-90ac-4a9d0b67ecb4
+uuid: 0078d7eb-c68f-4bb5-a84d-2e52dc24649b
 vendor: eu.sonata-nfv
 version: '0.1'
 virtual_deployment_units:
