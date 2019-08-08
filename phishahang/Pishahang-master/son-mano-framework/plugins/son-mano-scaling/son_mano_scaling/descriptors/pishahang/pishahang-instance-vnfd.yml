@@ -1,0 +1,27 @@
+---
+descriptor_version: vnfd-schema-01
+description: Pishahang Instance
+name: pishahang-instance
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+- id: pishahang-instance
+  description: Pishahang Instance
+  vm_image: "pishahang-instance"
+  vm_image_format: qcow2
+  resource_requirements:
+    cpu:
+      vcpus: 2
+    memory:
+      size: 1
+      size_unit: GB
+    storage:
+      size: 1
+      size_unit: GB
+  connection_points:
+  - id: eth0
+    interface: ipv4
+    type: external
+
+# Image name on openstack should be "pg-scramble_pishahang-instance_1.0_pishahang-instance"

@@ -1,0 +1,27 @@
+---
+descriptor_version: vnfd-schema-01
+description: A basic VNF descriptor with load generator and one VDU
+name: stress-image
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+- id: stress-image
+  description: stress-image
+  vm_image: "stress-image"
+  vm_image_format: qcow2
+  resource_requirements:
+    cpu:
+      vcpus: 1
+    memory:
+      size: 512
+      size_unit: MB
+    storage:
+      size: 5
+      size_unit: GB
+  connection_points:
+  - id: eth0
+    interface: ipv4
+    type: internal
+
+# Image name on openstack should be "pg-scramble_stress-image_1.0_stress-image"

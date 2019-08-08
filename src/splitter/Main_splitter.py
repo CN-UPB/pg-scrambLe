@@ -1,49 +1,27 @@
-import pymongo
-from pprint import pprint
-#import SonataUtilityFunctions as sonataUtilityFunctions
-from SonataUtilityFunctions import utility
+from Sonata.SonataUtilityFunctions import Utility
 from nameko.rpc import rpc
-#import SonataSplitter as splitter
-from SonataSplitter import splitter
-#import OsmSplitter as osmSplitter
-from OsmSplitter import osm_splitter
-#import OSMUtilityFunctions as OSM_utility
-from OSMUtilityFunctions import osm_utility
-import requests
-from Fetchfile import Fetchfile
-
-reference_osm = "5c8869f4c957a9e5caf98629"    #Example reference id
-reference_sonata = "5c833a400594c7824aba2714"
-
-
-#def main():
+from Sonata.SonataSplitter import splitter
 
 class SplitterService:
     name = "splitter_service"
 
     @rpc
-    def hello(self, param_list):
-        #descriptor = requests.values.get('descriptor')
+    def split(self, param_list):
 
-        #To fetch OSM file and to call osm splitter
+        try:
+            '''To fetch Sonata file and to call sonata splitter'''
+            # fetches the set of VNFs to split.
+            vnf_sets = param_list['sets']
+            # fetches the descriptor
+            received_file_sonata = param_list["descriptor"]
 
-        #received_file_osm = param_list["descriptor"]#Fetchfile(descriptor, "source_nsd") #we dont need parameters while fetching file
-        #osmUtilityFunctions = osm_utility()
-        #osmUtilityFunctions.get_osm_nsd(received_file_osm)
-        #osmSplitter = osm_splitter(osmUtilityFunctions)
-        #nsds_all = osmSplitter.split_osm()
-        #return str(nsds_all)
-
-
-        #To fetch Sonata file and to call sonata splitter
-        vnf_sets = param_list['sets']
-        received_file_sonata = param_list["descriptor"]#Fetchfile(descriptor, "source_nsd")
-        sonataUtilityFunctions = utility()
-        sonataUtilityFunctions.get_data_sonata(received_file_sonata)
-        sonSplitter = splitter(vnf_sets,sonataUtilityFunctions )
-        nsds_all = sonSplitter.split_sonata()
-        return nsds_all #"Success"
-
- 
-#if __name__ == '__main__':
-#    main()
+            # Pulls out information from the received sonata NSD file and stores it in variables.
+            sonataUtilityFunctions = Utility(received_file_sonata)
+            sonSplitter = splitter(vnf_sets, sonataUtilityFunctions)
+            # Splits the NSD in parts as per the VNF set and returns it to the plugin.
+            nsds_all = sonSplitter.split_sonata()
+            return nsds_all
+        except LookupError:
+            print("No descriptor/ sets found.")
+        except:
+            print("Unknown Error!")

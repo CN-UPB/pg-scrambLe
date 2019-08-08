@@ -1,6 +1,4 @@
-import yaml
 import pymongo
-from pprint import pprint
 from bson.objectid import ObjectId
 
 def Fetchfile(ref, param):

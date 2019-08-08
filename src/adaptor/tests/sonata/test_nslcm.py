@@ -6,6 +6,21 @@ import json
 import time
 from .helpers import Helpers
 
+def test_get_ns_instances_request_status(get_ns_instances_request_status_keys):
+    """Tests API call query multiple NS instances"""
+    sonata_nslcm = SONATAClient.Nslcm(HOST_URL)
+    sonata_auth = SONATAClient.Auth(HOST_URL)
+    _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+    _token = json.loads(_token["data"])
+    response = json.loads(sonata_nslcm.get_ns_instances_request_status(
+                            token=_token["token"]["access_token"],
+                            nsInstanceId="3f2a59c5-b1d2-4a56-a6ad-21f7a402bc77",
+                            limit=1000))
+    response = json.loads(response["data"])
+    print(len(response))
+    print(response)
+    # print(response[0].keys())
+    assert isinstance(response, list) or isinstance(response, dict)
 
 def test_get_ns_instances(get_ns_instances_keys):
     """Tests API call query multiple NS instances"""
@@ -14,9 +29,10 @@ def test_get_ns_instances(get_ns_instances_keys):
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     response = json.loads(sonata_nslcm.get_ns_instances(
-                            token=_token["token"]["access_token"]))
+                            token=_token["token"]["access_token"], limit=1000))
     response = json.loads(response["data"])
-
+    print(len(response))
+    print(response)
     assert isinstance(response, list)
     if len(response) > 0:
          assert set(get_ns_instances_keys).issubset(
@@ -63,7 +79,8 @@ def test_get_vnf_instances(get_vnf_instances_keys):
     _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
     _token = json.loads(_token["data"])
     response = json.loads(sonata_nslcm.get_vnf_instances(
-                            token=_token["token"]["access_token"]))
+                            token=_token["token"]["access_token"], limit=1000))
+
     response = json.loads(response["data"])
 
     assert isinstance(response, list)

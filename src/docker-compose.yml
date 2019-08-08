@@ -4,13 +4,13 @@ services:
   rabbit:
     image: rabbitmq:3.6-management
     ports:
-        - "15672:15672"
+        - "15674:15672"
         
   mongo:
     image: mongo
     command: --smallfiles
     ports:
-        - "27017:27017"
+        - "27019:27017"
     # volumes:
         # - type: "volume"
           # source: "mongodb_data_volume"
@@ -45,7 +45,7 @@ services:
     depends_on:
       - rabbit
     ports:
-        - "8001:8000"
+        - "8004:8000"
     environment:
         RABBIT_PASSWORD: "guest"
         RABBIT_USER: "guest"
@@ -69,7 +69,7 @@ services:
     depends_on:
       - rabbit
     ports:
-        - "8000:8000"
+        - "8003:8000"
     environment:
         RABBIT_PASSWORD: "guest"
         RABBIT_USER: "guest"

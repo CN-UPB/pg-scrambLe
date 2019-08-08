@@ -112,6 +112,27 @@ class Admin():
         result['data'] = r.text
         return json.dumps(result)
 
+    def get_vims_requestId(self, token, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/vims/{1}".format(base_path, id)
+        
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
     def get_instantions_requests(self, token, host=None, port=None):
         if host is None:
             base_path = self._base_path.format(self._host, self._port)
@@ -175,9 +196,9 @@ class Admin():
 
     def get_functions_functionId(self, token, id, host=None, port=None):
         if host is None:
-            base_path = "http://{0}".format(self._host, self._port)
+            base_path = self._base_path.format(self._host, self._port)
         else:
-            base_path = "http://{0}".format(host, port)
+            base_path = self._base_path.format(host, port)
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
         _endpoint = "{0}/functions/{1}".format(base_path, id)
@@ -202,6 +223,7 @@ class Admin():
         result = {'error': True, 'data': ''}
         headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
         _endpoint = "{0}/packages".format(base_path)
+        
         try:
             r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
@@ -213,3 +235,87 @@ class Admin():
 
         result['data'] = r.text
         return json.dumps(result)
+
+    def get_services(self, token, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/services".format(base_path)
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+    def get_services_serviceId(self, token, id, host=None, port=None):
+        if host is None:
+            base_path = self._base_path.format(self._host, self._port)
+        else:
+            base_path = self._base_path.format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/services/{1}".format(base_path, id)
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+		
+    def get_ns_records(self, token, host=None, port=None):
+        if host is None:
+            base_path = "http://{0}:{1}".format(self._host, self._port)
+        else:
+            base_path = "http://{0}:{1}".format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/nsr".format(base_path)
+        
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+    def get_services_records(self, token, host=None, port=None):
+        if host is None:
+            base_path = "http://{0}:{1}".format(self._host, self._port)
+        else:
+            base_path = "http://{0}:{1}".format(host, port)
+        result = {'error': True, 'data': ''}
+        headers = {"Content-Type": "application/json", 'Authorization': 'Bearer {}'.format(token)}
+        _endpoint = "{0}/records/services".format(base_path)
+        
+        try:
+            r = requests.get(_endpoint, params=None, verify=False, stream=True, headers=headers)
+        except Exception as e:
+            result['data'] = str(e)
+            return result
+
+        if r.status_code == requests.codes.ok:
+            result['error'] = False
+
+        result['data'] = r.text
+        return json.dumps(result)
+
+    

@@ -32,7 +32,7 @@ Example usage
     password = "admin"
     mano = "osm"
     # mano = "sonata"
-    host = "vm-hadik3r-05.cs.uni-paderborn.de"
+    host = "osmmanodemo.com"
 
     if mano == "osm":
         _client = wrappers.OSMClient.Auth(host)

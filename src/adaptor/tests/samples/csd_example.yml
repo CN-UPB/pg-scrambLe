@@ -1,0 +1,21 @@
+---
+descriptor_version: "2.0"
+vendor: "eu.sonata-nfv.cloud-service-descriptor"
+name: "scramble-csd"
+version: "0.2"
+author: "T3-Scramble"
+description: "Deploy a cirros docker image"
+virtual_deployment_units:
+- id: "scramble-csd-1"
+  name: "scramble-csd"
+  service_image: "cirros"
+  service_type: "LoadBalancer"
+  service_ports:
+  - name: "ssh"
+    protocol: "TCP"
+    port: 22
+    target_port: 22
+  resource_requirements:
+    memory:
+      size: 128
+      size_unit: "Mi"

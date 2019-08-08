@@ -16,50 +16,45 @@ class setup():
         self.db_descriptors = self.client.descriptors
         self.db_mappings = self.client.mapping
 
-    def get_source_descriptor(self,received_ref):
-
-        cursor = self.db_descriptors.list_collection_names()
-        for ref in cursor:
-            doc = self.db_descriptors.get_collection(ref)
-            recieved_file = [ns for ns in doc.find({'_id': ObjectId(received_ref)})]
-            if len(recieved_file)>0:
-                break
-        recieved_file[0].pop('_id')
-        return recieved_file[0]
-
-    ### @Suheel
     def translate_to_osm_vnfd(self,received_file):
         '''
-        reads a pandas.DataFrame
+        reads a dictionary and is converted to a DataFrame with columns containing :
+        enumerated 'parent level', enumerated 'level', 'parent key', 'key', 
+        'value' and complete 'lineage'. 
+        Since the input dict contains further nested dict as well, storing 
+        the level information and the complete lineage helps in selecting out 
+        particular key-value pair and transforming it for osm to sonata values
+        and vice-versa.
         
         Params
         ------
-        ds : pandas.DataFrame
-            dataframe containing the full set of sonata vnf descriptor
-       
+        received_file : dict
+            dictionary containing the full set of sonata vnf descriptor
+        
         Returns
         -------
-        dictionary
-            returns a translated osm dictionary
+        message : dict
+            returns a translated osm vnf descriptor dictionary
             
         '''                
         
-        doc = self.db_descriptors["translated_vnfd"]
-        record = self.db_mappings.vnfd_mapping
-
         sonata = received_file
 
+        ### reading a dict/ json content into a pandas dataframe
         reader = read_dict()
-
         sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, '0|preroot|0'), 
                                           columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
         sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
         sonata_dataset.fillna('NULL', inplace=True)
 
+        
+        ### retrieving the vnfd mappings from DB
+        record = self.db_mappings.vnfd_mapping
         res = record.find()
 
         t = [i for i in res]
-
+        
+        ### if the mapping is not found then insert them
         if(len(t) ==0):
             insert = insert_into_db(self.client)
             insert.insert_vnfd_mapping()
@@ -69,13 +64,15 @@ class setup():
 
         transformation_obj= transformation()
 
-        mapping_vnfd = pd.DataFrame.from_dict(t[0])
-        osm_son_vl = pd.DataFrame.from_dict(t[1])
-        osm_son_cp = pd.DataFrame.from_dict(t[2])
-        osm_son_vdu = pd.DataFrame.from_dict(t[3])
-        osm_son_vdu_ext = pd.DataFrame.from_dict(t[4])
+        mapping_vnfd = pd.DataFrame.from_dict(t[0]) ## mapping for only the 1st level keys 
+        osm_son_vl = pd.DataFrame.from_dict(t[1])   ## mapping for only virtual links
+        osm_son_cp = pd.DataFrame.from_dict(t[2])   ## mapping for only connection points
+        osm_son_vdu = pd.DataFrame.from_dict(t[3])  ## mapping for only vdu
+        osm_son_vdu_ext = pd.DataFrame.from_dict(t[4]) ## mapping for only external cps in vdu
 
 
+        ### joining/ merging the 1st level vnfd mapping with the input sonata file to get the corresponding osm values
+        
         dataset = pd.merge(sonata_dataset, mapping_vnfd,
                            left_on=['key', 'parent_key', 'level', 'parent_level'],
                            right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
@@ -94,20 +91,24 @@ class setup():
         ],
              columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
 
-        dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL',axis=1)
+        dataset['lineage'] = dataset.apply(lambda x : x['osm_lineage'] + x['lineage'].split('|')[-1] 
+                                                      if x['lineage'] !='NULL' else 'NULL',axis=1)
         temp = dataset[(dataset['key'] == 'name') & 
-                                (dataset['parent_key'] == 'vnfd')].copy()
+                       (dataset['parent_key'] == 'vnfd')].copy()
         temp['key'] = 'id'
         dataset = dataset.append(temp)
 
-        dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
+        dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],
+                                ascending=[True,True,True,True,True],inplace=True)
         dataset.reset_index(inplace=True,drop=True)
 
 
-
+        ### translating and transforming the sonata connection points to osm
+        
         df_cp = transformation_obj.ret_ds(sonata_dataset, 'connection_points', 2)
         df_cp['level'] = df_cp['level'].astype('int64')
         df_cp['parent_level'] = df_cp['parent_level'].astype('int64')
+        
         df_son_cp = pd.merge(df_cp, osm_son_cp,
                              left_on=['key', 'parent_key', 'level', 'parent_level'],
                              right_on=['son_key', 'son_parent_key', 'son_level', 'son_parent_level'], how='inner')
@@ -132,12 +133,14 @@ class setup():
         
         
         if 'mgmt' in dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist():
+        
             dataset= dataset.append(pd.DataFrame([
                         ['NULL',2, 3, 'vnfd', 'mgmt-interface','NULL','NULL'],
                         ['NULL',3, 4, 'mgmt-interface', 'cp','0|preroot|0|root|0|vnfd:vnfd-catalog|0|vnfd|0','mgmt']],
                           columns = ['osm_lineage','parent_level','level','parent_key','key','lineage','value']))
 
         elif len(dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist()) ==1:
+        
             mgmt_cp=dataset[(dataset['parent_key']=='connection-point') & (dataset['key']=='name')]['value'].tolist()[0]
             dataset= dataset.append(pd.DataFrame([
                         ['NULL',2, 3, 'vnfd', 'mgmt-interface','NULL','NULL'],
@@ -146,14 +149,14 @@ class setup():
         
         
         
-        
+        ### translating and transforming the sonata vdu keys to osm
         df_vdu = transformation_obj.ret_ds(sonata_dataset, 'virtual_deployment_units', 2)
         df_vdu['level'] = df_vdu['level'].astype('int64')
         df_vdu['parent_level'] = df_vdu['parent_level'].astype('int64')
         df_vdu['value'] = df_vdu['value'].astype('object')
 
         if(len(df_vdu[(df_vdu['key']=='id') & ( df_vdu['parent_key'] == 'virtual_deployment_units')]) == 1):
-            
+      
             df_vdu.drop(df_vdu[( df_vdu['parent_key'] == 'connection_points')].index,inplace=True,axis=0)
 
 
@@ -213,8 +216,6 @@ class setup():
         df_son_vdu=df_son_vdu.append(temp)
         df_son_vdu.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
 
-
-
         if 'internal-connection-point' in df_son_vdu['parent_key'].values:
             df_son_vdu.loc[df_son_vdu[(df_son_vdu['key'] == 'type') & 
                                 (df_son_vdu['parent_key'] == 'internal-connection-point')].index,'value'] = df_son_vdu[(df_son_vdu['key'] == 'type') & 
@@ -235,6 +236,7 @@ class setup():
 
         dataset.drop('osm_lineage',inplace=True,axis=1)
 
+        ### translating and transforming the sonata virtual links keys to osm
         df_vl = transformation_obj.ret_ds(sonata_dataset, 'virtual_links', 2)
         df_vl['level'] = df_vl['level'].astype('int64')
         df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
@@ -331,12 +333,11 @@ class setup():
 
             df_son_vl.loc[(df_son_vl['level'] != 5), 'lineage'] = df_son_vl[(df_son_vl['level'] != 5)].apply(
                 lambda x: x['osm_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
-            df_son_vl.loc[(df_son_vl['level'] == 5) & 
-                         (df_son_vl['parent_key'] == 'internal-connection-point'),
-                          'lineage'] = df_son_vl[(df_son_vl['level'] == 5) &
-                                                 (df_son_vl['parent_key'] == 'internal-connection-point')].apply(
-                                               lambda x: ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+ x['lineage'].split('|')[-1]+'|'+x['osm_lineage'].split('|')[-2]+'|'+'0' 
-                                                if x['lineage'] !='NULL' else 'NULL', axis=1)
+            df_son_vl.loc[(df_son_vl['level'] == 5) & (df_son_vl['parent_key'] == 'internal-connection-point'),
+                          'lineage'] = df_son_vl[(df_son_vl['level'] == 5) & (df_son_vl['parent_key'] == 'internal-connection-point')].apply(
+                                               lambda x: ('|').join(x['osm_lineage'].split('|')[:-3])+'|'+ 
+                                                         x['lineage'].split('|')[-1]+'|'+x['osm_lineage'].split('|')[-2]+'|'+'0' 
+                                                         if x['lineage'] !='NULL' else 'NULL', axis=1)
 
 
             df_son_vl= transformation_obj.son_vld_vnfd(df_son_vl)
@@ -344,46 +345,50 @@ class setup():
                                   ascending=[True,True,True,True,True],inplace=True)
             df_son_vl.loc[df_son_vl[(df_son_vl['key'] == 'type') & 
                                     (df_son_vl['parent_key'] == 'internal-vld')].index,'value'] = df_son_vl[(df_son_vl['key'] == 'type') & 
-                                                                                                            (df_son_vl['parent_key'] == 'internal-vld')].apply(lambda x : 'ELAN' if x.value == 'E-LAN' else ( 'ELINE' if x.value == 'E-Line' else 'ELAN'),axis=1 )
+                                    (df_son_vl['parent_key'] == 'internal-vld')].apply(lambda x : 'ELAN' if x.value == 'E-LAN' 
+                                                                                        else ( 'ELINE' if x.value == 'E-Line' else 'ELAN'),axis=1 )
             dataset = dataset.append(df_son_vl)
 
         dataset.drop(dataset[(dataset['lineage']=='NULL')&(dataset['value']!='NULL')].index,axis=0,inplace=True)
         dataset.loc[(dataset['parent_key'] == 'interface') & 
                     ( dataset['key'] == 'position'),'value'] = dataset[(dataset['parent_key'] == 'interface') & 
-                                                                                                                ( dataset['key'] == 'position')]['value'].astype('int64')
+                      ( dataset['key'] == 'position')]['value'].astype('int64')
         dataset.reset_index(inplace=True,drop=True)
-        #dataset.drop('osm_lineage',axis=1,inplace=True)
-
+        
         writer = write_dict()
         message = writer.translate(dataset)
 
         if 'root' in message:
             message = message['root']
-        #temp = doc.insert_one(message).inserted_id
-        #translated_ref = str(temp)
 
-        return message#translated_ref
+        return message
 
-    ### @Arka
     def translate_to_osm_nsd(self,received_file):
         '''
-        reads a pandas.DataFrame
+        reads a dictionary and is converted to a DataFrame with columns containing :
+        enumerated 'parent level', enumerated 'level', 'parent key', 'key', 
+        'value' and complete 'lineage'. 
+        Since the input dict contains further nested dict as well, storing 
+        the level information and the complete lineage helps in selecting out 
+        particular key-value pair and transforming it for osm to sonata values
+        and vice-versa.
         
         Params
         ------
-        ds : pandas.DataFrame
-            dataframe containing the full set of sonata ns descriptor
+        received_file : dict
+            dictionary containing the full set of sonata ns descriptor
        
         Returns
         -------
-        dictionary
-            returns a translated osm dictionary
+        message : dict
+            returns a translated osm ns descriptor dictionary
             
         '''
-        doc = self.db_descriptors["translated_nsd"]
-        record = self.db_mappings.nsd_mapping
-        sonata = received_file
 
+        
+        sonata = received_file
+        
+        ### reading a dict/ json content into a pandas dataframe
         reader = read_dict()
 
         sonata_dataset = pd.DataFrame(reader.dict_parser(sonata, 'root', 1, '0|preroot|0'), 
@@ -391,10 +396,13 @@ class setup():
         sonata_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
         sonata_dataset.fillna('NULL', inplace=True)
 
+        ### if the mapping is not found then insert them
+        record = self.db_mappings.nsd_mapping
         res = record.find()
 
         t = [i for i in res]
 
+        ### if the mapping is not found then insert them
         if(len(t) ==0):
             insert = insert_into_db(self.client)
             insert.insert_nsd_mapping()
@@ -402,12 +410,14 @@ class setup():
             t = [i for i in res]
 
 
-        transformation_obj= transformation()
+        transformation_obj = transformation()
 
         osm_sonata = pd.DataFrame.from_dict(t[0])
         osm_son_vld = pd.DataFrame.from_dict(t[1])
         osm_son_vnffgd = pd.DataFrame.from_dict(t[2])
-
+        
+        
+        ### joining/ merging the 1st level nsd mapping with the input sonata file to get the corresponding osm values
         dataset=pd.merge(sonata_dataset,osm_sonata,
              left_on=['key','parent_key','level','parent_level'],
              right_on=['son_key','son_parent_key','son_level','son_parent_level'],how='inner')
@@ -438,13 +448,9 @@ class setup():
         temp = dataset[(dataset['key'] == 'name') & 
                        (dataset['parent_key'] == 'nsd')].copy()
         temp['key'] = 'id'
-        dataset= dataset.append(temp)
+        dataset= dataset.append(temp)      
         
-        #temp = dataset[(dataset['key'] == 'name') & 
-        #               (dataset['parent_key'] == 'connection-point')].copy()
-        #temp['key'] = 'id'
-        #dataset= dataset.append(temp)       
-        
+        ### translating and transforming the sonata virtual links to osm
         df = transformation_obj.ret_ds(sonata_dataset,'virtual_links',2)
         vl_list = df[(df['key'] == 'connectivity_type') & ( df['value'] == 'E-Line')]['lineage'].values
 
@@ -468,7 +474,8 @@ class setup():
                 df.loc[df[(df['lineage'] == vl_list[i])].index,'lineage'] = vl_list[i-1]
                 
             df.drop(df[(df['lineage'] == vl_list[-1])].index,inplace=True,axis=0)
-        vl = transformation_obj.son_vld_nsd(df,'value','key',':')
+            
+        vl = transformation_obj.son_vld_nsd(df,':')
         vl['level'] = vl['level'].astype('int64')
         vl['parent_level'] = vl['parent_level'].astype('int64')
 
@@ -506,9 +513,15 @@ class setup():
         df_son_vld = df_son_vld.append(temp)
 
         def lookup_value(value):
-            vnf_lkup = dataset[(dataset['parent_key'] == 'constituent-vnfd')][['lineage','key','value']].pivot(index='lineage',columns='key',values='value').copy()
-            return int(vnf_lkup[vnf_lkup['vnfd-id-ref']==value]['member-vnf-index'].values[0])
-
+            vnf_lkup = dataset[(dataset['parent_key'] == 'constituent-vnfd')
+                              ][['lineage','key','value']].pivot(index='lineage',
+                                                                 columns='key',
+                                                                 values='value').reset_index().copy()
+            
+            mask_vnf_name = vnf_lkup['vnfd-id-ref'] == value
+            values = vnf_lkup.loc[mask_vnf_name,'member-vnf-index'].values[0]
+            
+            return int(values)
         
         df_son_vld.loc[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & 
         (df_son_vld['key'] == 'member-vnf-index-ref'),'value'] =df_son_vld[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & 
@@ -518,9 +531,10 @@ class setup():
         dataset = dataset.append(df_son_vld)
         dataset=dataset.sort_values(by= 'lineage',ascending=True)
         
+        ### translating and transforming the sonata forwarding graphs to osm
         if len(dataset[(dataset['parent_key'] == 'constituent-vnfd') & (dataset['key'] == 'vnfd-id-ref')]) > 1:
             df = transformation_obj.ret_ds(sonata_dataset,'forwarding_graphs',2)
-            fg = transformation_obj.son_fwdg_nsd(df,'value','key',':')
+            fg = transformation_obj.son_fwdg_nsd(df,':')
             fg['level'] = fg['level'].astype('int64')
             fg['parent_level'] = fg['parent_level'].astype('int64')
             df_son_vnffgd = pd.merge(fg,osm_son_vnffgd,
@@ -559,32 +573,33 @@ class setup():
         writer = write_dict()
         message = writer.translate(dataset.sort_values(by='lineage'))
 
-        #temp = doc.insert_one(message).inserted_id
-        #translated_ref = str(temp)
+        return message
 
-        return message#translated_ref
-
-    ### @Arka
     def translate_to_sonata_nsd(self,received_file):
         '''
-        reads a pandas.DataFrame
+        reads a dictionary and is converted to a DataFrame with columns containing :
+        enumerated 'parent level', enumerated 'level', 'parent key', 'key', 
+        'value' and complete 'lineage'. 
+        Since the input dict contains further nested dict as well, storing 
+        the level information and the complete lineage helps in selecting out 
+        particular key-value pair and transforming it for osm to sonata values
+        and vice-versa.
         
         Params
         ------
-        ds : pandas.DataFrame
-            dataframe containing the full set of osm ns descriptor
-       
+        received_file : dict
+            dictionary containing the full set of osm ns descriptor
+        
         Returns
         -------
-        dictionary
-            returns a translated sonata dictionary
+        message : dict
+            returns a translated sonata ns descriptor dictionary
             
-        '''    
-    
-        record = self.db_mappings.nsd_mapping
-        doc = self.db_descriptors["translated_nsd"]
+        '''
 
         osm = received_file
+        
+        ### reading a dict/ json content into a pandas dataframe
         reader = read_dict()
 
         osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, '0|preroot|0'),
@@ -592,10 +607,13 @@ class setup():
 
         osm_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
         osm_dataset.fillna('NULL', inplace=True)
-
+        
+        ### if the mapping is not found then insert them
+        record = self.db_mappings.nsd_mapping
         res = record.find()
         t = [i for i in res]
-
+        
+        ### if the mapping is not found then insert them
         if(len(t) ==0):
             insert = insert_into_db(self.client)
             insert.insert_nsd_mapping()
@@ -649,6 +667,7 @@ class setup():
         dataset=dataset.sort_values(by= ['lineage','parent_key'],ascending=True)
         dataset['value'] = dataset['value'].astype('str')
 
+        ### translating and transforming the osm virtual links to sonata
         df = transformation_obj.ret_ds(osm_dataset,'vld',4)
         df.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,False,True],inplace=True)
         vl = transformation_obj.osm_vld_nsd(df)
@@ -670,6 +689,7 @@ class setup():
 
         dataset=dataset.sort_values(by= ['lineage','parent_key'],ascending=True)
 
+        ### translating and transforming the osm forwarding graphs to sonata
         df = transformation_obj.ret_ds(osm_dataset,'vnffgd',4)
 
         if not df.empty:
@@ -726,31 +746,33 @@ class setup():
         message = writer.translate(dataset.sort_values(by='lineage'))
         message = message['preroot']['root'][0]
 
-        #temp = doc.insert_one(message).inserted_id
-        #translated_ref = str(temp)
+        return message
 
-        return message#translated_ref
-
-    ### @Suheel
     def translate_to_sonata_vnfd(self,received_file):
         '''
-        reads a pandas.DataFrame
+        reads a dictionary and is converted to a DataFrame with columns containing :
+        enumerated 'parent level', enumerated 'level', 'parent key', 'key', 
+        'value' and complete 'lineage'. 
+        Since the input dict contains further nested dict as well, storing 
+        the level information and the complete lineage helps in selecting out 
+        particular key-value pair and transforming it for osm to sonata values
+        and vice-versa.
         
         Params
         ------
-        ds : pandas.DataFrame
-            dataframe containing the full set of osm vnf descriptor
-       
+        received_file : dict
+            dictionary containing the full set of osm vnf descriptor
+        
         Returns
         -------
-        dictionary
-            returns a translated sonata dictionary
+        message : dict
+            returns a translated sonata vnf descriptor dictionary
             
         '''
-        doc = self.db_descriptors["translated_vnfd"]
-        record = self.db_mappings.vnfd_mapping
 
         osm = received_file
+        
+        ### reading a dict/ json content into a pandas dataframe
         reader = read_dict()
 
         osm_dataset = pd.DataFrame(reader.dict_parser(osm, 'root', 1, '0|preroot|0'),
@@ -759,6 +781,8 @@ class setup():
         osm_dataset.sort_values(ascending=True, by=['level', 'parent_key'])
         osm_dataset.fillna('NULL', inplace=True)
 
+        ### if the mapping is not found then insert them
+        record = self.db_mappings.vnfd_mapping
         res = record.find()
         t = [i for i in res]
 
@@ -796,7 +820,7 @@ class setup():
         dataset.sort_values(by=['parent_level','parent_key','lineage','key','level'],ascending=[True,True,True,True,True],inplace=True)
         dataset.reset_index(inplace=True,drop=True)
 
-
+        ### translating and transforming the osm connection points to sonata
         df_cp = transformation_obj.ret_ds(osm_dataset,'connection-point',4)
         df_cp['level'] = df_cp['level'].astype('int64')
         df_cp['parent_level'] = df_cp['parent_level'].astype('int64')
@@ -809,12 +833,13 @@ class setup():
         df_osm_cp.columns = ['parent_level', 'level', 'parent_key', 'key', 'value', 'son_lineage', 'lineage']
 
 
-        df_osm_cp['lineage'] = df_osm_cp.apply(lambda x: x['son_lineage'] + x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
+        df_osm_cp['lineage'] = df_osm_cp.apply(lambda x: x['son_lineage'] + 
+                                                x['lineage'].split('|')[-1] if x['lineage'] !='NULL' else 'NULL', axis=1)
 
         temp = df_osm_cp[(df_osm_cp['parent_key'] == 'connection_points') & 
                         (df_osm_cp['key'] == 'type')&
-                        (df_osm_cp['level']==2) & 
-                        (df_osm_cp['parent_level']==1)].copy()
+                        (df_osm_cp['level'] == 2) & 
+                        (df_osm_cp['parent_level'] == 1)].copy()
         temp['key'] = 'interface'
         temp['value'] = 'ipv4'
         df_osm_cp = df_osm_cp.append(temp)
@@ -828,10 +853,12 @@ class setup():
 
 
         dataset = dataset.append(df_osm_cp)
+        
+        
+        ### translating and transforming the osm vdu to sonata
         df_vl = transformation_obj.ret_ds(osm_dataset,'vdu',4)
         df_vl = transformation_obj.osm_vld_vnfd(df_vl)
-        #if 'internal-connection-point-ref' in df_vl['key'].values:
-
+        
         df_vl['level'] = df_vl['level'].astype('int64')
         df_vl['parent_level'] = df_vl['parent_level'].astype('int64')
         df_osm_vl =  pd.merge(df_vl, osm_son_vl,
@@ -876,9 +903,9 @@ class setup():
                        (df_osm_vdu['level'] == 4),'lineage'] = df_osm_vdu[(df_osm_vdu['parent_level']==3) &(df_osm_vdu['level'] == 4)].apply(lambda x: ('|').join(x['son_lineage'].split('|')[:-5]) + '|'+x['lineage'].split('|')[-3] 
                                                                                                         + '|' + ('|').join(x['son_lineage'].split('|')[-4:]) if x['lineage'] !='NULL' else 'NULL', axis=1)
         df_osm_vdu.loc[(df_osm_vdu['parent_level']==3) & 
-                       (df_osm_vdu['level'] == 4),'value'] = df_osm_vdu[(df_osm_vdu['parent_level']==3) &(df_osm_vdu['level'] == 4)].apply(lambda x: 'MB' if ((x['key'] =='size_unit') & (x['parent_key'] =='memory')) 
-                                                                                                                                               else ( 'GB' if ((x['key'] =='size_unit') & (x['parent_key'] =='storage'))
-                                                                                                                                                    else x['value']),axis=1)
+                       (df_osm_vdu['level'] == 4),'value'] = df_osm_vdu[(df_osm_vdu['parent_level']==3) &(df_osm_vdu['level'] == 4)].apply(lambda x: 'MB' if                                                            ((x['key'] =='size_unit') & (x['parent_key'] =='memory')) 
+                                                                                else ( 'GB' if ((x['key'] =='size_unit') & (x['parent_key'] =='storage'))
+                                                                                else x['value']),axis=1)
 
         df_osm_vdu=df_osm_vdu.append(pd.DataFrame([
         ['NULL',1, 2, 'virtual_deployment_units', 'connection_points','NULL','NULL'],
@@ -926,15 +953,11 @@ class setup():
         dataset.drop('son_lineage',inplace=True,axis=1)
         dataset.reset_index(inplace=True,drop=True)
 
-
         writer = write_dict()
         message = writer.translate(dataset)
         message = message['preroot']['root'][0]
 
-        #temp = doc.insert_one(message).inserted_id
-        #translated_ref = str(temp)
-
-        return message#translated_ref
+        return message
 
 class insert_into_db():
     
@@ -1134,31 +1157,7 @@ class insert_into_db():
         
         temp = osm_son_vdu_ext.to_dict()
         id = record.insert_one(temp)
-    
-    ### temporary code ... to be removed after integration
-    def insert_nsd(self,framework):
         
-        if framework == 'osm':
-            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_2vnf_nsd.yaml"))
-            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\cirros_vnfd.yaml"))
-            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_ns\hackfest_multivdu_nsd.yaml"))
-            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\hackfest_multivdu_vnf\hackfest_multivdu_vnfd.yaml"))
-        
-        elif framework == 'sonata':
-            #nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_nsd.yml"))
-            #vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\sonata_simple_vnfd.yml"))
-            nsd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\NSD.yaml"))
-            vnfd=yaml.load(open(r"C:\Users\Arkajit\Desktop\Winter Semester\Project\WP1\VNFD.yaml"))
-            
-        record_nsd = self.db_descriptors.source_nsd
-        id_nsd = record_nsd.insert_one(nsd).inserted_id
-        
-        record_vnfd = self.db_descriptors.source_vnfd
-        id_vnfd = record_vnfd.insert_one(vnfd).inserted_id
-        
-        return [id_nsd , id_vnfd]
-        
-### @Arka
 
 class transformation():
 
@@ -1347,7 +1346,6 @@ class transformation():
         
         return df.append(temp) 
 
-    ### @Suheel
     def osm_vld_vnfd(self,df):
         '''
         reads a pandas.DataFrame
@@ -1442,7 +1440,7 @@ class transformation():
         
         return vl_conn_pts
 
-    def son_fwdg_nsd(self,df, column1='value',column2='key', sep=':'):
+    def son_fwdg_nsd(self,df,sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -1451,19 +1449,18 @@ class transformation():
         ------
         df : pandas.DataFrame
             dataframe with the column to split and expand
-        column : str
-            the column to split and expand
         sep : str
             the string used to split the column's values
-        keep : bool
-            whether to retain the presplit value as it's own row
 
         Returns
         -------
         pandas.DataFrame
             Returns a dataframe with the same columns as `df`.
         '''
-        column3='lineage'
+        
+        column1 = 'value'
+        column2 = 'key'
+        column3 = 'lineage'
         indexes = []
         new_values = []
         new_values2 = []
@@ -1509,7 +1506,7 @@ class transformation():
         
         return new_df
 
-    def son_vld_nsd(self,df,column1='value',column2='key', sep=':'):
+    def son_vld_nsd(self,df,sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -1518,12 +1515,8 @@ class transformation():
         ------
         df : pandas.DataFrame
             dataframe with the column to split and expand
-        column : str
-            the column to split and expand
         sep : str
             the string used to split the column's values
-        keep : bool
-            whether to retain the presplit value as it's own row
 
         Returns
         -------
@@ -1533,6 +1526,11 @@ class transformation():
         indexes = []
         new_values = []
         new_values2 = []
+        
+        
+        column1 = 'value'
+        column2 = 'key'
+        
         df = df.dropna(subset=[column1])
 
         for i, presplit in enumerate(df[[column1,column2]].itertuples()):
@@ -1562,8 +1560,7 @@ class transformation():
         
         return new_df
 
-    ### @Suheel & Arka
-    def son_vld_int_ext_vnfd(self,df,column1='value',column2='key',sep=':'):
+    def son_vld_int_ext_vnfd(self,df,sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -1572,12 +1569,8 @@ class transformation():
         ------
         df : pandas.DataFrame
             dataframe with the column to split and expand
-        column : str
-            the column to split and expand
         sep : str
             the string used to split the column's values
-        keep : bool
-            whether to retain the presplit value as it's own row
 
         Returns
         -------
@@ -1595,6 +1588,8 @@ class transformation():
 
         j=0
 
+        column1 = 'value'
+        column2 = 'key'
         column3 = 'parent_key'
         column4 = 'level'
         column5 = 'parent_level'
@@ -1663,7 +1658,7 @@ class transformation():
                 new_osm_lineage.append(row[7])
 
 
-                new_value.append(vdu1 + sep+ 'VIRTIO')
+                new_value.append(vdu1 + sep+ 'PARAVIRT')
                 new_key.append('type')
                 index.append(i)
                 new_lineage.append(row[6][:-1] +internal1)
@@ -1709,7 +1704,7 @@ class transformation():
                 new_osm_lineage.append(row[7])
 
 
-                new_value.append(vdu2 + sep+ 'VIRTIO')
+                new_value.append(vdu2 + sep+ 'PARAVIRT')
                 new_key.append('type')
                 index.append(i)
                 new_lineage.append(row[6][:-1] +internal2)
@@ -1759,7 +1754,7 @@ class transformation():
             new_osm_lineage.append(row[7])
 
 
-            new_value.append(vdu + sep+ 'VIRTIO')
+            new_value.append(vdu + sep+ 'PARAVIRT')
             new_key.append('type')
             index.append(i)
             new_lineage.append(row[6][:-1] +external)
@@ -1770,9 +1765,6 @@ class transformation():
 
             j+=1
             
-            
-            
-        #print (df.index,len(index),len(new_value),len(new_key),len(new_parentKey),len(new_level),len(new_parentLevel),len(new_lineage),len(new_osm_lineage))
         new_df = df.loc[index,:].copy()
         new_df[column1] = new_value
         new_df[column2] = new_key
@@ -1783,9 +1775,8 @@ class transformation():
         new_df[column7] = new_osm_lineage
 
         return new_df
-    
-    ### @Suheel & Arka
-    def son_vld_vnfd(self,df,column1='value',column2='key',sep=':'):
+
+    def son_vld_vnfd(self,df,sep=':'):
         '''
         Split the values of a column and expand so the new DataFrame has one split
         value per row. Filters rows where the column is missing.
@@ -1794,12 +1785,8 @@ class transformation():
         ------
         df : pandas.DataFrame
             dataframe with the column to split and expand
-        column : str
-            the column to split and expand
         sep : str
             the string used to split the column's values
-        keep : bool
-            whether to retain the presplit value as it's own row
 
         Returns
         -------
@@ -1815,6 +1802,8 @@ class transformation():
         new_lineage =[]
         
         df = df.dropna(subset=[column1])
+        column1 = 'value'
+        column2 = 'key'
         column3 = 'parent_key'
         column4 ='level'
         column5 = 'parent_level'

@@ -1,0 +1,27 @@
+---
+descriptor_version: vnfd-schema-01
+description: OSM Instance
+name: osm-instance
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+- id: osm-instance
+  description: OSM Instance
+  vm_image: "osm-instance"
+  vm_image_format: qcow2
+  resource_requirements:
+    cpu:
+      vcpus: 2
+    memory:
+      size: 1
+      size_unit: GB
+    storage:
+      size: 1
+      size_unit: GB
+  connection_points:
+  - id: eth0
+    interface: ipv4
+    type: external
+
+# Image name on openstack should be "pg-scramble_osm-instance_1.0_osm-instance"
