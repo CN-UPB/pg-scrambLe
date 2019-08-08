@@ -1,0 +1,2078 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"definitions": {
+		"ipv4-address": {
+            "type": "string",
+            "pattern": "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}+([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])+(%[\\p{N}\\p{L}]+)?"
+        },
+		"ipv6-address":{
+			"type": "string",
+            "pattern": "((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}+((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){3}+(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))+(%[\\p{N}\\p{L}]+)?",
+			"pattern": "(([^:]+:){6}(([^:]+:[^:]+)|(.*\\..*)))|+((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)+(%.+)?"
+        },
+		"ipv4-prefix": {
+			"type": "string",
+			"pattern": "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}+([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])+//(([0-9])|([1-2][0-9])|(3[0-2]))"
+		},
+		"ipv6-prefix": {
+			"type": "string",
+			"pattern": "((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}+((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|+(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){3}+(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))+(//(([0-9])|([0-9]{2})|(1[0-1][0-9])|(12[0-8])))",
+			"pattern": "(([^:]+:){6}(([^:]+:[^:]+)|(.*\\..*)))|+((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)+ (/.+)"
+		}
+	},		
+	"type": "object",
+	"properties": {
+		"vnfd:vnfd-catalog": {
+			"type": "object",
+			"properties": {
+				"schema-version": {
+					"type": "string"
+				},
+				"vnfd": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"short-name": {
+								"type": "string"
+							},
+							"vendor": {
+								"type": "string"
+							},
+							"logo": {
+								"type": "string"
+							},
+							"description": {
+								"type": "string"
+							},
+							"version": {
+								"type": "string"
+							},
+							"vnf-configuration": {
+								"type": "object",
+								"items": {
+									"type": "object",
+									"properties": {
+										"config-method": {
+											"type": "object",
+											"items": {
+												"script": {
+													"type": "object",
+													"items": {
+														"script-type": {
+															"enum": [
+																"rift"
+															]
+														}
+													}
+												},		
+												"juju": {
+													"type": "object",
+													"items": {
+														"charm": {
+															"type": "string"
+														},
+														"proxy": {
+															"type": "string"
+														}
+													}
+												}
+											}	
+										},		
+										"config-primitive": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"parameter": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																},
+																"data-type": {
+																	"enum": [
+																		"STRING",
+																		"INTEGER",
+																		"BOOLEAN"
+																	]
+																},	
+																"mandatory": {
+																	"type": "string"
+																},
+																"default-value": {
+																	"type": "string"
+																},
+																"parameter-pool": {
+																	"type": "string"
+																},
+																"read-only": {
+																	"type": "string"
+																},
+																"hidden": {
+																	"type": "string"
+																}
+															},	
+															"required": [
+																"name"
+															]
+														}	
+													},	
+													"user-defined-script": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"name"
+												]
+											}
+										},		
+										"initial-config-primitive": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"seq": {
+														"type": "string"
+													},
+													"primitive-type": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"primitive-definition": {
+																	"type": "object",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"name": {
+																				"type": "string"
+																			},
+																			"parameter": {
+																				"type": "array",
+																				"items": {
+																					"type": "object",
+																					"properties": {
+																						"name": {
+																							"type": "string"
+																						},
+																						"data-type": {
+																							"enum": [
+																								"STRING",
+																								"INTEGER",
+																								"BOOLEAN"
+																							]
+																						},	
+																						"value": {
+																							"type": "string"
+																						}
+																					},
+																					"required": [
+																						"name"
+																					]
+																				}
+																			},		
+																			"user-defined-script": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												},
+												"required": [
+													"seq"
+												]
+											}
+										},		
+										"metrics": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"name"
+												]
+											}
+										}
+									}
+								}
+							},		             
+							"operational-status": {
+								"enum": [
+									"init",
+									"running",
+									"failed",
+									"terminated",
+									"terminate",
+									"upgrading"
+								]
+							},
+							"mgmt-interface": {
+								"type": "object",
+								"items": {
+									"type": "object",
+									"properties": {
+										"endpoint-type": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"ip": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"ip-address": {
+																	"union": [
+																		{"$ref": "#/definitions/ipv4-address"},
+																		{"$ref": "#/definitions/ipv6-address"}
+																	]
+																}
+															}
+														}
+													},		
+													"vdu-id": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vdu-id": {
+																	"type": "string"
+																}
+															}
+														}
+													},		
+													"cp": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"cp": {
+																	"type": "string"
+																}
+															}
+														}
+													}
+												}
+											}
+										},		
+										"port": {
+											"type": "string"
+										},
+										"dashboard-params": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"path": {
+														"type": "string"
+													},
+													"https": {
+														"type": "string"
+													},
+													"port": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									}		
+								}
+							},	
+							"internal-vld": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"short-name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										},
+										"type": {
+											"enum": [
+												"ELINE",
+												"ELAN"
+											]
+										},
+										"root-bandwidth": {
+											"type": "integer"
+										},
+										"leaf-bandwidth": {
+											"type": "string"
+										},
+										"internal-connection-point": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id-ref": {
+														"type": "string"
+													},
+													"ip-address": {
+														"enum": {
+															"$ref": "#/definitions/ipv6-address",
+															"$ref": "#/definitions/ipv4-address"
+														}
+													}
+												},
+												"required": [
+													"id-ref"
+												]
+											}
+										},		
+										"provider-network": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"physical-network": {
+														"type": "string"
+													},
+													"segmentation_id": {
+														"type": "integer"
+													}
+												}
+											}
+										},
+										"init-params": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"vim-network-ref": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vim-network-name": {
+																	"type": "string"
+																}
+															}
+														}
+													},		
+													"vim-network-profile": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"ip-profile-ref": {
+																	"type": "string"
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									},
+									"required": [
+										"id"
+									],
+									"minItems": 1,
+									"uniqueItems": true
+								}              
+							},
+							"ip-profiles": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										},
+										"ip-profile-params": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"ip-version": {
+														"enum": [
+															"unknown",
+															"ipv4",
+															"ipv6"
+														] 
+													},
+													"subnet-address": {
+														"enum": [
+															{"$ref": "#/definitions/ipv4-prefix"},
+															{"$ref": "#/definitions/ipv6-prefix"}
+														]
+													},
+													"gateway-address": {
+														"enum": [
+															{"$ref": "#/definitions/ipv4-address"},
+															{"$ref": "#/definitions/ipv6-address"}
+														]	
+													},
+													"security-group": {
+														"type": "string"
+													},
+													"dns-server": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"address": {
+																	"enum": [
+																		{"$ref": "#/definitions/ipv4-address"},
+																		{"$ref": "#/definitions/ipv6-address"}
+																	]
+																}
+															},
+															"required": [
+																"address"
+															]
+														}
+													},		
+													"dhcp-params": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"enabled": {
+																	"type": "boolean"
+																},
+																"start-address": {
+																	"enum":[
+																		{"$ref": "#/definitions/ipv4-address"},
+																		{"$ref": "#/definitions/ipv6-address"}
+																	]
+																},	
+																"count": {
+																	"type": "integer"
+																}
+															}
+														}
+													},		
+													"subnet-prefix-pool": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									},
+									"required": [
+										"name"
+									],
+									"minItems": 1,
+									"uniqueItems": true
+								}
+							},		
+							"connection-point": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"short-name": {
+											"type": "string"
+										},
+										"port-security-enabled": {
+											"type": "string"
+										},
+										"type": {
+											"enum": [
+												"VPORT"
+											]
+										},
+										"internal-vld-ref": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"name"
+									]	
+								}
+							},
+							"vdu": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										},
+										"pdu-type": {
+											"type": "string"
+										},
+										"count": {
+											"type": "integer"
+										},
+										"mgmt-vpci": {
+											"type": "string"
+										},
+										"vm-flavor": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"vcpu-count": {
+														"type": "integer"
+													},
+													"memory-mb": {
+														"type": "integer"
+													},
+													"storage-gb": {
+														"type": "integer"
+													}
+												}
+											}
+										},		
+										"guest-epa": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"trusted-execution": {
+														"type": "string"
+													},
+													"mempage-size": {
+														"enum": [
+															"LARGE",
+															"SMALL",
+															"PREFER_LARGE",
+															"SIZE_2MB",
+															"SIZE_1GB"
+														]
+													},	
+													"cpu-pinning-policy": {
+														"enum": [
+															"DEDICATED",
+															"SHARED",
+															"ANY"
+														]
+													},
+													"cpu-thread-pinning-policy": {
+														"enum": [
+															"AVOID",
+															"SEPERATE",
+															"PREFER",
+															"ISOLATE"
+														]
+													},
+													"pcie-device": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"device-id": {
+																	"type": "string"
+																},
+																"count": {
+																	"type": "integer"
+																}
+															},
+															"required": [
+																"name"
+															]
+														}
+													},		
+													"numa-policy": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"numa-unaware": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"numa-unaware": {
+																				"type": "NULL"
+																			}
+																		}
+																	}
+																},
+																"numa-aware": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"numa-node-policy": {
+																				"type": "array",
+																				"items": {
+																					"type": "object",
+																					"properties": {
+																						"node-cnt": {
+																							"type": "integer"
+																						},			
+																						"mem-policy": {
+																							"enum": [
+																								"STRICT",
+																								"PREFERRED"
+																							]
+																						},	
+																						"node": {
+																							"type": "array",
+																							"items": {
+																								"type": "object",
+																								"properties": {
+																									"id": {
+																										"type": "string"
+																									},
+																									"vcpu": {
+																										"type": "array",
+																										"items": {
+																											"type": "object",
+																											"properties": {
+																												"id": {
+																													"type": "integer"
+																												}
+																											},
+																											"required": [
+																												"name"
+																											]
+																										}
+																									},		
+																									"memory-mb": {
+																										"type": "integer"
+																									},
+																									"om-numa-type": {
+																										"type": "array",
+																										"items": {
+																											"type": "object",
+																											"properties": {
+																												"cores": {
+																													"type": "array",
+																													"items": {                                                                                    
+																														"type": "object",
+																														"properties": {
+																															"num-cores": {
+																																"type": "integer"
+																															}
+																														}
+																													}
+																												},
+																												"paired-threads": {
+																													"type": "array",
+																													"items": {
+																														"type": "object",
+																														"properties": {
+																															"paired-threads": {
+																																"type": "array",
+																																"items": {
+																																	"type": "object",
+																																	"properties": {
+																																		"num-paired-threads": {
+																																			"type": "integer"
+																																		},
+																																		"paired-thread-ids": {
+																																			"type": "array",
+																																			"items": {
+																																				"type": "object",
+																																				"properties": {
+																																					"thread-a": {
+																																						"type": "string"
+																																					},
+																																					"thread-b": {
+																																						"type": "string"
+																																					}
+																																				},
+																																				"required": [
+																																					"thread-a"
+																																				]
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												},		
+																												"threads": {
+																													"type": "array",
+																													"items": {
+																														"type": "object",
+																														"properties": {
+																															"num-threads": {
+																																"type": "integer"
+																															}
+																														}
+																													}
+																												}		
+																											}
+																										}
+																									}
+																								},
+																								"required": [
+																									"id"
+																								]
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										},		
+										"vswitch-epa": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"ovs-acceleration": {
+														"enum": [
+															"MANDATORY",
+															"PREFERRED",
+															"DISABLED"
+														]
+													},
+													"ovs-offload": {
+														"enum": [
+															"MANDATORY",
+															"PREFERRED",
+															"DISABLED"
+														]
+													}
+												}
+											}
+										},		
+										"hypervisor-epa": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"type": {
+														"enum": [
+															"PREFER_KVM",
+															"REQUIRED_KVM"
+														]
+													},
+													"version": {
+														"type": "string"
+													}
+												}
+											}
+										},		
+										"host-epa": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"cpu-socket-count": {
+														"type": "integer"
+													},
+													"cpu-model": {
+														"enum": [
+															"PREFER_WESTMERE",
+															"REQUIRE_WESTMERE",
+															"PREFER_SANDYBRIDGE",
+															"REQUIRE_SANDYBRIDGE",
+															"PREFER_IVYBRIDGE",
+															"REQUIRE_IVYBRIDGE",
+															"PREFER_HASWELL",
+															"REQUIRE_HASWELL",
+															"PREFER_BROADWELL",
+															"REQUIRE_BROADWELL",
+															"PREFER_NEHALEM",
+															"REQUIRE_NEHALEM",
+															"PREFER_PENRYN",
+															"REQUIRE_PENRYN",
+															"PREFER_CONROE",
+															"REQUIRE_CONROE",
+															"PREFER_CORE2DUO",
+															"REQUIRE_CORE2DUO"
+														]
+													},	
+													"cpu-arch": {
+														"enum": [
+															"PREFER_X86",
+															"REQUIRE_X86",
+															"PREFER_X86_64",
+															"REQUIRE_X86_64",
+															"PREFER_I686",
+															"REQUIRE_I686",
+															"PREFER_IA64",
+															"REQUIRE_IA64",
+															"PREFER_ARMV7",
+															"REQUIRE_ARMV7",
+															"PREFER_ARMV8",
+															"REQUIRE_ARMV8"
+														]
+													},
+													"cpu-vendor": {
+														"enum": [
+															"PREFER_INTEL",
+															"REQUIRE_INTEL",
+															"PREFER_AMD",
+															"REQUIRE_AMD"
+														]
+													},
+													"cpu-core-count": {
+														"type": "integer"
+													},
+													"cpu-core-thread-count": {
+														"type": "integer"
+													},
+													"om-cpu-model-string": {
+														"type": "string"
+													},
+													"cpu-feature": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"feature": {
+																	"enum": [
+																		"PREFER_AES",
+																		"REQUIRE_AES",
+																		"PREFER_CAT",
+																		"REQUIRE_CAT",
+																		"PREFER_CMT",
+																		"REQUIRE_CMT",
+																		"PREFER_DDIO",
+																		"REQUIRE_DDIO",
+																		"REQUIRE_VME",
+																		"PREFER_VME",
+																		"REQUIRE_DE",
+																		"PREFER_DE",
+																		"REQUIRE_PSE",
+																		"PREFER_PSE",
+																		"REQUIRE_TSC",
+																		"PREFER_TSC",
+																		"REQUIRE_MSR",
+																		"PREFER_MSR",
+																		"REQUIRE_PAE",
+																		"PREFER_PAE",
+																		"REQUIRE_MCE",
+																		"PREFER_MCE",
+																		"REQUIRE_CX8",
+																		"PREFER_CX8",
+																		"REQUIRE_APIC",
+																		"PREFER_APIC",
+																		"REQUIRE_SEP",
+																		"PREFER_SEP",
+																		"REQUIRE_MTRR",
+																		"PREFER_MTRR",
+																		"REQUIRE_PGE",
+																		"PREFER_PGE",
+																		"REQUIRE_MCA",
+																		"PREFER_MCA",
+																		"REQUIRE_CMOV",
+																		"PREFER_CMOV",
+																		"REQUIRE_PAT",
+																		"PREFER_PAT",
+																		"REQUIRE_PSE36",
+																		"PREFER_PSE36",
+																		"REQUIRE_CLFLUSH",
+																		"REQUIRE_DTS",
+																		"PREFER_CLFLUSH",
+																		"PREFER_DTS",
+																		"REQUIRE_ACPI",
+																		"PREFER_ACPI",
+																		"REQUIRE_MMX",
+																		"PREFER_MMX",
+																		"REQUIRE_FXSR",
+																		"PREFER_FXSR",
+																		"REQUIRE_SSE",
+																		"PREFER_SSE",
+																		"REQUIRE_SSE2",
+																		"PREFER_SSE2",
+																		"REQUIRE_SS",
+																		"PREFER_SS",
+																		"REQUIRE_HT",
+																		"PREFER_HT",
+																		"REQUIRE_TM",
+																		"PREFER_TM",
+																		"REQUIRE_IA64",
+																		"PREFER_IA64",
+																		"REQUIRE_PBE",
+																		"PREFER_PBE",
+																		"REQUIRE_RDTSCP",
+																		"PREFER_RDTSCP",
+																		"REQUIRE_PNI",
+																		"PREFER_PNI",
+																		"REQUIRE_PCLMULQDQ",
+																		"PREFER_PCLMULQDQ",
+																		"REQUIRE_DTES64",
+																		"PREFER_DTES64",
+																		"REQUIRE_MONITOR",
+																		"PREFER_MONITOR",
+																		"REQUIRE_DS_CPL",
+																		"PREFER_DS_CPL",
+																		"REQUIRE_VMX",
+																		"PREFER_VMX",
+																		"REQUIRE_SMX",
+																		"PREFER_SMX",
+																		"REQUIRE_EST",
+																		"PREFER_EST",
+																		"REQUIRE_TM2",
+																		"PREFER_TM2",
+																		"REQUIRE_SSSE3",
+																		"PREFER_SSSE3",
+																		"REQUIRE_CID",
+																		"PREFER_CID",
+																		"REQUIRE_FMA",
+																		"PREFER_FMA",
+																		"REQUIRE_CX16",
+																		"PREFER_CX16",
+																		"REQUIRE_XTPR",
+																		"PREFER_XTPR",
+																		"REQUIRE_PDCM",
+																		"PREFER_PDCM",
+																		"REQUIRE_PCID",
+																		"PREFER_PCID",
+																		"REQUIRE_DCA",
+																		"PREFER_DCA",
+																		"REQUIRE_SSE4_1",
+																		"PREFER_SSE4_1",
+																		"REQUIRE_SSE4_2",
+																		"PREFER_SSE4_2",
+																		"REQUIRE_X2APIC",
+																		"PREFER_X2APIC",
+																		"REQUIRE_MOVBE",
+																		"PREFER_MOVBE",
+																		"REQUIRE_POPCNT",
+																		"PREFER_POPCNT",
+																		"REQUIRE_TSC_DEADLINE_TIMER",
+																		"PREFER_TSC_DEADLINE_TIMER",
+																		"REQUIRE_XSAVE",
+																		"PREFER_XSAVE",
+																		"REQUIRE_AVX",
+																		"PREFER_AVX",
+																		"REQUIRE_F16C",
+																		"PREFER_F16C",
+																		"REQUIRE_RDRAND",
+																		"PREFER_RDRAND",
+																		"REQUIRE_FSGSBASE",
+																		"PREFER_FSGSBASE",
+																		"REQUIRE_BMI1",
+																		"PREFER_BMI1",
+																		"REQUIRE_HLE",
+																		"PREFER_HLE",
+																		"REQUIRE_AVX2",
+																		"PREFER_AVX2",
+																		"REQUIRE_SMEP",
+																		"PREFER_SMEP",
+																		"REQUIRE_BMI2",
+																		"PREFER_BMI2",
+																		"REQUIRE_ERMS",
+																		"PREFER_ERMS",
+																		"REQUIRE_INVPCID",
+																		"PREFER_INVPCID",
+																		"REQUIRE_RTM",
+																		"PREFER_RTM",
+																		"REQUIRE_MPX",
+																		"PREFER_MPX",
+																		"REQUIRE_RDSEED",
+																		"PREFER_RDSEED",
+																		"REQUIRE_ADX",
+																		"PREFER_ADX",
+																		"REQUIRE_SMAP"
+																	]
+																}	
+															},		
+															"required": [
+																"feature"
+															]		
+														}
+													},
+													"om-cpu-feature": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"feature": {
+																	"type": "string"
+																}
+															},
+															"required": [
+																"feature"
+															]
+														}
+													}
+												}
+											}
+										},		
+										"alarm": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"alarm-id": {
+														"type": "string"
+													},
+													"name": {
+													  "type": "string"
+													},
+													"description": {
+													  "type": "string"
+													},
+													"vdur-id": {
+													  "type": "string"
+													},
+													"actions": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"ok": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"url": {
+																				"type": "string"
+																			}
+																		},	
+																		"required": [
+																			"url"
+																		]	
+																	}
+																},
+																"insufficient-data": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"url": {
+																				"type": "string"
+																			}
+																		},
+																		"required": [
+																			"url"
+																		]
+																	}
+																},		
+																"alarm": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"url": {
+																				"type": "string"
+																			}
+																		},
+																		"required": [
+																			"url"
+																		]
+																	}
+																}
+															}
+														}
+													},		
+													"repeat": {
+														"type": "boolean"
+													},
+													"enabled": {
+														"type": "boolean"
+													},
+													"severity": {
+														"enum": [
+															"LOW",
+															"MODERATE",
+															"CRITICAL"
+														]
+													},	
+													"metric": {
+													  "enum": [
+															"CPU_UTILIZATION",
+															"MEMORY_UTILIZATION",
+															"STORAGE_UTILIZATION"
+														]
+													},
+													"statistic": {
+														"enum": [
+															"AVERAGE",
+															"MINIMUM",
+															"MAXIMUM",
+															"SUM",
+															"COUNT"
+														]
+													},
+													"operation": {
+														"enum": [
+															"GE",
+															"LE",
+															"GT",
+															"LT",
+															"EQ"
+														]
+													},
+													"value": {
+														"type": "decimal"
+													},
+													"period": {
+														"type": "integer"
+													},
+													"evaluations": {
+														"type": "integer"
+													}
+												},
+												"required": [
+													"alarm-id"
+												],
+												"minItems": 1,
+												"uniqueItems": true
+											}
+										},
+										"image": {
+											"type": "string"
+										},
+										"image-checksum": {
+											"type": "string"
+										},
+										"alternative-images": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"vim-type": {
+														"type": "string"
+													},
+													"image": {
+													  "type": "string"
+													},
+													"image-checksum": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"vim-type"
+												]
+											}
+										},
+										"vdu-configuration": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"config-method": {
+														"type": "object",
+														"items": {
+															"type": "object",
+															"properties": {
+																"script": {
+																	"type": "object",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"script-type": {
+																				"enum": [
+																					"rift"
+																				]
+																			}
+																		}		
+																	}
+																},
+																"juju": {
+																	"type": "object",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"charm": {
+																			  "type": "string"
+																			},
+																			"proxy": {
+																				"type": "string"
+																			},
+																			"vca-relationships": {
+																				"type": "array",
+																				"items": {
+																					"type": "object",
+																					"properties": {
+																						"relation": {
+																							"type": "array",
+																							"items": {
+																								"type": "object",
+																								"properties": {
+																									"requires": {
+																										"type": "string"
+																									},
+																									"provides": {
+																										"type": "string"
+																									}
+																								},
+																								"required": [
+																									"provides",
+																									"requires"
+																								]
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													},		
+													"config-primitive": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																},
+																"parameter": {
+																	"type": "object",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"name": {
+																				"type": "string"
+																			},
+																			"data-type": {
+																				"enum": [
+																					"STRING",
+																					"INTEGER",
+																					"BOOLEAN"
+																				]
+																			},	
+																			"mandatory": {
+																				"type": "boolean"
+																			},
+																			"default-value": {
+																				"type": "string"
+																			},
+																			"parameter-pool": {
+																				"type": "string"
+																			},
+																			"read-only": {
+																				"type": "boolean"
+																			},
+																			"hidden": {
+																				"type": "boolean"
+																			}
+																		},
+																		"required": [
+																			"name"
+																		]
+																	}
+																},
+																"user-defined-script": {
+																	"type": "string"
+																}
+															},
+															"required": [
+																"name"
+															],
+															"minItems": 1,
+															"uniqueItems": true
+														}
+													},		
+													"initial-config-primitive": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"seq": {
+																	"type": "string"
+																},
+																"primitive-type": {
+																	"type": "object",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"primitive-definition": {
+																				"type": "array",
+																				"items": {
+																					"type": "object",
+																					"properties": {
+																						"name": {
+																							"type": "string"
+																						},
+																						"parameter": {
+																							"type": "array",
+																							"items": {
+																								"type": "object",
+																								"properties": {
+																									"name": {
+																										"type": "string"
+																									},
+																									"data-type": {
+																										"enum": [
+																											"STRING",
+																											"INTEGER",
+																											"BOOLEAN"
+																										]
+																									},
+																									"value": {
+																										"type": "string"
+																									}
+																								},
+																								"required": [
+																									"name"
+																								]
+																							}
+																						},
+																						"user-defined-script": {
+																							"type": "string"
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															},		
+															"required": [
+																"user-defined-script"
+															],
+															"minItems": 1,
+															"uniqueItems": true
+														}
+													},
+													"metrics": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																}
+															},
+															"required": [
+																"name"
+															]
+														}
+													}
+												}
+											}		
+										},
+										"monitoring-param": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "string"
+													},
+													"nfvi-metric": {
+														"enum": [
+															"cpu_utilization",
+															"average_memory_utilization",
+															"disk_read_ops",
+															"disk_write_ops",
+															"disk_read_bytes",
+															"disk_write_bytes",
+															"packets_sent",
+															"packets_received",
+															"packets_dropped"
+														]
+													},
+													"interface-name-ref": {
+														"type": "string"  
+													}
+												},
+												"required": [
+													"id"
+												]
+											}
+										},	
+										"cloud-init-input": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"inline": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"cloud-init": {
+																	"type": "string"
+																}
+															}
+														}
+													},		
+													"filename": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"cloud-init-file": {
+																	"type": "string"
+																}
+															}
+														}
+													}
+												}
+											}
+										},		
+										"supplemental-boot-data": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"boot-data-drive": {
+														"type": "string"
+													}
+												}
+											}		
+										},
+										"internal-connection-point": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"id": {
+														"type": "string"
+													},
+													"short-name": {
+														"type": "string"
+													},
+													"port-security-enabled": {
+														"type": "string"
+													},
+													"internal-vld-ref": {
+														"type": "string"
+													},
+													"type": {
+														"enum": [
+															"VPORT"
+														]			
+													}
+												},	
+												"required": [
+													"id"
+												]
+											}
+										},
+										"interface": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"position": {
+														"type": "integer"
+													},
+													"mgmt-interface": {
+														"type": "boolean"
+													},
+													"type": {
+														"enum": [
+															"INTERNAL",
+															"EXTERNAL"
+														]
+													},
+													"mac-address": {
+														"type": "string"
+													},
+													"connection-point-type": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"internal": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"internal-connection-point-ref": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																},		
+																"external": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"external-connection-point-ref": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}		
+															}
+														}
+													},
+													"virtual-interface": {
+														"type": "object",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vpci": {
+																	"type": "string"
+																},
+																"bandwidth": {
+																	"type": "integer"
+																},
+																"type": {
+																	"enum": [
+																		"PARAVIRT",
+																		"OM-MGMT",
+																		"PCI-PASSTHROUGH",
+																		"SR-IOV",
+																		"VIRTIO",
+																		"E1000",
+																		"RTL8139",
+																		"PCNET"
+																	]
+																}
+															}
+														}
+													}
+												},		
+												"required": [
+													"name"
+												]
+											}
+										},
+										"volumes": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"description": {
+														"type": "string"
+													},
+													"size": {
+														"type": "integer"
+													},
+													"device-bus": {
+														"enum": [
+															"usb",
+															"ide",
+															"virtio",
+															"scsi"
+														]
+													},
+													"device-type": {
+														"enum": [
+															"disk",
+															"cdrom",
+															"lun",
+															"floppy"
+														]
+													},
+													"volume-source": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"ephemeral": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"ephemeral": {
+																				"type": "NULL"
+																			}
+																		}
+																	}
+																},		
+																"image": {
+																	"type": "array",
+																	"items": {
+																		"type": "object",
+																		"properties": {
+																			"image": {
+																				"type": "string"
+																			},
+																			"image-checksum": {
+																				"type": "string"
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}		
+												},
+												"required": [
+													"name"
+												]
+											}
+										}
+									},
+									"required": [
+										"id"
+									],
+									"minItems": 1,
+									"uniqueItems": true		  
+								}
+							},	
+							"vdu-dependency": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"vdu-source-ref": {
+											"type": "string"
+										},
+										"vdu-depends-on-ref": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"vdu-source-ref"
+									]
+								}
+							},
+							"service-function-chain": {
+								"enum": [
+									"UNAWARE",
+									"CLASSIFIER",
+									"SF",
+									"SFF"
+								]
+							},
+							"service-function-type": {
+									"type": "string"
+							},
+							"http-endpoint": {
+								"type": "object",
+								"items": {
+									"type": "object",
+									"properties": {
+										"path": {
+											"type": "string"
+										},
+										"https": {
+											"type": "boolean"
+										},
+										"port": {
+											"type": "integer"
+										},
+										"username": {
+											"type": "string"
+										},
+										"password": {
+											"type": "string"
+										},
+										"polling-interval-secs": {
+											"type": "string"
+										},
+										"method": {
+											"enum": [
+												"POST",
+												"PUT",
+												"GET",
+												"DELETE",
+												"OPTIONS",
+												"PATCH"
+											]
+										},
+										"headers": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"key": {
+														"type": "string"
+													},
+													"value": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"key"
+												]
+											}
+										}
+									},	
+									"required": [
+										"path"
+									]
+								}
+							},
+							"scaling-group-descriptor": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"min-instance-count": {
+											"type": "integer"
+										},
+										"max-instance-count": {
+											"type": "integer"
+										},
+										"scaling-policy": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"name": {
+														"type": "string"
+													},
+													"scaling-type": {
+														"enum": [
+															"manual",
+															"automatic"
+														]
+													},
+													"enabled": {
+														"type": "string"
+													},
+													"scale-in-operation-type": {
+														"enum": [
+															"AND",
+															"OR"
+														]
+													},
+													"scale-out-operation-type": {
+														"enum": [
+															"AND",
+															"OR"
+														]
+													},
+													"threshold-time": {
+														"type": "integer"
+													},
+													"cooldown-time": {
+														"type": "integer"
+													},
+													"scaling-criteria": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																},
+																"scale-in-threshold": {
+																	"type": "integer"
+																},
+																"scale-out-threshold": {
+																	"type": "integer"
+																},
+																"vnf-monitoring-param-ref": {
+																	"type": "string"
+																},
+																"scale-in-relational-operation": {
+																	"enum": [
+																		"GE",
+																		"LE",
+																		"GT",
+																		"LT",
+																		"EQ"
+																	]
+																},
+																"scale-out-relational-operation": {
+																	"enum": [
+																		"GE",
+																		"LE",
+																		"GT",
+																		"LT",
+																		"EQ"
+																	]
+																}
+															},
+															"required": [
+																"name"
+															]
+														}
+													}
+												},	
+												"required": [
+													"name"
+												]
+											}
+										},
+										"vdu": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"vdu-id-ref": {
+														"type": "string"
+													},
+													"count": {
+														"type": "integer"
+													}
+												},
+												"required": [
+													"count"
+												]
+											}
+										},	
+										"scaling-config-action": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"trigger": {
+														"enum": [
+															"pre-scale-in",
+															"post-scale-in",
+															"pre-scale-out",
+															"post-scale-out"
+														]
+													},
+													"vnf-config-primitive-name-ref": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"trigger"
+												]
+											}
+										}
+									},
+									"required": [
+										"name"
+									]
+								}
+							},	
+							"monitoring-param": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"aggregation-type": {
+											"enum": [
+												"AVERAGE",
+												"MINIMUM",
+												"MAXIMUM",
+												"SUM",
+												"COUNT"
+											]
+										},
+										"http-endpoint-ref": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										},
+										"group-tag": {
+											"type": "string"
+										},
+										"widget-type": {
+											"enum": [
+												"COUNTER",
+												"GAUGE",
+												"TEXTBOX",
+												"SLIDER",
+												"HISTOGRAM",
+												"BAR"
+											]
+										},
+										"units": {
+											"type": "string"
+										},
+										"value-type": {
+											"enum": [
+												"INT",
+												"DECIMAL",
+												"STRING"
+											]
+										},
+										"value-integer": {
+											"type": "integer"
+										},
+										"value-decimal": {
+											"type": "decimal"
+										},
+										"value-string": {
+											"type": "string"
+										},
+										"monitoring-type": {
+											"type": "object",
+											"items": {
+												"type": "object",
+												"properties": {
+													"vdu-monitoring-param": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vdu-ref": {
+																	"type": "string"
+																},
+																"vdu-monitoring-param-ref": {
+																	"type": "string"
+																}
+															}
+														}
+													},
+													"vnf-metric": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vnf-metric-name-ref": {
+																	"type": "string"
+																}
+															}
+														}
+													},		
+													"vdu-metric": {
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+																"vdu-ref": {
+																	"type": "string"
+																},
+																"vdu-metric-name-ref": {
+																	"type": "string"
+																}
+															}
+														}
+													}
+												}
+											}
+										},		
+										"numeric-constraints": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"min-value": {
+														"type": "integer"
+													},
+													"max-value": {
+														"type": "integer"
+													}
+												}
+											}
+										},
+										"text-constraints": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"min-length": {
+														"type": "integer"
+													},
+													"max-length": {
+														"type": "integer"
+													}
+												}
+											}
+										},		
+										"json-query-params": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"json-path": {
+														"type": "string"
+													},
+													"object-path": {
+														"type": "string"
+													}
+												}
+											}
+										},
+										"json-query-method": {
+											"enum": [
+												"NAMEKEY",
+												"JSONPATH",
+												"OBJECTPATH"
+											]
+										}
+									},	
+									"required": [
+										"id"
+									]
+								}
+							},
+							"placement-groups": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"requirement": {
+											"type": "string"
+										},
+										"strategy": {
+											"enum": [
+												"COLOCATION",
+												"ISOLATION"
+											]
+										},
+										"member-vdus": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"member-vdu-ref": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									},
+									"required": [
+										"name"
+									]
+								}
+									
+							}
+						},
+						"required": [
+							"name",
+							"id"
+						],
+						"minItems": 1,
+						"uniqueItems": true,
+						"additionalProperties": false	
+					}
+				}
+			}
+		}
+	}
+}

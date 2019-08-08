@@ -1,0 +1,42 @@
+---
+nsd:nsd-catalog:
+  nsd:
+  - name: sonata-demo
+    version: 0.2.1
+    description: |-
+      The network service descriptor for the SONATA demo,
+       comprising iperf, a firewall, and tcpump.
+    connection-point:
+    - type: VPORT
+      name: mgmt
+    - name: input
+      type: VPORT
+    - name: output
+      type: VPORT
+    constituent-vnfd:
+    - member-vnf-index: '1'
+      vnfd-id-ref: vtc_vnf
+    - member-vnf-index: '2'
+      vnfd-id-ref: vtc_vnf
+    vld:
+    - type: ELAN
+      id: mgmt
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: mgmt
+      - member-vnf-index-ref: '2'
+        vnfd-connection-point-ref: mgmt
+    - id: input
+      type: ELINE
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '1'
+        vnfd-connection-point-ref: output
+      - vnfd-connection-point-ref: input
+        member-vnf-index-ref: '2'
+    - id: output
+      type: ELINE
+      vnfd-connection-point-ref:
+      - member-vnf-index-ref: '2'
+        vnfd-connection-point-ref: output
+      - vnfd-connection-point-ref: input
+        member-vnf-index-ref: '1'

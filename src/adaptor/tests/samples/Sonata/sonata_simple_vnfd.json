@@ -1,0 +1,33 @@
+{
+  "description": "Simple VNF example with a cirros SCrAMbLE",
+  "name": "osm_cirros_vnfd_arka4_v2",
+  "vendor": "pg-scramble",
+  "version": "1.0",
+  "connection_points": [
+      {
+          "id": "eth0",
+          "interface": "ipv4",
+          "type": "external"
+      }
+  ],
+  "virtual_deployment_units": [
+      {
+          "id": "cirros_vnfd-VM",
+          "vm_image": "cirros034",
+          "vm_image_format": "qcow2",
+          "resource_requirements": {
+              "cpu": {
+                  "vcpus": 1
+              },
+              "memory": {
+                  "size": 256,
+                  "size_unit": "MB"
+              },
+              "storage": {
+                  "size": 1,
+                  "size_unit": "GB"
+              }
+          }
+      }
+  ]
+}

@@ -1,0 +1,352 @@
+module: vnfd
+  +--rw vnfd-catalog
+     +--rw schema-version?   string
+     +--rw vnfd* [id]
+        +--rw id                          string
+        +--rw name                        string
+        +--rw short-name?                 string
+        +--rw vendor?                     string
+        +--rw logo?                       string
+        +--rw description?                string
+        +--rw version?                    string
+        +--rw vnf-configuration
+        |  +--rw (config-method)?
+        |  |  +--:(script)
+        |  |  |  +--rw script
+        |  |  |     +--rw script-type?   enumeration
+        |  |  +--:(juju)
+        |  |     +--rw juju
+        |  |        +--rw charm?               string
+        |  |        +--rw proxy?               boolean
+        |  |        +--rw vca-relationships
+        |  |           +--rw relation* [requires provides]
+        |  |              +--rw requires    string
+        |  |              +--rw provides    string
+        |  +--rw config-primitive* [name]
+        |  |  +--rw name                   string
+        |  |  +--rw parameter* [name]
+        |  |  |  +--rw name              string
+        |  |  |  +--rw data-type?        manotypes:parameter-data-type
+        |  |  |  +--rw mandatory?        boolean
+        |  |  |  +--rw default-value?    string
+        |  |  |  +--rw parameter-pool?   string
+        |  |  |  +--rw read-only?        boolean
+        |  |  |  +--rw hidden?           boolean
+        |  |  +--rw user-defined-script?   string
+        |  +--rw initial-config-primitive* [seq]
+        |  |  +--rw seq                          uint64
+        |  |  +--rw (primitive-type)?
+        |  |     +--:(primitive-definition)
+        |  |        +--rw name?                  string
+        |  |        +--rw parameter* [name]
+        |  |        |  +--rw name         string
+        |  |        |  +--rw data-type?   manotypes:parameter-data-type
+        |  |        |  +--rw value?       string
+        |  |        +--rw user-defined-script?   string
+        |  +--rw metrics* [name]
+        |     +--rw name    string
+        +--rw operational-status?         vnf-operational-status
+        +--rw mgmt-interface
+        |  +--rw (endpoint-type)?
+        |  |  +--:(ip)
+        |  |  |  +--rw ip-address?   inet:ip-address
+        |  |  +--:(vdu-id)
+        |  |  |  +--rw vdu-id?       -> ../../vdu/id
+        |  |  +--:(cp)
+        |  |     +--rw cp?           -> ../../connection-point/name
+        |  +--rw port?               inet:port-number
+        |  +--rw dashboard-params
+        |     +--rw path?    string
+        |     +--rw https?   boolean
+        |     +--rw port?    inet:port-number
+        +--rw internal-vld* [id]
+        |  +--rw id                           string
+        |  +--rw name?                        string
+        |  +--rw short-name?                  string
+        |  +--rw description?                 string
+        |  +--rw type?                        manotypes:virtual-link-type
+        |  +--rw root-bandwidth?              uint64
+        |  +--rw leaf-bandwidth?              uint64
+        |  +--rw internal-connection-point* [id-ref]
+        |  |  +--rw id-ref        -> ../../../vdu/internal-connection-point/id
+        |  |  +--rw ip-address?   inet:ip-address
+        |  +--rw provider-network
+        |  |  +--rw physical-network?   string
+        |  |  +--rw segmentation_id?    uint32
+        |  +--rw (init-params)?
+        |     +--:(vim-network-ref)
+        |     |  +--rw vim-network-name?      string
+        |     +--:(vim-network-profile)
+        |        +--rw ip-profile-ref?        string
+        +--rw ip-profiles* [name]
+        |  +--rw name                 string
+        |  +--rw description?         string
+        |  +--rw ip-profile-params
+        |     +--rw ip-version?           inet:ip-version
+        |     +--rw subnet-address?       inet:ip-prefix
+        |     +--rw gateway-address?      inet:ip-address
+        |     +--rw security-group?       string
+        |     +--rw dns-server* [address]
+        |     |  +--rw address    inet:ip-address
+        |     +--rw dhcp-params
+        |     |  +--rw enabled?         boolean
+        |     |  +--rw start-address?   inet:ip-address
+        |     |  +--rw count?           uint32
+        |     +--rw subnet-prefix-pool?   string
+        +--rw connection-point* [name]
+        |  +--rw name                     string
+        |  +--rw id?                      string
+        |  +--rw short-name?              string
+        |  +--rw type?                    manotypes:connection-point-type
+        |  +--rw port-security-enabled?   boolean
+        |  +--rw internal-vld-ref?        -> ../../internal-vld/id
+        +--rw vdu* [id]
+        |  +--rw id                           string
+        |  +--rw name?                        string
+        |  +--rw description?                 string
+        |  +--rw pdu-type?                    string
+        |  +--rw count?                       uint64
+        |  +--rw mgmt-vpci?                   string
+        |  +--rw vm-flavor
+        |  |  +--rw vcpu-count?   uint16
+        |  |  +--rw memory-mb?    uint64
+        |  |  +--rw storage-gb?   uint64
+        |  +--rw guest-epa
+        |  |  +--rw trusted-execution?           boolean
+        |  |  +--rw mempage-size?                enumeration
+        |  |  +--rw cpu-pinning-policy?          enumeration
+        |  |  +--rw cpu-thread-pinning-policy?   enumeration
+        |  |  +--rw pcie-device* [device-id]
+        |  |  |  +--rw device-id    string
+        |  |  |  +--rw count?       uint64
+        |  |  +--rw (numa-policy)?
+        |  |     +--:(numa-unaware)
+        |  |     |  +--rw numa-unaware?          empty
+        |  |     +--:(numa-aware)
+        |  |        +--rw numa-node-policy
+        |  |           +--rw node-cnt?     uint16
+        |  |           +--rw mem-policy?   enumeration
+        |  |           +--rw node* [id]
+        |  |              +--rw id                      uint64
+        |  |              +--rw vcpu* [id]
+        |  |              |  +--rw id    uint64
+        |  |              +--rw memory-mb?              uint64
+        |  |              +--rw (om-numa-type)?
+        |  |                 +--:(cores)
+        |  |                 |  +--rw num-cores?        uint8
+        |  |                 +--:(paired-threads)
+        |  |                 |  +--rw paired-threads
+        |  |                 |     +--rw num-paired-threads?   uint8
+        |  |                 |     +--rw paired-thread-ids* [thread-a]
+        |  |                 |        +--rw thread-a    uint8
+        |  |                 |        +--rw thread-b?   uint8
+        |  |                 +--:(threads)
+        |  |                    +--rw num-threads?      uint8
+        |  +--rw vswitch-epa
+        |  |  +--rw ovs-acceleration?   enumeration
+        |  |  +--rw ovs-offload?        enumeration
+        |  +--rw hypervisor-epa
+        |  |  +--rw type?      enumeration
+        |  |  +--rw version?   string
+        |  +--rw host-epa
+        |  |  +--rw cpu-model?               enumeration
+        |  |  +--rw cpu-arch?                enumeration
+        |  |  +--rw cpu-vendor?              enumeration
+        |  |  +--rw cpu-socket-count?        uint64
+        |  |  +--rw cpu-core-count?          uint64
+        |  |  +--rw cpu-core-thread-count?   uint64
+        |  |  +--rw cpu-feature* [feature]
+        |  |  |  +--rw feature    cpu-feature-type
+        |  |  +--rw om-cpu-model-string?     string
+        |  |  +--rw om-cpu-feature* [feature]
+        |  |     +--rw feature    string
+        |  +--rw alarm* [alarm-id]
+        |  |  +--rw alarm-id       string
+        |  |  +--rw name?          string
+        |  |  +--rw description?   string
+        |  |  +--rw vdur-id?       string
+        |  |  +--rw actions
+        |  |  |  +--rw ok* [url]
+        |  |  |  |  +--rw url    string
+        |  |  |  +--rw insufficient-data* [url]
+        |  |  |  |  +--rw url    string
+        |  |  |  +--rw alarm* [url]
+        |  |  |     +--rw url    string
+        |  |  +--rw repeat?        boolean
+        |  |  +--rw enabled?       boolean
+        |  |  +--rw severity?      alarm-severity-type
+        |  |  +--rw metric?        alarm-metric-type
+        |  |  +--rw statistic?     alarm-statistic-type
+        |  |  +--rw operation?     relational-operation-type
+        |  |  +--rw value?         decimal64
+        |  |  +--rw period?        uint32
+        |  |  +--rw evaluations?   uint32
+        |  +--rw image?                       string
+        |  +--rw image-checksum?              string
+        |  +--rw alternative-images* [vim-type]
+        |  |  +--rw vim-type          string
+        |  |  +--rw image?            string
+        |  |  +--rw image-checksum?   string
+        |  +--rw vdu-configuration
+        |  |  +--rw (config-method)?
+        |  |  |  +--:(script)
+        |  |  |  |  +--rw script
+        |  |  |  |     +--rw script-type?   enumeration
+        |  |  |  +--:(juju)
+        |  |  |     +--rw juju
+        |  |  |        +--rw charm?               string
+        |  |  |        +--rw proxy?               boolean
+        |  |  |        +--rw vca-relationships
+        |  |  |           +--rw relation* [requires provides]
+        |  |  |              +--rw requires    string
+        |  |  |              +--rw provides    string
+        |  |  +--rw config-primitive* [name]
+        |  |  |  +--rw name                   string
+        |  |  |  +--rw parameter* [name]
+        |  |  |  |  +--rw name              string
+        |  |  |  |  +--rw data-type?        manotypes:parameter-data-type
+        |  |  |  |  +--rw mandatory?        boolean
+        |  |  |  |  +--rw default-value?    string
+        |  |  |  |  +--rw parameter-pool?   string
+        |  |  |  |  +--rw read-only?        boolean
+        |  |  |  |  +--rw hidden?           boolean
+        |  |  |  +--rw user-defined-script?   string
+        |  |  +--rw initial-config-primitive* [seq]
+        |  |  |  +--rw seq                          uint64
+        |  |  |  +--rw (primitive-type)?
+        |  |  |     +--:(primitive-definition)
+        |  |  |        +--rw name?                  string
+        |  |  |        +--rw parameter* [name]
+        |  |  |        |  +--rw name         string
+        |  |  |        |  +--rw data-type?   manotypes:parameter-data-type
+        |  |  |        |  +--rw value?       string
+        |  |  |        +--rw user-defined-script?   string
+        |  |  +--rw metrics* [name]
+        |  |     +--rw name    string
+        |  +--rw monitoring-param* [id]
+        |  |  +--rw id                    string
+        |  |  +--rw nfvi-metric?          manotypes:nfvi-metric-type
+        |  |  +--rw interface-name-ref?   -> ../../interface/name
+        |  +--rw (cloud-init-input)?
+        |  |  +--:(inline)
+        |  |  |  +--rw cloud-init?            string
+        |  |  +--:(filename)
+        |  |     +--rw cloud-init-file?       string
+        |  +--rw supplemental-boot-data
+        |  |  +--rw boot-data-drive?   boolean
+        |  +--rw internal-connection-point* [id]
+        |  |  +--rw name?                    string
+        |  |  +--rw id                       string
+        |  |  +--rw short-name?              string
+        |  |  +--rw type?                    manotypes:connection-point-type
+        |  |  +--rw port-security-enabled?   boolean
+        |  |  +--rw internal-vld-ref?        -> ../../../internal-vld/id
+        |  +--rw interface* [name]
+        |  |  +--rw name                                   string
+        |  |  +--rw position?                              uint32
+        |  |  +--rw mgmt-interface?                        boolean
+        |  |  +--rw type?                                  interface-type
+        |  |  +--rw mac-address?                           string
+        |  |  +--rw (connection-point-type)?
+        |  |  |  +--:(internal)
+        |  |  |  |  +--rw internal-connection-point-ref?   -> ../../internal-connection-point/id
+        |  |  |  +--:(external)
+        |  |  |     +--rw external-connection-point-ref?   -> ../../../connection-point/name
+        |  |  +--rw virtual-interface
+        |  |     +--rw type?        enumeration
+        |  |     +--rw vpci?        string
+        |  |     +--rw bandwidth?   uint64
+        |  +--rw volumes* [name]
+        |     +--rw name                    string
+        |     +--rw description?            string
+        |     +--rw size?                   uint64
+        |     +--rw (volume-source)?
+        |     |  +--:(ephemeral)
+        |     |  |  +--rw ephemeral?        empty
+        |     |  +--:(image)
+        |     |     +--rw image?            string
+        |     |     +--rw image-checksum?   string
+        |     +--rw device-bus?             enumeration
+        |     +--rw device-type?            enumeration
+        +--rw vdu-dependency* [vdu-source-ref]
+        |  +--rw vdu-source-ref        -> ../../vdu/id
+        |  +--rw vdu-depends-on-ref?   -> ../../vdu/id
+        +--rw service-function-chain?     enumeration
+        +--rw service-function-type?      string
+        +--rw http-endpoint* [path]
+        |  +--rw path                     string
+        |  +--rw https?                   boolean
+        |  +--rw port?                    inet:port-number
+        |  +--rw username?                string
+        |  +--rw password?                string
+        |  +--rw polling-interval-secs?   uint8
+        |  +--rw method?                  manotypes:http-method
+        |  +--rw headers* [key]
+        |     +--rw key      string
+        |     +--rw value?   string
+        +--rw scaling-group-descriptor* [name]
+        |  +--rw name                     string
+        |  +--rw scaling-policy* [name]
+        |  |  +--rw name                        string
+        |  |  +--rw scaling-type?               manotypes:scaling-policy-type
+        |  |  +--rw enabled?                    boolean
+        |  |  +--rw scale-in-operation-type?    manotypes:scaling-criteria-operation
+        |  |  +--rw scale-out-operation-type?   manotypes:scaling-criteria-operation
+        |  |  +--rw threshold-time              uint32
+        |  |  +--rw cooldown-time               uint32
+        |  |  +--rw scaling-criteria* [name]
+        |  |     +--rw name                              string
+        |  |     +--rw scale-in-threshold?               uint64
+        |  |     +--rw scale-in-relational-operation?    manotypes:relational-operation-type
+        |  |     +--rw scale-out-threshold?              uint64
+        |  |     +--rw scale-out-relational-operation?   manotypes:relational-operation-type
+        |  |     +--rw vnf-monitoring-param-ref?         -> ../../../../monitoring-param/id
+        |  +--rw vdu* [vdu-id-ref]
+        |  |  +--rw vdu-id-ref    -> ../../../vdu/id
+        |  |  +--rw count?        uint32
+        |  +--rw min-instance-count?      uint32
+        |  +--rw max-instance-count?      uint32
+        |  +--rw scaling-config-action* [trigger]
+        |     +--rw trigger                          manotypes:scaling-trigger
+        |     +--rw vnf-config-primitive-name-ref?   -> ../../../vnf-configuration/config-primitive/name
+        +--rw monitoring-param* [id]
+        |  +--rw id                            string
+        |  +--rw name?                         string
+        |  +--rw aggregation-type?             aggregation-type
+        |  +--rw (monitoring-type)?
+        |  |  +--:(vdu-monitoring-param)
+        |  |  |  +--rw vdu-monitoring-param
+        |  |  |     +--rw vdu-ref?                    -> ../../../vdu/id
+        |  |  |     +--rw vdu-monitoring-param-ref?   -> ../../../vdu[id = current()/../vdu-ref]/monitoring-param/id
+        |  |  +--:(vnf-metric)
+        |  |  |  +--rw vnf-metric
+        |  |  |     +--rw vnf-metric-name-ref?   -> ../../../vnf-configuration/metrics/name
+        |  |  +--:(vdu-metric)
+        |  |     +--rw vdu-metric
+        |  |        +--rw vdu-ref?               -> ../../../vdu/id
+        |  |        +--rw vdu-metric-name-ref?   -> ../../../vdu[id = current()/../vdu-ref]/vdu-configuration/metrics/name
+        |  +--rw http-endpoint-ref?            -> ../../http-endpoint/path
+        |  +--rw json-query-method?            manotypes:json-query-method
+        |  +--rw json-query-params
+        |  |  +--rw json-path?     string
+        |  |  +--rw object-path?   string
+        |  +--rw description?                  string
+        |  +--rw group-tag?                    string
+        |  +--rw widget-type?                  manotypes:widget-type
+        |  +--rw units?                        string
+        |  +--rw value-type?                   param-value-type
+        |  +--rw numeric-constraints
+        |  |  +--rw min-value?   uint64
+        |  |  +--rw max-value?   uint64
+        |  +--rw text-constraints
+        |  |  +--rw min-length?   uint8
+        |  |  +--rw max-length?   uint8
+        |  +--rw value-integer?                int64
+        |  +--rw value-decimal?                decimal64
+        |  +--rw value-string?                 string
+        +--rw placement-groups* [name]
+           +--rw name           string
+           +--rw requirement?   string
+           +--rw strategy?      enumeration
+           +--rw member-vdus* [member-vdu-ref]
+              +--rw member-vdu-ref    -> ../../../vdu/id

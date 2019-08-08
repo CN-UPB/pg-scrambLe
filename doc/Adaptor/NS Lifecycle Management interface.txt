@@ -1,0 +1,363 @@
+etsi = [    
+    {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "NS instances",
+        "endpoint": "ns_instances",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query multiple NS instances."
+            },
+            {
+                "method": "post",
+                "meaning": "POST - Create a NS instance resource."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Individual NS instance",
+        "endpoint": "ns_instances_nsinstanceid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read an individual NS instance resource."
+            },
+            {
+                "method": "delete",
+                "meaning": "DELETE - Delete NS instance resource."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Instantiate NS task",
+        "endpoint": "ns_instances_nsinstanceid_instantiate",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "GET - Read an individual NS instance resource."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Scale NS task",
+        "endpoint": "ns_instances_nsinstanceid_scale",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Scale a NS instance."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Update NS task",
+        "endpoint": "ns_instances_nsinstanceid_update",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Updates a NS instance."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Terminate NS task",
+        "endpoint": "ns_instances_nsinstanceid_terminate",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Terminate a NS instance."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Heal NS task",
+        "endpoint": "ns_instances_nsinstanceid_heal",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Heal a NS instance."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "NS lifecycle operation occurrences",
+        "endpoint": "ns_lcm_op_ops",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Query multiple NS LCM operation occurrences."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Individual NS lifecycle operation occurrence",
+        "endpoint": "ns_lcm_op_ops_nslcmopoccid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read an individual NS LCM operation occurrence resource."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Retry operation task",
+        "endpoint": "ns_lcm_op_occs_nslcmopoccid_retry",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Retry a NS lifecycle management operation occurrence."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Rollback operation task",
+        "endpoint": "ns_lcm_op_occs_nsLcmOpOccId_rollback",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Rollback a NS lifecycle management operation occurrence."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Continue operation task",
+        "endpoint": "ns_lcm_op_occs_nsLcmOpOccId_continue",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Continue a NS lifecycle management operation occurrence."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Fail operation task",
+        "endpoint": "ns_lcm_op_occs_nsLcmOpOccId_fail",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Mark a NS lifecycle management operation occurrence as failed."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Cancel operation task",
+        "endpoint": "ns_lcm_op_occs_nsLcmOpOccId_cancel",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Cancel a NS lifecycle management operation occurrence."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Subscriptions",
+        "endpoint": "ns_lcm_subscriptions",
+        "methods": [
+            {
+                "method": "post",
+                "meaning": "POST - Subscribe to NS lifecycle change notifications."
+            },{
+                "method": "get",
+                "meaning": "GET - Query multiple subscriptions."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Individual subscription",
+        "endpoint": "ns_lcm_subscriptions_subscriptionid",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Read an individual subscription resource."
+            },{
+                "method": "delete",
+                "meaning": "DELETE - Terminate a subscription."
+            }
+        ]
+    }, {
+        "section": " NS Lifecycle Management interface",
+        "resourceName": "Notification endpoint",
+        "endpoint": "unknown",
+        "methods": [
+            {
+                "method": "get",
+                "meaning": "GET - Test the notification endpoint."
+            },{
+                "method": "post",
+                "meaning": "POST - Notify about NS lifecycle change."
+            }
+        ]
+    }
+]
+
+
+------------------------
+
+Individual NS instance - /ns_instances/{nsInstanceId}
+GET
+DELETE
+
+Instantiate NS task - /ns_instances/{nsInstanceId}/instantiate
+POST
+Instantiate a NS
+
+Scale NS task - /ns_instances/{nsInstanceId}/scale
+POST
+Scale a NS instance
+
+Update NS task - /ns_instances/{nsInstanceId}/update
+POST
+Updates a NS instance
+
+Terminate NS task - /ns_instances/{nsInstanceId}/terminate
+POST
+Terminate a NS instance
+
+Heal NS task - /ns_instances/{nsInstanceId}/heal
+POST
+Heal a NS instance
+
+NS lifecycle operation occurrences - /ns_lcm_op_ops
+GET
+Query multiple NS LCM operation occurrences
+
+Individual NS lifecycle operation occurrence - /ns_lcm_op_ops/{nsLcmOpOccId}
+GET
+Read an individual NS LCM operation occurrence resource
+
+Retry operation task - /ns_lcm_op_occs/{nsLcmOpOccId}/retry
+POST
+Retry a NS lifecycle management operation occurrence
+
+Rollback operation task - /ns_lcm_op_occs/{nsLcmOpOccId}/rollback
+POST
+Rollback a NS lifecycle management operation occurrence
+
+Continue operation task - /ns_lcm_op_occs/{nsLcmOpOccId}/continue
+POST
+Continue a NS lifecycle management operation occurrence
+
+Fail operation task - /ns_lcm_op_occs/{nsLcmOpOccId}/fail
+POST
+Mark a NS lifecycle management operation occurrence as failed
+
+Cancel operation task - /ns_lcm_op_occs/{nsLcmOpOccId}/cancel
+POST
+Cancel a NS lifecycle management operation occurrence
+
+Subscriptions - /subscriptions
+POST
+Subscribe to NS lifecycle change notifications
+
+GET
+Query multiple subscriptions
+
+Individual subscription - /subscriptions/{subscriptionId}
+GET
+Read an individual subscription resource
+
+DELETE
+Terminate a subscription
+
+Notification endpoint - (client-provided)
+POST
+Notify about NS lifecycle change. (*) See note
+
+GET
+Test the notification endpoint (*) See note
+------------------------
+
+NS Lifecycle Management interface
+
+# resourceName
+
+NS instances
+Individual NS instance
+Instantiate NS task
+Scale NS task
+Update NS task
+Terminate NS task
+Heal NS task
+NS lifecycle operation occurrences
+Individual NS lifecycle operation occurrence
+Retry operation task
+Rollback operation task
+Continue operation task
+Fail operation task
+Cancel operation task
+Subscriptions
+Individual subscription
+Notification endpoint
+
+# endpoint
+
+/ns_instances
+/ns_instances/{nsInstanceId}
+/ns_instances/{nsInstanceId}/instantiate
+/ns_instances/{nsInstanceId}/scale
+/ns_instances/{nsInstanceId}/update
+/ns_instances/{nsInstanceId}/terminate
+/ns_instances/{nsInstanceId}/heal
+/ns_lcm_op_ops
+/ns_lcm_op_ops/{nsLcmOpOccId}
+/ns_lcm_op_occs/{nsLcmOpOccId}/retry
+/ns_lcm_op_occs/{nsLcmOpOccId}/rollback
+/ns_lcm_op_occs/{nsLcmOpOccId}/continue
+/ns_lcm_op_occs/{nsLcmOpOccId}/fail
+/ns_lcm_op_occs/{nsLcmOpOccId}/cancel
+/subscriptions
+/subscriptions/{subscriptionId}
+(client-provided)
+
+# Method
+GET
+POST
+
+GET
+DELETE
+
+POST
+POST
+POST
+POST
+POST
+GET
+GET
+POST
+POST
+POST
+POST
+POST
+
+POST
+GET
+
+GET
+DELETE
+
+POST
+GET
+
+# meaning
+
+Query multiple NS instances
+Create a NS instance resource
+Read an individual NS instance resource
+Delete NS instance resource
+Instantiate a NS
+Scale a NS instance
+Updates a NS instance
+Terminate a NS instance
+Heal a NS instance
+Query multiple NS LCM operation occurrences
+Read an individual NS LCM operation occurrence resource
+Retry a NS lifecycle management operation occurrence
+Rollback a NS lifecycle management operation occurrence
+Continue a NS lifecycle management operation occurrence
+Mark a NS lifecycle management operation occurrence as failed
+Cancel a NS lifecycle management operation occurrence
+Subscribe to NS lifecycle change notifications
+Query multiple subscriptions
+Read an individual subscription resource
+Terminate a subscription
+Notify about NS lifecycle change
+Test the notification endpoint 

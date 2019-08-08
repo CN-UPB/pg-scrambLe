@@ -1,0 +1,46 @@
+FROM python:3
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get -y install netcat && apt-get clean
+RUN apt-get install software-properties-common -y
+RUN apt-get install apt-transport-https ca-certificates -y
+RUN curl https://osm-download.etsi.org/repository/osm/debian/ReleaseFIVE/OSM%20ETSI%20Release%20Key.gpg | apt-key add -
+RUN add-apt-repository -y "deb [arch=amd64] https://osm-download.etsi.org/repository/osm/debian/ReleaseFIVE stable IM osmclient devops"
+RUN apt update -y
+RUN apt install python-osm-im -y
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY config.yml ./
+COPY start.sh ./
+COPY translator.py ./
+COPY utilities.py ./
+COPY descriptorReader.py ./
+COPY descriptorWriter.py ./
+COPY validate.py ./
+COPY until.py ./
+COPY event.py ./
+COPY storage.py ./
+COPY osmdata.py ./
+COPY eventcfg.yml ./
+
+COPY ./descriptors_examples/hackfest_multivdu_nsd.yaml ./
+COPY ./descriptors_examples/NSD.yaml ./
+
+COPY ./descriptors_examples/hackfest_multivdu_vnfd.yaml ./
+COPY ./descriptors_examples/VNFD.yaml ./
+
+COPY ./tng-schema/Nsd/nsd-schema.yml ./
+COPY ./tng-schema/Vnfd/vnfd-schema.yml ./
+COPY ./tng-schema/Nsd/nsd-pishahang.yml ./
+COPY ./tng-schema/Vnfd/vnfd-pishahang.yml ./
+COPY ./tng-schema/Vnfd/osm-vnfd-schema.json ./
+COPY ./tng-schema/Nsd/osm-schema-nsd.json ./
+
+
+RUN chmod +x ./start.sh
+
+CMD watchmedo auto-restart --recursive --pattern="*.py" --directory="." /bin/bash start.sh

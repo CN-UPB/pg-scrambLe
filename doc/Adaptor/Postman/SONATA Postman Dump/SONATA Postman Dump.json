@@ -1,0 +1,947 @@
+{
+	"info": {
+		"_postman_id": "c9a990ff-f932-41e6-9630-48d8425daffa",
+		"name": "SONATA Postman Dump",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Creating a session",
+			"request": {
+				"auth": {
+					"type": "basic"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"sonata\",\"password\":\"1234\"}"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/sessions",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"sessions"
+					]
+				},
+				"description": "Creating a session"
+			},
+			"response": []
+		},
+		{
+			"name": "Receive all NSR",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiJjMzdmNzllMi01ZDNiLTQzMzgtYTgzZC1lMjI5MWE0ZmI2NTIiLCJleHAiOjE1NTA3NDY2ODgsIm5iZiI6MCwiaWF0IjoxNTUwNzQ1NDg4LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiJkZGRiNzFjOC0yNDFkLTQ3ZjctYjZlMi1kOGM1MGY0MDk4NzciLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.WDnEPtw_DjbjYCaYuPUtBjUQtPvBmVDG16-GetbwjaFTuNzvAEv_fm6F2FHQt-hjjTPLegGguOn1NNNdFG4x0BPR2c-SBTiyYEejS7q7bznr_wSDtB-VUgRAOzP2zYc2krzFT5t0tA6Ylgx63W6Y_QK_toxp5ikKvIY3gbQhptPm8lSzlhI7m7MgQ0dEIJxOaXwvMRMjgbM0KXokXnYV9Lc8SGfPcPSFWtfCs-GfG23BC4gPYa3YcL_uwgCwOMGabnmSaEO4kTRWa_XN3T2RaYJ848cT83biG_EtB5qfxb5Xej_tZkQWxnTLuXJ-88lvBKvaPmUlCd_ZV3g1DLNp3w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/requests?limit=100",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"requests"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Receive all VNFs",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiJmYjI4MDFkOS0xYWI0LTRlN2MtYjc5Ni0xMzk5NmY5YzcxYTEiLCJleHAiOjE1NDgzNDEzNTIsIm5iZiI6MCwiaWF0IjoxNTQ4MzM5NTUyLCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJhZGFwdGVyIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiNWNhNjUxYmEtODM2MS00ZGJjLThmY2QtZjU1M2U2YTVhOTNhIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX19.Xsi34W7XRDKnqLcP0LkE66fqU59VUjNzP7ipnqZiX6LkemdZwdF_nebZuy_BA8a_vWWcsxp_PZliD1OdVOX2M0_ATechH79gdOEWTUcKFDhb1nkBwS8q7OG9ZPTds06ZmLlGB6vCkFGk1YHnn_h5lFonUamuZajK7myA_3YxSxcbOrVXVqVtKLFvEOnYgij-OVEo3nBhvB539oOBmiMjYNVlehqnaBesSBRD0oTLRkdsOycIayT5AV3aASe2QsCTYew8Zi8bLP8V2ESV8JgbbVAptykHY2908iEuJg3EhkJiylLLntwWMqvdEaH0X2e0sT8ULc8-dRVsHNw2J2-awg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"sonata\",\"password\":\"1234\"}"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/vnfs",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"vnfs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Receive all NS",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiJmYjI4MDFkOS0xYWI0LTRlN2MtYjc5Ni0xMzk5NmY5YzcxYTEiLCJleHAiOjE1NDgzNDEzNTIsIm5iZiI6MCwiaWF0IjoxNTQ4MzM5NTUyLCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJhZGFwdGVyIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiNWNhNjUxYmEtODM2MS00ZGJjLThmY2QtZjU1M2U2YTVhOTNhIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX19.Xsi34W7XRDKnqLcP0LkE66fqU59VUjNzP7ipnqZiX6LkemdZwdF_nebZuy_BA8a_vWWcsxp_PZliD1OdVOX2M0_ATechH79gdOEWTUcKFDhb1nkBwS8q7OG9ZPTds06ZmLlGB6vCkFGk1YHnn_h5lFonUamuZajK7myA_3YxSxcbOrVXVqVtKLFvEOnYgij-OVEo3nBhvB539oOBmiMjYNVlehqnaBesSBRD0oTLRkdsOycIayT5AV3aASe2QsCTYew8Zi8bLP8V2ESV8JgbbVAptykHY2908iEuJg3EhkJiylLLntwWMqvdEaH0X2e0sT8ULc8-dRVsHNw2J2-awg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"sonata\",\"password\":\"1234\"}"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/network-services",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"network-services"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Receive all packages",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiJmYjI4MDFkOS0xYWI0LTRlN2MtYjc5Ni0xMzk5NmY5YzcxYTEiLCJleHAiOjE1NDgzNDEzNTIsIm5iZiI6MCwiaWF0IjoxNTQ4MzM5NTUyLCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IlJlZnJlc2giLCJhenAiOiJhZGFwdGVyIiwiYXV0aF90aW1lIjowLCJzZXNzaW9uX3N0YXRlIjoiNWNhNjUxYmEtODM2MS00ZGJjLThmY2QtZjU1M2U2YTVhOTNhIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX19.Xsi34W7XRDKnqLcP0LkE66fqU59VUjNzP7ipnqZiX6LkemdZwdF_nebZuy_BA8a_vWWcsxp_PZliD1OdVOX2M0_ATechH79gdOEWTUcKFDhb1nkBwS8q7OG9ZPTds06ZmLlGB6vCkFGk1YHnn_h5lFonUamuZajK7myA_3YxSxcbOrVXVqVtKLFvEOnYgij-OVEo3nBhvB539oOBmiMjYNVlehqnaBesSBRD0oTLRkdsOycIayT5AV3aASe2QsCTYew8Zi8bLP8V2ESV8JgbbVAptykHY2908iEuJg3EhkJiylLLntwWMqvdEaH0X2e0sT8ULc8-dRVsHNw2J2-awg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"sonata\",\"password\":\"1234\"}"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/packages",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Receive a list of stored packages",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/son-packages",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"son-packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "To send a particular package",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment; filename=sonata_example.son",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/son-packages",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"son-packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a particular package",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/zip",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/son-packages/",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"son-packages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send a NS",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/network-services",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"network-services"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send a VNFs",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/vnfs",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"vnfs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send a descriptor package",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/packages",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a descriptor package",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a VNFs",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/vnfs/6c834910-ea17-4233-8c7d-9dfb28c6dd2a",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"vnfs",
+						"6c834910-ea17-4233-8c7d-9dfb28c6dd2a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete NS",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiI1OGZiNzFlZC1hODMzLTRkNDEtODlkYy03NTA3NjE2ZjNjOWYiLCJleHAiOjE1NDgzNDM3ODUsIm5iZiI6MCwiaWF0IjoxNTQ4MzQyNTg1LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRkNGI0Ni04YTc1LTRkYTUtYWVkZC0xMjkwZTJkMzRjNGIiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.Fx-0yMVtsbYYoCURCCySr7hsYVbt4o-fAXkuTu0i9LM3kIAl_mfzqa_yUIa7W-y96gxnr63FghSxquJyOJmX1QyxlqcXHJzbYTehC2924eu6nK00yNmS-6TEXh9w78Ae5bzUailxDW8pTI9qJSbBFSfpf_y6RagSi6CeKZfHz9Z94VoUDrd0QssE8j0WaKMkI2KGvZEx4JqE8YeIAp7B9Nk-v7vfxeeSQQAQ1QIdD47qA3Yko1a1OE4QUf3p-AXKFxkA5nIke2iwrCT7HXt86tJQ3Kpu_XnQRC2vuV3Xfp7SNLswh6f-SszNfuVUpHtm1M0-FvqQf0oeIXj_mq0H_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-yaml",
+						"type": "text"
+					},
+					{
+						"key": "Content-Disposition",
+						"value": "attachment",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:4002/catalogues/api/v2/network-services/7cacca56-aacf-46de-87d1-6728e8d6b045",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "4002",
+					"path": [
+						"catalogues",
+						"api",
+						"v2",
+						"network-services",
+						"7cacca56-aacf-46de-87d1-6728e8d6b045"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/requests",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJqbUYtS192SUd2VzNpeVN5QnEwa1h3Qm90dDhqYlVrVGgzcjJuY2ZXSkRvIn0.eyJqdGkiOiI5Mjg2ZTNkZS05Yjk5LTQ4OTctYmRhMy01MzE3ZGFhMzEwZDYiLCJleHAiOjE1NTEzNDg2OTIsIm5iZiI6MCwiaWF0IjoxNTUxMzQ3NDkyLCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6ImFlZDIzMWVhLWM2N2MtNDJhZi1hMzkxLTkzNDkwMGVlMzY2MSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiJhNTUxOGUzZC1lZjQ0LTRiMjgtOTFmZC0zN2M3ODVhOGY2NTciLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.gCy5yCr5iWy1hdwR5OjaK9arg1M8oSjF-9mgDcM9_awzGJ1ZehhWlMGImsj5EqMM-WdBQkglJ14Izq-xHNloZioMlUCCzJGaVtRKIFMktp1ZkzzUH8feYYITsYrMC6P7SNUg3c8K9rC85tMNDZsDxHPXh63YLJgFle9yIgn2BGZFkF3x0WmWrIH3qxxH-Epa90ZZYC2VyWfz0sigAMFvFV2LrgJUZuWJLaqT2KXBan98fvrfe50Z7OG6CEUnijAezYDwHGvRoKjTGlM4TNerII4viY2Va9Oz_ckgMZYx99y4o5b-AxbFnNKVOCRMLiNuaxGXZdR0mFHM7zACWt10mw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/requests/",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"requests",
+						""
+					]
+				},
+				"description": "Receive all requests"
+			},
+			"response": []
+		},
+		{
+			"name": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/records/nsr",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzUFJObUhpczB2N2RnQjk0bGpFaTlJUC15UmQ1c1JJOWtFdklSSG1rWG1ZIn0.eyJqdGkiOiJjMzdmNzllMi01ZDNiLTQzMzgtYTgzZC1lMjI5MWE0ZmI2NTIiLCJleHAiOjE1NTA3NDY2ODgsIm5iZiI6MCwiaWF0IjoxNTUwNzQ1NDg4LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6IjkzZjg2NzAwLWNmMmEtNDNjOC1hNzQzLWRhNTUwOGQ5NDhiOCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiJkZGRiNzFjOC0yNDFkLTQ3ZjctYjZlMi1kOGM1MGY0MDk4NzciLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctaWRlbnRpdHktcHJvdmlkZXJzIiwidmlldy1yZWFsbSIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.WDnEPtw_DjbjYCaYuPUtBjUQtPvBmVDG16-GetbwjaFTuNzvAEv_fm6F2FHQt-hjjTPLegGguOn1NNNdFG4x0BPR2c-SBTiyYEejS7q7bznr_wSDtB-VUgRAOzP2zYc2krzFT5t0tA6Ylgx63W6Y_QK_toxp5ikKvIY3gbQhptPm8lSzlhI7m7MgQ0dEIJxOaXwvMRMjgbM0KXokXnYV9Lc8SGfPcPSFWtfCs-GfG23BC4gPYa3YcL_uwgCwOMGabnmSaEO4kTRWa_XN3T2RaYJ848cT83biG_EtB5qfxb5Xej_tZkQWxnTLuXJ-88lvBKvaPmUlCd_ZV3g1DLNp3w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/records/nsr",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"records",
+						"nsr"
+					]
+				},
+				"description": "Receive all nsr in records\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Receive all NS instances",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJqbUYtS192SUd2VzNpeVN5QnEwa1h3Qm90dDhqYlVrVGgzcjJuY2ZXSkRvIn0.eyJqdGkiOiJkNjBhMjljMy04ODllLTQyYjEtODY2Mi05YWViNWI2ZGRkMDAiLCJleHAiOjE1NTEzNjc4NTksIm5iZiI6MCwiaWF0IjoxNTUxMzY2NjU5LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6ImFlZDIzMWVhLWM2N2MtNDJhZi1hMzkxLTkzNDkwMGVlMzY2MSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiI2NWRiZDIyOC1mZTk1LTQ5MGUtYjE3Zi1mZWUyZWEzZTcwZmQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.hIemNgPlbX0yjsLga42v6XNk8sJTeHbE0UPbtZjHExjYXBOP0hqCxFT-rk7DBFR858uFity3ucHWSi8_RXhfpge0jx7cPBCE_Ugu8vDZiz5epelRyMuPzwyJWLFSADfoK50Xf7Jh_A0Qbxj-iWb8yNxs6CKWzli8hacoVM8kAa1dA_HIFgrPjsKgpghyaB9BDGE616tolpZnadjaCGIRsORnYOMnc3abo9VUjmWovkajzxzzIL5su77kaFvrGJJREZkXNIDUZcNz7kJ1F7NsBoM-a1dEtD5sl8j4rVJlBMVYex4esSMDztR9t7YC_Y10mlaW0ANtwM_RD01rtdCqqQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"service_uuid\": \"61945333-65d3-4468-bf6c-f3099d1c413f\",\n   \"egresses\" : [],\n   \"ingresses\" : []\n   \n}\n\n"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/requests",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of all available APIs",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJqbUYtS192SUd2VzNpeVN5QnEwa1h3Qm90dDhqYlVrVGgzcjJuY2ZXSkRvIn0.eyJqdGkiOiIwODQwMTMzNC0yODFjLTQ5MDQtOTY4ZS03MzljNjU3MGM2NGYiLCJleHAiOjE1NTEzNTAxMTQsIm5iZiI6MCwiaWF0IjoxNTUxMzQ4OTE0LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6ImFlZDIzMWVhLWM2N2MtNDJhZi1hMzkxLTkzNDkwMGVlMzY2MSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiJmNWVmZDk4Ni1kODk4LTQ0N2UtODRkNC02NmQzZWQ1YmZkMmQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.BEvoh3v5JnmqmgD_M8J_8p3Bwq411XRWcaWxdOqcm5B1_4aOozPS98Kye0CJ6G0tWfKx5YNwgOIaRJzztl7xEWlUdDYDkEhY9xf3cnj0K_RSrHGnoBGCeYOaGZBaN2O6l86PBwNT5muYOlhiIPbsgrdOzWWq_7wBoRb7hBUdY2qTrbojw5faUyJG_F-1NkjF4YoBVdKZdXDs-KfbfCvOAZUZsPuwmxD5x6gORg86vUpMMjGx2ZvWmw2ascHBSai02pODYGMcQOMn7TC-126MqolcpHDaYkdI1Ao835YXRTHkPseqaoDmc6vFfKWwk2hPGNQ3f_BCAQ4WgdiQzV0GNQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de:32001/api/",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"port": "32001",
+					"path": [
+						"api",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post NS instances",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJqbUYtS192SUd2VzNpeVN5QnEwa1h3Qm90dDhqYlVrVGgzcjJuY2ZXSkRvIn0.eyJqdGkiOiJkZThlNmE5Zi05ZDJmLTQzOGQtOGFiNC1jOWM4Zjc4NTA3M2IiLCJleHAiOjE1NTEzNjkyMDgsIm5iZiI6MCwiaWF0IjoxNTUxMzY4MDA4LCJpc3MiOiJodHRwOi8vc29uLWtleWNsb2FrOjU2MDEvYXV0aC9yZWFsbXMvc29uYXRhIiwiYXVkIjoiYWRhcHRlciIsInN1YiI6ImFlZDIzMWVhLWM2N2MtNDJhZi1hMzkxLTkzNDkwMGVlMzY2MSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkYXB0ZXIiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiIzM2MzZjZiZi01OWE1LTRlNzgtYWU1MC05ZGY4ZmZhYTkxZTciLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9zb24tZ3RrdXNyOjU2MDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImFkbWluIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctcmVhbG0iLCJ2aWV3LWlkZW50aXR5LXByb3ZpZGVycyIsIm1hbmFnZS1pZGVudGl0eS1wcm92aWRlcnMiLCJpbXBlcnNvbmF0aW9uIiwicmVhbG0tYWRtaW4iLCJjcmVhdGUtY2xpZW50IiwibWFuYWdlLXVzZXJzIiwicXVlcnktcmVhbG1zIiwidmlldy1hdXRob3JpemF0aW9uIiwicXVlcnktY2xpZW50cyIsInF1ZXJ5LXVzZXJzIiwibWFuYWdlLWV2ZW50cyIsIm1hbmFnZS1yZWFsbSIsInZpZXctZXZlbnRzIiwidmlldy11c2VycyIsInZpZXctY2xpZW50cyIsIm1hbmFnZS1hdXRob3JpemF0aW9uIiwibWFuYWdlLWNsaWVudHMiLCJxdWVyeS1ncm91cHMiXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sIm5hbWUiOiJBZG1pbiBEZWZhdWx0IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic29uYXRhIiwiZ2l2ZW5fbmFtZSI6IkFkbWluIiwiZmFtaWx5X25hbWUiOiJEZWZhdWx0IiwiZW1haWwiOiJzb25hdGFuZnZAZ21haWwuY29tIn0.AkKAoiaHlulzPTHNcsiCvckNYm8xSsyLOcxHbLje3LORw04Eu2I-aLcgiifwf5BeOC0pDYVBfUIR_tyWnjjbyh1_NoHbf5TzkIyJHk25CC3uC1igRiUM6ZKeYWDBSAzdqLekasaTrMSAl_6E4y2J5vQaS0rM8Vf1bN3lrriaq29XWVx-z1hDo_TF8n_ZDTpo7AS8DdhE8N-PraDT3bf49adRKB8lLAfB8J_4JM1GlSt3RB0Ksc1P0sfopwJ_p_Ph68x7s2MNLsSlNS4p3Qw5yKtLP_8r8BtiL5MLlRKrJtMeU9COAAK2rfcP9SX7K5F_DzU6umM9S0FvLtImsToXNA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"service_uuid\": \"61945333-65d3-4468-bf6c-f3099d1c413f\",\n   \"egresses\" : [],\n   \"ingresses\" : []\n   \n}\n\n"
+				},
+				"url": {
+					"raw": "http://vm-hadik3r-08.cs.uni-paderborn.de/api/v2/requests",
+					"protocol": "http",
+					"host": [
+						"vm-hadik3r-08",
+						"cs",
+						"uni-paderborn",
+						"de"
+					],
+					"path": [
+						"api",
+						"v2",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
