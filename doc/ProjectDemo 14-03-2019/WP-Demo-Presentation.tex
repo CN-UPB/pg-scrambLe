@@ -1,0 +1,82 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Paderborn Beamer Presentation 
+
+% Author: Ashwin Prasad Shivarpatna Venkatesh 
+
+%This template is free: you can redistribute it and/or modify
+%it under the terms of the GNU General Public License as published by
+%the Free Software Foundation, either version 3 of the License, or any later version.
+%
+%This program is distributed in the hope that it will be useful,
+%but WITHOUT ANY WARRANTY; without even the implied warranty of
+%MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%GNU General Public License for more details.
+%
+%You should have received a copy of the GNU General Public License
+%along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{beamer}
+% Default page size 12.8cm x 9.6cm
+
+% import packages and user-defined commands
+\input{internal/packages}
+\input{internal/commands}
+\input{internal/upb-unicolors}
+\input{internal/upb-theme}
+\input{presentation-details}
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+
+\begin{document}
+
+{
+\upbtitlebackground 
+\begin{frame}
+%\upblogo
+\titlepage % Print the title page as the first slide
+\end{frame}
+}
+
+\begin{frame}
+\frametitle{Agenda} % Table of contents slide, comment this block out to remove it
+\tableofcontents 
+
+\section{Introduction}
+\section{Adaptor Demo}
+%\subsection{Test cases}
+%\subsection{Front End}
+%\subsection{MANO Scalability Investigation}
+\section{Translator Demo}
+\section{Splitter Demo}
+\section{Conclusion}
+
+
+
+% Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+\include{Introduction}
+\include{Architecture}
+\include{Adaptor}
+\include{Frontend}
+\include{Testcases}
+\begin{frame}
+\Huge{\centerline{MANO Scalability}}
+\Huge{\centerline{Investigation}}
+\end{frame}
+\include{ScalabilityInvestigation}
+\include{Translator}
+\include{Splitter}
+\include{Conclusion}
+
+
+\end{document} 
