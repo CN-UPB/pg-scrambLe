@@ -26,12 +26,12 @@ DOCKER_CASE_MEM_BAR = True
 SYSTEM_RAM_BAR = True
 SUCCESS_RATIO_LINE = True
 
-CPU_MAX_SCALE = 100
+CPU_MAX_SCALE = 150
 LIMIT_DOCKERS_IN_GRAPH = -10
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/Final"
-_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/Graphs"
-_SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/data_csv"
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/Final"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/Graphs"
+_SUCCESS_RATIO_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/data_csv"
 
 
 
@@ -62,8 +62,7 @@ if DOCKER_CASE_CPU_BAR:
         df = pd.read_csv(_docker_cpu_files)
         
         for index, row in df.iterrows():
-            _case, _instances = row['Case'].split("s_")[1].split("_")
-            _image = row['Case'].split("_")[0]
+            _image, _case, _instances = row['Case'].split("_")
 
             if not _case in data_dict:
                 data_dict[_case] = {}
@@ -71,12 +70,12 @@ if DOCKER_CASE_CPU_BAR:
             if not _instances in data_dict[_case]: 
                 data_dict[_case][_instances] = {}
                 data_dict[_case][_instances] = {}
-                data_dict[_case][_instances]["stress"] = {}
+                data_dict[_case][_instances]["ubuntu"] = {}
                 data_dict[_case][_instances]["cirros"] = {}
 
-            if _image == "stress":
-                data_dict[_case][_instances]["stress"]["mean"] = row['CPU Mean']
-                data_dict[_case][_instances]["stress"]["sd"] = row['CPU SD']
+            if _image == "ubuntu":
+                data_dict[_case][_instances]["ubuntu"]["mean"] = row['CPU Mean']
+                data_dict[_case][_instances]["ubuntu"]["sd"] = row['CPU SD']
             elif _image == "cirros":
                 data_dict[_case][_instances]["cirros"]["mean"] = row['CPU Mean']
                 data_dict[_case][_instances]["cirros"]["sd"] = row['CPU SD']
@@ -93,8 +92,8 @@ if DOCKER_CASE_CPU_BAR:
                         'case': int(_instances), 
                         'CPU cirros mean': _instances_data['cirros']["mean"],
                         'CPU cirros sd': _instances_data['cirros']["sd"],
-                        'CPU stress mean': _instances_data['stress']["mean"],
-                        'CPU stress sd': _instances_data['stress']["sd"]
+                        'CPU ubuntu mean': _instances_data['ubuntu']["mean"],
+                        'CPU ubuntu sd': _instances_data['ubuntu']["sd"]
                     })
 
 
@@ -104,14 +103,14 @@ if DOCKER_CASE_CPU_BAR:
                 divisions = df['case']
                 cpu_cirros = df['CPU cirros mean']
                 cpu_cirros_sd = df['CPU cirros sd']
-                cpu_stress = df['CPU stress mean']
-                cpu_stress_sd = df['CPU stress sd']
+                cpu_ubuntu = df['CPU ubuntu mean']
+                cpu_ubuntu_sd = df['CPU ubuntu sd']
 
                 df['CPU cirros mean T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
-                df['CPU stress mean T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+                df['CPU ubuntu mean T'] = abs(T_BOUNDS[1] * df['CPU ubuntu sd'] / sqrt(RUNS))
 
                 cirros_t_mean = df['CPU cirros mean T']
-                stress_t_mean = df['CPU stress mean T']
+                ubuntu_t_mean = df['CPU ubuntu mean T']
 
         
                 index = np.arange(len(data))
@@ -119,7 +118,7 @@ if DOCKER_CASE_CPU_BAR:
                 
 
                 axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index+width, cpu_ubuntu, width,yerr=ubuntu_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -146,8 +145,7 @@ if DOCKER_CASE_CPU_BAR:
         df = pd.read_csv(_docker_cpu_files)
         
         for index, row in df.iterrows():
-            _case, _instances = row['Case'].split("s_")[1].split("_")
-            _image = row['Case'].split("_")[0]
+            _image, _case, _instances = row['Case'].split("_")
 
             if not _case in data_dict:
                 data_dict[_case] = {}
@@ -155,12 +153,12 @@ if DOCKER_CASE_CPU_BAR:
             if not _instances in data_dict[_case]: 
                 data_dict[_case][_instances] = {}
                 data_dict[_case][_instances] = {}
-                data_dict[_case][_instances]["stress"] = {}
+                data_dict[_case][_instances]["ubuntu"] = {}
                 data_dict[_case][_instances]["cirros"] = {}
 
-            if _image == "stress":
-                data_dict[_case][_instances]["stress"]["max"] = row['CPU Max']
-                data_dict[_case][_instances]["stress"]["sd"] = row['CPU Max SD']
+            if _image == "ubuntu":
+                data_dict[_case][_instances]["ubuntu"]["max"] = row['CPU Max']
+                data_dict[_case][_instances]["ubuntu"]["sd"] = row['CPU Max SD']
             elif _image == "cirros":
                 data_dict[_case][_instances]["cirros"]["max"] = row['CPU Max']
                 data_dict[_case][_instances]["cirros"]["sd"] = row['CPU Max SD']
@@ -177,8 +175,8 @@ if DOCKER_CASE_CPU_BAR:
                         'case': int(_instances), 
                         'CPU cirros max': _instances_data['cirros']["max"],
                         'CPU cirros sd': _instances_data['cirros']["sd"],
-                        'CPU stress max': _instances_data['stress']["max"],
-                        'CPU stress sd': _instances_data['stress']["sd"]
+                        'CPU ubuntu max': _instances_data['ubuntu']["max"],
+                        'CPU ubuntu sd': _instances_data['ubuntu']["sd"]
                     })
 
 
@@ -188,20 +186,20 @@ if DOCKER_CASE_CPU_BAR:
                 divisions = df['case']
                 cpu_cirros = df['CPU cirros max']
                 cpu_cirros_sd = df['CPU cirros sd']
-                cpu_stress = df['CPU stress max']
-                cpu_stress_sd = df['CPU stress sd']
+                cpu_ubuntu = df['CPU ubuntu max']
+                cpu_ubuntu_sd = df['CPU ubuntu sd']
 
                 df['CPU cirros max T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
-                df['CPU stress max T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+                df['CPU ubuntu max T'] = abs(T_BOUNDS[1] * df['CPU ubuntu sd'] / sqrt(RUNS))
 
                 cirros_t_max = df['CPU cirros max T']
-                stress_t_max = df['CPU stress max T']
+                ubuntu_t_max = df['CPU ubuntu max T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
                 axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index+width, cpu_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -232,8 +230,7 @@ if DOCKER_CASE_MEM_BAR:
         df = pd.read_csv(_docker_mem_files)
         
         for index, row in df.iterrows():
-            _case, _instances = row['Case'].split("s_")[1].split("_")
-            _image = row['Case'].split("_")[0]
+            _image, _case, _instances = row['Case'].split("_")
 
             if not _case in data_dict:
                 data_dict[_case] = {}
@@ -241,12 +238,12 @@ if DOCKER_CASE_MEM_BAR:
             if not _instances in data_dict[_case]: 
                 data_dict[_case][_instances] = {}
                 data_dict[_case][_instances] = {}
-                data_dict[_case][_instances]["stress"] = {}
+                data_dict[_case][_instances]["ubuntu"] = {}
                 data_dict[_case][_instances]["cirros"] = {}
 
-            if _image == "stress":
-                data_dict[_case][_instances]["stress"]["mean"] = row['MEM Mean']
-                data_dict[_case][_instances]["stress"]["sd"] = row['MEM SD']
+            if _image == "ubuntu":
+                data_dict[_case][_instances]["ubuntu"]["mean"] = row['MEM Mean']
+                data_dict[_case][_instances]["ubuntu"]["sd"] = row['MEM SD']
             elif _image == "cirros":
                 data_dict[_case][_instances]["cirros"]["mean"] = row['MEM Mean']
                 data_dict[_case][_instances]["cirros"]["sd"] = row['MEM SD']
@@ -263,8 +260,8 @@ if DOCKER_CASE_MEM_BAR:
                         'case': int(_instances), 
                         'MEM cirros mean': _instances_data['cirros']["mean"],
                         'MEM cirros sd': _instances_data['cirros']["sd"],
-                        'MEM stress mean': _instances_data['stress']["mean"],
-                        'MEM stress sd': _instances_data['stress']["sd"]
+                        'MEM ubuntu mean': _instances_data['ubuntu']["mean"],
+                        'MEM ubuntu sd': _instances_data['ubuntu']["sd"]
                     })
 
 
@@ -274,20 +271,20 @@ if DOCKER_CASE_MEM_BAR:
                 divisions = df['case']
                 mem_cirros = df['MEM cirros mean']
                 mem_cirros_sd = df['MEM cirros sd']
-                mem_stress = df['MEM stress mean']
-                mem_stress_sd = df['MEM stress sd']
+                mem_ubuntu = df['MEM ubuntu mean']
+                mem_ubuntu_sd = df['MEM ubuntu sd']
 
                 df['MEM cirros mean T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
-                df['MEM stress mean T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+                df['MEM ubuntu mean T'] = abs(T_BOUNDS[1] * df['MEM ubuntu sd'] / sqrt(RUNS))
 
                 cirros_t_mean = df['MEM cirros mean T']
-                stress_t_mean = df['MEM stress mean T']
+                ubuntu_t_mean = df['MEM ubuntu mean T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
                 axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index+width, mem_ubuntu, width,yerr=ubuntu_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -314,8 +311,7 @@ if DOCKER_CASE_MEM_BAR:
         df = pd.read_csv(_docker_mem_files)
         
         for index, row in df.iterrows():
-            _case, _instances = row['Case'].split("s_")[1].split("_")
-            _image = row['Case'].split("_")[0]
+            _image, _case, _instances = row['Case'].split("_")
 
             if not _case in data_dict:
                 data_dict[_case] = {}
@@ -323,12 +319,12 @@ if DOCKER_CASE_MEM_BAR:
             if not _instances in data_dict[_case]: 
                 data_dict[_case][_instances] = {}
                 data_dict[_case][_instances] = {}
-                data_dict[_case][_instances]["stress"] = {}
+                data_dict[_case][_instances]["ubuntu"] = {}
                 data_dict[_case][_instances]["cirros"] = {}
 
-            if _image == "stress":
-                data_dict[_case][_instances]["stress"]["max"] = row['MEM Max']
-                data_dict[_case][_instances]["stress"]["sd"] = row['MEM Max SD']
+            if _image == "ubuntu":
+                data_dict[_case][_instances]["ubuntu"]["max"] = row['MEM Max']
+                data_dict[_case][_instances]["ubuntu"]["sd"] = row['MEM Max SD']
             elif _image == "cirros":
                 data_dict[_case][_instances]["cirros"]["max"] = row['MEM Max']
                 data_dict[_case][_instances]["cirros"]["sd"] = row['MEM Max SD']
@@ -345,8 +341,8 @@ if DOCKER_CASE_MEM_BAR:
                         'case': int(_instances), 
                         'MEM cirros max': _instances_data['cirros']["max"],
                         'MEM cirros sd': _instances_data['cirros']["sd"],
-                        'MEM stress max': _instances_data['stress']["max"],
-                        'MEM stress sd': _instances_data['stress']["sd"]
+                        'MEM ubuntu max': _instances_data['ubuntu']["max"],
+                        'MEM ubuntu sd': _instances_data['ubuntu']["sd"]
                     })
 
 
@@ -356,20 +352,20 @@ if DOCKER_CASE_MEM_BAR:
                 divisions = df['case']
                 mem_cirros = df['MEM cirros max']
                 mem_cirros_sd = df['MEM cirros sd']
-                mem_stress = df['MEM stress max']
-                mem_stress_sd = df['MEM stress sd']
+                mem_ubuntu = df['MEM ubuntu max']
+                mem_ubuntu_sd = df['MEM ubuntu sd']
 
                 df['MEM cirros max T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
-                df['MEM stress max T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+                df['MEM ubuntu max T'] = abs(T_BOUNDS[1] * df['MEM ubuntu sd'] / sqrt(RUNS))
 
                 cirros_t_max = df['MEM cirros max T']
-                stress_t_max = df['MEM stress max T']
+                ubuntu_t_max = df['MEM ubuntu max T']
         
                 index = np.arange(len(data))
                 width = 0.30
 
                 axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-                axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+                axs[_count].bar(index+width, mem_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
                 axs[_count].set_title(_case, fontsize=15)
 
@@ -507,8 +503,8 @@ if SYSTEM_CPU_BAR:
 
     for _sys_cpu_files in sys_cpu_files:
         _title = (Path(_sys_cpu_files).name).split("-System-CPU")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
+
         df = pd.read_csv(_sys_cpu_files)
         
         if not _case in data_dict:
@@ -517,12 +513,12 @@ if SYSTEM_CPU_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["mean"] = df['CPU Mean'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['CPU SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["mean"] = df['CPU Mean'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['CPU SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["mean"] = df['CPU Mean'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['CPU SD'].mean()            
@@ -539,8 +535,8 @@ if SYSTEM_CPU_BAR:
                     'case': int(_instances), 
                     'CPU cirros mean': _instances_data['cirros']["mean"],
                     'CPU cirros sd': _instances_data['cirros']["sd"],
-                    'CPU stress mean': _instances_data['stress']["mean"],
-                    'CPU stress sd': _instances_data['stress']["sd"]
+                    'CPU ubuntu mean': _instances_data['ubuntu']["mean"],
+                    'CPU ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
         
             df = pd.DataFrame(data) 
@@ -550,14 +546,14 @@ if SYSTEM_CPU_BAR:
             df = df[LIMIT_DOCKERS_IN_GRAPH:]
             cpu_cirros = df['CPU cirros mean']
             cpu_cirros_sd = df['CPU cirros sd']
-            cpu_stress = df['CPU stress mean']
-            cpu_stress_sd = df['CPU stress sd']
+            cpu_ubuntu = df['CPU ubuntu mean']
+            cpu_ubuntu_sd = df['CPU ubuntu sd']
 
             df['CPU cirros mean T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
-            df['CPU stress mean T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+            df['CPU ubuntu mean T'] = abs(T_BOUNDS[1] * df['CPU ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_mean = df['CPU cirros mean T']
-            stress_t_mean = df['CPU stress mean T']
+            ubuntu_t_mean = df['CPU ubuntu mean T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -565,7 +561,7 @@ if SYSTEM_CPU_BAR:
             _title = "System-CPU"
 
             axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, cpu_ubuntu, width,yerr=ubuntu_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -590,8 +586,7 @@ if SYSTEM_CPU_BAR:
 
     for _sys_cpu_files in sys_cpu_files:
         _title = (Path(_sys_cpu_files).name).split("-System-CPU")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
         df = pd.read_csv(_sys_cpu_files)
         
         if not _case in data_dict:
@@ -600,12 +595,12 @@ if SYSTEM_CPU_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["max"] = df['CPU Max'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['CPU Max SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["max"] = df['CPU Max'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['CPU Max SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["max"] = df['CPU Max'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['CPU Max SD'].mean()            
@@ -622,8 +617,8 @@ if SYSTEM_CPU_BAR:
                     'case': int(_instances), 
                     'CPU cirros max': _instances_data['cirros']["max"],
                     'CPU cirros sd': _instances_data['cirros']["sd"],
-                    'CPU stress max': _instances_data['stress']["max"],
-                    'CPU stress sd': _instances_data['stress']["sd"]
+                    'CPU ubuntu max': _instances_data['ubuntu']["max"],
+                    'CPU ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
         
             df = pd.DataFrame(data) 
@@ -632,14 +627,14 @@ if SYSTEM_CPU_BAR:
             divisions = df['case']
             cpu_cirros = df['CPU cirros max']
             cpu_cirros_sd = df['CPU cirros sd']
-            cpu_stress = df['CPU stress max']
-            cpu_stress_sd = df['CPU stress sd']
+            cpu_ubuntu = df['CPU ubuntu max']
+            cpu_ubuntu_sd = df['CPU ubuntu sd']
 
             df['CPU cirros max T'] = abs(T_BOUNDS[1] * df['CPU cirros sd'] / sqrt(RUNS))
-            df['CPU stress max T'] = abs(T_BOUNDS[1] * df['CPU stress sd'] / sqrt(RUNS))
+            df['CPU ubuntu max T'] = abs(T_BOUNDS[1] * df['CPU ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_max = df['CPU cirros max T']
-            stress_t_max = df['CPU stress max T']
+            ubuntu_t_max = df['CPU ubuntu max T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -647,7 +642,7 @@ if SYSTEM_CPU_BAR:
             _title = "System-CPU"
 
             axs[_count].bar(index, cpu_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, cpu_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, cpu_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -676,8 +671,7 @@ if SYSTEM_LOAD_BAR:
 
     for _sys_load_files in sys_load_files:
         _title = (Path(_sys_load_files).name).split("-System-Load")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
         df = pd.read_csv(_sys_load_files)
         
         if not _case in data_dict:
@@ -686,12 +680,12 @@ if SYSTEM_LOAD_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["mean"] = df['Load1 Mean'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['Load1 SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["mean"] = df['Load1 Mean'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['Load1 SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["mean"] = df['Load1 Mean'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['Load1 SD'].mean()
@@ -709,8 +703,8 @@ if SYSTEM_LOAD_BAR:
                     'case': int(_instances),
                     'Load1 cirros mean': _instances_data['cirros']["mean"],
                     'Load1 cirros sd': _instances_data['cirros']["sd"],
-                    'Load1 stress mean': _instances_data['stress']["mean"],
-                    'Load1 stress sd': _instances_data['stress']["sd"]
+                    'Load1 ubuntu mean': _instances_data['ubuntu']["mean"],
+                    'Load1 ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
 
             df = pd.DataFrame(data) 
@@ -719,14 +713,14 @@ if SYSTEM_LOAD_BAR:
             divisions = df['case']    
             load1_cirros = df['Load1 cirros mean']
             load1_cirros_sd = df['Load1 cirros sd']
-            load1_stress = df['Load1 stress mean']
-            load1_stress_sd = df['Load1 stress sd']
+            load1_ubuntu = df['Load1 ubuntu mean']
+            load1_ubuntu_sd = df['Load1 ubuntu sd']
 
             df['Load1 cirros mean T'] = abs(T_BOUNDS[1] * df['Load1 cirros sd'] / sqrt(RUNS))
-            df['Load1 stress mean T'] = abs(T_BOUNDS[1] * df['Load1 stress sd'] / sqrt(RUNS))
+            df['Load1 ubuntu mean T'] = abs(T_BOUNDS[1] * df['Load1 ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_mean = df['Load1 cirros mean T']
-            stress_t_max = df['Load1 stress mean T']
+            ubuntu_t_max = df['Load1 ubuntu mean T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -734,7 +728,7 @@ if SYSTEM_LOAD_BAR:
             _title = "System-Load1"
 
             axs[_count].bar(index, load1_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, load1_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, load1_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -760,8 +754,8 @@ if SYSTEM_LOAD_BAR:
 
     for _sys_load_files in sys_load_files:
         _title = (Path(_sys_load_files).name).split("-System-Load")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
+
         df = pd.read_csv(_sys_load_files)
         
         if not _case in data_dict:
@@ -770,12 +764,12 @@ if SYSTEM_LOAD_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["max"] = df['Load1 Max'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['Load1 Max SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["max"] = df['Load1 Max'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['Load1 Max SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["max"] = df['Load1 Max'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['Load1 Max SD'].mean()
@@ -793,8 +787,8 @@ if SYSTEM_LOAD_BAR:
                     'case': int(_instances),
                     'Load1 cirros max': _instances_data['cirros']["max"],
                     'Load1 cirros sd': _instances_data['cirros']["sd"],
-                    'Load1 stress max': _instances_data['stress']["max"],
-                    'Load1 stress sd': _instances_data['stress']["sd"]
+                    'Load1 ubuntu max': _instances_data['ubuntu']["max"],
+                    'Load1 ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
 
             df = pd.DataFrame(data) 
@@ -803,14 +797,14 @@ if SYSTEM_LOAD_BAR:
             divisions = df['case']    
             load1_cirros = df['Load1 cirros max']
             load1_cirros_sd = df['Load1 cirros sd']
-            load1_stress = df['Load1 stress max']
-            load1_stress_sd = df['Load1 stress sd']
+            load1_ubuntu = df['Load1 ubuntu max']
+            load1_ubuntu_sd = df['Load1 ubuntu sd']
 
             df['Load1 cirros max T'] = abs(T_BOUNDS[1] * df['Load1 cirros sd'] / sqrt(RUNS))
-            df['Load1 stress max T'] = abs(T_BOUNDS[1] * df['Load1 stress sd'] / sqrt(RUNS))
+            df['Load1 ubuntu max T'] = abs(T_BOUNDS[1] * df['Load1 ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_max = df['Load1 cirros max T']
-            stress_t_max = df['Load1 stress max T']
+            ubuntu_t_max = df['Load1 ubuntu max T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -818,7 +812,7 @@ if SYSTEM_LOAD_BAR:
             _title = "System-Load1"
 
             axs[_count].bar(index, load1_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, load1_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, load1_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -849,8 +843,7 @@ if SYSTEM_RAM_BAR:
 
     for _sys_ram_files in sys_ram_files:
         _title = (Path(_sys_ram_files).name).split("-System-RAM")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
         df = pd.read_csv(_sys_ram_files)
 
         if not _case in data_dict:
@@ -859,12 +852,12 @@ if SYSTEM_RAM_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["mean"] = df['RAM Mean'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['RAM SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["mean"] = df['RAM Mean'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['RAM SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["mean"] = df['RAM Mean'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['RAM SD'].mean()
@@ -881,8 +874,8 @@ if SYSTEM_RAM_BAR:
                     'case': int(_instances),
                     'MEM cirros mean': _instances_data['cirros']["mean"],
                     'MEM cirros sd': _instances_data['cirros']["sd"],
-                    'MEM stress mean': _instances_data['stress']["mean"],
-                    'MEM stress sd': _instances_data['stress']["sd"]
+                    'MEM ubuntu mean': _instances_data['ubuntu']["mean"],
+                    'MEM ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
     
             df = pd.DataFrame(data) 
@@ -891,14 +884,14 @@ if SYSTEM_RAM_BAR:
             divisions = df['case']
             mem_cirros = df['MEM cirros mean']
             mem_cirros_sd = df['MEM cirros sd']
-            mem_stress = df['MEM stress mean']
-            mem_stress_sd = df['MEM stress sd']
+            mem_ubuntu = df['MEM ubuntu mean']
+            mem_ubuntu_sd = df['MEM ubuntu sd']
 
             df['MEM cirros mean T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
-            df['MEM stress mean T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+            df['MEM ubuntu mean T'] = abs(T_BOUNDS[1] * df['MEM ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_mean = df['MEM cirros mean T']
-            stress_t_mean = df['MEM stress mean T']
+            ubuntu_t_mean = df['MEM ubuntu mean T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -906,7 +899,7 @@ if SYSTEM_RAM_BAR:
             _title = "System-MEM"
 
             axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, mem_ubuntu, width,yerr=ubuntu_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -932,8 +925,7 @@ if SYSTEM_RAM_BAR:
 
     for _sys_ram_files in sys_ram_files:
         _title = (Path(_sys_ram_files).name).split("-System-RAM")[0]
-        _case, _instances = _title.split("s_")[1].split("_")
-        _image = _title.split("_")[0]
+        _image, _case, _instances = _title.split("_")
         df = pd.read_csv(_sys_ram_files)
 
         if not _case in data_dict:
@@ -942,12 +934,12 @@ if SYSTEM_RAM_BAR:
         if not _instances in data_dict[_case]: 
             data_dict[_case][_instances] = {}
             data_dict[_case][_instances] = {}
-            data_dict[_case][_instances]["stress"] = {}
+            data_dict[_case][_instances]["ubuntu"] = {}
             data_dict[_case][_instances]["cirros"] = {}
 
-        if _image == "stress":
-            data_dict[_case][_instances]["stress"]["max"] = df['RAM Max'].mean()
-            data_dict[_case][_instances]["stress"]["sd"] = df['RAM Max SD'].mean()
+        if _image == "ubuntu":
+            data_dict[_case][_instances]["ubuntu"]["max"] = df['RAM Max'].mean()
+            data_dict[_case][_instances]["ubuntu"]["sd"] = df['RAM Max SD'].mean()
         elif _image == "cirros":
             data_dict[_case][_instances]["cirros"]["max"] = df['RAM Max'].mean()
             data_dict[_case][_instances]["cirros"]["sd"] = df['RAM Max SD'].mean()
@@ -964,8 +956,8 @@ if SYSTEM_RAM_BAR:
                     'case': int(_instances),
                     'MEM cirros max': _instances_data['cirros']["max"],
                     'MEM cirros sd': _instances_data['cirros']["sd"],
-                    'MEM stress max': _instances_data['stress']["max"],
-                    'MEM stress sd': _instances_data['stress']["sd"]
+                    'MEM ubuntu max': _instances_data['ubuntu']["max"],
+                    'MEM ubuntu sd': _instances_data['ubuntu']["sd"]
                 })
     
             df = pd.DataFrame(data) 
@@ -974,14 +966,14 @@ if SYSTEM_RAM_BAR:
             divisions = df['case']
             mem_cirros = df['MEM cirros max']
             mem_cirros_sd = df['MEM cirros sd']
-            mem_stress = df['MEM stress max']
-            mem_stress_sd = df['MEM stress sd']
+            mem_ubuntu = df['MEM ubuntu max']
+            mem_ubuntu_sd = df['MEM ubuntu sd']
 
             df['MEM cirros max T'] = abs(T_BOUNDS[1] * df['MEM cirros sd'] / sqrt(RUNS))
-            df['MEM stress max T'] = abs(T_BOUNDS[1] * df['MEM stress sd'] / sqrt(RUNS))
+            df['MEM ubuntu max T'] = abs(T_BOUNDS[1] * df['MEM ubuntu sd'] / sqrt(RUNS))
 
             cirros_t_max = df['MEM cirros max T']
-            stress_t_max = df['MEM stress max T']
+            ubuntu_t_max = df['MEM ubuntu max T']
 
             index = np.arange(len(data))
             width = 0.30
@@ -989,7 +981,7 @@ if SYSTEM_RAM_BAR:
             _title = "System-MEM"
 
             axs[_count].bar(index, mem_cirros, width, yerr=cirros_t_max, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Cirros')
-            axs[_count].bar(index+width, mem_stress, width,yerr=stress_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Stress')
+            axs[_count].bar(index+width, mem_ubuntu, width,yerr=ubuntu_t_max, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'ubuntu')
 
             axs[_count].set_title(_case, fontsize=15)
 
@@ -1026,7 +1018,7 @@ if SUCCESS_RATIO_LINE:
         _docker = Path(_success_ratio_file).name
         _docker = _docker.split(".")[0]
         print(_docker)
-        _docker = _docker+"-"+_case
+        _docker = _docker+"-"+_case+"-"+_run
         print(_docker)
         end_to_end_path = Path(_success_ratio_file).parent / "end-to-end-time.csv"
         etime = (pd.read_csv(end_to_end_path)["end-to-end-time"][0])/360
