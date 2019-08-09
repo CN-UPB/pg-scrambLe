@@ -15,22 +15,23 @@ import datetime as dt
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
-DOCKER_CPU_BAR = False
-DOCKER_CASE_CPU_BAR = False
-SYSTEM_CPU_BAR = False
+DOCKER_CPU_BAR = True
+DOCKER_CASE_CPU_BAR = True
+SYSTEM_CPU_BAR = True
 
-SYSTEM_LOAD_BAR = False
+SYSTEM_LOAD_BAR = True
 
-DOCKER_MEM_BAR = False
-DOCKER_CASE_MEM_BAR = False
-SYSTEM_RAM_BAR = False
+DOCKER_MEM_BAR = True
+DOCKER_CASE_MEM_BAR = True
+SYSTEM_RAM_BAR = True
 SUCCESS_RATIO_LINE = True
 
 CPU_MAX_SCALE = 100
 LIMIT_DOCKERS_IN_GRAPH = -10
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/2_10/Final"
-_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/2_10/Graphs"
+_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/Final"
+_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/Graphs"
+_SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/OSM Results/15_90_180/data_csv"
 
 
 
@@ -47,7 +48,7 @@ docker_mem_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '
 sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-CPU-Final-Results.csv'))]
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
-success_ratio_file = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
+success_ratio_file = [y for x in os.walk(_SUCCESS_RATIO_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
 start_time = time.time()
 
 ##############################################
@@ -1015,38 +1016,54 @@ if SYSTEM_RAM_BAR:
 
 
 if SUCCESS_RATIO_LINE:
-    for _success_ration_file in success_ratio_file:
-        _title = (Path(_success_ration_file).name).split("-success-ratio")[0]
-        df = pd.read_csv(_success_ration_file)
+    for _success_ratio_file in success_ratio_file:
+        print(Path(_success_ratio_file).parent.name)
+        print(Path(_success_ratio_file).name)
+
+        _case, _run = Path(_success_ratio_file).parent.name.split("_Run")
+        _case = _case.split("-")[1]
+        print(_case)
+        _docker = Path(_success_ratio_file).name
+        _docker = _docker.split(".")[0]
+        print(_docker)
+        _docker = _docker+"-"+_case
+        print(_docker)
+        end_to_end_path = Path(_success_ratio_file).parent / "end-to-end-time.csv"
+        etime = (pd.read_csv(end_to_end_path)["end-to-end-time"][0])/360
+        etime = "{:.3}".format(etime)
+        df = pd.read_csv(_success_ratio_file)
 
 
-unix_time = pd.to_datetime(df['Time'],unit = 's')
 
-total = df['Total']
-active = df['Active']
-build = df['Build']
-error = df['Error']
+        unix_time = pd.to_datetime(df['Time'],unit = 's')
 
-
-fig = plt.figure()
-plt.figure(figsize=(11,6))
-plt.suptitle('success-ratio', fontsize=22)
-ax = fig.add_subplot(1,1,1)  
-plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-plt.plot(unix_time, total,label = 'Total')
-plt.plot(unix_time, active, label = 'Active')
-plt.plot(unix_time, build, label = 'Build')
-plt.plot(unix_time, error,label = 'Error')
-
-plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        total = df['Total']
+        active = df['Active']
+        build = df['Build']
+        error = df['Error']
 
 
-plt.xticks(rotation=-45)
+        fig = plt.figure()
+        plt.figure(figsize=(11,6))
+        plt.suptitle('{} in {} minutes'.format(_docker,etime), fontsize=22)
+        ax = fig.add_subplot(1,1,1) 
+        plt.xlabel('Time', fontsize=18)
+        plt.ylabel('VNF instances', fontsize=16) 
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.plot(unix_time, total,label = 'Total')
+        plt.plot(unix_time, active, label = 'Active')
+        plt.plot(unix_time, build, label = 'Build')
+        plt.plot(unix_time, error,label = 'Error')
 
-ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=2))   #to get a tick every 15 minutes
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-plt.savefig('output.png')
+
+        plt.xticks(rotation=-45)
+
+        ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=2))   #to get a tick every 15 minutes
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+        plt.savefig('{}/{}.png'.format(_OUT_PATH, _docker) ,bbox_inches='tight',dpi=100)
 
 
 
