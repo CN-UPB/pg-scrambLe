@@ -10,33 +10,38 @@ import time
 import seaborn as sns
 import matplotlib.dates as mdates
 import datetime as dt
-
+import statistics
 
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
-DOCKER_CPU_BAR = True
-DOCKER_CASE_CPU_BAR = True
-SYSTEM_CPU_BAR = True
+DOCKER_CPU_BAR = False
+DOCKER_CASE_CPU_BAR = False
+SYSTEM_CPU_BAR = False
+DOCKER_CASE_GROUPED = False
+END_TO_END_TIME_BAR = True
+SYSTEM_LOAD_BAR = False
 
-SYSTEM_LOAD_BAR = True
-
-DOCKER_MEM_BAR = True
-DOCKER_CASE_MEM_BAR = True
-SYSTEM_RAM_BAR = True
-SUCCESS_RATIO_LINE = True
+DOCKER_MEM_BAR = False
+DOCKER_CASE_MEM_BAR = False
+SYSTEM_RAM_BAR = False
+SUCCESS_RATIO_LINE = False
 
 CPU_MAX_SCALE = 150
 LIMIT_DOCKERS_IN_GRAPH = -10
 
-_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/Final"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/Graphs"
-_SUCCESS_RATIO_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/OSM Results/data_csv"
+_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/Final"
+_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/Graphs"
+_SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 
+_COMMON_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv"
+_OSM_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
+_PISHAHANG_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/Pishahang Results/data_csv"
 
 
 RUNS = 3 # Not fully supported
 CASES = 3 # Not fully supported
+IMAGES = 2
 
 CONFIDENCE = 0.95
 T_BOUNDS = t.interval(CONFIDENCE, RUNS - 1)
@@ -1059,7 +1064,299 @@ if SUCCESS_RATIO_LINE:
 
 
 
+##############################################
+# Dockers grouped
+##############################################
 
+if DOCKER_CASE_GROUPED:
+    data_dict = {}
+    for _docker_cpu_files in docker_cpu_files:
+        _title = (Path(_docker_cpu_files).name).split("-CPU")[0]
+        df = pd.read_csv(_docker_cpu_files)
+        
+        for index, row in df.iterrows():
+            _image, _case, _instances = row['Case'].split("_")
+
+            if not _image in data_dict:
+                data_dict[_image] = {}
+
+            if not _instances in data_dict[_image]: 
+                data_dict[_image][_instances] = {}
+                data_dict[_image][_instances] = {}
+                data_dict[_image][_instances]["case1"] = {}
+                data_dict[_image][_instances]["case2"] = {}
+                data_dict[_image][_instances]["case3"] = {}
+
+            if _case == "case1":
+                data_dict[_image][_instances][_case]["mean"] = row['CPU Mean']
+                data_dict[_image][_instances][_case]["sd"] = row['CPU SD']
+            elif _case == "case2":
+                data_dict[_image][_instances][_case]["mean"] = row['CPU Mean']
+                data_dict[_image][_instances][_case]["sd"] = row['CPU SD']
+            elif _case == "case3":
+                data_dict[_image][_instances][_case]["mean"] = row['CPU Mean']
+                data_dict[_image][_instances][_case]["sd"] = row['CPU SD']
+
+        fig, axs = plt.subplots(IMAGES, figsize=(6, 8), sharex=True, sharey=True)
+        fig.suptitle('{} - Mean'.format(_title), fontsize=25)
+        _count = 0
+
+        while(_count < IMAGES):
+            for _image, _data in sorted(data_dict.items()):
+                data = []
+                for _instances, _instances_data in sorted(_data.items()):
+                    data.append({
+                        'instance': int(_instances), 
+                        'CPU case1 mean': _instances_data["case1"]["mean"],
+                        'CPU case1 sd': _instances_data["case1"]["sd"],
+                        'CPU case2 mean': _instances_data["case2"]["mean"],
+                        'CPU case2 sd': _instances_data["case2"]["sd"],
+                        'CPU case3 mean': _instances_data["case3"]["mean"],
+                        'CPU case3 sd': _instances_data["case3"]["sd"]
+                    })
+
+
+                df = pd.DataFrame(data) 
+                df = df.sort_values('instance')
+
+                divisions = df['instance']
+                cpu_case1_mean = df['CPU case1 mean']
+                cpu_case1_sd = df['CPU case1 sd']
+                cpu_case2_mean = df['CPU case2 mean']
+                cpu_case2_sd = df['CPU case2 sd']
+                cpu_case3_mean = df['CPU case3 mean']
+                cpu_case3_sd = df['CPU case3 sd']
+
+                df['CPU case1 mean T'] = abs(T_BOUNDS[1] * df['CPU case1 sd'] / sqrt(RUNS))
+                df['CPU case2 mean T'] = abs(T_BOUNDS[1] * df['CPU case2 sd'] / sqrt(RUNS))
+                df['CPU case3 mean T'] = abs(T_BOUNDS[1] * df['CPU case3 sd'] / sqrt(RUNS))
+
+                case1_t_mean = df['CPU case1 mean T']
+                case2_t_mean = df['CPU case2 mean T']
+                case3_t_mean = df['CPU case3 mean T']
+
+        
+                index = np.arange(len(data))
+                width = 0.30
+                
+
+                axs[_count].bar(index-width, cpu_case1_mean, width, yerr=case1_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'case1')
+                axs[_count].bar(index, cpu_case2_mean, width,yerr=case2_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'case2')
+                axs[_count].bar(index+width, cpu_case3_mean, width,yerr=case3_t_mean, alpha=0.6, ecolor='black', capsize=5, color='y', label = 'case3')
+                axs[_count].set_title(_image, fontsize=15)
+
+                _count += 1
+
+        plt.xticks(index+width/2, divisions)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+        fig.add_subplot(111, frameon=False)
+        # hide tick and tick label of the big axes
+        plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+        plt.grid(False)
+
+        plt.ylabel('CPU Mean (percentage)', fontsize=20)
+        plt.xlabel('Cases', fontsize=20)
+
+        plt.savefig('{}/{}-Mean-CPU-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+        plt.close()
+
+##############################################
+# End to End Time Graphs
+##############################################
+
+if END_TO_END_TIME_BAR:
+    osm_e2e_files = [y for x in os.walk(_OSM_PATH) for y in glob(os.path.join(x[0], 'end-to-end-time.csv'))]
+    pishahang_e2e_files = [y for x in os.walk(_PISHAHANG_PATH) for y in glob(os.path.join(x[0], 'end-to-end-time.csv'))]
+    osm_data_dict = {}
+    pishahang_data_dict = {}
+    for _e2e_file in osm_e2e_files:
+        print(Path(_e2e_file).parent.name)
+        print(Path(_e2e_file).name)
+        _case, _run = Path(_e2e_file).parent.name.split("_Run")
+        _image, _case, _instances = _case.split("_")
+        _image = _image.split("-")[1]
+        print(_case)
+        etime = (pd.read_csv(_e2e_file)["end-to-end-time"][0])
+
+        if not _image in osm_data_dict:
+            osm_data_dict[_image] = {}
+
+        if _image == "ubuntu":
+            if not _instances in osm_data_dict[_image]: 
+                osm_data_dict[_image][_instances] = {}
+            if not _case in osm_data_dict[_image][_instances]: 
+                osm_data_dict[_image][_instances][_case] = {}
+                osm_data_dict[_image][_instances][_case]["e2e"] = []
+            osm_data_dict[_image][_instances][_case]["e2e"].append(etime)
+            
+        elif _image == "cirros":
+            if not _instances in osm_data_dict[_image]: 
+                osm_data_dict[_image][_instances] = {}
+            if not _case in osm_data_dict[_image][_instances]: 
+                osm_data_dict[_image][_instances][_case] = {}
+                osm_data_dict[_image][_instances][_case]["e2e"] = []
+            osm_data_dict[_image][_instances][_case]["e2e"].append(etime)
+
+    for _e2e_file in pishahang_e2e_files:
+        print(Path(_e2e_file).parent.name)
+        print(Path(_e2e_file).name)
+        _case, _run = Path(_e2e_file).parent.name.split("_Run")
+        _image, _case, _instances = _case.split("_")
+        _image = _image.split("-")[1]
+        print(_case)
+        etime = (pd.read_csv(_e2e_file)["end-to-end-time"][0])
+        if not _image in pishahang_data_dict:
+            pishahang_data_dict[_image] = {}
+        if _image == "ubuntu":
+            if not _instances in pishahang_data_dict[_image]: 
+                pishahang_data_dict[_image][_instances] = {}
+            if not _case in pishahang_data_dict[_image][_instances]: 
+                pishahang_data_dict[_image][_instances][_case] = {}
+                pishahang_data_dict[_image][_instances][_case]["e2e"] = []
+            pishahang_data_dict[_image][_instances][_case]["e2e"].append(etime)
+        elif _image == "cirros":
+            if not _instances in pishahang_data_dict[_image]: 
+                pishahang_data_dict[_image][_instances] = {}
+            if not _case in pishahang_data_dict[_image][_instances]: 
+                pishahang_data_dict[_image][_instances][_case] = {}
+                pishahang_data_dict[_image][_instances][_case]["e2e"] = []
+            pishahang_data_dict[_image][_instances][_case]["e2e"].append(etime)
+
+    final_dict = {"osm" : {}, 
+                    "pishahang" : {}}
+
+    for _image, _data in sorted(osm_data_dict.items()):
+        if not _image in final_dict["osm"]:
+            final_dict["osm"][_image] = {}
+        data = []
+        
+        for _instances, _instances_data in sorted(_data.items()):
+            data.append({
+                'instances': int(_instances),
+                'case1 mean': statistics.mean(_instances_data["case1"]["e2e"]),
+                'case1 sd': statistics.pstdev(_instances_data["case1"]["e2e"]),
+                'case2 mean': statistics.mean(_instances_data["case2"]["e2e"]),
+                'case2 sd': statistics.pstdev(_instances_data["case2"]["e2e"]),
+                'case3 mean': statistics.mean(_instances_data["case3"]["e2e"]),
+                'case3 sd': statistics.pstdev(_instances_data["case3"]["e2e"])
+            })
+        final_dict["osm"][_image] = data
+
+    for _image, _data in sorted(pishahang_data_dict.items()):
+        if not _image in final_dict["pishahang"]:
+            final_dict["pishahang"][_image] = {}
+        data = []
+        for _instances, _instances_data in sorted(_data.items()):
+            data.append({
+                'instances': int(_instances),
+                'case1 mean': statistics.mean(_instances_data["case1"]["e2e"]),
+                'case1 sd': statistics.pstdev(_instances_data["case1"]["e2e"]),
+                'case2 mean': statistics.mean(_instances_data["case2"]["e2e"]),
+                'case2 sd': statistics.pstdev(_instances_data["case2"]["e2e"]),
+                'case3 mean': statistics.mean(_instances_data["case3"]["e2e"]),
+                'case3 sd': statistics.pstdev(_instances_data["case3"]["e2e"])
+            })
+        final_dict["pishahang"][_image] = data
+
+    # -------------------------------- 
+    fig, axs = plt.subplots(2, figsize=(6, 8), sharex=False, sharey=True)
+    fig.suptitle('End to end deployment times', fontsize=25)
+    _count = 0
+    
+    # while(_count < IMAGES):
+
+    for _mano, _data in sorted(final_dict.items()):
+        for _image, _image_data in sorted(_data.items()):
+            if _image == "ubuntu":
+                continue
+            df = pd.DataFrame.from_dict(_image_data) 
+            df = df.sort_values('instances')
+            divisions = df['instances']    
+            case1_mean = df["case1 mean"]            
+            case1_sd = df["case1 sd"]
+            case2_mean = df["case2 mean"]
+            case2_sd = df["case2 sd"]
+            case3_mean = df["case3 mean"]
+            case3_sd = df["case3 sd"]
+            df['case1 mean T'] = abs(T_BOUNDS[1] * df['case1 sd'] / sqrt(RUNS))
+            df['case2 mean T'] = abs(T_BOUNDS[1] * df['case2 sd'] / sqrt(RUNS))
+            df['case3 mean T'] = abs(T_BOUNDS[1] * df['case3 sd'] / sqrt(RUNS))
+            case1_mean_t = df['case1 mean T']
+            case2_mean_t = df['case2 mean T']
+            case3_mean_t = df['case3 mean T']
+            index = np.arange(len(data))
+            width = 0.30
+            _title = "E2E Times"
+            axs[_count].bar(index-width, case1_mean, width, yerr=case1_mean_t, alpha=0.6, ecolor='black', capsize=5, color='g', label = 'case1')
+            axs[_count].bar(index, case2_mean, width, yerr=case2_mean_t, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'case2')
+            axs[_count].bar(index+width, case3_mean, width,yerr=case3_mean_t, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'case3')
+            if _mano == "osm":
+                axs[_count].set_title(_mano+"-"+_image+"-vm", fontsize=15)
+            else:
+                axs[_count].set_title(_mano+"-"+_image+"-container", fontsize=15)
+            axs[_count].set_xticks(index+width/2)
+            axs[_count].set_xticklabels(divisions)
+            _count += 1
+    # plt.xticks(index+width/2, divisions)
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+    plt.ylabel('Sec', fontsize=20)
+    plt.xlabel('Instances', fontsize=20)
+    plt.savefig('{}/{}-cirros-E2E.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+    fig, axs = plt.subplots(2, figsize=(6, 8), sharex=False, sharey=True)
+    fig.suptitle('End to end deployment times', fontsize=25)
+    _count = 0
+    
+    # while(_count < IMAGES):
+
+    for _mano, _data in sorted(final_dict.items()):
+        for _image, _image_data in sorted(_data.items()):
+            if _image == "cirros":
+                continue
+            df = pd.DataFrame.from_dict(_image_data) 
+            df = df.sort_values('instances')
+            divisions = df['instances']    
+            case1_mean = df["case1 mean"]            
+            case1_sd = df["case1 sd"]
+            case2_mean = df["case2 mean"]
+            case2_sd = df["case2 sd"]
+            case3_mean = df["case3 mean"]
+            case3_sd = df["case3 sd"]
+            df['case1 mean T'] = abs(T_BOUNDS[1] * df['case1 sd'] / sqrt(RUNS))
+            df['case2 mean T'] = abs(T_BOUNDS[1] * df['case2 sd'] / sqrt(RUNS))
+            df['case3 mean T'] = abs(T_BOUNDS[1] * df['case3 sd'] / sqrt(RUNS))
+            case1_mean_t = df['case1 mean T']
+            case2_mean_t = df['case2 mean T']
+            case3_mean_t = df['case3 mean T']
+            index = np.arange(len(data))
+            width = 0.30
+            _title = "E2E Times"
+            axs[_count].bar(index-width, case1_mean, width, yerr=case1_mean_t, alpha=0.6, ecolor='black', capsize=5, color='g', label = 'case1')
+            axs[_count].bar(index, case2_mean, width, yerr=case2_mean_t, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'case2')
+            axs[_count].bar(index+width, case3_mean, width,yerr=case3_mean_t, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'case3')
+            if _mano == "osm":
+                axs[_count].set_title(_mano+"-"+_image+"-vm", fontsize=15)
+            else:
+                axs[_count].set_title(_mano+"-"+_image+"-container", fontsize=15)
+            axs[_count].set_xticks(index+width/2)
+            axs[_count].set_xticklabels(divisions)
+            _count += 1
+    # plt.xticks(index+width/2, divisions)
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    fig.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+    plt.ylabel('Sec', fontsize=20)
+    plt.xlabel('Instances', fontsize=20)
+    plt.savefig('{}/{}-ubuntu-E2E.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
+    plt.close()
 
 
 
