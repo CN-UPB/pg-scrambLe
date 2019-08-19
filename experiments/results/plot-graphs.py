@@ -15,17 +15,19 @@ import statistics
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
 
+start_time = time.time()
+
 DOCKER_CPU_BAR = False
 DOCKER_CASE_CPU_BAR = False
 SYSTEM_CPU_BAR = False
 DOCKER_CASE_GROUPED = False
 END_TO_END_TIME_BAR = True
 SYSTEM_LOAD_BAR = False
-
 DOCKER_MEM_BAR = False
 DOCKER_CASE_MEM_BAR = False
 SYSTEM_RAM_BAR = False
 SUCCESS_RATIO_LINE = False
+END_TO_END_TIME_BAR = True
 
 CPU_MAX_SCALE = 150
 LIMIT_DOCKERS_IN_GRAPH = -10
@@ -54,7 +56,6 @@ sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-S
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
 success_ratio_file = [y for x in os.walk(_SUCCESS_RATIO_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
-start_time = time.time()
 
 ##############################################
 # Docker Case CPU Bar Chart 

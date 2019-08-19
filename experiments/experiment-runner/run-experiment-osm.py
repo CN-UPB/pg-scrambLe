@@ -113,6 +113,45 @@ def delete_instances():
             print(e)
 
 
+def get_individual_times(individual_init_times, folder_path, init_time, _ns_list):
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
+                    user_domain_id='default',
+                    project_domain_id='default')
+
+    sess = session.Session(auth=auth)
+
+    nova = nvclient.Client('2', session=sess)
+
+    _servers = nova.servers.list()
+
+
+    with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
+        _file.write("id, mano_time, ns_mano_time, vim_time\n")
+
+        for _s in _servers:
+            ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
+            if not ns_init_time:
+                ns_init_time = 0
+            else:
+                ns_init_time = ns_init_time['crete-time']
+
+            server_created = parser.parse(_s.created)
+            launch_time = parser.parse(_s.updated)
+            if int(server_created.strftime("%s")) > int(init_time):
+                # print(server_created.strftime("%s"), nsname, individual_init_times[int(_s.name.split("-")[1])])
+                _mano_time = float(server_created.strftime("%s")) - float(individual_init_times[int(_s.name.split("-")[1])])
+                ns_mano_time = float(server_created.strftime("%s")) - float(ns_init_time)
+                _vim_time = float(launch_time.strftime("%s")) - float(server_created.strftime("%s"))
+
+                print("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
+                _file.write("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
+    
+
+    return
+
 osm_nsd = OSMClient.Nsd(HOST_URL)
 osm_nslcm = OSMClient.Nslcm(HOST_URL) 
 osm_auth = OSMClient.Auth(HOST_URL)
@@ -241,13 +280,17 @@ for _image in IMAGES:
                 successThread = threading.Thread(target=successRatioThread)
                 successThread.start()
 
+                individual_init_times = {}
+
                 print("Instantiating {0} NS instances".format(no_instantiate))
                 for i in range(0, no_instantiate):
                     response = json.loads(osm_nslcm.post_ns_instances_nsinstanceid_instantiate(token=_token["id"],
                                     nsDescription=NSDESCRIPTION, 
-                                    nsName=NSNAME, 
+                                    nsName="{}-{}".format(NSNAME, i), 
                                     nsdId=_nsd, 
                                     vimAccountId=VIMACCOUNTID))
+                    # Store init
+                    individual_init_times[i] = time.time()
                     # print(response)
                     time.sleep(60/REQUESTS_PER_MINUTE)
 
@@ -266,6 +309,8 @@ for _image in IMAGES:
 
                 _ns_list = json.loads(osm_nslcm.get_ns_instances(token=_token["id"]))
                 _ns_list = json.loads(_ns_list["data"])
+
+                get_individual_times(individual_init_times, nit, experiment_timestamps["ns_inst_time"], _ns_list)
 
                 _ns = None
                 print("Printing Status Of Instances...")

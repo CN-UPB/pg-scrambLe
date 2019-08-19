@@ -155,6 +155,38 @@ def get_count(init_time):
 
     return active_count, build_count, error_count
 
+
+def get_individual_times(individual_init_times, folder_path, init_time, _ns_list):
+    v1 = client.CoreV1Api(aApiClient)
+    print("Listing pods with their IPs:")
+    _servers = v1.list_namespaced_pod(namespace='default', watch=False)
+
+
+    with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
+        _file.write("id, mano_time, ns_mano_time, vim_time\n")
+
+        for _s in _servers.items:
+
+            ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
+            if not ns_init_time:
+                ns_init_time = 0
+            else:
+                ns_init_time = ns_init_time['crete-time']
+
+            server_created = _s.metadata.creation_timestamp
+            launch_time = _s.status.phase.start_time
+            if int() > int(init_time):
+                # print(server_created.strftime("%s"), nsname, individual_init_times[int(_s.name.split("-")[1])])
+                _mano_time = float(server_created.strftime("%s")) - float(individual_init_times[int(_s.name.split("-")[1])])
+                ns_mano_time = float(server_created.strftime("%s")) - float(ns_init_time)
+                _vim_time = float(launch_time.strftime("%s")) - float(server_created.strftime("%s"))
+
+                print("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
+                _file.write("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
+    
+
+    return
+
 # http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
 print("""
 
@@ -320,6 +352,8 @@ for _image in IMAGES:
 
                 print(len(_cosd_list))
 
+                individual_init_times = {}
+
                 for i in range(0, no_instantiate):
                     _ns = None
                     for _n in _cosd_list:
@@ -335,6 +369,8 @@ for _image in IMAGES:
                                         token=_token["token"]["access_token"], nsInstanceId=_ns))
                         if response["error"]:
                             print("ERROR - request error")
+                        # Store init
+                        individual_init_times[i] = time.time()
                     else:
                         print("ERROR - no ns uuid")
                     print(response)
@@ -351,16 +387,18 @@ for _image in IMAGES:
                 print("PHASE 3 : Starting Termination Sequence...")
                 experiment_timestamps["ns_term_start_time"] = int(time.time())
 
-                # _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
-                # _token = json.loads(_token["data"])
+                _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
+                _token = json.loads(_token["data"])
 
-                # _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
-                #                         token=_token["token"]["access_token"], limit=1000))
-                # _nsd_list = json.loads(_nsd_list["data"])
+                _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                                        token=_token["token"]["access_token"], limit=1000))
+                _nsd_list = json.loads(_nsd_list["data"])
 
-                # _ns_list = json.loads(sonata_nslcm.get_ns_instances(
-                #                         token=_token["token"]["access_token"], limit=1000))
-                # _ns_list = json.loads(_ns_list["data"])
+                _ns_list = json.loads(sonata_nslcm.get_ns_instances(
+                                        token=_token["token"]["access_token"], limit=1000))
+                _ns_list = json.loads(_ns_list["data"])
+
+                get_individual_times(individual_init_times, nit, experiment_timestamps["ns_inst_time"], _ns_list)
 
                 # _ns = None
                 # for _n in _nsd_list:

@@ -55,7 +55,7 @@ def get_count(init_time):
     build_count = 0
     error_count = 0
 
-    for _s in _servers:
+    for _s in _servers.items:
         server_created = parser.parse(_s.created)
         if int(server_created.strftime("%s")) > int(init_time) :
             if _s.status == "ACTIVE":
@@ -74,3 +74,4 @@ def get_count(init_time):
 if __name__ == '__main__':
 #     delete_replication_controller()
 #     delete_replication_pod()
+    get_count(0)

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 app = Flask(__name__)
 
 import sys
@@ -6,6 +6,7 @@ import docker
 client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
 DOCKER_EXCLUDE = ['experiment-runner']
+METRICS_MOCK_FILE = ""
 
 @app.route('/')
 def index_html():
@@ -52,6 +53,20 @@ def save_data():
             # format url and list_url_query.append() 
 
     return render_template('index.html', docker_list=docker_list)
+
+
+@app.route('/scale')
+def scale_metrics():
+    try:
+        _scale_metrics = request.args.get('scale_metrics')
+        with open('/app/app/debugnorm', 'w') as _file:
+            _file.write("{0}\n".format(_scale_metrics))
+    except Exception as e:
+        with open('/app/app/debugnorm', 'w') as _file:
+            _file.write("0.5,0.5,0.5\n")
+        return "Error"
+
+    return "Done"
 
 
 if __name__ == '__main__':
