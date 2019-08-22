@@ -11,6 +11,8 @@ import seaborn as sns
 import matplotlib.dates as mdates
 import datetime as dt
 import statistics
+# from scipy.interpolate import spline
+
 
 from scipy.stats import t # sudo pip3 install scipy
 from math import sqrt
@@ -21,13 +23,14 @@ DOCKER_CPU_BAR = False
 DOCKER_CASE_CPU_BAR = False
 SYSTEM_CPU_BAR = False
 DOCKER_CASE_GROUPED = False
-END_TO_END_TIME_BAR = True
+END_TO_END_TIME_BAR = False
 SYSTEM_LOAD_BAR = False
 DOCKER_MEM_BAR = False
 DOCKER_CASE_MEM_BAR = False
 SYSTEM_RAM_BAR = False
 SUCCESS_RATIO_LINE = False
-END_TO_END_TIME_BAR = True
+I_END_TO_END_TIME_BAR = False
+LIFECYCLE_GRAPH = True
 
 CPU_MAX_SCALE = 150
 LIMIT_DOCKERS_IN_GRAPH = -10
@@ -35,10 +38,11 @@ LIMIT_DOCKERS_IN_GRAPH = -10
 _PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/Final"
 _OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/Graphs"
 _SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
-
+_I_E2E_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 _COMMON_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv"
 _OSM_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 _PISHAHANG_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/Pishahang Results/data_csv"
+_LIFECYCLE_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/test"
 
 
 RUNS = 3 # Not fully supported
@@ -56,6 +60,8 @@ sys_cpu_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-S
 sys_load_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-Load-Final-Results.csv'))]
 sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-System-RAM-Final-Results.csv'))]
 success_ratio_file = [y for x in os.walk(_SUCCESS_RATIO_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
+i_e2e_file = [y for x in os.walk(_I_E2E_PATH) for y in glob(os.path.join(x[0], 'individual-build-times.csv'))]
+cpu_lifecycle_file = [y for x in os.walk(_LIFECYCLE_PATH) for y in glob(os.path.join(x[0], 'system-cpu.csv'))]
 
 ##############################################
 # Docker Case CPU Bar Chart 
@@ -1358,6 +1364,107 @@ if END_TO_END_TIME_BAR:
     plt.xlabel('Instances', fontsize=20)
     plt.savefig('{}/{}-ubuntu-E2E.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
     plt.close()
+
+
+#########################################
+# Individual E2E
+#########################################
+
+if I_END_TO_END_TIME_BAR:
+    for _i_e2e_file in i_e2e_file:
+        print(Path(_i_e2e_file).parent.name)
+        print(Path(_i_e2e_file).name)
+
+        _case, _run = Path(_i_e2e_file).parent.name.split("_Run")
+        _case = _case.split("-")[1]
+        print(_case)
+        _docker = Path(_i_e2e_file).name
+        _docker = _docker.split(".")[0]
+        print(_docker)
+        _docker = _docker+"-"+_case+"-"+_run
+        print(_docker)
+        df = pd.read_csv(_i_e2e_file)
+
+        manotime = df['mano_time']
+        vimtime = df['vim_time']
+        manoid = df['id']
+
+        fig = plt.figure()
+        plt.figure(figsize=(11,6))
+        plt.suptitle('Individual build times'.format(_docker), fontsize=22)
+        ax = fig.add_subplot(1,1,1) 
+        plt.xlabel('MANO ID', fontsize=18)
+        plt.ylabel('Time (s)', fontsize=16) 
+        plt.plot(manoid, manotime,label = 'mano_time')
+        plt.plot(manoid, vimtime, label = 'vim_time')
+    
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+
+        plt.xticks(rotation=-45)
+
+        # ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=2))   #to get a tick every 15 minutes
+        # ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+        plt.savefig('{}/{}.png'.format(_OUT_PATH, _docker) ,bbox_inches='tight',dpi=100)
+
+#########################################
+# Life cycle graphs
+#########################################
+
+
+if LIFECYCLE_GRAPH:
+    for _cpu_lifecycle_file in cpu_lifecycle_file:
+        print(Path(_cpu_lifecycle_file).parent.name)
+        print(Path(_cpu_lifecycle_file).name)
+
+        _case, _run = Path(_cpu_lifecycle_file).parent.name.split("_Run")
+        _case = _case.split("-")[1]
+        print(_case)
+        _docker = Path(_cpu_lifecycle_file).name
+        _docker = _docker.split(".")[0]
+        print(_docker)
+        _docker = _docker+"-"+_case+"-"+_run
+        print(_docker)
+        df = pd.read_csv(_cpu_lifecycle_file)
+
+        unix_time = df['time']
+        user = df['user']
+        system = df['system']
+        # unix_time = np.array(unix_time)
+        # user = np.array(user)
+        # system = np.array(system)
+
+        # unix_time_smooth = np.linspace(unix_time.min(),unix_time.max(),600)
+        # user_smooth = spline(unix_time,user,unix_time_smooth)
+        # system_smooth = spline(unix_time,system,system_smooth)
+        fig = plt.figure()
+        plt.figure(figsize=(15,6))
+        plt.suptitle('{}'.format(_docker), fontsize=22)
+        ax = fig.add_subplot(1,1,1) 
+        plt.xlabel('Time', fontsize=18)
+        plt.ylabel('VNF instances', fontsize=16) 
+        plt.plot(unix_time[0::250], user[0::250],'ro-',label = 'user')
+        plt.plot(unix_time[0::250] , system[0::250],'bo-',label = 'system')
+        plt.plot(unix_time,user,'ro-',markevery=250)
+        plt.plot(unix_time,system,'bo-',markevery=250)
+        
+        frequency = 10
+    
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.xticks(rotation=-90)
+        plt.xticks(unix_time[::frequency])
+
+       
+        
+        # ax.xaxis.set_major_locator(plt.MaxNLocator(30))
+        #ax.xaxis.set_major_locator(mdates.MinuteLocator(interval=20))   #to get a tick every 15 minutes
+        #ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+
+        plt.savefig('{}/{}.png'.format(_OUT_PATH, _docker) ,bbox_inches='tight',dpi=100)
+
+
+
 
 
 
