@@ -329,8 +329,8 @@ class osm_splitter():
                 "logo": str(self.NSDs[i].logo),
                 "constituent-vnfd": constituent_vnfds['constituent-vnfd'],
                 "ip-profiles": ip_profile['ip-profiles'],
-                "vld": vld['vld'],
-                "vnffgd": vnffgd['vnffgd']
+                "vld": vld['vld']
+                # "vnffgd": vnffgd['vnffgd']
             })
 
             for k in general_information.keys():
@@ -353,6 +353,6 @@ class osm_splitter():
         self.split_network_function()
         self.set_ip_profiles()
         self.split_vld()
-        self.split_forwarding_path()
+        # self.split_forwarding_path()
         self.set_general_information()
         return self.create_files()
