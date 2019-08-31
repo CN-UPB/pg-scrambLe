@@ -3043,9 +3043,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
     
     
         # connecting to OSM MANO to send the NS package
-        username_osm = os.environ['username_osm']
-        password_osm = os.environ['password_osm']
-        host_osm = os.environ['host_osm'] 
+        username_osm = sets[2][0]['user']#os.environ['username_osm']
+        password_osm = sets[2][0]['pwd']#os.environ['password_osm']
+        host_osm = sets[2][0]['ip']#os.environ['host_osm'] 
         
 
         LOG.info("Connecting to OSM MANO..." )
@@ -3118,9 +3118,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         LOG.info("Connecting to Pishahang2..." )
 
-        username_pish = os.environ['username_pish2']
-        password_pish = os.environ['password_pish2']
-        host_pish = os.environ['host_pishahang']
+        username_pish = sets[2][0]['user']#os.environ['username_pish2']
+        password_pish = sets[2][0]['pwd']#os.environ['password_pish2']
+        host_pish = sets[2][0]['ip']#os.environ['host_pishahang']
 
         son_auth = wrappers.SONATAClient.Auth(host_pish)
         token = json.loads(son_auth.auth(username =username_pish , password= password_pish))
@@ -3197,7 +3197,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         for key, val in mano_dict.items():
             for manos in mano_details:
                 if manos['name']==key:
-                    mano_list.append(manos['type'])
+                    mano_list.append(manos)
 
                 
         if 'nsd' in self.services[serv_id]['service']:
@@ -3248,7 +3248,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
             for i,sets in enumerate(rndm_sets):
             
-                if sets[2][0] == 'MAIN_PISHAHANG':
+                if sets[2][0]['type'] == 'MAIN_PISHAHANG':
                     
                     main_pish_nsd = nsds_splitted['message'][i]
                     LOG.info(main_pish_nsd)
@@ -3259,11 +3259,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
                             
                     LOG.info(function_pish)           
                             
-                elif sets[2][0] == 'PISHAHANG':
+                elif sets[2][0]['type'] == 'PISHAHANG':
                 
                     self.send_to_pishahang(sets, functions, nsds_splitted['message'][i])
                     
-                elif sets[2][0] == 'OSM':
+                elif sets[2][0]['type'] == 'OSM':
                     
                     self.send_to_osm(sets, functions, nsds_splitted['message'][i])             
             

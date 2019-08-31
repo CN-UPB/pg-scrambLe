@@ -36,7 +36,7 @@ echo "Starting Scramble SLM.."
 
 sudo docker stop servicelifecyclemanagement
 sudo docker rm servicelifecyclemanagement
-sudo docker build --build-arg HOST=$1 --build-arg HOST_PISHAHANG=$2 --build-arg HOST_OSM=$3 -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile-dev .
+sudo docker build --build-arg HOST=$1 -t servicelifecyclemanagement -f plugins/son-mano-service-lifecycle-management/Dockerfile-dev .
 sudo docker run -d --name servicelifecyclemanagement --net=son-sp --network-alias=servicelifecyclemanagement -v $(pwd)/plugins/son-mano-service-lifecycle-management:/plugins/son-mano-service-lifecycle-management servicelifecyclemanagement 
 
 

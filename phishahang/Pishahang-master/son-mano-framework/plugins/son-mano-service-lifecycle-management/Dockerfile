@@ -33,18 +33,18 @@ ENV url_nsr_repository http://son-catalogue-repos:4011/records/nsr/
 ENV url_vnfr_repository http://son-catalogue-repos:4011/records/vnfr/
 ENV url_monitoring_server http://son-monitor-manager:8000/api/v1/
 
-ARG HOST_PISHAHANG
-ARG HOST_OSM
-ARG HOST
+#ARG HOST_PISHAHANG
+#ARG HOST_OSM
+#ARG HOST
 # Environment variables
 ENV splitter_url=http://$HOST:8003/Main_splitter/split
 ENV translator_url=http://$HOST:8003/translator/hello
-ENV username_osm=admin
-ENV password_osm=admin
-ENV host_osm=$HOST_OSM
-ENV username_pish2=sonata
-ENV password_pish2=1234
-ENV host_pishahang=$HOST_PISHAHANG
+#ENV username_osm=admin
+#ENV password_osm=admin
+#ENV host_osm=$HOST_OSM
+#ENV username_pish2=sonata
+#ENV password_pish2=1234
+#ENV host_pishahang=$HOST_PISHAHANG
 
 RUN apt-get update && apt-get install -y gcc
 
