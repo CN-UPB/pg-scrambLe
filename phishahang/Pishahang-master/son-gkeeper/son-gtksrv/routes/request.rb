@@ -134,7 +134,8 @@ class GtkSrv < Sinatra::Base
       if params['scramble'] == true
         logger.debug(log_msg) {"SScramble"}
         start_request['scramble'] = true 
-        start_request['selectedmanos'] = params['selectedmanos'] 
+        start_request['selectedmanos'] = params['selectedmanos']
+        start_request['manoips'] = params['manoips']
                
       end
 
@@ -148,8 +149,8 @@ class GtkSrv < Sinatra::Base
       halt 201, json_request
     rescue Exception => e
       logger.debug(log_msg) {e.message}
-	    logger.debug(log_msg) {e.backtrace.inspect}
-	    halt 500, 'Internal server error'+e.message
+        logger.debug(log_msg) {e.backtrace.inspect}
+        halt 500, 'Internal server error'+e.message
     end
   end
 

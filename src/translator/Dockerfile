@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.6
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get -y install netcat && apt-get clean

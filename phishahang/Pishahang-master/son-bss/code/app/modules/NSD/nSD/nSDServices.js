@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
+
  *     http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
@@ -40,10 +41,43 @@
             return defer.promise;
         },
 
-        instantiateScramble:function(id, ingresses, egresses, ENV, selectedmanos){				
+	saveManos:function(manodetail){				
             var defer=$q.defer();
 
-            /* check for empty ingress/egress */
+            var data= manodetail;
+            $http({ method: 'POST',
+		    url: 'http://131.234.28.186:7001/mano_create',
+		    data: data,
+		    dataType: 'json',
+                    headers: {'Content-Type': 'application/json'}
+		  })
+            .then(function successCallback(result){defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            
+            return defer.promise;
+        },
+
+	deleteManos:function(manodb){				
+            var defer=$q.defer();
+
+            var data= {"_id" : manodb.id};
+            $http({ method: 'POST',
+		    url: 'http://131.234.28.186:7001/mano/remove',
+		    data: data,
+		    dataType: 'json',
+                    headers: {'Content-Type': 'application/json'}
+		  })
+            .then(function successCallback(result){defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            
+            return defer.promise;
+        },
+
+
+        instantiateScramble:function(id, ingresses, egresses, ENV, selectedmanos, manodetails){				
+            var defer=$q.defer();
+
+            /* check for empty ingress/egress and mano details*/
 
             if (Object.keys(ingresses).length > 0) {
                 var element = ingresses.pop();
@@ -59,7 +93,15 @@
                 }
             }
 
-            var data={"service_uuid":id, "ingresses": ingresses, "egresses":egresses, "scramble":true, "selectedmanos":selectedmanos};
+            if (Object.keys(manodetails).length > 0) {
+                var element = manodetails.pop();
+                if ( angular.toJson(element) != "{}") {
+                    manodetails.push(element);
+                }
+            }
+
+
+            var data={"service_uuid":id, "ingresses": ingresses, "egresses": egresses, "scramble":true, "selectedmanos":selectedmanos, "manoips":manodetails};
             $http.post(ENV.apiEndpoint+"/requests",data)
             .then(function successCallback(result){defer.resolve(result)})
             .catch(function errorCallback(error){defer.reject(error)});
@@ -91,6 +133,7 @@
             $http.post(ENV.apiEndpoint+"/requests",data)
             .then(function successCallback(result){defer.resolve(result)})
             .catch(function errorCallback(error){defer.reject(error)});
+	    
             
             return defer.promise;
         },

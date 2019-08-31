@@ -33,22 +33,25 @@
 
   $scope.currentNSD = {};
   $scope.offset = 0;
-  $scope.limit = 10;
+  $scope.limit = 11;
   $scope.ingresses = [{}];
   $scope.egresses = [{}];
   $scope.manos = [{'name':'Parent'}, {'name':'MANO1'}, {'name':'MANO2'}];
+  $scope.manodetails = [{}];
+  $scope.manodetail = {};
+  $scope.manodb = [{}];
 
-  var selectedmanos = {
-    Parent: true
-  };
+
+
+  var selectedmano = {};
   
   $scope.formData = {
-    selectedmanos: selectedmanos
+    selectedmanos: selectedmano
   };
 
   var calculateSomeSelected = function() {
-    $scope.someSelected = Object.keys(selectedmanos).some(function (key) {
-      return selectedmanos[key];
+    $scope.someSelected = Object.keys(selectedmano).some(function (key) {
+      return selectedmano[key];
     });
   };
 
@@ -136,8 +139,7 @@
  }
 
  $scope.instantiateScramble = function() {
-  console.log("MANOS"+ $scope.formData.selectedmanos);
-  NSDServices.instantiateScramble($scope.currentNSD.uuid, $scope.ingresses, $scope.egresses, ENV, $scope.formData.selectedmanos)
+  NSDServices.instantiateScramble($scope.currentNSD.uuid, $scope.ingresses, $scope.egresses, ENV, $scope.formData.selectedmanos, $scope.allManos)
   .then(function(result) {
     $('#instantiateNSD.modal').modal('hide');	 
     $scope.instantiateRequest = result.data;
@@ -150,6 +152,34 @@
   $scope.cleanInstantiationIngressEgress();
 
 }
+
+$scope.saveManos = function() {
+   NSDServices.saveManos($scope.manodetail)
+  .then(function(result) {
+    $scope.allManos = result.data;    
+  }, function(error) {
+    $scope.error = angular.copy(JSON.stringify(error.data.message));
+    $('#error.modal').modal('show');   
+  })
+
+  $scope.cleanInstantiationIngressEgress();
+
+}
+
+
+$scope.deleteManos = function() {
+   NSDServices.deleteManos($scope.manodb)
+  .then(function(result) {
+    $scope.delete = result.data;    
+  }, function(error) {
+    $scope.error = angular.copy(JSON.stringify(error.data.message));
+    $('#error.modal').modal('show');   
+  })
+
+  $scope.cleanInstantiationIngressEgress();
+
+}
+
 
  $scope.emptyNSD = function() {
    $scope.currentNSD = {};
@@ -195,6 +225,9 @@
  $scope.cleanInstantiationIngressEgress = function() {
    $scope.ingresses = [{}];
    $scope.egresses = [{}];
+   $scope.manodetails = [{}];
+   $scope.manodetail = {};
+   $scope.manodb = {};
  }
 
 }]);

@@ -54,6 +54,19 @@ angular.module('NSD')
     }    
   };
 
+  
+  $scope.addNewMano = function() {    
+    $scope.manodetails.push({});
+  };
+    
+  $scope.removeMano = function() {
+    if ($scope.manodetails.length > 1) {
+      var lastItem = $scope.manodetails.length-1;
+      $scope.manodetails.splice(lastItem);
+    }    
+  };
+
+
   $scope.getLocations = function() {
 
     NSDServices.getVimRequests(ENV)

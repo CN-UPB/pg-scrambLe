@@ -17,7 +17,8 @@
                     </div>
                     <div class="col-md-4">
                         <h3>Egress</h3>
-                    </div>                    
+                    </div>  
+						
                 </div>                
                 <div class="row">
                     <form name="instantiationForm">
@@ -49,15 +50,14 @@
     
                             <h3>Select MANOs</h3>
                                     <form class="Scroller-Container" name="multipleCheckbox" novalidate="">
-                                      <div ng-repeat="mano in manos">
+                                      <div ng-repeat="mano in allManos">
                                         <input type="checkbox" ng-model="formData.selectedmanos[mano.name]" ng-change="checkboxChanged()" ng-required="!someSelected" /> {{mano.name}}
                                       </div>
                                       <p style="color: red;" ng-show="multipleCheckbox.$error.required">You must choose one mano</p>
                                     </form>
-                                    <!-- <pre>manos model:
-                              {{formData.selectedmanos | json}}</pre> -->
 
-                        </div>                                        
+                        </div>
+									
                         <div class="col-md-4">                         
                             <fieldset  data-ng-repeat="egress in egresses">
                                 <ng-form name='egressForm'>
@@ -82,15 +82,62 @@
                                 </ng-form>                                                                                                                                               
                             </fieldset>                                                                            
                         </div> 
+						<div class="col-md-4">  
+							<h3>MANO Details</h3>
+
+                                <ng-form name='manodetailsForm'>
+                                    <p style="color:red" ng-show='manodetailsForm.$error.required'>
+                                        Both Name and IP fields required!
+                                    </p>                             
+                                    <label for="username">Mano Name</label>
+                                    <input type="text" name="manodetailname" id="manodetailname" class="form-control" ng-model="manodetail.name" placeholder="-- Name --" ng-required='manodetail.ip'/>
+									
+									<label for="username">Mano Type</label>
+                                    <input type="text" name="manodetailtype" id="manodetailtype" class="form-control" ng-model="manodetail.type" placeholder="-- Type --" ng-required='manodetail.name'/>
+									
+									<label for="username">Username</label>
+                                    <input type="text" name="manodetailuser" id="manodetailuser" class="form-control" ng-model="manodetail.user" placeholder="-- Username --" ng-required='manodetail.pwd'/>
+									
+									<label for="username">Password</label>
+                                    <input type="text" name="manodetailpwd" id="manodetailpwd" class="form-control" ng-model="manodetail.pwd" placeholder="-- Password --" ng-required='manodetail.user'/>
+									
+                                    <label for="username">IP</label>
+                                    <input type="text" name="manodetailip" id="manodetailip" class="form-control" ng-model="manodetail.ip" placeholder="Enter IP Address" ng-required='manodetail.name' ng-pattern="/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/([0-9]|[1-2][0-9]|3[0-2]))?$/"/>
+                                    <span ng-show="manodetailsForm.manodetailip.$dirty && manodetailsForm.manodetailip.$error.pattern" class="help-block" style="color:red">IP: [0-255].[0-255].[0-255].[0-255]/[0-32]</span>
+                                    <br>  
+									<hr ng-hide="$last">
+                                    <br ng-show="$last">
+                                    <br ng-show="$last">
+                                    <br ng-show="$last">
+                                    <br ng-show="$last">
+									
+                                </ng-form>
+                        </div>
+						<div class="col-md-4">
+    
+                            <h3>Saved MANOs</h3>
+							<pre>all manos from db:{{allManos | json}}</pre> 
+							<button id="SaveButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="saveManos()">
+								SaveManos
+							</button>
+                        </div>	
+						<div class="col-md-4">
+							<label for="username">Mano ID</label>
+                                    <input type="text" name="manodbid" id="manodbid" class="form-control" ng-model="manodb.id" placeholder="-- ID --" ng-required='manodb.id'/>
+							<button id="DeleteButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="deleteManos()">
+								DeleteManos
+							</button>
+							<pre>response:{{delete | json}}</pre>
+                        </div>
                     </form>                   
                 </div>
             </div>            
             <div class="modal-footer">
                 <h4 class="form-control-static pull-left">Please, confirm the Service instantiation:</h4>                        
-                <button id="yesButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid || instantiationForm.$error.pattern "" ng-click="instantiateNSD()">
+                <button id="yesButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid || instantiationForm.$error.pattern " ng-click="instantiateNSD()">
                     Yes
                 </button>
-                <button id="SButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid || instantiationForm.$error.pattern "" ng-click="instantiateScramble()">
+                <button id="SButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid || instantiationForm.$error.pattern " ng-click="instantiateScramble()">
                     Scramble
                 </button>
                 <button class="btn btn-danger" data-ng-click="emptyNSD()" data-dismiss="modal">

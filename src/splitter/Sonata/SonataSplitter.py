@@ -392,43 +392,43 @@ class splitter():
                     "connection_points_reference": virtual_link.connection_points_reference
                 })
 
-            sub_data = {}
-            sub_data['network_forwarding_paths'] = []
-            for network_forwarding_path in self.NSDs[i].forwardingGraphs[0].network_forwarding_path:
+#            sub_data = {}
+#            sub_data['network_forwarding_paths'] = []
+#            for network_forwarding_path in self.NSDs[i].forwardingGraphs[0].network_forwarding_path:
 
-                sub_data['connection_points'] = []
+#                sub_data['connection_points'] = []
 
-                for connection_point in network_forwarding_path.connection_points:
-                    sub_data['connection_points'].append({
-                        "connection_point_ref": str(connection_point.connection_point_ref),
-                        "position": connection_point.position
-                    })
-                sub_data['network_forwarding_paths'].append({
-                    "fp_id": str(network_forwarding_path.fp_id),
-                    "policy": str(network_forwarding_path.policy),
-                    "connection_points": sub_data['connection_points']
-                })
+#                for connection_point in network_forwarding_path.connection_points:
+#                    sub_data['connection_points'].append({
+#                        "connection_point_ref": str(connection_point.connection_point_ref),
+#                        "position": connection_point.position
+#                    })
+#                sub_data['network_forwarding_paths'].append({
+#                    "fp_id": str(network_forwarding_path.fp_id),
+#                    "policy": str(network_forwarding_path.policy),
+#                    "connection_points": sub_data['connection_points']
+#                })
 
-            data['forwarding_graphs'] = []
-            for forwarding_graph in self.NSDs[i].forwardingGraphs:
-                if len(forwarding_graph.constituent_virtual_links) != 0:
-                    print(len(forwarding_graph.constituent_virtual_links))
-                    data['forwarding_graphs'].append({
-                        "fg_id": str(forwarding_graph.fg_id),
-                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
-                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
-                        "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
-                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
-                        "network_forwarding_paths": sub_data['network_forwarding_paths']
-                    })
-                else:
-                    data['forwarding_graphs'].append({
-                        "fg_id": str(forwarding_graph.fg_id),
-                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
-                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
-                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
-                        "network_forwarding_paths": sub_data['network_forwarding_paths']
-                    })
+#            data['forwarding_graphs'] = []
+#            for forwarding_graph in self.NSDs[i].forwardingGraphs:
+#                if len(forwarding_graph.constituent_virtual_links) != 0:
+#                    print(len(forwarding_graph.constituent_virtual_links))
+#                    data['forwarding_graphs'].append({
+#                        "fg_id": str(forwarding_graph.fg_id),
+#                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+#                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+#                        "constituent_virtual_links": forwarding_graph.constituent_virtual_links,
+#                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+#                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+#                    })
+#                else:
+#                    data['forwarding_graphs'].append({
+#                        "fg_id": str(forwarding_graph.fg_id),
+#                        "number_of_endpoints": forwarding_graph.number_of_endpoints,
+#                        "number_of_virtual_links": forwarding_graph.number_of_virtual_links,
+#                        "constituent_vnfs": forwarding_graph.constituent_vnfs,
+#                        "network_forwarding_paths": sub_data['network_forwarding_paths']
+#                    })
 
             all_nsds.append(data)
         
@@ -441,12 +441,12 @@ class splitter():
 
     def split_sonata(self):
         if self.validate() is not False:
-            self.create_new_function_sets()
+            #self.create_new_function_sets()
             self.set_connection_point_refs_for_virtual_functions()
             self.split_network_function()
             self.set_connection_points()
             self.split_virtual_links()
-            self.split_forwarding_path()
+            #self.split_forwarding_path()
             self.set_general_information()
             return self.create_files()
         else:
