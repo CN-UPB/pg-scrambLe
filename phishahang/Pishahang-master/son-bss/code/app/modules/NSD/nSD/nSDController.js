@@ -36,7 +36,6 @@
   $scope.limit = 11;
   $scope.ingresses = [{}];
   $scope.egresses = [{}];
-  $scope.manos = [{'name':'Parent'}, {'name':'MANO1'}, {'name':'MANO2'}];
   $scope.manodetails = [{}];
   $scope.manodetail = {};
   $scope.manodb = [{}];
@@ -154,7 +153,7 @@
 }
 
 $scope.saveManos = function() {
-   NSDServices.saveManos($scope.manodetail)
+   NSDServices.saveManos(ENV, $scope.manodetail)
   .then(function(result) {
     $scope.allManos = result.data;    
   }, function(error) {
@@ -168,7 +167,7 @@ $scope.saveManos = function() {
 
 
 $scope.deleteManos = function() {
-   NSDServices.deleteManos($scope.manodb)
+   NSDServices.deleteManos(ENV, $scope.manodb)
   .then(function(result) {
     $scope.delete = result.data;    
   }, function(error) {
@@ -225,9 +224,9 @@ $scope.deleteManos = function() {
  $scope.cleanInstantiationIngressEgress = function() {
    $scope.ingresses = [{}];
    $scope.egresses = [{}];
-   $scope.manodetails = [{}];
    $scope.manodetail = {};
    $scope.manodb = {};
+   $scope.delete = '';
  }
 
 }]);

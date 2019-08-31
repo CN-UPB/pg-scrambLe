@@ -60,3 +60,15 @@ echo "Starting Scramble packages : Translator and Splitter.."
 sudo docker-compose stop $(sudo docker-compose ps -q -a)
 sudo docker-compose build
 sudo docker-compose up -d
+
+echo "##############################################"
+echo "##############################################"
+
+cd "$dir/phishahang/Pishahang-master/son-gkeeper/son-gtkmano"
+echo "$(pwd)"
+
+echo "Starting Scramble gtkmano.."
+
+sudo docker-compose stop $(sudo docker-compose ps -q -a)
+sudo docker-compose build
+sudo docker-compose up -d

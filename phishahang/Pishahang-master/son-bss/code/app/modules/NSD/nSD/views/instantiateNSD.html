@@ -116,9 +116,9 @@
 						<div class="col-md-4">
     
                             <h3>Saved MANOs</h3>
-							<pre>all manos from db:{{allManos | json}}</pre> 
+							<pre>Mano details added in db:{{allManos | json}}</pre> 
 							<button id="SaveButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="saveManos()">
-								SaveManos
+								Save/Refresh
 							</button>
                         </div>	
 						<div class="col-md-4">
@@ -128,7 +128,8 @@
 								DeleteManos
 							</button>
 							<pre>response:{{delete | json}}</pre>
-                        </div>
+
+	                        </div>
                     </form>                   
                 </div>
             </div>            

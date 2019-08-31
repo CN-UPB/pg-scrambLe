@@ -41,12 +41,12 @@
             return defer.promise;
         },
 
-	saveManos:function(manodetail){				
+	saveManos:function(ENV, manodetail){				
             var defer=$q.defer();
 
             var data= manodetail;
             $http({ method: 'POST',
-		    url: 'http://131.234.28.186:7001/mano_create',
+		    url: String(ENV.apiEndpoint).slice(0, -7)+':7001/mano_create',
 		    data: data,
 		    dataType: 'json',
                     headers: {'Content-Type': 'application/json'}
@@ -57,12 +57,12 @@
             return defer.promise;
         },
 
-	deleteManos:function(manodb){				
+	deleteManos:function(ENV, manodb){				
             var defer=$q.defer();
 
             var data= {"_id" : manodb.id};
             $http({ method: 'POST',
-		    url: 'http://131.234.28.186:7001/mano/remove',
+		    url: String(ENV.apiEndpoint).slice(0, -7)+':7001/mano/remove',
 		    data: data,
 		    dataType: 'json',
                     headers: {'Content-Type': 'application/json'}
