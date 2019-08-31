@@ -1,0 +1,13 @@
+service:
+  build: .
+  command: python -u app.py
+  ports:
+    - "7001:7001"
+  volumes:
+    - .:/todo
+  links:
+    - db
+db:
+  image: mongo:3.0.2
+  ports:
+   - 27020:27017
