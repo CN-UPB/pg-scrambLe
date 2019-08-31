@@ -35,7 +35,7 @@ ENV url_monitoring_server http://son-monitor-manager:8000/api/v1/
 
 #ARG HOST_PISHAHANG
 #ARG HOST_OSM
-#ARG HOST
+ARG HOST
 # Environment variables
 ENV splitter_url=http://$HOST:8003/Main_splitter/split
 ENV translator_url=http://$HOST:8003/translator/hello
