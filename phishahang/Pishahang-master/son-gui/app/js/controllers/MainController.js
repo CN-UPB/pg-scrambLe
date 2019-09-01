@@ -79,7 +79,7 @@ SonataApp.controller('MainController',['$rootScope','$scope','$routeParams', '$l
                   var mon_url = protocol+'//'+host+'/monitoring';
                   var vims_url = protocol+'//'+host+'/api/v2';
                   var logs_url = protocol+'//'+host+'/logs';
-		  var mano_url = protocol+'//'+host+'/api/v2';
+		  var mano_url = protocol+'//'+host;
 
                 }else{
                   var gk_url = 'https://sp.int3.sonata-nfv.eu/api/v2';

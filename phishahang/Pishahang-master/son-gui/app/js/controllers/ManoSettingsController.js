@@ -5,9 +5,10 @@ SonataApp.controller('ManoSettingsController',['$rootScope','$scope','$routePara
 
 $scope.post_a_mano = function(){
 	var newdata = $scope.new_mano;
+	var host = window.location.hostname;
 	$http({
           method  : 'POST',
-          url     : 'http://131.234.29.140:7001/mano_create',
+          url     : 'http://'+host+':7001/mano_create',
 	  dataType : 'json',	
           headers : { 'Content-Type': 'application/json','Accept':'application/json'},
           data    : newdata
@@ -20,15 +21,15 @@ $scope.post_a_mano = function(){
 	},
 
 $scope.getmano = function(){
-
+	var host = window.location.hostname;
 	$http({
           method  : 'GET',
-          url     : 'http://131.234.29.140:7001/mano',
+          url     : 'http://'+host+':7001/mano',
 	  dataType : 'json',	
           headers : {'Content-Type': 'application/json','Accept':'application/json'}
          })
           .then(function successCallback(result){
-		$scope.allmano = result.data;
+		$scope.checkmano = result.data;
 	 });
    },
 
