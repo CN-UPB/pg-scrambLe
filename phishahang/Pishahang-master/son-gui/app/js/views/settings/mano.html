@@ -44,7 +44,7 @@
                     <td>{{mano._id}}</td>
                     <td>{{mano.type}}</td> 
 		    <td>{{mano.name}}</td>	
-		    <td>{{mano.address}}</td>		
+		    <td>{{mano.ip}}</td>		
                   </tr>
                    <tr ng-show="zero_mano">
                     <td colspan="6" class="center" ng-show="zero_mano">There are no Mano</td>
@@ -73,7 +73,7 @@
           </div>
 
 	  <div class="input-field col s12 m4">
-            <input id="url" ng-model="new_mano.address" type="text" class="validate">
+            <input id="url" ng-model="new_mano.ip" type="text" class="validate">
             <label for="url">URL</label>
           </div>
 
@@ -96,6 +96,7 @@
                   </select>
                   <label for="mano_type">Mano Vendor</label>
         </div>
+	<pre>mano details:{{new_mano}}</pre>
       </div>
       </div>
      </form>
