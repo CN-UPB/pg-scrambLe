@@ -72,3 +72,18 @@ echo "Starting Scramble gtkmano.."
 sudo docker-compose stop $(sudo docker-compose ps -q -a)
 sudo docker-compose build
 sudo docker-compose up -d
+
+echo "##############################################"
+echo "##############################################"
+
+echo "Starting Scramble GUI.."
+cd "$dir/phishahang/Pishahang-master/son-gui"
+echo "$(pwd)"
+
+sudo docker stop son-gui
+sudo docker rm son-gui
+sudo docker rmi son-gui
+sudo docker build -t son-gui -f Dockerfile-dev .
+
+sudo docker run -d --name son-gui --net=son-sp son-gui
+
