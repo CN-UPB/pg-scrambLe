@@ -79,12 +79,14 @@ SonataApp.controller('MainController',['$rootScope','$scope','$routeParams', '$l
                   var mon_url = protocol+'//'+host+'/monitoring';
                   var vims_url = protocol+'//'+host+'/api/v2';
                   var logs_url = protocol+'//'+host+'/logs';
+		  var mano_url = protocol+'//'+host+'/api/v2';
 
                 }else{
                   var gk_url = 'https://sp.int3.sonata-nfv.eu/api/v2';
                   var mon_url = 'http://sp.int3.sonata-nfv.eu:8000';
                   var vims_url = 'http://sp.int3.sonata-nfv.eu:32001/api/v2';
                   var logs_url = 'http://logs.sonata-nfv.eu:12900/logs';
+		  var mano_url = 'http://sp.int3.sonata-nfv.eu:32001/api/v2';	
                 }
                   console.log("protocol: "+protocol);
                   console.log("host: "+host);
@@ -100,6 +102,7 @@ SonataApp.controller('MainController',['$rootScope','$scope','$routeParams', '$l
                         'logs':logs_url+'/search/universal/relative?',
                         'vims':vims_url+'/vims',
                         'wims':vims_url+'/wims',
+			'mano':mano_url+'/mano',	
                         'monitoring_data':gk_url+'/kpis/collected',
                         'gatekeeper':{
                           'services' :gk_url+'/services',
