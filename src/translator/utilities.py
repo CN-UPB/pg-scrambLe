@@ -453,7 +453,7 @@ class setup():
         ### translating and transforming the sonata virtual links to osm
         df = transformation_obj.ret_ds(sonata_dataset,'virtual_links',2)
         vl_list = df[(df['key'] == 'connectivity_type') & ( df['value'] == 'E-Line')]['lineage'].values
-
+        '''
         if len(vl_list) == 2:
             
             df.loc[(df['lineage'] == vl_list[0]) & 
@@ -474,7 +474,7 @@ class setup():
                 df.loc[df[(df['lineage'] == vl_list[i])].index,'lineage'] = vl_list[i-1]
                 
             df.drop(df[(df['lineage'] == vl_list[-1])].index,inplace=True,axis=0)
-            
+        '''    
         vl = transformation_obj.son_vld_nsd(df,':')
         vl['level'] = vl['level'].astype('int64')
         vl['parent_level'] = vl['parent_level'].astype('int64')
@@ -510,6 +510,10 @@ class setup():
 
         temp = df_son_vld[(df_son_vld['parent_key'] == 'vnfd-connection-point-ref') & (df_son_vld['key'] == 'member-vnf-index-ref')].copy()
         temp['key'] = 'vnfd-id-ref'
+        df_son_vld = df_son_vld.append(temp)
+        
+        temp = df_son_vld[(df_son_vld['key'] == 'name') & (df_son_vld['value'] == 'mgmt')].copy()
+        temp['key'] = 'vim-network-name'
         df_son_vld = df_son_vld.append(temp)
 
         def lookup_value(value):
@@ -1473,7 +1477,7 @@ class transformation():
             if len(values) == 1 and str(presplit[2]) == 'connection_point_ref':
                 lineage = presplit[3]
                 continue 
-            if (str(presplit[2]) == 'position' and presplit[3] == lineage):
+            if (str(presplit[2]) == 'position' ):
                 continue
             for j in range(len(values)):
                 indexes.append(i)
