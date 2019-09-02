@@ -3196,7 +3196,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         for key, val in mano_dict.items():
             for manos in mano_details:
-                if manos['name']==key:
+                if manos['name']==key and val == True:
                     mano_list.append(manos)
 
                 
