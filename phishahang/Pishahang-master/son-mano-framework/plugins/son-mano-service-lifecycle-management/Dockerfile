@@ -45,6 +45,7 @@ ENV translator_url=http://$HOST:8003/translator/hello
 #ENV username_pish2=sonata
 #ENV password_pish2=1234
 #ENV host_pishahang=$HOST_PISHAHANG
+ENV gtkmanourl=http://$HOST:7001/scrambled_ns
 
 RUN apt-get update && apt-get install -y gcc
 

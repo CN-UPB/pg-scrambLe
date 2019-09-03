@@ -2984,7 +2984,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         self.services[serv_id]['pause_chain'] = True
         LOG.info("Service " + serv_id + ": Placement request sent")
 
-    def send_to_osm(self, sets, functions, nsd_splitted):
+    def send_to_osm(self, serv_id, sets, functions, nsd_splitted):
     
         function_osm = [] # list to store vnfs for OSM
         LOG.info('\nCalling Scramble Translator for translating NSD to OSM...\n')
@@ -3017,6 +3017,10 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 for id_, name_ in zip(osm_vnf_ids,osm_vnf_names):
                     if (osm_vnfd['vnfd-catalog']['vnfd'][0]['name'] == name_ ):
                         osm_vnfd['vnfd-catalog']['vnfd'][0]['id'] = id_
+                
+                gtkmano_payload= {'nsd_uuid' : str(serv_id), 'vnfs':{'vnf_uuid' : str(vnf['vnfd']['uuid']), 'mano':'OSM', 'url': str(sets[2][0]['ip'])}}
+                gtkmano_url=os.environ['gtkmanourl']
+                response = requests.post(gtkmano_url, headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
                 
                 function_osm.append(osm_vnfd)
                 
@@ -3104,7 +3108,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         LOG.info("response from OSM MANO after instantiating the ns\n"+str(instantiate_resp))
 
-    def send_to_pishahang(self,sets, functions, nsd_splitted):
+    def send_to_pishahang(self, serv_id, sets, functions, nsd_splitted):
     
         function_pish2 =[] # list to store vnfs for other PISHAHANG
         pish2_nsd = nsd_splitted
@@ -3112,6 +3116,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         for vnf in functions:
             if(vnf['vnfd']['name'] in sets[1]):
+                
+                gtkmano_payload= {'nsd_uuid' : str(serv_id), 'vnfs':{'vnf_uuid' : str(vnf['vnfd']['uuid']), 'mano':'PISHAHANG', 'url': str(sets[2][0]['ip'])}}
+                gtkmano_url=os.environ['gtkmanourl']
+                response = requests.post(gtkmano_url,headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
+                
                 function_pish2.append(vnf['vnfd'])
                 
         LOG.info(function_pish2)
@@ -3199,7 +3208,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 if manos['name']==key and val == True:
                     mano_list.append(manos)
 
-                
+              
         if 'nsd' in self.services[serv_id]['service']:
             
             descriptor = self.services[serv_id]['service']['nsd']
@@ -3261,11 +3270,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
                             
                 elif sets[2][0]['type'] == 'PISHAHANG':
                 
-                    self.send_to_pishahang(sets, functions, nsds_splitted['message'][i])
+                    self.send_to_pishahang(serv_id, sets, functions, nsds_splitted['message'][i])
                     
                 elif sets[2][0]['type'] == 'OSM':
                     
-                    self.send_to_osm(sets, functions, nsds_splitted['message'][i])             
+                    self.send_to_osm(serv_id, sets, functions, nsds_splitted['message'][i])             
             
             # remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
             NSD = main_pish_nsd

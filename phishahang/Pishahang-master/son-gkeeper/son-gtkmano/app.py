@@ -11,7 +11,8 @@ app = Flask(__name__)
 CORS(app)
 client = MongoClient("mongodb://db:27017")
 db = client.tododb
-cors = CORS(app, resources={r"/mano_create": {"origins": "*"}, r"/mano/remove": {"origins": "*"}})	
+scramble_db = client.scrambled
+cors = CORS(app, resources={r"/mano_create": {"origins": "*"}, r"/mano/remove": {"origins": "*"}, r"/scrambled_ns": {"origins": "*"}})	
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("son-gtkmano:app")
@@ -32,7 +33,7 @@ def todo():
 def new():
 	content = request.get_json()
 	if content:
-		LOG.info("Printing Content from son-bss {}".format(str(request.data)))
+		LOG.info("Printing Content from son-bss/son-gui {}".format(str(request.data)))
 		x = db.tododb.insert_one(content)
 	
 	return  redirect('/mano')
@@ -63,6 +64,14 @@ def uuid ():
 	ret = dumps(dictionary)
 	y = json.loads(ret)
 	return y
+	
+@app.route('/scrambled_ns', methods=['POST'])
+def scrambled_functions ():
+	content = request.get_json()
+	if content:
+		LOG.info("Printing Content from son-slm {}".format(str(request.data)))
+		x = scramble_db.functions_route.insert_one(content)
+	return str(x.inserted_id)
 
 if __name__ == "__main__":
 
