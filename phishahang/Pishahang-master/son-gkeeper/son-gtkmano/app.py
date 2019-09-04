@@ -49,21 +49,15 @@ def remove ():
 	else:
 		return "failure"
 
-@app.route('/mano_uuid', methods=['POST'])
+@app.route('/nsd_uuid')
 def uuid ():
-	x = []
-	dictionary = {}
-	rec = request.get_json()
-	id = rec["_id"]
-	found = db.tododb.find({"_id": ObjectId(id)})
-	for doc in found:
-		x.append(doc)
-	dlist = x
-	for i , d in enumerate(dlist):
-		dictionary[i] = d
-	ret = dumps(dictionary)
-	y = json.loads(ret)
-	return y
+	nsmano = scramble_db.functions_route.find()
+	nsmano = list(nsmano)
+	
+	for ns in nsmano:
+	    ns['_id'] = str(ns['_id'])
+
+	return json.dumps(nsmano)
 	
 @app.route('/scrambled_ns', methods=['POST'])
 def scrambled_functions ():

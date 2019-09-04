@@ -83,7 +83,7 @@
                             </fieldset>                                                                            
                         </div> 
 						<div class="col-md-4">  
-							<h3>MANO Details</h3>
+							<h3>Insert MANO Details</h3>
 
                                 <ng-form name='manodetailsForm'>
                                     <p style="color:red" ng-show='manodetailsForm.$error.required'>
@@ -104,7 +104,9 @@
                                     <label for="username">IP</label>
                                     <input type="text" name="manodetailip" id="manodetailip" class="form-control" ng-model="manodetail.ip" placeholder="Enter IP Address" ng-required='manodetail.name' ng-pattern="/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/([0-9]|[1-2][0-9]|3[0-2]))?$/"/>
                                     <span ng-show="manodetailsForm.manodetailip.$dirty && manodetailsForm.manodetailip.$error.pattern" class="help-block" style="color:red">IP: [0-255].[0-255].[0-255].[0-255]/[0-32]</span>
-                                    <br>  
+                                    <br>  <button id="SaveButton" class="btn btn-primary" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="saveManos()">
+								Save/Refresh
+							</button>
 									<hr ng-hide="$last">
                                     <br ng-show="$last">
                                     <br ng-show="$last">
@@ -113,23 +115,53 @@
 									
                                 </ng-form>
                         </div>
+						
+
+
+						
 						<div class="col-md-4">
-    
-                            <h3>Saved MANOs</h3>
-							<pre>Mano details added in db:{{allManos | json}}</pre> 
-							<button id="SaveButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="saveManos()">
-								Save/Refresh
+						<h3>Delete MANO</h3>
+							<label for="username">Mano UUID</label>
+                                    <input type="text" name="manodbid" id="manodbid" class="form-control" ng-model="manodb.id" placeholder="-- UUID --" ng-required='manodb.id'/>
+							<br><button id="DeleteButton" class="btn btn-danger" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="deleteManos()">
+								Delete
 							</button>
-                        </div>	
-						<div class="col-md-4">
-							<label for="username">Mano ID</label>
-                                    <input type="text" name="manodbid" id="manodbid" class="form-control" ng-model="manodb.id" placeholder="-- ID --" ng-required='manodb.id'/>
-							<button id="DeleteButton" class="btn btn-success" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="deleteManos()">
-								DeleteManos
-							</button>
-							<pre>response:{{delete | json}}</pre>
+							<br><p>{{delete | json}}</p>
 
 	                        </div>
+							
+			<div class="row">
+									   
+            <table width="60%" >
+			
+				<thead>
+				<tr><th data-field="_id" align="center"  colspan="4"><h3>Saved MANO Details</h3></th></tr>
+				</thead>
+               <thead>
+			   
+                <tr>
+                  <th align="center"  data-field="">UUID</th>
+                  <th align="center"  data-field="">Name</th>
+				  <th align="center"  data-field="">Type</th>
+                  <th align="center"  data-field="">URL</th>
+                  
+                </tr>
+                </thead>
+
+                <tbody>
+				
+                  <tr ng-repeat="eachmano in allManos" ng-show="!loading">
+                    <td align="left"><p>  {{eachmano._id}}</p>  </td>
+                    <td align="left"><p>  {{eachmano.type}} </p> </td> 
+					<td align="left"><p>  {{eachmano.name}} </p> </td>	
+					<td align="left"><p>  {{eachmano.ip}} </p> </td>		
+                  </tr>
+                   <tr ng-show="zero_mano">
+                    <td colspan="35" class="center" ng-show="zero_mano">There are no Mano</td>
+                  </tr>
+                </tbody>
+            </table>
+          </div>
                     </form>                   
                 </div>
             </div>            
