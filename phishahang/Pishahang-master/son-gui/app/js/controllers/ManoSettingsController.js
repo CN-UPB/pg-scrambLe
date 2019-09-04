@@ -2,6 +2,7 @@ SonataApp.controller('ManoSettingsController',['$rootScope','$scope','$routePara
 	
 (function(w){w = w || window; var i = w.setInterval(function(){},100000); while(i>=0) { w.clearInterval(i--); }})(/*window*/);
   $scope.new_mano = {};
+  $scope.manoid = '';
 
 $scope.post_a_mano = function(){
 	var newdata = $scope.new_mano;
@@ -32,6 +33,22 @@ $scope.getmano = function(){
 		$scope.checkmano = result.data;
 	 });
    },
+
+$scope.deleteMano = function(manoid ){
+	var host = window.location.hostname;
+	var data= {"_id" : manoid };
+
+	$http({
+          method  : 'POST',
+          url     : 'http://'+host+':7001/mano/remove',
+	  data: data,
+	  dataType : 'json',	
+          headers : {'Content-Type': 'application/json','Accept':'application/json'}
+         })
+          .then(function successCallback(result){
+	 });
+   },
+
 
 $scope.clear = function() {
     $scope.new_mano = null;

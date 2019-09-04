@@ -44,7 +44,12 @@
                     <td>{{mano._id}}</td>
                     <td>{{mano.type}}</td> 
 		    <td>{{mano.name}}</td>	
-		    <td>{{mano.ip}}</td>		
+		    <td>{{mano.ip}}</td>
+                      <td>
+                          <a ng-click="deleteMano(mano._id)" class="modal-trigger waves-effect waves-light">
+                              <i class="material-icons">delete_forever</i>
+                          </a>
+                      </td>		
                   </tr>
                    <tr ng-show="zero_mano">
                     <td colspan="6" class="center" ng-show="zero_mano">There are no Mano</td>
@@ -90,13 +95,13 @@
 	<div class="input-field col s12">
                   <select class="" id="mano_type" ng-model="new_mano.type"
                           material-select watch>
-                      <option value="">Select Mano vendor</option>
-                      <option value="osm">OSM</option>
-                      <option value="Pishahang">Pishahang</option>
+                      <option value="MAIN_PISHAHANG">Main Pishahang</option>
+                      <option value="OSM">OSM</option>
+                      <option value="PISHAHANG">Pishahang</option>
                   </select>
                   <label for="mano_type">Mano Vendor</label>
         </div>
-	<pre>mano details:{{new_mano}}</pre>
+	
       </div>
       </div>
      </form>
