@@ -3002,7 +3002,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         osm_nsd = json.loads(response.text)
         osm_nsd = osm_nsd['message']['descriptor']
         
-        LOG.info('\n\n\ntranslated NSD:\n'+str(osm_nsd)+"\n\n")
+        LOG.info('\n\n\ntranslated NSD for OSM MANO:\n'+str(osm_nsd)+"\n\n")
         
         # getting the vnfds list from Pishahang to translate to osm
         for vnf in functions:
@@ -3024,7 +3024,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 function_osm.append(osm_vnfd)
                 
-        LOG.info('\n\ntranslated VNFD:\n'+str(function_osm)+"\n\n")    
+        LOG.info('\n\ntranslated VNFDs for OSM MANO:\n'+str(function_osm)+"\n\n")    
         # creating packages
         nsd_name = osm_nsd['nsd:nsd-catalog']['nsd'][0]['name']
         if osm_helpers.generatePackage(packageType = "nsd", 
@@ -3110,9 +3110,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
     def send_to_pishahang(self, serv_id, sets, functions, nsd_splitted):
     
-        function_pish2 =[] # list to store vnfs for other PISHAHANG
+        function_pish2 =[] # list to store vnfs for other Pishahang
         pish2_nsd = nsd_splitted
-        LOG.info(pish2_nsd)
+        LOG.info("\n\nNSD for the other Pishahang::\n"+str(pish2_nsd)+"\n\n")
         
         for vnf in functions:
             if(vnf['vnfd']['name'] in sets[1]):
@@ -3123,9 +3123,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 function_pish2.append(vnf['vnfd'])
                 
-        LOG.info(function_pish2)
+        LOG.info("\n\nVNFDs for the other Pishahang:\n"+str(function_pish2)+"\n\n")
 
-        LOG.info("\n\nConnecting to Pishahang2...\n\n" )
+        LOG.info("\n\nConnecting to the other Pishahang...\n\n" )
 
         username_pish = sets[2][0]['user']#os.environ['username_pish2']
         password_pish = sets[2][0]['pwd']#os.environ['password_pish2']
@@ -3139,7 +3139,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         son_nslcm = wrappers.SONATAClient.Nslcm(host_pish)
         son_vnfd = wrappers.SONATAClient.VnfPkgm(host_pish)
 
-        LOG.info('\n\nPosting the packages to PISHAHANG\n\n')
+        LOG.info('\n\nPosting the packages to Pishahang\n\n')
 
         ff = open(pish2_nsd['name']+'.yml','w')
         yaml.dump(pish2_nsd, ff)
@@ -3153,15 +3153,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
             pish2_vnf_names.append(vnf['name'])
             response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
                     package_path=vnf['name']+'.yml'))
-            LOG.info("\n\nVNFD posted to Pishahang2..."+str(response)+"\n\n" )
+            LOG.info("\n\nVNFD posted to the other Pishahang...\n"+str(response)+"\n\n" )
             
         response = json.loads(son_nsd_client.post_ns_descriptors(
                     token=_token["token"]["access_token"],
                     package_path=pish2_nsd['name']+".yml"))
 
-        LOG.info("\n\nSub-NSD posted to Pishahang2...\n"+str(response) +"\n\n")
+        LOG.info("\n\nSub-NSD posted to the other Pishahang...\n"+str(response) +"\n\n")
 
-        LOG.info("\n\ninstantiate the ns on PISHAHANG...\n\n")
+        LOG.info("\n\ninstantiate the ns on Pishahang...\n\n")
 
         _nsd_list = json.loads(son_nsd_client.get_ns_descriptors(token=_token["token"]["access_token"]))
         _nsd_list = json.loads(_nsd_list["data"])
@@ -3180,7 +3180,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                             nsInstanceId=_ns))
 
 
-        LOG.info("\n\nresponse from Pishahang2 after instantiating the ns\n"+str(response)+"\n\n")
+        LOG.info("\n\nresponse from the other Pishahang after instantiating the ns\n"+str(response)+"\n\n")
         
         
     def SLM_mapping_scramble(self, serv_id):
@@ -3254,7 +3254,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             main_pish_nsd = '' # string to store nsd for MAIN_PISHAHANG
             
             LOG.info("\n\nfunctions\n\n")
-            LOG.info(rndm_sets)
+            LOG.info(rndm_sets+"\n\n")
 
             for i,sets in enumerate(rndm_sets):
             
