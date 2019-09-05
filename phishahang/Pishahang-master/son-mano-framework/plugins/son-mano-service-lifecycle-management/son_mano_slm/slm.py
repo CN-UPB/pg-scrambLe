@@ -451,8 +451,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         # Start handling the request
         message = yaml.load(payload)
 
-        LOG.info("Scramble Message Debug ")
-        LOG.info(message)
+        #LOG.info("Scramble Message Debug ")
+        #LOG.info(message)
 
         # Add the service to the ledger
         serv_id = self.add_service_to_ledger(message, corr_id)
@@ -3002,7 +3002,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         osm_nsd = json.loads(response.text)
         osm_nsd = osm_nsd['message']['descriptor']
         
-        LOG.info('\n\n\ntranslated NSD for OSM MANO:\n'+str(osm_nsd)+"\n\n")
+        LOG.info('\n\n\ntranslated NSD for OSM MANO:\n'+yaml.dump(osm_nsd)+"\n\n")
         
         # getting the vnfds list from Pishahang to translate to osm
         for vnf in functions:
@@ -3024,7 +3024,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 function_osm.append(osm_vnfd)
                 
-        LOG.info('\n\ntranslated VNFDs for OSM MANO:\n'+str(function_osm)+"\n\n")    
+        LOG.info('\n\ntranslated VNFDs for OSM MANO:\n'+yaml.dump(function_osm)+"\n\n")    
         # creating packages
         nsd_name = osm_nsd['nsd:nsd-catalog']['nsd'][0]['name']
         if osm_helpers.generatePackage(packageType = "nsd", 
@@ -3073,11 +3073,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
             response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
                                                                 package_path="/tmp/"+vnf_name+"_vnfd.tar.gz"))
             
-            LOG.info("\n\nVNFD posted to OSM MANO...\n"+str(response)+"\n\n")
+            LOG.info("\n\nVNFD posted to OSM MANO...\n"+yaml.dump(response)+"\n\n")
         
         response = json.loads(osm_nsd_client.post_ns_descriptors(token=_token['id'],
                                                                  package_path="/tmp/"+nsd_name+"_nsd.tar.gz"))
-        LOG.info("\n\nNSD posted to OSM MANO...\n"+str(response)+"\n\n")
+        LOG.info("\n\nNSD posted to OSM MANO...\n"+yaml.dump(response)+"\n\n")
         
         LOG.info("\n\nInstantiate the ns on OSM MANO...\n\n")
         _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
@@ -3106,13 +3106,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         instantiate_resp = json.loads(response["data"])
         
-        LOG.info("\n\nresponse from OSM MANO after instantiating the ns\n"+str(instantiate_resp)+"\n\n")
+        LOG.info("\n\nresponse from OSM MANO after instantiating the ns\n"+yaml.dump(instantiate_resp)+"\n\n")
 
     def send_to_pishahang(self, serv_id, sets, functions, nsd_splitted):
     
         function_pish2 =[] # list to store vnfs for other Pishahang
         pish2_nsd = nsd_splitted
-        LOG.info("\n\nNSD for the other Pishahang::\n"+str(pish2_nsd)+"\n\n")
+        LOG.info("\n\nNSD for the other Pishahang::\n"+yaml.dump(pish2_nsd)+"\n\n")
         
         for vnf in functions:
             if(vnf['vnfd']['name'] in sets[1]):
@@ -3123,7 +3123,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 function_pish2.append(vnf['vnfd'])
                 
-        LOG.info("\n\nVNFDs for the other Pishahang:\n"+str(function_pish2)+"\n\n")
+        LOG.info("\n\nVNFDs for the other Pishahang:\n"+yaml.dump(function_pish2)+"\n\n")
 
         LOG.info("\n\nConnecting to the other Pishahang...\n\n" )
 
@@ -3153,13 +3153,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
             pish2_vnf_names.append(vnf['name'])
             response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
                     package_path=vnf['name']+'.yml'))
-            LOG.info("\n\nVNFD posted to the other Pishahang...\n"+str(response)+"\n\n" )
+            LOG.info("\n\nVNFD posted to the other Pishahang...\n"+yaml.dump(response)+"\n\n" )
             
         response = json.loads(son_nsd_client.post_ns_descriptors(
                     token=_token["token"]["access_token"],
                     package_path=pish2_nsd['name']+".yml"))
 
-        LOG.info("\n\nSub-NSD posted to the other Pishahang...\n"+str(response) +"\n\n")
+        LOG.info("\n\nSub-NSD posted to the other Pishahang...\n"+yaml.dump(response) +"\n\n")
 
         LOG.info("\n\ninstantiate the ns on Pishahang...\n\n")
 
@@ -3180,7 +3180,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                             nsInstanceId=_ns))
 
 
-        LOG.info("\n\nresponse from the other Pishahang after instantiating the ns\n"+str(response)+"\n\n")
+        LOG.info("\n\nresponse from the other Pishahang after instantiating the ns\n"+yaml.dump(response)+"\n\n")
         
         
     def SLM_mapping_scramble(self, serv_id):
@@ -3196,8 +3196,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         topology = self.services[serv_id]['infrastructure']['topology']
         
         # setting the manos list recieved from the BSS gui
-        LOG.info("\n\nPrinting scramble manochoices {}\n\n".format(str(self.services[serv_id]['payload']['selectedmanos'])))
-        LOG.info("\n\nPrinting scramble manodetails {}\n\n".format(str(self.services[serv_id]['payload']['manoips'])))
+        #LOG.info("\n\nPrinting scramble manochoices {}\n\n".format(yaml.dump(self.services[serv_id]['payload']['selectedmanos'])))
+        #LOG.info("\n\nPrinting scramble manodetails {}\n\n".format(yaml.dump(self.services[serv_id]['payload']['manoips'])))
         
         mano_dict = self.services[serv_id]['payload']['selectedmanos']
         mano_details = self.services[serv_id]['payload']['manoips']
@@ -3221,7 +3221,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             
             # create a set of vnfs for different MANO frameworks through random logic
             # Number of Splits is by default 2.
-            LOG.info("\n\n\nRandomly assigning VNFs to existing MANO Frameworks...\n\n\n" )
+            LOG.info("\n\nRandomly assigning VNFs to existing MANO Frameworks...\n\n" )
             
             function_list = self.get_network_functions(descriptor)
             rndm_sets = self.random_combination(function_list, mano_list)
@@ -3229,7 +3229,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             if(len(rndm_sets) > 1): # if there are more than 1 MANOs, SCRAMBLE-splitter is called to split the NSD
                 vnfid_set = [sets[0] for sets in rndm_sets]#[rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
                                 
-                LOG.info("\n\nvnf splits : "+str(vnfid_set)+"\n\n")
+                LOG.info("\n\nvnf splits : "+yaml.dump(vnfid_set)+"\n\n")
             
                 # send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
                 splitter_url = os.environ['splitter_url'] 
@@ -3241,7 +3241,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 LOG.info(response)
                 
                 nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
-                LOG.info("\n\n\nOriginal NSD Splitted"+str(nsds_splitted)+"\n\n")
+                LOG.info("\n\n\nOriginal NSD Splitted"+yaml.dump(nsds_splitted)+"\n\n")
 
             else:
                 #LOG.info("\n\nvnf splits : "+str(rndm_sets)+"\n\n")
@@ -3253,21 +3253,19 @@ class ServiceLifecycleManager(ManoBasePlugin):
             function_pish =[] # list to store vnfs for MAIN_PISHAHANG
             main_pish_nsd = '' # string to store nsd for MAIN_PISHAHANG
             
-            LOG.info("\n\nfunctions\n\n")
-            LOG.info("\n\n"+str(rndm_sets)+"\n\n")
+            #LOG.info("\n\nfunctions\n\n")
+            #LOG.info("\n\n"+yaml.dump(rndm_sets)+"\n\n")
 
             for i,sets in enumerate(rndm_sets):
             
                 if sets[2][0]['type'] == 'MAIN_PISHAHANG':
                     
                     main_pish_nsd = nsds_splitted['message'][i]
-                    LOG.info(main_pish_nsd)
-                    
+                                        
                     for vnf in functions:
                         if(vnf['vnfd']['name'] in sets[1]):
                             function_pish.append(vnf)
-                            
-                    LOG.info(function_pish)           
+                                       
                             
                 elif sets[2][0]['type'] == 'PISHAHANG':
                 
@@ -3281,7 +3279,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
             NSD = main_pish_nsd
             functions = function_pish
             NSD['uuid'] = original_nsd_uuid
-            LOG.info('\n\nNSD for the parent MANO'+str(NSD)+"\n\n")
+            LOG.info('\n\nNSD for the parent MANO'+yaml.dump(NSD)+"\n\n")
+            LOG.info('\n\nNSD for the parent MANO'+yaml.dump(functions)+"\n\n")
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
