@@ -3213,6 +3213,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             
             descriptor = self.services[serv_id]['service']['nsd']
             functions = self.services[serv_id]['function']
+            original_nsd_uuid = descriptor['uuid']
             
             ##-------------------------------------------------------------------------##
             ##---------------------SCRAMBLE PART---------------------------------------##
@@ -3279,6 +3280,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             # remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
             NSD = main_pish_nsd
             functions = function_pish
+            NSD['uuid'] = original_nsd_uuid
             LOG.info('NSD for the parent MANO'+str(NSD) )
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
