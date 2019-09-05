@@ -5,3 +5,4 @@ from .nslcm import CommonInterfaceNslcm
 from .nsfm import CommonInterfaceNsfm
 from .nspm import CommonInterfaceNspm
 from .sonpackage import CommonInterfaceSonPackage
+from .database import CommonInterfaceDatabase

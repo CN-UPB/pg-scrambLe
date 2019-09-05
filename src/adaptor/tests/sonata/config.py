@@ -1,3 +1,3 @@
-HOST_URL = "vm-hadik3r-08.cs.uni-paderborn.de"
-USERNAME = "sonata"
-PASSWORD = "1234"
+HOST_URL = "manodemo1.cs.upb.de"
+USERNAME = "mano1"
+PASSWORD = "mano1"

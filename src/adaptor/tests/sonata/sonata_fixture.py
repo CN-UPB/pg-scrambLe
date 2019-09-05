@@ -171,3 +171,19 @@ def post_cs_instances_nsinstanceid_instantiate_keys():
 def post_cs_instances_nsinstanceid_terminate_keys():
     return ['']
     
+@fixture
+def get_mano_list_keys():
+    return ['_id', 'name', 'type', 'user', 'pwd', 'ip']
+
+@fixture
+def post_mano_create_keys():
+    return ['_id', 'name', 'type', 'user', 'pwd', 'ip']
+	
+@fixture
+def post_mano_details_keys():
+    return ['_id', 'name', 'type', 'user', 'pwd', 'ip']
+
+@fixture
+def post_mano_remove_keys():
+    return ['']
+	
