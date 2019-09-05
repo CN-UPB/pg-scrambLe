@@ -3244,7 +3244,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 LOG.info("\n\n\nOriginal NSD Splitted"+str(nsds_splitted)+"\n\n")
 
             else:
-                LOG.info("\n\nvnf splits : "+str(rndm_sets)+"\n\n")
+                #LOG.info("\n\nvnf splits : "+str(rndm_sets)+"\n\n")
                 nsds_splitted = {"message" : [descriptor]}
                 
                 
@@ -3254,7 +3254,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             main_pish_nsd = '' # string to store nsd for MAIN_PISHAHANG
             
             LOG.info("\n\nfunctions\n\n")
-            LOG.info(rndm_sets+"\n\n")
+            LOG.info("\n\n"+str(rndm_sets)+"\n\n")
 
             for i,sets in enumerate(rndm_sets):
             
