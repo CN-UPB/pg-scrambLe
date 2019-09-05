@@ -50,7 +50,7 @@
 
   var calculateSomeSelected = function() {
     $scope.someSelected = Object.keys(selectedmano).some(function (key) {
-      return selectedmano[key];
+		return selectedmano[key];
     });
   };
 

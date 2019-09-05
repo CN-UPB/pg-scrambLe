@@ -2,3 +2,4 @@ flask
 bson
 pymongo
 flask_cors
+python-mano-wrappers

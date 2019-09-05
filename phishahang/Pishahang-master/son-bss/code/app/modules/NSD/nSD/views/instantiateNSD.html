@@ -82,7 +82,7 @@
                                 </ng-form>                                                                                                                                               
                             </fieldset>                                                                            
                         </div> 
-						<div class="col-md-4">  
+						<!---<div class="col-md-4">  
 							<h3>Insert MANO Details</h3>
 
                                 <ng-form name='manodetailsForm'>
@@ -128,22 +128,25 @@
 							</button>
 							<br><p>{{delete | json}}</p>
 
-	                        </div>
+	                        </div>-->
 							
+			<!--- -->
+			<div class="col-md-4">
+
 			<div class="row">
 									   
-            <table width="60%" >
+            <table width="200%" align="left">
 			
 				<thead>
-				<tr><th data-field="_id" align="center"  colspan="4"><h3>Saved MANO Details</h3></th></tr>
+				<tr><th data-field="_id" align="center"  colspan="20"><h3>MANOs Available</h3></th></tr>
 				</thead>
                <thead>
 			   
                 <tr>
-                  <th align="center"  data-field="">UUID</th>
-                  <th align="center"  data-field="">Name</th>
-				  <th align="center"  data-field="">Type</th>
-                  <th align="center"  data-field="">URL</th>
+                  <!--<th align="center"  data-field="">UUID</th>-->
+                  <td align="center"  data-field=""><h4>Name</h4></td>
+				  <td align="center"  data-field=""><h4>Type</h4></td>
+                  <td align="center"  data-field=""><h4>URL</h4></td>
                   
                 </tr>
                 </thead>
@@ -151,19 +154,24 @@
                 <tbody>
 				
                   <tr ng-repeat="eachmano in allManos" ng-show="!loading">
-                    <td align="left"><p>  {{eachmano._id}}</p>  </td>
-                    <td align="left"><p>  {{eachmano.type}} </p> </td> 
-					<td align="left"><p>  {{eachmano.name}} </p> </td>	
-					<td align="left"><p>  {{eachmano.ip}} </p> </td>		
+                    <!--<td align="left"><p>  {{eachmano._id}}</p>  </td>-->
+                    <td align="center"><p>  {{eachmano.type}} </p> </td> 
+					<td align="center"><p>  {{eachmano.name}} </p> </td>	
+					<td align="center"><p>  {{eachmano.ip}} </p> </td>		
                   </tr>
                    <tr ng-show="zero_mano">
                     <td colspan="35" class="center" ng-show="zero_mano">There are no Mano</td>
                   </tr>
                 </tbody>
             </table>
+			<button id="SaveButton" class="btn btn-primary" ng-disabled="instantiationForm.$error.required || instantiationForm.$invalid" ng-click="saveManos()">Refresh
+							</button>
+			</div>
           </div>
                     </form>                   
-                </div>
+             <!--   -->
+			 </div>
+
             </div>            
             <div class="modal-footer">
                 <h4 class="form-control-static pull-left">Please, confirm the Service instantiation:</h4>                        
@@ -177,7 +185,7 @@
                     No
                 </button>
             </div>
-
+			
         </div>
     </div>
 </div>

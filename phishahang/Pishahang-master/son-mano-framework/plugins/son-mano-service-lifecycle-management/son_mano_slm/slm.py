@@ -451,8 +451,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         # Start handling the request
         message = yaml.load(payload)
 
-        #LOG.info("Scramble Message Debug ")
-        #LOG.info(message)
+        #LOG.info("Scramble Message Debug \n\n")
+        #LOG.info(str(message)+"\n\n")
 
         # Add the service to the ledger
         serv_id = self.add_service_to_ledger(message, corr_id)
@@ -3004,6 +3004,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         
         LOG.info('\n\n\ntranslated NSD for OSM MANO:\n'+yaml.dump(osm_nsd)+"\n\n")
         
+        vnfd_id_parent=[]
         # getting the vnfds list from Pishahang to translate to osm
         for vnf in functions:
         
@@ -3018,10 +3019,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
                     if (osm_vnfd['vnfd-catalog']['vnfd'][0]['name'] == name_ ):
                         osm_vnfd['vnfd-catalog']['vnfd'][0]['id'] = id_
                 
-                gtkmano_payload= {'nsd_uuid' : str(serv_id), 'vnfs':{'vnf_uuid' : str(vnf['vnfd']['uuid']), 'mano':'OSM', 'url': str(sets[2][0]['ip'])}}
-                gtkmano_url=os.environ['gtkmanourl']
-                response = requests.post(gtkmano_url, headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
                 
+                vnfd_id_parent.append(vnf['vnfd']['uuid'])
                 function_osm.append(osm_vnfd)
                 
         LOG.info('\n\ntranslated VNFDs for OSM MANO:\n'+yaml.dump(function_osm)+"\n\n")    
@@ -3066,7 +3065,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host_osm)
         
         LOG.info("\n\nPosting the packages to OSM\n\n")
-                          
+        
+        vnfd_id = []
         for vnf in function_osm:
 
             vnf_name = vnf['vnfd-catalog']['vnfd'][0]['id']
@@ -3074,10 +3074,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
                                                                 package_path="/tmp/"+vnf_name+"_vnfd.tar.gz"))
             
             LOG.info("\n\nVNFD posted to OSM MANO...\n"+yaml.dump(response)+"\n\n")
+            vnfd_id.append(yaml.load(response['data'])['id'])
         
         response = json.loads(osm_nsd_client.post_ns_descriptors(token=_token['id'],
                                                                  package_path="/tmp/"+nsd_name+"_nsd.tar.gz"))
         LOG.info("\n\nNSD posted to OSM MANO...\n"+yaml.dump(response)+"\n\n")
+        
+        nsd_id = yaml.load(response['data'])['id']
         
         LOG.info("\n\nInstantiate the ns on OSM MANO...\n\n")
         _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
@@ -3106,7 +3109,14 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         instantiate_resp = json.loads(response["data"])
         
+        
         LOG.info("\n\nresponse from OSM MANO after instantiating the ns\n"+yaml.dump(instantiate_resp)+"\n\n")
+        
+        
+        gtkmano_payload= {'nsd_uuid' : str(serv_id), 'nsd_id_osm': nsd_id, 'ns_instantiation_id_osm':instantiate_resp['id'], 'vnf_uuid' : vnfd_id_parent, 'vnfd_id_osm':vnfd_id, 'mano':'OSM', 'url': host_osm, 'user': username_osm, 'password': password_osm}
+        gtkmano_url=os.environ['gtkmanourl']
+        response = requests.post(gtkmano_url, headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
+        
 
     def send_to_pishahang(self, serv_id, sets, functions, nsd_splitted):
     
@@ -3114,13 +3124,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
         pish2_nsd = nsd_splitted
         LOG.info("\n\nNSD for the other Pishahang::\n"+yaml.dump(pish2_nsd)+"\n\n")
         
+        vnfd_id_parent=[]
         for vnf in functions:
             if(vnf['vnfd']['name'] in sets[1]):
                 
-                gtkmano_payload= {'nsd_uuid' : str(serv_id), 'vnfs':{'vnf_uuid' : str(vnf['vnfd']['uuid']), 'mano':'PISHAHANG', 'url': str(sets[2][0]['ip'])}}
-                gtkmano_url=os.environ['gtkmanourl']
-                response = requests.post(gtkmano_url,headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
-                
+                vnfd_id_parent.append(vnf['vnfd']['uuid'])
                 function_pish2.append(vnf['vnfd'])
                 
         LOG.info("\n\nVNFDs for the other Pishahang:\n"+yaml.dump(function_pish2)+"\n\n")
@@ -3146,6 +3154,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         ff.close()
         pish2_vnf_names = []
 
+        vnfd_id = []
         for vnf in function_pish2:
             ff = open(vnf['name']+'.yml','w')
             yaml.dump(vnf, ff)
@@ -3154,6 +3163,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
                     package_path=vnf['name']+'.yml'))
             LOG.info("\n\nVNFD posted to the other Pishahang...\n"+yaml.dump(response)+"\n\n" )
+            vnfd_id.append(yaml.load(response['data'])['uuid'])
             
         response = json.loads(son_nsd_client.post_ns_descriptors(
                     token=_token["token"]["access_token"],
@@ -3161,6 +3171,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         LOG.info("\n\nSub-NSD posted to the other Pishahang...\n"+yaml.dump(response) +"\n\n")
 
+        
+        
         LOG.info("\n\ninstantiate the ns on Pishahang...\n\n")
 
         _nsd_list = json.loads(son_nsd_client.get_ns_descriptors(token=_token["token"]["access_token"]))
@@ -3173,6 +3185,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         LOG.info("\n\nnsd uuid generated: "+str(_ns)+"\n\n")
 
+        nsd_id = str(_ns)
         if _ns:
             response = json.loads(
                         son_nslcm.post_ns_instances_nsinstanceid_instantiate(
@@ -3181,6 +3194,11 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
 
         LOG.info("\n\nresponse from the other Pishahang after instantiating the ns\n"+yaml.dump(response)+"\n\n")
+        instantiation_response = yaml.load(response['data'])['id']
+        
+        gtkmano_payload= {'nsd_uuid' : str(serv_id),'nsd_id_pishahang': nsd_id, 'ns_instantiation_id_pishahang':instantiation_response, 'vnf_uuid' : vnfd_id_parent, 'vnfd_id_pishahang':vnfd_id, 'mano':'PISHAHANG', 'url': host_pish, 'user': username_pish, 'password': password_pish}
+        gtkmano_url=os.environ['gtkmanourl']
+        response = requests.post(gtkmano_url,headers={"Content-Type": 'application/json; charset=UTF-8'}, data=json.dumps(gtkmano_payload))
         
         
     def SLM_mapping_scramble(self, serv_id):
