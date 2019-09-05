@@ -2987,7 +2987,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
     def send_to_osm(self, serv_id, sets, functions, nsd_splitted):
     
         function_osm = [] # list to store vnfs for OSM
-        LOG.info('\nCalling Scramble Translator for translating NSD to OSM...\n')
+        LOG.info('\n\nCalling Scramble Translator for translating NSD to OSM...\n\n')
                     
         osm_vnf_ids = sets[0]
         osm_vnf_names = sets[1]
@@ -3002,7 +3002,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         osm_nsd = json.loads(response.text)
         osm_nsd = osm_nsd['message']['descriptor']
         
-        LOG.info('\ntranslated NSD:\n'+str(osm_nsd))
+        LOG.info('\n\n\ntranslated NSD:\n'+str(osm_nsd)+"\n\n")
         
         # getting the vnfds list from Pishahang to translate to osm
         for vnf in functions:
@@ -3024,15 +3024,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
                 function_osm.append(osm_vnfd)
                 
-        LOG.info('\ntranslated VNFD:\n'+str(function_osm))    
+        LOG.info('\n\ntranslated VNFD:\n'+str(function_osm)+"\n\n")    
         # creating packages
         nsd_name = osm_nsd['nsd:nsd-catalog']['nsd'][0]['name']
         if osm_helpers.generatePackage(packageType = "nsd", 
                                         descriptorName = nsd_name, 
                                         payload = str(osm_nsd)):
-            LOG.info('NSD package created for OSM')
+            LOG.info('\n\nNSD package created for OSM\n\n')
         else:
-            LOG.info('NSD package not created. ERROR!')
+            LOG.info('\n\nNSD package not created. ERROR!\n\n')
         
         for vnf in function_osm:
             
@@ -3041,9 +3041,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
             if osm_helpers.generatePackage(packageType = "vnfd", 
                                             descriptorName = vnf_name, 
                                             payload = str(vnf)):
-                LOG.info('VNFD package created for OSM')
+                LOG.info('\n\nVNFD package created for OSM\n\n')
             else:
-                LOG.info('VNFD package not created for OSM. ERROR!')
+                LOG.info('\n\nVNFD package not created for OSM. ERROR!\n\n')
     
     
         # connecting to OSM MANO to send the NS package
@@ -3052,7 +3052,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         host_osm = sets[2][0]['ip']#os.environ['host_osm'] 
         
 
-        LOG.info("Connecting to OSM MANO..." )
+        LOG.info("\n\nConnecting to OSM MANO...\n\n" )
         
         
         osm_auth = wrappers.OSMClient.Auth(host_osm)
@@ -3065,7 +3065,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         osm_nslcm = wrappers.OSMClient.Nslcm(host_osm) 
         osm_vnfpkgm = wrappers.OSMClient.VnfPkgm(host_osm)
         
-        LOG.info("posting the packages to OSM\n")
+        LOG.info("\n\nPosting the packages to OSM\n\n")
                           
         for vnf in function_osm:
 
@@ -3073,13 +3073,13 @@ class ServiceLifecycleManager(ManoBasePlugin):
             response = json.loads(osm_vnfpkgm.post_vnf_packages(token=_token["id"],
                                                                 package_path="/tmp/"+vnf_name+"_vnfd.tar.gz"))
             
-            LOG.info("VNFD posted to OSM MANO...\n"+str(response) )
+            LOG.info("\n\nVNFD posted to OSM MANO...\n"+str(response)+"\n\n")
         
         response = json.loads(osm_nsd_client.post_ns_descriptors(token=_token['id'],
                                                                  package_path="/tmp/"+nsd_name+"_nsd.tar.gz"))
-        LOG.info("NSD posted to OSM MANO...\n"+str(response) )
+        LOG.info("\n\nNSD posted to OSM MANO...\n"+str(response)+"\n\n")
         
-        LOG.info("instantiate the ns on OSM MANO...\n")
+        LOG.info("\n\nInstantiate the ns on OSM MANO...\n\n")
         _nsd_list = json.loads(osm_nsd_client.get_ns_descriptors(token=_token["id"]))
         _nsd_list = json.loads(_nsd_list["data"])
         _nsd = None
@@ -3106,7 +3106,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         instantiate_resp = json.loads(response["data"])
         
-        LOG.info("response from OSM MANO after instantiating the ns\n"+str(instantiate_resp))
+        LOG.info("\n\nresponse from OSM MANO after instantiating the ns\n"+str(instantiate_resp)+"\n\n")
 
     def send_to_pishahang(self, serv_id, sets, functions, nsd_splitted):
     
@@ -3125,7 +3125,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
         LOG.info(function_pish2)
 
-        LOG.info("Connecting to Pishahang2..." )
+        LOG.info("\n\nConnecting to Pishahang2...\n\n" )
 
         username_pish = sets[2][0]['user']#os.environ['username_pish2']
         password_pish = sets[2][0]['pwd']#os.environ['password_pish2']
@@ -3139,7 +3139,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         son_nslcm = wrappers.SONATAClient.Nslcm(host_pish)
         son_vnfd = wrappers.SONATAClient.VnfPkgm(host_pish)
 
-        LOG.info('posting the packages to PISHAHANG')
+        LOG.info('\n\nPosting the packages to PISHAHANG\n\n')
 
         ff = open(pish2_nsd['name']+'.yml','w')
         yaml.dump(pish2_nsd, ff)
@@ -3153,15 +3153,15 @@ class ServiceLifecycleManager(ManoBasePlugin):
             pish2_vnf_names.append(vnf['name'])
             response = json.loads(son_vnfd.post_vnf_packages(token=_token["token"]["access_token"],
                     package_path=vnf['name']+'.yml'))
-            LOG.info("VNFD posted to Pishahang2..."+str(response)+"\n" )
+            LOG.info("\n\nVNFD posted to Pishahang2..."+str(response)+"\n\n" )
             
         response = json.loads(son_nsd_client.post_ns_descriptors(
                     token=_token["token"]["access_token"],
                     package_path=pish2_nsd['name']+".yml"))
 
-        LOG.info("Sub-NSD posted to Pishahang2...\n"+str(response) +"\n")
+        LOG.info("\n\nSub-NSD posted to Pishahang2...\n"+str(response) +"\n\n")
 
-        LOG.info("instantiate the ns on PISHAHANG...\n")
+        LOG.info("\n\ninstantiate the ns on PISHAHANG...\n\n")
 
         _nsd_list = json.loads(son_nsd_client.get_ns_descriptors(token=_token["token"]["access_token"]))
         _nsd_list = json.loads(_nsd_list["data"])
@@ -3171,7 +3171,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             if pish2_nsd['name'] == _n['nsd']['name']:            
                 _ns = _n['uuid']
 
-        LOG.info("nsd id: "+str(_ns))
+        LOG.info("\n\nnsd uuid generated: "+str(_ns)+"\n\n")
 
         if _ns:
             response = json.loads(
@@ -3180,7 +3180,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
                             nsInstanceId=_ns))
 
 
-        LOG.info("response from Pishahang2 after instantiating the ns\n"+str(response))
+        LOG.info("\n\nresponse from Pishahang2 after instantiating the ns\n"+str(response)+"\n\n")
         
         
     def SLM_mapping_scramble(self, serv_id):
@@ -3196,8 +3196,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
         topology = self.services[serv_id]['infrastructure']['topology']
         
         # setting the manos list recieved from the BSS gui
-        LOG.info("Printing scramble manochoices {}".format(str(self.services[serv_id]['payload']['selectedmanos'])))
-        LOG.info("Printing scramble manodetails {}".format(str(self.services[serv_id]['payload']['manoips'])))
+        LOG.info("\n\nPrinting scramble manochoices {}\n\n".format(str(self.services[serv_id]['payload']['selectedmanos'])))
+        LOG.info("\n\nPrinting scramble manodetails {}\n\n".format(str(self.services[serv_id]['payload']['manoips'])))
         
         mano_dict = self.services[serv_id]['payload']['selectedmanos']
         mano_details = self.services[serv_id]['payload']['manoips']
@@ -3221,7 +3221,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             
             # create a set of vnfs for different MANO frameworks through random logic
             # Number of Splits is by default 2.
-            LOG.info("\nRandomly assigning VNFs to existing MANO Frameworks...\n" )
+            LOG.info("\n\n\nRandomly assigning VNFs to existing MANO Frameworks...\n\n\n" )
             
             function_list = self.get_network_functions(descriptor)
             rndm_sets = self.random_combination(function_list, mano_list)
@@ -3229,22 +3229,22 @@ class ServiceLifecycleManager(ManoBasePlugin):
             if(len(rndm_sets) > 1): # if there are more than 1 MANOs, SCRAMBLE-splitter is called to split the NSD
                 vnfid_set = [sets[0] for sets in rndm_sets]#[rndm_sets[0][0], rndm_sets[1][0]]  # vnf-ids of sets 1 and 2
                                 
-                LOG.info("\nvnf splits : "+str(vnfid_set)+"\n")
+                LOG.info("\n\nvnf splits : "+str(vnfid_set)+"\n\n")
             
                 # send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
                 splitter_url = os.environ['splitter_url'] 
                 nsd_to_split = { 'descriptor' : descriptor, 'sets': vnfid_set}
                 
-                LOG.info("Calling Scramble Splitter..." )
+                LOG.info("\n\nCalling Scramble Splitter...\n\n" )
                 response  = requests.post(splitter_url,
                                           data=json.dumps(nsd_to_split))
                 LOG.info(response)
                 
                 nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
-                LOG.info("Original NSD Splitted"+str(nsds_splitted))
+                LOG.info("\n\n\nOriginal NSD Splitted"+str(nsds_splitted)+"\n\n")
 
             else:
-                LOG.info("\nvnf splits : "+str(rndm_sets)+"\n")
+                LOG.info("\n\nvnf splits : "+str(rndm_sets)+"\n\n")
                 nsds_splitted = {"message" : [descriptor]}
                 
                 
@@ -3253,7 +3253,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             function_pish =[] # list to store vnfs for MAIN_PISHAHANG
             main_pish_nsd = '' # string to store nsd for MAIN_PISHAHANG
             
-            LOG.info("functions")
+            LOG.info("\n\nfunctions\n\n")
             LOG.info(rndm_sets)
 
             for i,sets in enumerate(rndm_sets):
@@ -3281,7 +3281,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             NSD = main_pish_nsd
             functions = function_pish
             NSD['uuid'] = original_nsd_uuid
-            LOG.info('NSD for the parent MANO'+str(NSD) )
+            LOG.info('\n\nNSD for the parent MANO'+str(NSD)+"\n\n")
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
