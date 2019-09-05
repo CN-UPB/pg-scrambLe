@@ -59,6 +59,16 @@
             .catch(function errorCallback(error){defer.reject(error)});
             return defer.promise;
         },
+
+        retrieveChildNSDs:function(url, accessToken){
+            var defer=$q.defer();
+            $http.defaults.headers.common.Authorization = 'Bearer ' + accessToken;
+            $http.get(url+"/services")
+            .then(function successCallback(result){
+               defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            return defer.promise;
+        },
         
         stopNSR:function(nsrId,ENV){                
             var defer=$q.defer();
@@ -68,7 +78,34 @@
             .catch(function errorCallback(error){defer.reject(error)});
             
             return defer.promise;
-        }
+        },
+
+        retrieveToken:function(url, userData){                
+            var defer=$q.defer();
+            $http.post(url+"/sessions", userData)
+            .then(function successCallback(result){defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            
+            return defer.promise;
+        },
+        retrieveOSMToken:function(url, userData){                
+            var defer=$q.defer();
+            $http.post(url, userData)
+            .then(function successCallback(result){defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            
+            return defer.promise;
+        },
+        retrieveNSRsFromChild:function(url, accessToken){
+
+            var defer=$q.defer();
+            $http.defaults.headers.common.Authorization = 'Bearer ' + accessToken;				
+            $http.get(url+"/records/services")
+            .then(function successCallback(result){
+               defer.resolve(result)})
+            .catch(function errorCallback(error){defer.reject(error)});
+            return defer.promise;
+        },
         
     }
 }]);
