@@ -1802,6 +1802,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
             self.error_handling(serv_id, t.GK_CREATE, error)
 
         return
+        
 
     def vnf_chain(self, serv_id):
         """
@@ -2440,6 +2441,83 @@ class ServiceLifecycleManager(ManoBasePlugin):
 
         for cloud_service in self.services[serv_id]['cloud_service']:
             message['csrs'].append(cloud_service['csr'])
+
+        LOG.debug("Payload of message " + str(message))
+
+        orig_corr_id = self.services[serv_id]['original_corr_id']
+        self.manoconn.notify(t.GK_CREATE,
+                             yaml.dump(message),
+                             correlation_id=orig_corr_id)
+                             
+    def inform_gk_instantiation_scramble(self, serv_id):
+        """
+        This method informs the gatekeeper.
+        """
+        vnfr_id = str(uuid.uuid4())
+        nsr_id = str(uuid.uuid4())
+        vnfd_id = str(uuid.uuid4())
+        nsd_id = str(uuid.uuid4())
+        
+        message = {"csrs": [], 
+                    "vnfrs": {"virtual_links": [], 
+                                "id": vnfr_id, 
+                                "descriptor_version": "vnfr-schema-01", "status": "normal operation", 
+                                "descriptor_reference": vnfd_id, 
+                                "virtual_deployment_units": [], "version": "2"}, 
+                    "status": "READY", "error": "None", "timestamp": "1567876074.529283", 
+                    "nsr": {"network_functions": [{"vnfr_id": vnfr_id}], 
+                                "id": nsr_id, "virtual_links": [], 
+                                "status": "normal operation", 
+                                "descriptor_version": "nsr-schema-01", "version": "1", 
+                                "descriptor_reference": nsd_id}}
+                                
+        url = t.VNFR_REPOSITORY_URL + 'vnf-instances/' + vnfd_id
+        LOG.info("Service " + serv_id + ": URL VNFR update: " + url)
+
+        error = None
+        try:
+            header = {'Content-Type': 'application/json'}
+            vnfr_resp = requests.put(url,
+                                     data=json.dumps(message['vnfrs']),
+                                     headers=header,
+                                     timeout=1.0)
+            vnfr_resp_json = str(vnfr_resp.json())
+            if (vnfr_resp.status_code == 200):
+                msg = ": VNFR update accepted for " + vnfd_id
+                LOG.info("Service " + serv_id + msg)
+            else:
+                msg = ": VNFR update not accepted: " + vnfr_resp_json
+                LOG.info("Service " + serv_id + msg)
+                error = {'http_code': vnfr_resp.status_code,
+                         'message': vnfr_resp_json}
+        except:
+            error = {'http_code': '0',
+                     'message': 'Timeout when contacting VNFR repo'}
+        
+        LOG.debug("Record to be stored: " + yaml.dump(message['nsr']))
+
+        error = None
+
+        try:
+            header = {'Content-Type': 'application/json'}
+            url = t.NSR_REPOSITORY_URL + 'ns-instances'
+            record_resp = requests.post(url,
+                                     data=json.dumps(message['nsr']),
+                                     headers=header,
+                                     timeout=1.0)
+            record_resp_json = record_resp.json()
+            if (record_resp.status_code == 200):
+                msg = ": Record accepted and stored for instance " + serv_id
+                LOG.info("Service " + serv_id + msg)
+            else:
+                msg = ": Record not accepted: " + str(record_resp_json)
+                LOG.info("Service " + serv_id + msg)
+                error = {'http_code': record_resp.status_code,
+                         'message': record_resp_json}
+        except:
+            error = {'http_code': '0',
+                     'message': 'Timeout when contacting record repo'}
+        LOG.info("Service " + serv_id + ": Reporting result to GK")
 
         LOG.debug("Payload of message " + str(message))
 
@@ -3268,8 +3346,8 @@ class ServiceLifecycleManager(ManoBasePlugin):
                 
             # logic to check which vnf is to be send to which MANO
             
-            function_pish =[] # list to store vnfs for MAIN_PISHAHANG
-            main_pish_nsd = '' # string to store nsd for MAIN_PISHAHANG
+            function_pish = [] # list to store vnfs for MAIN_PISHAHANG
+            main_pish_nsd = {} # string to store nsd for MAIN_PISHAHANG
             
             #LOG.info("\n\nfunctions\n\n")
             #LOG.info("\n\n"+yaml.dump(rndm_sets)+"\n\n")
@@ -3297,8 +3375,9 @@ class ServiceLifecycleManager(ManoBasePlugin):
             NSD = main_pish_nsd
             functions = function_pish
             NSD['uuid'] = original_nsd_uuid
+            
             LOG.info('\n\nNSD for the parent MANO'+yaml.dump(NSD)+"\n\n")
-            LOG.info('\n\nNSD for the parent MANO'+yaml.dump(functions)+"\n\n")
+            LOG.info('\n\nVNFDs for the parent MANO'+yaml.dump(functions)+"\n\n")
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
@@ -3317,20 +3396,26 @@ class ServiceLifecycleManager(ManoBasePlugin):
                        'topology': topology,
                        'serv_id': serv_id}
 
-        content['nap'] = {}
+        if(content['functions']==[]):
+                
+            self.inform_gk_instantiation_scramble(serv_id)
+            
+        else:
+            
+            content['nap'] = {}
 
-        if self.services[serv_id]['ingress'] is not None:
-            content['nap']['ingresses'] = self.services[serv_id]['ingress']
-        if self.services[serv_id]['egress'] is not None:
-            content['nap']['egresses'] = self.services[serv_id]['egress']
+            if self.services[serv_id]['ingress'] is not None:
+                content['nap']['ingresses'] = self.services[serv_id]['ingress']
+            if self.services[serv_id]['egress'] is not None:
+                content['nap']['egresses'] = self.services[serv_id]['egress']
 
-        self.manoconn.call_async(self.resp_mapping,
-                                 t.MANO_PLACE,
-                                 yaml.dump(content),
-                                 correlation_id=corr_id)
+            self.manoconn.call_async(self.resp_mapping,
+                                     t.MANO_PLACE,
+                                     yaml.dump(content),
+                                     correlation_id=corr_id)
 
-        self.services[serv_id]['pause_chain'] = True
-        LOG.info("Service " + serv_id + ": Placement request sent")
+            self.services[serv_id]['pause_chain'] = True
+            LOG.info("Service " + serv_id + ": Placement request sent")
 
     def resp_mapping(self, ch, method, prop, payload):
         """

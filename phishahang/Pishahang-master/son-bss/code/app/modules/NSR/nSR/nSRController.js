@@ -33,6 +33,7 @@ angular.module('NSR')
 
  $scope.offset = 0;
  $scope.limit = 10;
+ $scope.uuid = "";
 
  // retrieve NSD to server
  $scope.retrieveNSDs = (function() {
@@ -51,71 +52,62 @@ angular.module('NSR')
    })
 });
  
+
+
 // retrieve Child NSD to server
-$scope.retrieveChildNSDs = (function() {
-  let accessToken="";
-  let url =	"http://manodemo2.cs.upb.de/api/v2";	
-  let data = {"username":"sonata","password":"1234"};
-  NSRServices.retrieveToken(url, data)
-    .then(function(result) {
-      accessToken = result.data.token.access_token;
-      NSRServices.retrieveChildNSDs(url, accessToken)
-      .then(function(response){
-        $rootScope.childNSDs = response.data;
-        $scope.generateNSDMap(response.data);
-
-      }, function(error) {      
-        if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
-          $rootScope.childNSDs = '';
-          $rootScope.nSRs = '';
-        }
-        $scope.error = angular.copy(JSON.stringify(error.data.message));
-        $('#error.modal').modal('show');
-      })
-
-      NSRServices.retrieveNSRsFromChild(url, accessToken)
-      .then(function(data){
-        $rootScope.nSRsChild = data.data;
-
-       if (JSON.stringify($rootScope.nSRsChild) == "[{}]"){
-        $rootScope.nSRsChild = [];
-       }
-
-      //pagination
-      var linkHeaderText = data.headers("Link");                    
-      var link = linkHeaderParser.parse(linkHeaderText);                    
-      $scope.totalPages = parseInt(link.last.offset)+1;
-      $scope.limit = parseInt(link.last.limit);
-      $scope.totalRecords = $scope.limit*$scope.totalPages;
-      })
-
-   }, function(error) {
-    if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
-     $rootScope.nSRsChild = '';
+$scope.retrieveChildNSRsPishahang = (function() {
+  let url =	String(ENV.apiEndpoint).slice(0, -7)+":7001/pishahang/getnsr";	
+  let payload = {"uuid": "9fdef0ce-3b3b-49cd-a30b-4e127a582056"};
+  NSRServices.retrieveNSRsFromChild(url, payload)
+  .then(function(data){
+    $rootScope.nSRsChild = data.data;
+    console.log(data.data);
+   if (JSON.stringify($rootScope.nSRsChild) == "[{}]"){
+    $rootScope.nSRsChild = [];
    }
-});
+
+    //pagination
+    var linkHeaderText = data.headers("Link");                    
+    var link = linkHeaderParser.parse(linkHeaderText);                    
+    $scope.totalPages = parseInt(link.last.offset)+1;
+    $scope.limit = parseInt(link.last.limit);
+    $scope.totalRecords = $scope.limit*$scope.totalPages;
+  }, function(error) {
+    if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
+    $rootScope.nSRsChild = '';
+  }
+})
 });
 
-//OSM Child NSDs
-$scope.retrieveOSMChildNSDs = (function() {
-  let accessToken="";
-  let urlToken =	"https://131.234.29.101:9999/osm/admin/v1/tokens";	
-  let data = {"username":"admin","password":"admin"};
-  NSRServices.retrieveOSMToken(urlToken, data)
-    .then(function(result) {
-      console.log(result)
-   }, function(error) {
-    if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
-     $rootScope.nSRsChild = '';
+$scope.retrieveChildNSRsOSM = (function() {
+  let url =	String(ENV.apiEndpoint).slice(0, -7)+":7001/osm/getnsr";	
+  let payload = {"uuid": "9fdef0ce-3b3b-49cd-a30b-4e127a582056"};
+  NSRServices.retrieveNSRsFromChild(url, payload)
+  .then(function(data){
+    $rootScope.nSRsChild = data.data;
+    console.log(data.data);
+   if (JSON.stringify($rootScope.nSRsChild) == "[{}]"){
+    $rootScope.nSRsChild = [];
    }
-});
+
+    //pagination
+    var linkHeaderText = data.headers("Link");                    
+    var link = linkHeaderParser.parse(linkHeaderText);                    
+    $scope.totalPages = parseInt(link.last.offset)+1;
+    $scope.limit = parseInt(link.last.limit);
+    $scope.totalRecords = $scope.limit*$scope.totalPages;
+  }, function(error) {
+    if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
+    $rootScope.nSRsChild = '';
+  }
+})
 });
 
 
 
  $scope.retrieveNSDs();
- $scope.retrieveChildNSDs();
- $scope.retrieveOSMChildNSDs();
+ $scope.retrieveChildNSRsPishahang();
+ $scope.retrieveChildNSRsOSM();
  $scope.currentNSR = {};
 
  $scope.generateNSDMap = (function(obj){
@@ -150,7 +142,11 @@ $scope.retrieveNSRs($scope.offset);
     NSRServices.retrieveNSRs(ENV, offset)
     .then(function(result) {
       $rootScope.nSRs = result.data;
-
+      if(result.data.length > 0){
+        $scope.uuid = result.data[result.data.length - 1]["uuid"];
+      }
+      
+      console.log($scope.uuid);
       if (JSON.stringify($rootScope.nSRs) == "[{}]"){
        $rootScope.nSRs = [];
       }
@@ -178,6 +174,7 @@ $scope.retrieveNSRs($scope.offset);
   $('#detailedNSR.modal').modal('show');
   $($(".key.ng-binding.ng-scope")[0]).text("");//.text("NSR#" + $scope.currentNSR.uuid);      
 }
+
 
 $scope.openUpdateNSR = function(data) {
   $scope.currentNSR = angular.copy(data);
