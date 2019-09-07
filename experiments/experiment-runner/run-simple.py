@@ -32,66 +32,66 @@ pishahang_vnfpkgm = wrappers.SONATAClient.VnfPkgm(HOST_URL)
 
 
 
-def sonata_cleanup():
+# def sonata_cleanup():
 
-    print("Sonata NSD/VNFD Cleanup")
+#     print("Sonata NSD/VNFD Cleanup")
 
-    _token = json.loads(pishahang.auth(
-                    username=USERNAME,
-                    password=PASSWORD))
-    _token = json.loads(_token["data"])
+#     _token = json.loads(pishahang.auth(
+#                     username=USERNAME,
+#                     password=PASSWORD))
+#     _token = json.loads(_token["data"])
 
-    nsd_list = json.loads(pishahang_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"], limit=1000))
-    nsd_list = json.loads(nsd_list["data"])
+#     nsd_list = json.loads(pishahang_nsd.get_ns_descriptors(
+#                         token=_token["token"]["access_token"], limit=1000))
+#     nsd_list = json.loads(nsd_list["data"])
 
-    print(len(nsd_list))
-    for _nsd in nsd_list:
-        pishahang_nsd.delete_ns_descriptors_nsdinfoid(
-                    token=_token["token"]["access_token"],
-                    nsdinfoid=_nsd["uuid"]) 
+#     print(len(nsd_list))
+#     for _nsd in nsd_list:
+#         pishahang_nsd.delete_ns_descriptors_nsdinfoid(
+#                     token=_token["token"]["access_token"],
+#                     nsdinfoid=_nsd["uuid"]) 
 
-    nsd_list = json.loads(pishahang_nsd.get_ns_descriptors(
-                        token=_token["token"]["access_token"]))
-    nsd_list = json.loads(nsd_list["data"])
+#     nsd_list = json.loads(pishahang_nsd.get_ns_descriptors(
+#                         token=_token["token"]["access_token"]))
+#     nsd_list = json.loads(nsd_list["data"])
 
-    # Delete VNFDs
+#     # Delete VNFDs
 
-    vnf_list = json.loads(pishahang_vnfpkgm.get_vnf_packages(
-                        token=_token["token"]["access_token"], limit=1000))
-    vnf_list = json.loads(vnf_list["data"])
+#     vnf_list = json.loads(pishahang_vnfpkgm.get_vnf_packages(
+#                         token=_token["token"]["access_token"], limit=1000))
+#     vnf_list = json.loads(vnf_list["data"])
 
-    for _vnfd in vnf_list:
-        pishahang_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], vnfPkgId=_vnfd["uuid"]) 
+#     for _vnfd in vnf_list:
+#         pishahang_vnfpkgm.delete_vnf_packages_vnfpkgid(token=_token["token"]["access_token"], vnfPkgId=_vnfd["uuid"]) 
 
-    vnf_list = json.loads(pishahang_vnfpkgm.get_vnf_packages(
-                        token=_token["token"]["access_token"]))
-    vnf_list = json.loads(vnf_list["data"])
+#     vnf_list = json.loads(pishahang_vnfpkgm.get_vnf_packages(
+#                         token=_token["token"]["access_token"]))
+#     vnf_list = json.loads(vnf_list["data"])
 
-    time.sleep(5)
+#     time.sleep(5)
 
 
-sonata_cleanup()
+# sonata_cleanup()
 
 # extracting the token
 token = json.loads(pishahang.auth(username=USERNAME, password=PASSWORD))
 token = json.loads(token["data"])
 
 
-for _c in range(1, 6):
-    # for _vnfd in VNFD_PATHS:
-    _VNFD_PATH = VNFD_PATH.format(image=IMAGE, case=CASE, vnfid=_c)
-    _res = pishahang_vnfpkgm.post_vnf_packages(token=token,
-        package_path=_VNFD_PATH)
-    print(_res)
-    time.sleep(0.5)
+# for _c in range(1, 6):
+#     # for _vnfd in VNFD_PATHS:
+#     _VNFD_PATH = VNFD_PATH.format(image=IMAGE, case=CASE, vnfid=_c)
+#     _res = pishahang_vnfpkgm.post_vnf_packages(token=token,
+#         package_path=_VNFD_PATH)
+#     print(_res)
+#     time.sleep(0.5)
 
 
-_res = pishahang_nsd.post_ns_descriptors(token=token,
-        package_path=NSD_PATH)
-print(_res)
+# _res = pishahang_nsd.post_ns_descriptors(token=token,
+#         package_path=NSD_PATH)
+# print(_res)
 
-time.sleep(2)
+# time.sleep(2)
 
 _nsd_list = json.loads(pishahang_nsd.get_ns_descriptors(token=token["token"]["access_token"], limit=1000))
 _nsd_list = json.loads(_nsd_list["data"])

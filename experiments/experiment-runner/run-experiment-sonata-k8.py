@@ -23,7 +23,7 @@ from pprint import pprint
 
 from kubernetes import client, config
 
-ATOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tOWo3cTgiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjNjOTIxZjk4LTdhZTMtNDE2NS1hYjlmLWM1ZThiZTM5MjNjYyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.I-cs6gpNfHopqCJEnf9Jhhga9CQhovt--MY90uKlXKvPBhIQ-sdtkXf1_1cXTnmKcayA8p66FRliK61swlENTTZEj62OehfxfQz-7JQfqgp0g9xRae3laCYUyGwkCioLGnqI7sJILau4_2KXLw1nDiwy4gDGIT54q_JBR2Yhxwvz_N6uyJAt1rLdvHdpTKQc8ZnC0LlijgcbnGfXpWv6AO803E0ufUvAr6QpdoxUHO0BJcyEWTgE-xU97tgiX8CR1_QVtI8bGZa33_FhueMsILVt-BFZ5laxcSCYNK275mFX6ILRNcfWKKmKaFG8sC_xD5JWIES_VFpys6gem8qGCQ"
+ATOKEN = "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJkZWZhdWx0Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4ta3pqNWoiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjRmMjkzM2MyLTgxM2UtNDhhMC1hNjI5LTc0ZTZiOTIxMjZjMSIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDpkZWZhdWx0OmRlZmF1bHQifQ.VpFSCZNaxeH0Ulk6xipNRso3jVvKauBkIQ5ZY92BPoCMp0JpsWwfEL1aWG1v1t863HFburIXKb7utRrXJezdb8RCmY5dnHzjhMsO_Yh92w4_ILOp2u45YFOUnFebvxc39vwXOLa-3edHkiOC6gwlZAvnU4YuEgCQ3PmAMpo5E6GQa3fIM2q6AHwtC_fecIn8IN2-RMfnBadBBGd9J2DFkzPx93aUDrjfcpOoEXjJAbxd1t2B1Bc3BpBZVr7DfAD3SsC78rP0d0cv-jTJ1Xme00Woehb70fzye8Tj4ZjxwbOM24rkeOUkPktFzjfZwOGohxA4bYEkeUmIicbXWhAf4w"
 K8_URL = "https://131.234.29.11"
 
 aConfiguration = client.Configuration()
@@ -38,19 +38,19 @@ docker_client = docker.DockerClient(base_url='unix://container/path/docker.sock'
 
 DOCKER_EXCLUDE = ['experiment-runner']
 
-IDLE_SLEEP = 0.2
-NS_TERMINATION_SLEEP = 30
+IDLE_SLEEP = 0.1
+NS_TERMINATION_SLEEP = 10
 REQUESTS_PER_MINUTE = 60
-INTER_EXPERIMENT_SLEEP = 0.5
+INTER_EXPERIMENT_SLEEP = 100
 
 USERNAME = "sonata"
 PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
 
-IMAGES = ["ubuntu"]
-INSTANCES = [180]
+IMAGES = ["cirros"]
+INSTANCES = [90]
 CASES = [1]
-RUNS = 1
+RUNS = 4
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
 
@@ -143,7 +143,7 @@ def get_count(init_time):
     for _s in _servers.items:
         # print(_s.status.phase)
         if int(_s.metadata.creation_timestamp.strftime("%s")) > int(init_time) :
-            if _s.status.phase in ['Succeeded', 'Running']:
+            if _s.status.container_statuses[0].ready:
                 active_count += 1
             elif _s.status.phase in ['Pending']:
                 build_count += 1
@@ -157,35 +157,61 @@ def get_count(init_time):
 
 
 def get_individual_times(individual_init_times, folder_path, init_time, _ns_list):
-    v1 = client.CoreV1Api(aApiClient)
-    print("Listing pods with their IPs:")
-    _servers = v1.list_namespaced_pod(namespace='default', watch=False)
+    time.sleep(10)
+    try:
+        v1 = client.CoreV1Api(aApiClient)
+        print("Listing pods with their IPs:")
+        _servers = v1.list_namespaced_pod(namespace='default', watch=False)
 
+        sonata_nslcm = SONATAClient.Nslcm(HOST_URL) 
+        sonata_auth = SONATAClient.Auth(HOST_URL)
 
-    with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
-        _file.write("id, mano_time, ns_mano_time, vim_time\n")
+        _token = json.loads(sonata_auth.auth(
+                        username=USERNAME,
+                        password=PASSWORD))
+        _token = json.loads(_token["data"])
 
-        for _s in _servers.items:
+        _individual_init_times = {}
+        for _i, _v in individual_init_times.items():
+            # service_instance_uuid
+            request = json.loads(sonata_nslcm.get_ns_instances_request_status(
+                                token=_token["token"]["access_token"], nsInstanceId=_i))
+            request = json.loads(request["data"])
 
-            ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
-            if not ns_init_time:
-                ns_init_time = 0
-            else:
-                ns_init_time = ns_init_time['crete-time']
+            print(request)
+            _individual_init_times[request['service_instance_uuid']] = _v
+            time.sleep(1)
 
-            server_created = _s.metadata.creation_timestamp
-            launch_time = _s.status.phase.start_time
-            if int() > int(init_time):
-                # print(server_created.strftime("%s"), nsname, individual_init_times[int(_s.name.split("-")[1])])
-                _mano_time = float(server_created.strftime("%s")) - float(individual_init_times[int(_s.name.split("-")[1])])
-                ns_mano_time = float(server_created.strftime("%s")) - float(ns_init_time)
-                _vim_time = float(launch_time.strftime("%s")) - float(server_created.strftime("%s"))
+        with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
+            _file.write("id, mano_time, ns_mano_time, vim_time\n")
+            _id = 0
+            for _s in _servers.items:
 
-                print("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
-                _file.write("{},{},{},{}\n".format(int(_s.name.split("-")[1]), _mano_time, ns_mano_time, _vim_time))
+                # ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
+                # if not ns_init_time:
+                #     ns_init_time = 0
+                # else:
+                #     ns_init_time = ns_init_time['crete-time']
+                # print(_s.status.container_statuses)
+
+                server_created = _s.metadata.creation_timestamp
+                launch_time = _s.status.container_statuses[0].state.running.started_at
+
+                if int(server_created.strftime("%s")) >= int(init_time):
+                    # print(server_created.strftime("%s"), nsname, individual_init_times[int(_s.name.split("-")[1])])
+                    _mano_time = float(server_created.strftime("%s")) - float(_individual_init_times[_s.metadata.labels['service']])
+                    ns_mano_time = float(server_created.strftime("%s")) - float(_individual_init_times[_s.metadata.labels['service']])
+                    # ns_mano_time = float(server_created.strftime("%s")) - float(ns_init_time)
+                    _vim_time = float(launch_time.strftime("%s")) - float(server_created.strftime("%s"))
+
+                    print("{},{},{},{}\n".format(_id, _mano_time, ns_mano_time, _vim_time))
+                    _file.write("{},{},{},{}\n".format(_id, _mano_time, ns_mano_time, _vim_time))
+                    _id += 1
     
+    except Exception as e:
+        print(e)
+        print("get_individual_times")    
 
-    return
 
 # http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
 print("""
@@ -285,6 +311,8 @@ for _image in IMAGES:
 
                 experiment_timestamps["ns_inst_time"] = int(time.time())
 
+                time.sleep(5)
+
                 _token = json.loads(sonata_auth.auth(username=USERNAME, password=PASSWORD))
                 _token = json.loads(_token["data"])
 
@@ -369,8 +397,11 @@ for _image in IMAGES:
                                         token=_token["token"]["access_token"], nsInstanceId=_ns))
                         if response["error"]:
                             print("ERROR - request error")
+                        else:
+                            instantiation = json.loads(response["data"])
+                            # print(i, instantiation['id'])
                         # Store init
-                        individual_init_times[i] = time.time()
+                        individual_init_times[instantiation['id']] = time.time()
                     else:
                         print("ERROR - no ns uuid")
                     print(response)

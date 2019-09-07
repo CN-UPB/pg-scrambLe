@@ -26,9 +26,9 @@ docker_client = docker.DockerClient(base_url='unix://container/path/docker.sock'
 
 DOCKER_EXCLUDE = ['experiment-runner']
 
-IDLE_SLEEP = 1
-NS_TERMINATION_SLEEP = 30
-REQUESTS_PER_MINUTE = 5
+IDLE_SLEEP = 0.2
+NS_TERMINATION_SLEEP = 20
+REQUESTS_PER_MINUTE = 15
 INTER_EXPERIMENT_SLEEP = 300
 
 USERNAME = "sonata"
@@ -39,12 +39,13 @@ AUTH_URL = "http://131.234.29.169/identity/v3"
 OS_USERNAME = "demo"
 OS_PASSWORD = "1234"
 
-IMAGES = ["cirros"]
-INSTANCES = [15, 90, 180]
+IMAGES = ["cirros", "ubuntu"]
+INSTANCES = [15]
 CASES = [1, 2, 3]
-RUNS = 3
+RUNS = 4
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
+SKIP_EXPERIMENT_IF_ERRORS = True
 
 cases_vnfs = {
     1: 1,
@@ -167,6 +168,51 @@ def get_count(init_time):
                 print(_s.status)
 
     return active_count, build_count, error_count
+
+def get_individual_times(individual_init_times, folder_path, init_time, _ns_list):
+    auth = v3.Password(auth_url=AUTH_URL,
+                    username=OS_USERNAME,
+                    password=OS_PASSWORD,
+                    project_name='demo',
+                    user_domain_id='default',
+                    project_domain_id='default')
+    sess = session.Session(auth=auth)
+    heat = hclient.Client('1', session=sess)
+
+    _servers =  heat.stacks.list()
+
+    print(individual_init_times)
+
+    with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
+        _file.write("id, mano_time, ns_mano_time, vim_time\n")
+
+        for _s in _servers:
+            if _s.status == "COMPLETE":
+                server_created = parser.parse(_s.creation_time)
+                launch_time = parser.parse(_s.updated_time)
+                if int(server_created.strftime("%s")) > int(init_time):
+
+                    # ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
+                    # ns_init_time = next((item for item in _ns_list if item["short-name"] == "{}-{}".format(_s.name.split("-")[0], _s.name.split("-")[1])), False)
+                    # if not ns_init_time:
+                    #     ns_init_time = 0
+                    # else:
+                    #     ns_init_time = ns_init_time['crete-time']
+
+
+                    # print(server_created.strftime("%s"), nsname, individual_init_times[int(_s.name.split("-")[1])])
+                    _mano_time = float(server_created.strftime("%s")) - float(individual_init_times[0])
+                    ns_mano_time = float(server_created.strftime("%s")) - float(individual_init_times[0])
+                    # ns_mano_time = float(server_created.strftime("%s")) - float(ns_init_time)
+                    _vim_time = float(launch_time.strftime("%s")) - float(server_created.strftime("%s"))
+
+                    print("{},{},{},{}\n".format(_s.stack_name, _mano_time, ns_mano_time, _vim_time))
+                    _file.write("{},{},{},{}\n".format(_s.stack_name, _mano_time, ns_mano_time, _vim_time))
+            else:
+                print("Not Complete")
+
+    return
+
 
 # http://patorjk.com/software/taag/#p=display&h=1&v=1&f=ANSI%20Shadow&t=OSM%20%0AExperiment
 print("""
@@ -327,6 +373,11 @@ for _image in IMAGES:
                                     print("END-TO-END Time {enetime}".format( enetime=experiment_timestamps["end_to_end_lifecycle_time"]))
                                     break
 
+                                if SKIP_EXPERIMENT_IF_ERRORS:
+                                    if STACK_ERROR_INSTANCES > 0:
+                                        print("Skipping Experiment Due To Errors")
+                                        break
+
                                 experiment_timestamps["end_to_end_lifecycle_time"] = int(time.time())-int(experiment_timestamps["ns_inst_time"])
 
                             except Exception as e:
@@ -338,6 +389,8 @@ for _image in IMAGES:
 
                 successThread = threading.Thread(target=successRatioThread)
                 successThread.start()
+
+                individual_init_times = {}
 
                 for i in range(0, no_instantiate):
                     _ns = None
@@ -354,6 +407,8 @@ for _image in IMAGES:
                                         token=_token["token"]["access_token"], nsInstanceId=_ns))
                         # print("response")
                         # print(response)
+                        individual_init_times[i] = time.time()
+
                         if response["error"]:
                             print("ERROR - no ns uuid")
                     else:
@@ -382,6 +437,8 @@ for _image in IMAGES:
                 _ns_list = json.loads(sonata_nslcm.get_ns_instances(
                                         token=_token["token"]["access_token"], limit=1000))
                 _ns_list = json.loads(_ns_list["data"])
+
+                get_individual_times(individual_init_times, nit, experiment_timestamps["ns_inst_time"], _ns_list)
 
                 _ns = None
                 for _n in _nsd_list:

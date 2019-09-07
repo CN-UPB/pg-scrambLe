@@ -59,10 +59,10 @@ def save_data():
 def scale_metrics():
     try:
         _scale_metrics = request.args.get('scale_metrics')
-        with open('/app/app/debugnorm', 'w') as _file:
+        with open('/debugscale', 'w') as _file:
             _file.write("{0}\n".format(_scale_metrics))
     except Exception as e:
-        with open('/app/app/debugnorm', 'w') as _file:
+        with open('/debugscale', 'w') as _file:
             _file.write("0.5,0.5,0.5\n")
         return "Error"
 

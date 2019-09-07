@@ -40,6 +40,7 @@ VIMACCOUNTID = "a94aa0af-e03b-4a8c-8208-a6fb5cc223ea"
 AUTH_URL = "http://131.234.29.168/identity/v3"
 OS_USERNAME = "demo"
 OS_PASSWORD = "123"
+OS_PROJECT = "demo"
 
 IMAGES = ["cirros", "ubuntu"]
 INSTANCES = [15, 90, 180]
@@ -61,7 +62,7 @@ def get_count(init_time):
     auth = v3.Password(auth_url=AUTH_URL,
                     username=OS_USERNAME,
                     password=OS_PASSWORD,
-                    project_name='demo',
+                    project_name=OS_PROJECT,
                     user_domain_id='default',
                     project_domain_id='default')
 
@@ -96,7 +97,7 @@ def delete_instances():
     auth = v3.Password(auth_url=AUTH_URL,
                     username=OS_USERNAME,
                     password=OS_PASSWORD,
-                    project_name='demo',
+                    project_name=OS_PROJECT,
                     user_domain_id='default',
                     project_domain_id='default')
 
@@ -117,7 +118,7 @@ def get_individual_times(individual_init_times, folder_path, init_time, _ns_list
     auth = v3.Password(auth_url=AUTH_URL,
                     username=OS_USERNAME,
                     password=OS_PASSWORD,
-                    project_name='demo',
+                    project_name=OS_PROJECT,
                     user_domain_id='default',
                     project_domain_id='default')
 
