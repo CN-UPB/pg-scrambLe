@@ -32,7 +32,7 @@
         retrieveNSRs:function(ENV, offset){
 
             var defer=$q.defer();				
-            $http.get(ENV.apiEndpoint+"/records/services?limit="+1000000+"&offset="+offset)
+            $http.get(ENV.apiEndpoint+"/records/services?limit="+1000+"&offset="+offset)
             .then(function successCallback(result){
                defer.resolve(result)})
             .catch(function errorCallback(error){defer.reject(error)});

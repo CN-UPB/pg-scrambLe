@@ -83,37 +83,44 @@ def scrambled_getosmnsr ():
     content = request.get_json()
     nsr_vnfr= {}
     if content:
-        LOG.info("Printing Content from son-bss {}".format(str(request.data)))
+        LOG.info("Printing Content from son-bss for OSM{}".format(str(request.data)))
         osm_details = scramble_db.functions_route.find({'nsd_uuid' : str(content['uuid'])})
-        osm_details = list(osm_details)[0]
-        LOG.info("Printing Content from son-bss {}".format(str(osm_details)))
-        osm_host = osm_details['url']
-        osm_user = osm_details['user']
-        osm_pwd = osm_details['password']
-        
-        osm_instance_id = osm_details["ns_instantiation_id_osm"]
-        
-        osm_auth = wrappers.OSMClient.Auth(osm_host)
-        osm_nslcm = wrappers.OSMClient.Nslcm(osm_host)
-        token = json.loads(osm_auth.auth(username =osm_user , password= osm_pwd))
-        _token = json.loads(token["data"])
-        
-        response = json.loads(osm_nslcm.get_ns_instances(token=_token["id"]))
-        nsrs = json.loads(response['data'])
-        
-        response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
-        vnfrs = json.loads(response['data'])
-        
-        
-        vnfr_list=[]
-        for nsr in nsrs:
-            if nsr['_id'] == osm_instance_id:   
-                nsr_vnfr['nsr'] = nsr
-                vnfr_ids = nsr['constituent-vnfr-ref']
-                for vnfr in vnfrs:
-                    if vnfr['id'] in vnfr_ids:
-                        vnfr_list.append(vnfr)
-                nsr_vnfr['vnfr'] = vnfr_list
+        all_osm_details = list(osm_details)
+        if all_osm_details:
+            for osm_detail in all_osm_details:
+                if osm_detail['mano'] == str(content['mano']):
+                    osm_details = osm_detail
+            LOG.info("Printing Content from son-bss {}".format(str(osm_details)))
+            osm_host = osm_details['url']
+            osm_user = osm_details['user']
+            osm_pwd = osm_details['password']
+            
+            osm_instance_id = osm_details["ns_instantiation_id_osm"]
+            
+            osm_auth = wrappers.OSMClient.Auth(osm_host)
+            osm_nslcm = wrappers.OSMClient.Nslcm(osm_host)
+            token = json.loads(osm_auth.auth(username =osm_user , password= osm_pwd))
+            _token = json.loads(token["data"])
+            
+            response = json.loads(osm_nslcm.get_ns_instances(token=_token["id"]))
+            nsrs = json.loads(response['data'])
+            
+            response = json.loads(osm_nslcm.get_vnf_instances(token=_token["id"]))
+            vnfrs = json.loads(response['data'])
+            
+            
+            vnfr_list=[]
+            for nsr in nsrs:
+                if nsr['_id'] == osm_instance_id: 
+                    nsr['uuid'] = nsr['_id']
+                    nsr['status'] = nsr['_admin']['nsState']
+                    nsr['vnfrid'] = nsr['constituent-vnfr-ref']
+                    nsr_vnfr['nsr'] = nsr
+                    vnfr_ids = nsr['constituent-vnfr-ref']
+                    for vnfr in vnfrs:
+                        if vnfr['id'] in vnfr_ids:
+                            vnfr_list.append(vnfr)
+                    nsr_vnfr['vnfr'] = vnfr_list
     return json.dumps(nsr_vnfr) 
 
     
@@ -122,37 +129,43 @@ def scrambled_getpishnsr ():
     content = request.get_json()
     nsr_vnfr= {}
     if content:
-        LOG.info("Printing Content from son-bss {}".format(str(request.data)))
+        LOG.info("Printing Content from son-bss for PISHAHANG{}".format(str(request.data)))
         pish_details = scramble_db.functions_route.find({'nsd_uuid' : str(content['uuid'])})
-        pish_details = list(pish_details)[0]
-        LOG.info("Printing Content from son-bss {}".format(str(pish_details)))
-        pish_host = pish_details['url']
-        pish_user = pish_details['user']
-        pish_pwd = pish_details['password']
-        
-        pish_instance_id = pish_details["nsd_id_pishahang"]
-        
-        pish_auth = wrappers.SONATAClient.Auth(pish_host)
-        pish_nslcm = wrappers.SONATAClient.Nslcm(pish_host)
-        token = json.loads(pish_auth.auth(username =pish_user , password= pish_pwd))
-        _token = json.loads(token["data"])
-        
-        response = json.loads(pish_nslcm.get_ns_instances(token=_token['token']['access_token'], limit=1000))
-        nsrs = json.loads(response['data'])
-        
-        response = json.loads(pish_nslcm.get_vnf_instances(token=_token['token']['access_token'], limit=1000))
-        vnfrs = json.loads(response['data'])
-        
-        
-        vnfr_list=[]
-        for nsr in nsrs: 
-            if nsr['descriptor_reference'] == pish_instance_id:   
-                nsr_vnfr['nsr'] = nsr
-                vnfr_ids = nsr['network_functions']
-                for vnfr in vnfrs:
-                    if vnfr['uuid'] in [items.get('vnfr_id') for items in vnfr_ids]:
-                        vnfr_list.append(vnfr)
-                nsr_vnfr['vnfr'] = vnfr_list
+        all_pish_details = list(pish_details)
+        if all_pish_details:
+            for pish_detail in all_pish_details:
+                if pish_detail['mano'] == str(content['mano']):
+                    pish_details = pish_detail
+                    
+            LOG.info("Printing Content from son-bss {}".format(str(pish_details)))
+            pish_host = pish_details['url']
+            pish_user = pish_details['user']
+            pish_pwd = pish_details['password']
+            
+            pish_instance_id = pish_details["nsd_id_pishahang"]
+            
+            pish_auth = wrappers.SONATAClient.Auth(pish_host)
+            pish_nslcm = wrappers.SONATAClient.Nslcm(pish_host)
+            token = json.loads(pish_auth.auth(username =pish_user , password= pish_pwd))
+            _token = json.loads(token["data"])
+            
+            response = json.loads(pish_nslcm.get_ns_instances(token=_token['token']['access_token'], limit=1000))
+            nsrs = json.loads(response['data'])
+            
+            response = json.loads(pish_nslcm.get_vnf_instances(token=_token['token']['access_token'], limit=1000))
+            vnfrs = json.loads(response['data'])
+            
+            
+            vnfr_list=[]
+            for nsr in nsrs: 
+                if nsr['descriptor_reference'] == pish_instance_id:   
+                    nsr_vnfr['nsr'] = nsr
+                    vnfr_ids = nsr['network_functions']
+                    nsr['vnfrid'] = [ids['vnfr_id'] for ids in nsr['network_functions']]
+                    for vnfr in vnfrs:
+                        if vnfr['uuid'] in [items.get('vnfr_id') for items in vnfr_ids]:
+                            vnfr_list.append(vnfr)
+                    nsr_vnfr['vnfr'] = vnfr_list
     return json.dumps(nsr_vnfr)
     
     

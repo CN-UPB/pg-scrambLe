@@ -30,10 +30,10 @@ angular.module('NSR')
 .controller('NSRCtrl', ["$scope", "$rootScope", "NSRServices", "NSDServices", "ENV", "linkHeaderParser", "$localStorage", function($scope, $rootScope, NSRServices, NSDServices, ENV, linkHeaderParser, $localStorage) {
 
  $rootScope.username=$localStorage.currentUser.username;
-
+ $scope.nSRsChild =[];
+ $scope.VNFRsChild =[];
  $scope.offset = 0;
  $scope.limit = 10;
- $scope.uuid = "";
 
  // retrieve NSD to server
  $scope.retrieveNSDs = (function() {
@@ -55,15 +55,15 @@ angular.module('NSR')
 
 
 // retrieve Child NSD to server
-$scope.retrieveChildNSRsPishahang = (function() {
+$scope.retrieveChildNSRsPishahang = (function(uuid) {
   let url =	String(ENV.apiEndpoint).slice(0, -7)+":7001/pishahang/getnsr";	
-  let payload = {"uuid": "9fdef0ce-3b3b-49cd-a30b-4e127a582056"};
+  let payload = {"uuid": uuid, "mano": "PISHAHANG"};
   NSRServices.retrieveNSRsFromChild(url, payload)
   .then(function(data){
-    $rootScope.nSRsChild = data.data;
-    console.log(data.data);
+    $scope.nSRsChild.push(data.data['nsr']);
+    $scope.VNFRsChild.push(data.data['vnfr']);
    if (JSON.stringify($rootScope.nSRsChild) == "[{}]"){
-    $rootScope.nSRsChild = [];
+    $scope.nSRsChild = [];
    }
 
     //pagination
@@ -74,20 +74,20 @@ $scope.retrieveChildNSRsPishahang = (function() {
     $scope.totalRecords = $scope.limit*$scope.totalPages;
   }, function(error) {
     if(JSON.stringify(error.data.code).indexOf('401') >= 0) {
-    $rootScope.nSRsChild = '';
+    $scope.nSRsChild = '';
   }
 })
 });
 
-$scope.retrieveChildNSRsOSM = (function() {
+$scope.retrieveChildNSRsOSM = (function(uuid) {
   let url =	String(ENV.apiEndpoint).slice(0, -7)+":7001/osm/getnsr";	
-  let payload = {"uuid": "9fdef0ce-3b3b-49cd-a30b-4e127a582056"};
+  let payload = {"uuid": uuid, "mano": "OSM"};
   NSRServices.retrieveNSRsFromChild(url, payload)
   .then(function(data){
-    $rootScope.nSRsChild = data.data;
-    console.log(data.data);
+    $scope.nSRsChild.push(data.data['nsr']);
+    $scope.VNFRsChild.push(data.data['vnfr']);
    if (JSON.stringify($rootScope.nSRsChild) == "[{}]"){
-    $rootScope.nSRsChild = [];
+    $scope.nSRsChild = [];
    }
 
     //pagination
@@ -106,8 +106,6 @@ $scope.retrieveChildNSRsOSM = (function() {
 
 
  $scope.retrieveNSDs();
- $scope.retrieveChildNSRsPishahang();
- $scope.retrieveChildNSRsOSM();
  $scope.currentNSR = {};
 
  $scope.generateNSDMap = (function(obj){
@@ -143,10 +141,12 @@ $scope.retrieveNSRs($scope.offset);
     .then(function(result) {
       $rootScope.nSRs = result.data;
       if(result.data.length > 0){
-        $scope.uuid = result.data[result.data.length - 1]["uuid"];
+        let uuid = result.data[result.data.length - 1]["uuid"];
+        $scope.retrieveChildNSRsOSM(uuid);
+        $scope.retrieveChildNSRsPishahang(uuid);
       }
       
-      console.log($scope.uuid);
+      console.log(uuid);
       if (JSON.stringify($rootScope.nSRs) == "[{}]"){
        $rootScope.nSRs = [];
       }
@@ -235,6 +235,39 @@ $scope.getActualNSDVersion = function(nSR, nSDsMap, activeNSDsMap){
    return $scope.actualDescVersion;
  }
  
+$scope.getVNFs = function(nSR){
+  var vnf_name = []
+  for(var i = 0; i < nSR['vnfrid'].length; i++){
+    //console.log(nSR['vnfrid'][i]);
+    //console.log($scope.VNFRsChild);
+    for(var j = 0; j < $scope.VNFRsChild.length; j++){
+      for(var k = 0; k < $scope.VNFRsChild[j].length; k++){
+          if($scope.VNFRsChild[j][k]['status'] == "normal operation"){
+            if($scope.VNFRsChild[j][k]['uuid'] == nSR['vnfrid'][i]){
+              var vnf_name_id = $scope.VNFRsChild[j][k]['virtual_deployment_units'][0]['vdu_reference'];
+              vnf_name.push(vnf_name_id.substring(0, vnf_name_id.indexOf(":")));
+            }
+          } else{
+            if($scope.VNFRsChild[j][k]['id'] == nSR['vnfrid'][i]){
+              vnf_name.push($scope.VNFRsChild[j][k]['vnfd-ref']);
+            }
+          }
+      }
+    }
+  }
+  return vnf_name;
+}
+
+$scope.getMANOname = function(nSR){
+  var mano_name = "";
+  if(nSR['status'] == "INSTANTIATED"){
+    mano_name = "OSM";
+  } else if(nSR['status'] == "normal operation"){
+    mano_name = "Pishahang";
+  }
+  return mano_name;
+}
+
  $scope.compareVersion = function (a, b) {
    if (a === b) {
     return 0;

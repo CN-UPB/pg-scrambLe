@@ -2454,7 +2454,7 @@ class ServiceLifecycleManager(ManoBasePlugin):
         This method informs the gatekeeper.
         """
         vnfr_id = str(uuid.uuid4())
-        nsr_id = str(uuid.uuid4())
+        nsr_id = str(serv_id)
         vnfd_id = str(uuid.uuid4())
         nsd_id = str(uuid.uuid4())
         
@@ -3381,7 +3381,12 @@ class ServiceLifecycleManager(ManoBasePlugin):
             self.services[serv_id]['service']['nsd'] = NSD
             self.services[serv_id]['function'] = functions
             
-            content = {'nsd': NSD,
+            if(functions == []):
+                
+                self.inform_gk_instantiation_scramble(serv_id)
+            
+            else:
+                content = {'nsd': NSD,
                        'functions': functions,
                        'topology': topology,
                        'serv_id': serv_id} 
@@ -3396,26 +3401,24 @@ class ServiceLifecycleManager(ManoBasePlugin):
                        'topology': topology,
                        'serv_id': serv_id}
 
-        if(content['functions']==[]):
-                
-            self.inform_gk_instantiation_scramble(serv_id)
+        
             
-        else:
+       
             
-            content['nap'] = {}
+        content['nap'] = {}
 
-            if self.services[serv_id]['ingress'] is not None:
-                content['nap']['ingresses'] = self.services[serv_id]['ingress']
-            if self.services[serv_id]['egress'] is not None:
-                content['nap']['egresses'] = self.services[serv_id]['egress']
+        if self.services[serv_id]['ingress'] is not None:
+            content['nap']['ingresses'] = self.services[serv_id]['ingress']
+        if self.services[serv_id]['egress'] is not None:
+            content['nap']['egresses'] = self.services[serv_id]['egress']
 
-            self.manoconn.call_async(self.resp_mapping,
-                                     t.MANO_PLACE,
-                                     yaml.dump(content),
-                                     correlation_id=corr_id)
+        self.manoconn.call_async(self.resp_mapping,
+                                 t.MANO_PLACE,
+                                 yaml.dump(content),
+                                 correlation_id=corr_id)
 
-            self.services[serv_id]['pause_chain'] = True
-            LOG.info("Service " + serv_id + ": Placement request sent")
+        self.services[serv_id]['pause_chain'] = True
+        LOG.info("Service " + serv_id + ": Placement request sent")
 
     def resp_mapping(self, ch, method, prop, payload):
         """
