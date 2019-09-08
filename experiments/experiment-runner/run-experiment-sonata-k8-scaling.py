@@ -40,25 +40,46 @@ DOCKER_EXCLUDE = ['experiment-runner']
 
 IDLE_SLEEP = 0.1
 NS_TERMINATION_SLEEP = 10
-REQUESTS_PER_MINUTE = 60
-INTER_EXPERIMENT_SLEEP = 100
+REQUESTS_PER_MINUTE = 10
+INTER_EXPERIMENT_SLEEP = 30
 
 USERNAME = "sonata"
 PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
+HOST_URL_2 = "serverdemo1.cs.upb.de"
 
 IMAGES = ["cirros"]
 INSTANCES = [90]
 CASES = [1]
-RUNS = 4
+RUNS = 3
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
+SKIP_EXPERIMENT_IF_ERRORS = True
 
 cases_vnfs = {
     1: 1,
     2: 3,
     3: 5
 }
+
+def set_load(host=HOST_URL, port=9000, debugscale="0.55,0.55,0.5") :
+    _base_path = 'http://{0}:{1}/scale?scale_metrics={2}'.format(host, port, debugscale)
+
+    try:
+        r = requests.get(_base_path, verify=False)
+        print("Scale metrics")
+        print(r.text)
+    except Exception as e:
+        print("Scale debug could'nt be set")
+
+def set_dockers_id(host=HOST_URL, port=9000) :
+    _base_path = 'http://{0}:{1}/get_docker_names'.format(host, port)
+    try:
+        r = requests.get(_base_path, verify=False)
+        return json.loads(r.text)
+    except Exception as e:
+        print("Docker Names error")
+
 
 def sonata_cleanup():
 
@@ -88,6 +109,36 @@ def sonata_cleanup():
         sonata_pishahang.delete_cosd_descriptors_cosdpkgid(
                     token=_token,
                     cosdpkgid=_cosd['uuid'])
+
+
+    sonata_pishahang_2 = SONATAClient.Pishahang(HOST_URL_2)
+    sonata_auth_2 = SONATAClient.Auth(HOST_URL_2)
+
+    _token = json.loads(sonata_auth.auth(
+                    username=USERNAME,
+                    password=PASSWORD))
+    _token = json.loads(_token["data"])
+
+    _csd_list = json.loads(sonata_pishahang_2.get_csd_descriptors(
+                    token=_token, limit=1000,))
+    _csd_list = json.loads(_csd_list["data"])
+
+    print(len(_csd_list))
+    for _csd in _csd_list:
+        sonata_pishahang_2.delete_csd_descriptors_csdpkgid(
+                    token=_token,
+                    csdpkgid=_csd['uuid'])
+
+    _cosd_list = json.loads(sonata_pishahang_2.get_cosd_descriptors(
+                    token=_token, limit=1000))
+    _cosd_list = json.loads(_cosd_list["data"])
+
+    print(len(_cosd_list))
+    for _cosd in _cosd_list:
+        sonata_pishahang_2.delete_cosd_descriptors_cosdpkgid(
+                    token=_token,
+                    cosdpkgid=_cosd['uuid'])
+
 
 
     time.sleep(5)
@@ -133,7 +184,7 @@ def delete_services():
 def get_count(init_time):
 
     v1 = client.CoreV1Api(aApiClient)
-    print("Listing pods with their IPs:")
+    print("Pod count from k8")
     _servers = v1.list_namespaced_pod(namespace='default', watch=False)
 
     active_count = 0
@@ -243,6 +294,7 @@ print("""
 delete_replication_controller()
 delete_pod()
 delete_services()
+set_load(debugscale="0.4,0.4,0.4")
 
 for _image in IMAGES:
     for _case in CASES:
@@ -282,7 +334,7 @@ for _image in IMAGES:
                     VNFD_PATH = "/app/SONATA/Container/CASE{case}/{image}_csd_{vnfid}.yml".format(image=_image, case=_case, vnfid=_c)
                     _res = sonata_pishahang.post_csd_descriptors(token=_token,
                         package_path=VNFD_PATH)
-                    print(_res)
+                    # print(_res)
                     time.sleep(0.5)
 
                 if IS_EXPERIMENT_VNF_INSTANCES_BASED:
@@ -329,8 +381,11 @@ for _image in IMAGES:
                     except OSError:
                         print ('Error: Creating directory. ' + directory)
 
-                nit = "{0}-{1}".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
+                nit = "{0}-{1}-PARENT".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
+                nit2 = "{0}-{1}-CHILD".format(str(experiment_timestamps["ns_inst_time"]), NSDESCRIPTION)
+
                 createFolder("./{nit}/".format(nit=nit))
+                createFolder("./{nit}/".format(nit=nit2))
 
                 def successRatioThread():
                     TIME_OUT = 60*NS_TERMINATION_SLEEP
@@ -366,6 +421,11 @@ for _image in IMAGES:
                                     print("END-TO-END Time {enetime}".format( enetime=experiment_timestamps["end_to_end_lifecycle_time"]))
                                     break
 
+                                if SKIP_EXPERIMENT_IF_ERRORS:
+                                    if ERROR_INSTANCES > 0:
+                                        print("Skipping Experiment Due To Errors")
+                                        break
+
                                 experiment_timestamps["end_to_end_lifecycle_time"] = int(time.time())-int(experiment_timestamps["ns_inst_time"])
 
                             except Exception as e:
@@ -383,6 +443,14 @@ for _image in IMAGES:
                 individual_init_times = {}
 
                 for i in range(0, no_instantiate):
+                    if (i == no_instantiate/3):
+                        # Set Warning
+                        set_load(debugscale="0.71,0.71,0.5")
+
+                    if (i == no_instantiate/2):
+                        # Set Load
+                        set_load(debugscale="0.71,0.71,0.71")
+
                     _ns = None
                     for _n in _cosd_list:
                         if NSNAME.format(_id=str(i), image=_image, case=_case) == _n['cosd']['name']:            
@@ -399,12 +467,12 @@ for _image in IMAGES:
                             print("ERROR - request error")
                         else:
                             instantiation = json.loads(response["data"])
-                            # print(i, instantiation['id'])
+                            print(i, instantiation['id'])
                         # Store init
                         individual_init_times[instantiation['id']] = time.time()
                     else:
                         print("ERROR - no ns uuid")
-                    print(response)
+                    # print(response)
                     # time.sleep(0.1) - 0.1 sleep not working with pishahang                    
                     time.sleep(60/REQUESTS_PER_MINUTE)
 
@@ -471,6 +539,7 @@ for _image in IMAGES:
 
                 print("PHASE 4 : Saving Metrics  ...")
 
+# Parent 
                 _charts = {
                     "system-cpu" : { 
                         "url": "http://{host}:19999/api/v1/data?chart=system.cpu&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL,after=experiment_timestamps["start_time"],before=experiment_timestamps["end_time"])
@@ -490,11 +559,12 @@ for _image in IMAGES:
                     }
 
                 docker_list = {}
-                for _container in docker_client.containers.list():        
-                    if not _container.attrs["Name"][1:] in DOCKER_EXCLUDE:
-                            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
-                            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
-                            _charts["{0}-{1}".format(_container.attrs["Name"][1:], "mem_usage")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.mem_usage&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_container.attrs["Name"][1:])}
+
+                for _dName, _dId in set_dockers_id().items():                    
+                    _charts["{0}-{1}".format(_dName, "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+                    _charts["{0}-{1}".format(_dName, "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+                    _charts["{0}-{1}".format(_dName, "mem_usage")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.mem_usage&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+
                             
                         
                 for _sc, value  in _charts.items():
@@ -507,6 +577,52 @@ for _image in IMAGES:
                             print("success")
 
                             with open('./{nit}/{sc}.csv'.format(nit=nit,sc=_sc), 'w') as csv_file:
+                                csv_file.write(r.text)
+                        else:
+                            print("Failed")
+
+                    except Exception as e:
+                        print(str(e))
+
+# Child
+
+                _charts = {
+                    "system-cpu" : { 
+                        "url": "http://{host}:19999/api/v1/data?chart=system.cpu&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL_2,after=experiment_timestamps["start_time"],before=experiment_timestamps["end_time"])
+                    },
+                    "system-load" : { 
+                        "url": "http://{host}:19999/api/v1/data?chart=system.load&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL_2, after=experiment_timestamps['start_time'], before=experiment_timestamps["end_time"])
+                    },
+                    "system-ram" : { 
+                        "url": "http://{host}:19999/api/v1/data?chart=system.ram&format=datasource&after={after}&before={before}&format=csv&options=nonzero".format(host=HOST_URL_2, after=experiment_timestamps['start_time'], before=experiment_timestamps["end_time"])
+                    },
+                    "system-net" : { 
+                        "url": "http://{host}:19999/api/v1/data?chart=system.net&format=datasource&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL_2, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"])
+                    },
+                    "system-io" : { 
+                        "url": "http://{host}:19999/api/v1/data?chart=system.io&format=datasource&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL_2, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"])
+                    }
+                    }
+
+                docker_list = {}
+
+                for _dName, _dId in set_dockers_id().items():                    
+                    _charts["{0}-{1}".format(_dName, "cpu")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.cpu&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL_2, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+                    _charts["{0}-{1}".format(_dName, "throttle_io")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.throttle_io&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL_2, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+                    _charts["{0}-{1}".format(_dName, "mem_usage")] = { "url" : "http://{host}:19999/api/v1/data?chart=cgroup_{_name}.mem_usage&format=csv&after={after}&before={before}&format=csv&group=average&gtime=0&datasource&options=nonzeroseconds".format(host=HOST_URL_2, after=experiment_timestamps["start_time"], before=experiment_timestamps["end_time"], _name=_dName)}
+
+                            
+                        
+                for _sc, value  in _charts.items():
+                    print(_sc)
+                    try:
+                        # TODO: make verify=false as a fallback
+                        r = requests.get(value["url"], verify=False)
+
+                        if r.status_code == requests.codes.ok:
+                            print("success")
+
+                            with open('./{nit}/{sc}.csv'.format(nit=nit2,sc=_sc), 'w') as csv_file:
                                 csv_file.write(r.text)
                         else:
                             print("Failed")
@@ -538,4 +654,6 @@ for _image in IMAGES:
                 delete_replication_controller()
                 delete_pod()
                 delete_services()
+                set_load(debugscale="0.4,0.4,0.4")
+
                 time.sleep(INTER_EXPERIMENT_SLEEP)

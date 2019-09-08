@@ -12,10 +12,12 @@ sudo docker stop experiment-runner
 sudo docker rm experiment-runner
 sudo docker build -t experiment-runner -f Dockerfile-dev .
 
-sudo docker run -d --name experiment-runner -p 9000:9000 -v $(pwd):/app \ 
+sudo docker run -d --name experiment-runner -p 9000:9000 -v $(pwd):/app \
     -v /var/run/docker.sock:/container/path/docker.sock \
-    -v /home/sonatamano/pg-scrambLe/phishahang/Pishahang-master/son-mano-framework/plugins/son-mano-scaling/debugnorm:/debugscale \ 
+    -v /home/sonatamano/pg-scrambLe/phishahang/Pishahang-master/son-mano-framework/plugins/son-mano-scaling/debugnorm:/debugscale \
     experiment-runner
+
+sudo docker exec -it experiment-runner bash
 
 sudo docker logs experiment-runner -f
 
@@ -25,3 +27,4 @@ sudo docker exec -it experiment-runner bash
 # Background Run 
 nohup python -u ./run-experiment-osm.py > experiment.log &
 nohup python -u ./run-experiment-sonata.py > experiment.log &
+nohup python -u ./run-experiment-sonata-k8-scaling.py > 10xpc-experiment.log &

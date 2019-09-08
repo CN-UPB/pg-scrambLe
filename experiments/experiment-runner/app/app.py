@@ -3,6 +3,8 @@ app = Flask(__name__)
 
 import sys
 import docker
+import json
+
 client = docker.DockerClient(base_url='unix://container/path/docker.sock')
 
 DOCKER_EXCLUDE = ['experiment-runner']
@@ -67,6 +69,23 @@ def scale_metrics():
         return "Error"
 
     return "Done"
+
+
+@app.route('/get_docker_names')
+def docker_names():
+    try:
+        # print(client.containers.list(), file=sys.stderr)
+        docker_list = {}
+        for _container in client.containers.list():
+            
+            if not _container.attrs["Name"][1:] in DOCKER_EXCLUDE:
+                docker_list[_container.attrs["Name"][1:]] = _container.attrs["Id"]
+            
+        return json.dumps(docker_list)
+
+    except Exception as e:
+        return str(e)
+
 
 
 if __name__ == '__main__':
