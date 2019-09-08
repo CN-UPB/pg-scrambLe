@@ -102,34 +102,38 @@ class ScalingPlugin(ManoBasePlugin):
         LOG.info(">>>> \n Creating MANO instance...")
         self.instantiating_mano_instance = True
         
-        if mano_type == "pishahang":
-            mano_instance_meta = self.mano_manager.create_pishahang_instance()
-            LOG.info(mano_instance_meta)
-            if not mano_instance_meta:
-                LOG.info("!!! MANO could not be instantiated...")
-                self.instantiating_mano_instance = False
-                return False
-        elif mano_type == "osm":
-            mano_instance_meta = self.mano_manager.create_osm_instance()
-            if not mano_instance_meta:
-                LOG.info("!!! MANO could not be instantiated...")
-                self.instantiating_mano_instance = False
-                return False
-        else:
-            LOG.info("!!! MANO type not supported...")
-            self.instantiating_mano_instance = False
-            return False
+        if self.DEBUGMODE:
+            mano_instance_meta = "DEBUG!!"
 
-        # TODO: FIX ME! should be ip from the instantiation
-        # self.mano_instances.append(
-        #     {
-        #         "host_ip":mano_instance_meta["ip"],
-        #         "monitoring_port": NETDATA_PORT,
-        #         "username":"",
-        #         "password":"",
-        #         "type":mano_type
-        #     }
-        # )
+        else:
+            if mano_type == "pishahang":
+                mano_instance_meta = self.mano_manager.create_pishahang_instance()
+                LOG.info(mano_instance_meta)
+                if not mano_instance_meta:
+                    LOG.info("!!! MANO could not be instantiated...")
+                    self.instantiating_mano_instance = False
+                    return False
+            elif mano_type == "osm":
+                mano_instance_meta = self.mano_manager.create_osm_instance()
+                if not mano_instance_meta:
+                    LOG.info("!!! MANO could not be instantiated...")
+                    self.instantiating_mano_instance = False
+                    return False
+            else:
+                LOG.info("!!! MANO type not supported...")
+                self.instantiating_mano_instance = False
+                return False
+
+            # TODO: FIX ME! should be ip from the instantiation
+            self.mano_instances.append(
+                {
+                    "host_ip":mano_instance_meta["ip"],
+                    "monitoring_port": NETDATA_PORT,
+                    "username":"",
+                    "password":"",
+                    "type":mano_type
+                }
+            )
 
         LOG.info("\n MANO instantiated with IP... {0}".format(mano_instance_meta))
 
@@ -177,6 +181,15 @@ class ScalingPlugin(ManoBasePlugin):
         vnfr_payload = json.loads(vnfr_payload["data"]) 
         
         _time_now = str( int(time.time()) )
+
+        LOG.info("\n ############### ")
+        LOG.info("\n NSR AND VNFR FROM CHILD MANO ")
+        LOG.info("\n ############### \n")
+
+        LOG.info(vnfr_payload)
+        LOG.info(nsr_payload)
+
+        LOG.info("\n ############### ")
 
         with open('{timestamp}-vnfr-backup-{ip}.json'.format(timestamp=_time_now, ip=host_ip), 'w') as outfile:
             json.dump(vnfr_payload, outfile)
@@ -493,7 +506,7 @@ class ScalingPlugin(ManoBasePlugin):
         # TODO: Check if the current MANO instance is not overloaded by checking CPU and Memory usage
         
         if self.parent_mano_loaded:
-            if self.child_mano_added:
+            if self.child_mano_added and len(self.mano_priority) > 0:
                 # TODO: wait for a few seconds mano_priority to be filled
                 # TODO: Select the best mano from the list
                 response = {'system_loaded': True, 'error': None, 'mano_instance': self.mano_priority[0]}

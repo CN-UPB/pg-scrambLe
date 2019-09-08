@@ -185,6 +185,10 @@ class ManoManager():
 
                     except Exception as e:
                         LOG.info("MANO Instantiation Exception")
+
+                    
+                    time.sleep(1)
+
         else:
             return False
 

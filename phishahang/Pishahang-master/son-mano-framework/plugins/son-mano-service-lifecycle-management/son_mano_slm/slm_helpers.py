@@ -769,98 +769,98 @@ def build_monitoring_message(service, functions, cloud_services, userdata):
 
 
 def forward_instantiation_request(mano_instance, payload):
+    try:
+        sonata_pishahang = wrappers.SONATAClient.Pishahang(mano_instance['host_ip'])
+        sonata_auth = wrappers.SONATAClient.Auth(mano_instance['host_ip'])
+        sonata_nslcm = wrappers.SONATAClient.Nslcm(mano_instance['host_ip'])
+        sonata_vnfd = wrappers.SONATAClient.VnfPkgm(mano_instance['host_ip'])
+        sonata_nsd = wrappers.SONATAClient.Nsd(mano_instance['host_ip'])
 
-    sonata_pishahang = wrappers.SONATAClient.Pishahang(mano_instance['host_ip'])
-    sonata_auth = wrappers.SONATAClient.Auth(mano_instance['host_ip'])
-    sonata_nslcm = wrappers.SONATAClient.Nslcm(mano_instance['host_ip'])
-    sonata_vnfd = wrappers.SONATAClient.VnfPkgm(mano_instance['host_ip'])
-    sonata_nsd = wrappers.SONATAClient.Nsd(mano_instance['host_ip'])
+        _token = json.loads(sonata_auth.auth(
+                                username=SONATA_USERNAME, 
+                                password=SONATA_PASSWORD))
+        _token = json.loads(_token["data"])
 
-    _token = json.loads(sonata_auth.auth(
-                            username=SONATA_USERNAME, 
-                            password=SONATA_PASSWORD))
-    _token = json.loads(_token["data"])
+        if 'nsd' in payload['service']:
 
-    if 'nsd' in payload['service']:
+            for function in payload['function']:
+                vnf_id = function['id']
+                vnfd = function['vnfd']
+                LOG.debug("vnf_id")
+                LOG.debug(vnfd)
+                with open("/tmp/{}-vnfd.yml".format(vnf_id), 'w') as _vnfdFile:
+                    yaml.dump(vnfd, _vnfdFile)
 
-        for function in payload['function']:
-            vnf_id = function['id']
-            vnfd = function['vnfd']
-            LOG.debug("vnf_id")
-            LOG.debug(vnfd)
-            with open("/tmp/{}-vnfd.yml".format(vnf_id), 'w') as _vnfdFile:
-                yaml.dump(vnfd, _vnfdFile)
+                response = json.loads(sonata_vnfd.post_vnf_packages(
+                                token=_token["token"]["access_token"],
+                                package_path="/tmp/{}-vnfd.yml".format(vnf_id)))
 
-            response = json.loads(sonata_vnfd.post_vnf_packages(
+
+            nsd = payload['service']['nsd']
+        else:
+            for function in payload['cloud_service']:
+
+                csd_id = function['id']
+                csd = function['csd']
+                LOG.debug("csd_id")
+                LOG.debug(csd)
+                with open("/tmp/{}-csd.yml".format(csd_id), 'w') as _csdFile:
+                    yaml.dump(csd, _csdFile)
+
+                response = json.loads(sonata_pishahang.post_csd_descriptors(
+                                token=_token["token"]["access_token"],
+                                package_path="/tmp/{}-csd.yml".format(csd_id)))
+
+            nsd = payload['service']['cosd']
+
+        LOG.debug("NSD")
+        LOG.debug(nsd)
+
+        with open("/tmp/{}-nsd.yml".format(nsd['name']), 'w') as _nsdFile:
+            yaml.dump(nsd, _nsdFile)
+
+        if 'nsd' in payload['service']:
+            response = json.loads(sonata_nsd.post_ns_descriptors(
                             token=_token["token"]["access_token"],
-                            package_path="/tmp/{}-vnfd.yml".format(vnf_id)))
+                            package_path="/tmp/{}-nsd.yml".format(nsd['name'])))
 
+            _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
+                                    token=_token["token"]["access_token"], limit=1000))
+            _nsd_list = json.loads(_nsd_list["data"])
 
-        nsd = payload['service']['nsd']
-    else:
-        for function in payload['cloud_service']:
+            _ns = None
+            for _n in _nsd_list:
+                if nsd['name'] == _n['nsd']['name']:            
+                    _ns = _n['uuid']
 
-            csd_id = function['id']
-            csd = function['csd']
-            LOG.debug("csd_id")
-            LOG.debug(csd)
-            with open("/tmp/{}-csd.yml".format(csd_id), 'w') as _csdFile:
-                yaml.dump(csd, _csdFile)
+            if _ns:
+                response = json.loads(
+                            sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
+                                token=_token["token"]["access_token"], nsInstanceId=_ns))
+                LOG.debug("NSD Handover Complete")
+                LOG.debug(response)
+        else:
+            LOG.debug("COSD")
+            LOG.debug(mano_instance['host_ip'])
 
-            response = json.loads(sonata_pishahang.post_csd_descriptors(
+            response = json.loads(sonata_pishahang.post_cosd_descriptors(
                             token=_token["token"]["access_token"],
-                            package_path="/tmp/{}-csd.yml".format(csd_id)))
+                            package_path="/tmp/{}-nsd.yml".format(nsd['name'])))
 
-        nsd = payload['service']['cosd']
 
-    LOG.debug("NSD")
-    LOG.debug(nsd)
+            LOG.debug("CLOUD message")
+            message = yaml.load(response['data'])
+            LOG.debug(message)
+            _ns = message['uuid']
+            LOG.debug(_ns)
 
-    with open("/tmp/{}-nsd.yml".format(nsd['name']), 'w') as _nsdFile:
-        yaml.dump(nsd, _nsdFile)
+            if _ns:
+                response = json.loads(
+                            sonata_pishahang.post_cs_instances_nsinstanceid_instantiate(
+                                token=_token["token"]["access_token"], nsInstanceId=_ns))
+                LOG.debug("COSD Handover Complete")
+                LOG.debug(response)
 
-    if 'nsd' in payload['service']:
-        response = json.loads(sonata_nsd.post_ns_descriptors(
-                        token=_token["token"]["access_token"],
-                        package_path="/tmp/{}-nsd.yml".format(nsd['name'])))
-
-        _nsd_list = json.loads(sonata_nsd.get_ns_descriptors(
-                                token=_token["token"]["access_token"], limit=1000))
-        _nsd_list = json.loads(_nsd_list["data"])
-
-        _ns = None
-        for _n in _nsd_list:
-            if nsd['name'] == _n['nsd']['name']:            
-                _ns = _n['uuid']
-
-        if _ns:
-            response = json.loads(
-                        sonata_nslcm.post_ns_instances_nsinstanceid_instantiate(
-                            token=_token["token"]["access_token"], nsInstanceId=_ns))
-            LOG.debug("NSD Handover Complete")
-            LOG.debug(response)
-    else:
-        LOG.debug("COSD")
-        LOG.debug(mano_instance['host_ip'])
-
-        response = json.loads(sonata_pishahang.post_cosd_descriptors(
-                        token=_token["token"]["access_token"],
-                        package_path="/tmp/{}-nsd.yml".format(nsd['name'])))
-
-        _cosd_list = json.loads(sonata_pishahang.get_cosd_descriptors(
-                            token=_token["token"]["access_token"],
-                            limit=1000))
-        _cosd_list = json.loads(_cosd_list["data"])
-
-        _ns = None
-        for _n in _cosd_list:
-            if nsd['name'] == _n['cosd']['name']:            
-                _ns = _n['uuid']
-
-        if _ns:
-            response = json.loads(
-                        sonata_pishahang.post_cs_instances_nsinstanceid_instantiate(
-                            token=_token["token"]["access_token"], nsInstanceId=_ns))
-            LOG.debug("COSD Handover Complete")
-            LOG.debug(response)
-        
+    except Exception as e:
+        LOG.debug(e)
+        LOG.debug("forward_instantiation_request")
