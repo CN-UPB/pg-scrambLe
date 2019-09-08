@@ -2972,40 +2972,42 @@ class ServiceLifecycleManager(ManoBasePlugin):
             
             if vnf_len > 1:
             
-                rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
-                rand_int = random.randint(0, vnf_len-1)            # random selection of vnf indexes
-               
-                vnf_set1 = [vnf_ids[rand_int]]                     # storing 1st set of vnf-ids
-                vnf_nm_set1 = [vnf_nm[rand_int]]                   # storing 1st set of vnf-names                
-                mano_set1 = [mano[rand_int_mano[0]]]               # storing 1st MANO
-               
-                vnf_set2 = list(set(vnf_ids) - set(vnf_set1))      # storing 2nd set of vnf-ids
-                vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
-                mano_set2 = [mano[rand_int_mano[1]]]               # storing 2nd MANO
-                    
-                return [[vnf_set1,vnf_nm_set1,mano_set1], [vnf_set2,vnf_nm_set2,mano_set2]]
+                if vnf_len != mano_len:
+                    rand_int_mano = random.sample(range(0,mano_len),2) # select only two manos randomly
+                    rand_int = random.randint(0, vnf_len-1)            # random selection of vnf indexes
+                   
+                    vnf_set1 = [vnf_ids[rand_int]]                     # storing 1st set of vnf-ids
+                    vnf_nm_set1 = [vnf_nm[rand_int]]                   # storing 1st set of vnf-names                
+                    mano_set1 = [mano[rand_int_mano[0]]]               # storing 1st MANO
+                   
+                    vnf_set2 = list(set(vnf_ids) - set(vnf_set1))      # storing 2nd set of vnf-ids
+                    vnf_nm_set2 = list(set(vnf_nm) - set(vnf_nm_set1)) # storing 2nd set of vnf-names
+                    mano_set2 = [mano[rand_int_mano[1]]]               # storing 2nd MANO
+                        
+                    return [[vnf_set1,vnf_nm_set1,mano_set1], [vnf_set2,vnf_nm_set2,mano_set2]]
                 
+                else:
                 
-#                rand_int_mano = random.sample(range(0, len(mano)), len(mano)) # select only two manos randomly
+                    rand_int_mano = random.sample(range(0, mano_len), mano_len) # select manos randomly
 
-#                random_sets = []
-#                for i, mano_indx in enumerate(rand_int_mano):
-                    
-#                    if i+1 == len(mano):
-#                        if len(vnf_ids):
-#                            random_sets.append([vnf_ids, vnf_nm, [mano[mano_indx]]])
-#                    else:
-#                        if len(vnf_ids):
-#                            rand_int = random.randint(0, len(vnf_ids) -1)            # random selection of vnf indexes
+                    random_sets = []
+                    for i, mano_indx in enumerate(rand_int_mano):
+                        
+                        if i+1 == mano_len:
+                            if len(vnf_ids):
+                                random_sets.append([vnf_ids, vnf_nm, [mano[mano_indx]]])
+                        else:
+                            if len(vnf_ids):
+                                rand_int = random.randint(0, len(vnf_ids) -1)      # random selection of vnf indexes
 
-#                            vnf_set1 = [vnf_ids[rand_int]]                     # storing 1st set of vnf-ids
-#                            vnf_nm_set1 = [vnf_nm[rand_int]]                   # storing 1st set of vnf-names                
-#                            mano_set1 = [mano[mano_indx]]               # storing 1st MANO
-#                            vnf_ids.remove(vnf_ids[rand_int])
-#                            vnf_nm.remove(vnf_nm[rand_int])
-#                            random_sets.append([vnf_set1, vnf_nm_set1, mano_set1])
-                
-#                return random_sets
+                                vnf_set1 = [vnf_ids[rand_int]]                     # storing 1st set of vnf-ids
+                                vnf_nm_set1 = [vnf_nm[rand_int]]                   # storing 1st set of vnf-names                
+                                mano_set1 = [mano[mano_indx]]                      # storing 1st MANO
+                                vnf_ids.remove(vnf_ids[rand_int])
+                                vnf_nm.remove(vnf_nm[rand_int])
+                                random_sets.append([vnf_set1, vnf_nm_set1, mano_set1])
+                    
+                    return random_sets
             
             else:
                 

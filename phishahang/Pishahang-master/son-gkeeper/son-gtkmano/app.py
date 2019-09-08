@@ -12,7 +12,7 @@ import wrappers
 app = Flask(__name__)
 CORS(app)
 client = MongoClient("mongodb://db:27017")
-db = client.tododb
+db = client.scramble_mano
 scramble_db = client.scrambled
 cors = CORS(app, resources={r"/mano_create": {"origins": "*"}, r"/mano/remove": {"origins": "*"}, r"/scrambled_ns": {"origins": "*"}, r"/mano_uuid" : {"origins": "*"}, r'/osm/getnsr' : {"origins": "*"}, r'/pishahang/getnsr' : {"origins": "*"} })    
 
@@ -23,7 +23,7 @@ LOG.setLevel(logging.DEBUG)
 @app.route('/mano')
 def todo():
 
-    listmano = db.tododb.find()
+    listmano = db.manos.find()
     listmano = list(listmano)
     
     for mano in listmano:
@@ -36,7 +36,7 @@ def new():
     content = request.get_json()
     if content:
         LOG.info("Printing Content from son-bss/son-gui {}".format(str(request.data)))
-        x = db.tododb.insert_one(content)
+        x = db.manos.insert_one(content)
     
     return  redirect('/mano')
 
@@ -46,7 +46,7 @@ def remove ():
     if rec:
         LOG.info("Printing Content from son-bss {}".format(str(request.data)))
         id = rec["_id"]
-        db.tododb.delete_one({"_id":ObjectId(id)})
+        db.manos.delete_one({"_id":ObjectId(id)})
         return "success"
     else:
         return "failure"
@@ -68,7 +68,7 @@ def manouuid():
     rec = request.get_json()
     id = rec["_id"]
     LOG.info("Printing Content from son-bss {}".format(str(rec)))
-    manos = db.tododb.find({"_id":ObjectId(id)})
+    manos = db.manos.find({"_id":ObjectId(id)})
     
     manos = list(manos)
     
@@ -113,6 +113,7 @@ def scrambled_getosmnsr ():
             for nsr in nsrs:
                 if nsr['_id'] == osm_instance_id: 
                     nsr['uuid'] = nsr['_id']
+                    nsr['descriptor_reference'] = nsr['instantiate_params']['nsdId']
                     nsr['status'] = nsr['_admin']['nsState']
                     nsr['vnfrid'] = nsr['constituent-vnfr-ref']
                     nsr_vnfr['nsr'] = nsr
