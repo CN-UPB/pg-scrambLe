@@ -19,27 +19,41 @@ from math import sqrt
 
 start_time = time.time()
 
+# Horizontal Top Mean Graph
 DOCKER_CPU_BAR = False
-DOCKER_CASE_CPU_BAR = False
-SYSTEM_CPU_BAR = False
-DOCKER_CASE_GROUPED = False
-END_TO_END_TIME_BAR = False
-SYSTEM_LOAD_BAR = False
 DOCKER_MEM_BAR = False
-DOCKER_CASE_MEM_BAR = False
-SYSTEM_RAM_BAR = False
-SUCCESS_RATIO_LINE = False
-I_END_TO_END_TIME_BAR = False
-LIFECYCLE_GRAPH = True
 
-CPU_MAX_SCALE = 150
+# Graph grouped by images
+DOCKER_CASE_GROUPED = False
+
+# Old docker cases
+DOCKER_CASE_CPU_BAR = False
+DOCKER_CASE_MEM_BAR = False
+
+# System Wide Graphs
+SYSTEM_CPU_BAR = False
+SYSTEM_LOAD_BAR = False
+SYSTEM_RAM_BAR = False
+
+# one-on-one graphs
+ONE_ON_ONE_SYSTEM_BAR = True
+ONE_ON_ONE_OTHER_BAR = True
+
+SUCCESS_RATIO_LINE = False
+END_TO_END_TIME_BAR = False
+I_END_TO_END_TIME_BAR = False
+LIFECYCLE_GRAPH = False
+
+CPU_MAX_SCALE = 125
+MEM_MAX_SCALE = 2750
 LIMIT_DOCKERS_IN_GRAPH = -10
 
-_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/Final"
-_OUT_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/Graphs"
+_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker/cases_system_graphs/graphs"
+_COMMON_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
+
 _SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 _I_E2E_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
-_COMMON_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv"
 _OSM_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 _PISHAHANG_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/Pishahang Results/data_csv"
 _LIFECYCLE_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/test"
@@ -62,6 +76,268 @@ sys_ram_files = [y for x in os.walk(_PATH) for y in glob(os.path.join(x[0], '*-S
 success_ratio_file = [y for x in os.walk(_SUCCESS_RATIO_PATH) for y in glob(os.path.join(x[0], 'success-ratio.csv'))]
 i_e2e_file = [y for x in os.walk(_I_E2E_PATH) for y in glob(os.path.join(x[0], 'individual-build-times.csv'))]
 cpu_lifecycle_file = [y for x in os.walk(_LIFECYCLE_PATH) for y in glob(os.path.join(x[0], 'system-cpu.csv'))]
+
+
+##############################################
+# One on One Comparison graphs  
+##############################################
+if ONE_ON_ONE_SYSTEM_BAR:
+    data_dict = {
+        "pishahang" : {
+            "cpu_mean" : "",
+            "cpu_max" : "",
+            "cpu_sd" : "",
+            "ram_mean" : "",
+            "ram_max" : "",
+            "ram_sd" : "",
+            "load1m_mean" : "",
+            "load1m_max" : "",
+            "load1m_sd" : ""
+        },
+        "osm" : {
+            "cpu_mean" : "",
+            "cpu_max" : "",
+            "cpu_sd" : "",
+            "ram_mean" : "",
+            "ram_max" : "",
+            "ram_sd" : "",
+            "load1m_mean" : "",
+            "load1m_max" : "",
+            "load1m_sd" : ""
+        }
+    }
+
+    for _sys_cpu_files in sys_cpu_files:
+        _title = (Path(_sys_cpu_files).name).split("-System-CPU")[0]
+        _image, _case, _instances = _title.split("_")
+        _mano = Path(_sys_cpu_files).parent.parent.name
+
+        df = pd.read_csv(_sys_cpu_files)
+
+        if _mano == "osm":
+            data_dict["osm"]["cpu_mean"] = df["CPU Mean"][0]
+            data_dict["osm"]["cpu_max"] = df["CPU Max"][0]
+            data_dict["osm"]["cpu_sd"] = df["CPU SD"][0]
+        elif _mano == "pishahang":
+            data_dict["pishahang"]["cpu_mean"] = df["CPU Mean"][0]
+            data_dict["pishahang"]["cpu_max"] = df["CPU Max"][0]
+            data_dict["pishahang"]["cpu_sd"] = df["CPU SD"][0]
+
+    for _sys_ram_files in sys_ram_files:
+        _title = (Path(_sys_ram_files).name).split("-System-RAM")[0]
+        _image, _case, _instances = _title.split("_")
+        _mano = Path(_sys_ram_files).parent.parent.name
+
+        df = pd.read_csv(_sys_ram_files)
+
+        if _mano == "osm":
+            data_dict["osm"]["ram_mean"] = df["RAM Mean"][0]
+            data_dict["osm"]["ram_max"] = df["RAM Max"][0]
+            data_dict["osm"]["ram_sd"] = df["RAM SD"][0]
+        elif _mano == "pishahang":
+            data_dict["pishahang"]["ram_mean"] = df["RAM Mean"][0]
+            data_dict["pishahang"]["ram_max"] = df["RAM Max"][0]
+            data_dict["pishahang"]["ram_sd"] = df["RAM SD"][0]
+
+    for _sys_load_files in sys_load_files:
+        _title = (Path(_sys_load_files).name).split("-System-Load")[0]
+        _image, _case, _instances = _title.split("_")
+        _mano = Path(_sys_load_files).parent.parent.name
+
+        df = pd.read_csv(_sys_load_files)
+
+        if _mano == "osm":
+            data_dict["osm"]["load1m_mean"] = df["Load1 Mean"][0]
+            data_dict["osm"]["load1m_max"] = df["Load1 Max"][0]
+            data_dict["osm"]["load1m_sd"] = df["Load1 SD"][0]
+        elif _mano == "pishahang":
+            data_dict["pishahang"]["load1m_mean"] = df["Load1 Mean"][0]
+            data_dict["pishahang"]["load1m_max"] = df["Load1 Max"][0]
+            data_dict["pishahang"]["load1m_sd"] = df["Load1 SD"][0]
+
+    data = []
+    for _manoName, _values in sorted(data_dict.items()):
+        data.append({
+            'mano': _manoName, 
+            "cpu_mean": _values["cpu_mean"],
+            "cpu_max": _values["cpu_max"],
+            "cpu_sd": _values["cpu_sd"],
+            "ram_mean": _values["ram_mean"],
+            "ram_max": _values["ram_max"],
+            "ram_sd": _values["ram_sd"],
+            "load1m_mean": _values["load1m_mean"],
+            "load1m_max": _values["load1m_max"],
+            "load1m_sd": _values["load1m_sd"]
+        })
+
+    df = pd.DataFrame(data)
+
+    fig, axs = plt.subplots(3, figsize=(6, 8), sharex=False, sharey=False)
+    fig.suptitle('OSM (VM) vs Pishahang (Docker) - 90 Instances', fontsize=25)
+
+    index = np.arange(len(data))
+    width = 0.30
+
+    divisions = df['mano']
+
+    df['cpu_mean T'] = abs(T_BOUNDS[1] * df['cpu_sd'] / sqrt(RUNS))
+    df['ram_mean T'] = abs(T_BOUNDS[1] * df['ram_sd'] / sqrt(RUNS))
+    df['load1m_mean T'] = abs(T_BOUNDS[1] * df['load1m_sd'] / sqrt(RUNS))
+
+    axs[0].bar(index, df['cpu_max'], width, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Max')
+    axs[0].bar(index, df['cpu_mean'], width,yerr=df['cpu_mean T'], alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Mean')
+    axs[0].set_title("System CPU", fontsize=15)
+    axs[0].set_xticks(index)
+    axs[0].set_xticklabels(divisions)
+    axs[0].set_ylim([0, 100])
+    axs[0].set_ylabel('CPU Usage (%)', fontsize=12)
+    # axs[0].set_xlabel('# VNFs Instantiated', fontsize=20)
+
+    axs[1].bar(index, df['load1m_max'], width, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Max')
+    axs[1].bar(index, df['load1m_mean'], width,yerr=df['load1m_mean T'], alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Mean')
+    axs[1].set_title("System Load", fontsize=15)
+    axs[1].set_xticks(index)
+    axs[1].set_xticklabels(divisions)
+    axs[1].set_ylim([0, 5])
+    axs[1].set_ylabel('System Load', fontsize=12)
+    # axs[0].set_xlabel('# VNFs Instantiated', fontsize=20)
+
+    axs[2].bar(index, df['ram_max'], width, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Max')
+    axs[2].bar(index, df['ram_mean'], width,yerr=df['ram_mean T'], alpha=0.6, ecolor='black', capsize=5, color='b', label = 'Mean')
+    axs[2].set_title("System RAM", fontsize=15)
+    axs[2].set_xticks(index)
+    axs[2].set_xticklabels(divisions)
+    # axs[2].set_ylim([0, 100])
+    axs[2].set_ylabel('MEM Usage (MiB)', fontsize=12)
+    # axs[0].set_xlabel('# VNFs Instantiated', fontsize=20)
+
+    plt.legend(loc='best', bbox_to_anchor=(1, 0.3))
+    # plt.ylim([0, 50])
+
+    fig.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    # plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('MANO', fontsize=20)
+
+    plt.savefig('{}/System_metrics_comparison.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+    print("")
+
+
+##############################################
+# One on One Comparison graphs  
+##############################################
+if ONE_ON_ONE_OTHER_BAR:
+    ono_i_build_file = [y for x in os.walk(_COMMON_PATH) for y in glob(os.path.join(x[0], 'individual-build-times.csv'))]
+    ono_e2e_file = [y for x in os.walk(_COMMON_PATH) for y in glob(os.path.join(x[0], 'end-to-end-time.csv'))]
+
+    # end_to_end_path = Path(_success_ratio_file).parent / "end-to-end-time.csv"
+    # etime = (pd.read_csv(end_to_end_path)["end-to-end-time"][0])/360
+    # etime = "{:.3}".format(etime)
+
+    data_dict = {
+        "pishahang" : {
+            "mano_time_mean" : [],
+            "mano_time_sd" : [],
+            "vim_time_mean" : [],
+            "vim_time_sd" : [],
+            "end_to_end_mean" : [],
+            "end_to_end_sd" : []
+        },
+        "osm" : {
+            "mano_time_mean" : [],
+            "mano_time_sd" : [],
+            "vim_time_mean" : [],
+            "vim_time_sd" : [],
+            "end_to_end_mean" : [],
+            "end_to_end_sd" : []
+        }
+    }
+
+    for _ono_i_build_file in ono_i_build_file:
+        _mano = Path(_ono_i_build_file).parent.parent.parent.name
+
+        df = pd.read_csv(_ono_i_build_file)
+
+        if _mano == "osm":
+            data_dict["osm"]["mano_time_mean"].append(df["mano_time"].mean())
+            data_dict["osm"]["vim_time_mean"].append(df["vim_time"].mean())
+        elif _mano == "pishahang":
+            data_dict["pishahang"]["mano_time_mean"].append(df["mano_time"].mean())
+            data_dict["pishahang"]["vim_time_mean"].append(df["vim_time"].mean())
+
+    for _ono_e2e_file in ono_e2e_file:
+        _mano = Path(_ono_e2e_file).parent.parent.parent.name
+
+        df = pd.read_csv(_ono_e2e_file)
+
+        if _mano == "osm":
+            data_dict["osm"]["end_to_end_mean"].append(df["end-to-end-time"][0])
+        elif _mano == "pishahang":
+            data_dict["pishahang"]["end_to_end_mean"].append(df["end-to-end-time"][0])
+
+
+    data = []
+    for _manoName, _values in sorted(data_dict.items()):
+        data.append({
+            'mano': _manoName, 
+            "mano_time_mean": statistics.mean(_values["mano_time_mean"]),
+            "mano_time_sd": statistics.pstdev(_values["mano_time_mean"]),
+            "vim_time_mean": statistics.mean(_values["vim_time_mean"]),
+            "vim_time_sd": statistics.pstdev(_values["vim_time_mean"]),
+            "end_to_end_mean": statistics.mean(_values["end_to_end_mean"]),
+            "end_to_end_sd": statistics.pstdev(_values["end_to_end_mean"]),
+        })
+
+    df = pd.DataFrame(data)
+
+    fig, axs = plt.subplots(2, figsize=(6, 8), sharex=False, sharey=False)
+    fig.suptitle('OSM (VM) vs Pishahang (Docker) - 90 Instances', fontsize=25)
+
+    index = np.arange(len(data))
+    width = 0.30
+
+    divisions = df['mano']
+
+    axs[0].bar(index, df['mano_time_mean'], width, yerr=df['mano_time_sd'], alpha=0.6, ecolor='black', capsize=5, color='r', label = 'MANO Time')
+    axs[0].bar(index+width, df['vim_time_mean'], width,yerr=df['vim_time_sd'], alpha=0.6, ecolor='black', capsize=5, color='b', label = 'VIM Time')
+    axs[0].set_title("Time Distribution", fontsize=15)
+    axs[0].set_xticks(index)
+    axs[0].set_xticklabels(divisions)
+    # axs[0].set_ylim([0, 100])
+    axs[0].set_ylabel('Time (s)', fontsize=12)
+    # axs[0].set_xlabel('# VNFs Instantiated', fontsize=20)
+
+    axs[0].legend(loc='best', bbox_to_anchor=(1, 0.2))
+
+    # axs[1].bar(index, df['load1m_max'], width, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'Max')
+    axs[1].bar(index, df['end_to_end_mean'], width,yerr=df['end_to_end_sd'], alpha=0.6, ecolor='black', capsize=5, color='b')
+    axs[1].set_title("End-to-End Time", fontsize=15)
+    axs[1].set_xticks(index)
+    axs[1].set_xticklabels(divisions)
+    # axs[1].set_ylim([0, 5])
+    axs[1].set_ylabel('Time (s)', fontsize=12)
+    # axs[0].set_xlabel('# VNFs Instantiated', fontsize=20)
+
+    # plt.ylim([0, 50])
+
+    fig.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    # plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('MANO', fontsize=20)
+
+    plt.savefig('{}/Time_comparison.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+    print("")
+
 
 ##############################################
 # Docker Case CPU Bar Chart 
@@ -411,7 +687,7 @@ if DOCKER_CPU_BAR:
         df = pd.read_csv(_cpu_files)
         df = df.sort_values('CPU Mean')
         df = df[LIMIT_DOCKERS_IN_GRAPH:]
-        docker_col = df['Docker Container']
+        docker_col = df["Docker Container"].str.split('-cpu').str[0]
         value_col = df['CPU Mean']
         value_col_max = df['CPU Max']
         value_col_max_sd = df['CPU Max SD']
@@ -428,7 +704,7 @@ if DOCKER_CPU_BAR:
         plt.figure(figsize=(10,6))
         plt.xlim([0, CPU_MAX_SCALE])
 
-        a2=plt.barh(docker_col, value_col_max, xerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=2, color='red')
+        a2=plt.barh(docker_col, value_col_max, alpha=0.6, ecolor='black', capsize=2, color='red')
         a=plt.barh(docker_col, value_col, xerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=2, color='blue')
 
         # for rect in a.patches:
@@ -444,11 +720,11 @@ if DOCKER_CPU_BAR:
         #             ha='center', va='center', fontsize=9, color='black',fontweight='bold')
 
 
-        # plt.xticks(rotation=-90)
-        plt.title("CPU -- {}".format(cpu_title), fontsize=25)
-        plt.xlabel("CPU Mean (percentage)", fontsize=20)
-        plt.ylabel("Dockers", fontsize=20)
-        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='center left', bbox_to_anchor=(1, 0.5))
+        # plt.yticks(rotation=30)
+        plt.title("OSM - CPU Usage - 180 Instances (30 rpm)\n".format(cpu_title), fontsize=25)
+        plt.xlabel("CPU Usage (%)", fontsize=20)
+        plt.ylabel("Docker Services", fontsize=20)
+        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='lower right')
         plt.savefig('{}/{}-CPU.png'.format(_OUT_PATH, cpu_title),bbox_inches='tight', dpi=100)
         plt.close()
 
@@ -466,7 +742,7 @@ if DOCKER_MEM_BAR:
         df = pd.read_csv(_mem_files)
         df = df.sort_values('MEM Max')
         df = df[LIMIT_DOCKERS_IN_GRAPH:]
-        docker_col = df['Docker Container']
+        docker_col = df['Docker Container'].str.split('-mem').str[0]
         value_col = df['MEM Mean']
         value_col_max = df['MEM Max']
         value_col_max_sd = df['MEM Max SD']
@@ -481,8 +757,9 @@ if DOCKER_MEM_BAR:
 
         width = 0.30
         plt.figure(figsize=(10,6))
+        plt.xlim([0, MEM_MAX_SCALE])
 
-        a2=plt.barh(docker_col, value_col_max, xerr=value_col_t_max, alpha=0.6, ecolor='black', capsize=5, color='red')
+        a2=plt.barh(docker_col, value_col_max, alpha=0.6, ecolor='black', capsize=5, color='red')
         a=plt.barh(docker_col, value_col, xerr=value_col_t_mean, alpha=0.6, ecolor='black', capsize=5, color='blue')
 
         # for rect in a.patches:
@@ -499,10 +776,11 @@ if DOCKER_MEM_BAR:
 
 
         # plt.xticks(rotation=-90)
-        plt.title("MEM -- {}".format(mem_title),fontsize=25)
-        plt.xlabel("MEM Mean (MiB)",fontsize=20)
-        plt.ylabel("Dockers",fontsize=20)
-        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.title("Pishahang - Memory Usage - 180 Instances (30 rpm)\n", fontsize=25)
+        # plt.title("MEM -- {}".format(mem_title),fontsize=25)
+        plt.xlabel("Memory Usage (MiB)",fontsize=20)
+        plt.ylabel("Docker Services",fontsize=20)
+        plt.legend((a2[2],a[2]),(header[0],header[1]),loc='lower right')
         plt.savefig('{}/{}-MEM.png'.format(_OUT_PATH, mem_title),bbox_inches='tight',dpi=100)
         plt.close()
 
@@ -1104,8 +1382,8 @@ if DOCKER_CASE_GROUPED:
                 data_dict[_image][_instances][_case]["mean"] = row['CPU Mean']
                 data_dict[_image][_instances][_case]["sd"] = row['CPU SD']
 
-        fig, axs = plt.subplots(IMAGES, figsize=(6, 8), sharex=True, sharey=True)
-        fig.suptitle('{} - Mean'.format(_title), fontsize=25)
+        fig, axs = plt.subplots(IMAGES, figsize=(6, 8), sharex=False, sharey=True)
+        fig.suptitle('{}\nCPU Usage - Different NS'.format(_title.split("-cpu")[0]), y=1.05, fontsize=25)
         _count = 0
 
         while(_count < IMAGES):
@@ -1123,7 +1401,7 @@ if DOCKER_CASE_GROUPED:
                     })
 
 
-                df = pd.DataFrame(data) 
+                df = pd.DataFrame(data)
                 df = df.sort_values('instance')
 
                 divisions = df['instance']
@@ -1147,23 +1425,25 @@ if DOCKER_CASE_GROUPED:
                 width = 0.30
                 
 
-                axs[_count].bar(index-width, cpu_case1_mean, width, yerr=case1_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'case1')
-                axs[_count].bar(index, cpu_case2_mean, width,yerr=case2_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'case2')
-                axs[_count].bar(index+width, cpu_case3_mean, width,yerr=case3_t_mean, alpha=0.6, ecolor='black', capsize=5, color='y', label = 'case3')
-                axs[_count].set_title(_image, fontsize=15)
-
+                axs[_count].bar(index-width, cpu_case1_mean, width, yerr=case1_t_mean, alpha=0.6, ecolor='black', capsize=5, color='b', label = 'NS 1 VNF')
+                axs[_count].bar(index, cpu_case2_mean, width,yerr=case2_t_mean, alpha=0.6, ecolor='black', capsize=5, color='r', label = 'NS 3 VNF')
+                axs[_count].bar(index+width, cpu_case3_mean, width,yerr=case3_t_mean, alpha=0.6, ecolor='black', capsize=5, color='y', label = 'NS 5 VNF')
+                axs[_count].set_title("{} Image (VNF)".format(_image), fontsize=15)
+                axs[_count].set_xticks(index+width/4)
+                axs[_count].set_xticklabels(divisions)
                 _count += 1
 
-        plt.xticks(index+width/2, divisions)
+        # plt.xticks(index+width/2, divisions)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.ylim([0, 50])
 
         fig.add_subplot(111, frameon=False)
         # hide tick and tick label of the big axes
         plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
         plt.grid(False)
 
-        plt.ylabel('CPU Mean (percentage)', fontsize=20)
-        plt.xlabel('Cases', fontsize=20)
+        plt.ylabel('CPU Usage (%)\n', fontsize=20)
+        plt.xlabel('# VNFs Instantiated', fontsize=20)
 
         plt.savefig('{}/{}-Mean-CPU-Cases.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
         plt.close()

@@ -183,7 +183,7 @@ def get_individual_times(individual_init_times, folder_path, init_time, _ns_list
             time.sleep(1)
 
         with open('./{nit}/individual-build-times.csv'.format(nit=nit), 'w') as _file:
-            _file.write("id, mano_time, ns_mano_time, vim_time\n")
+            _file.write("id,mano_time,ns_mano_time,vim_time\n")
             _id = 0
             for _s in _servers.items:
 
