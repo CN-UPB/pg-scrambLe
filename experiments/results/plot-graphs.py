@@ -39,8 +39,8 @@ SYSTEM_RAM_BAR = False
 ONE_ON_ONE_SYSTEM_BAR = False
 ONE_ON_ONE_OTHER_BAR = False
 
-TOP_LIFECYCLE_GRAPH = False
-TOP_SCALABILITY_LIFECYCLE_GRAPH = True
+TOP_LIFECYCLE_GRAPH = True
+TOP_SCALABILITY_LIFECYCLE_GRAPH = False
 
 SUCCESS_RATIO_LINE = False
 END_TO_END_TIME_BAR = False
@@ -52,14 +52,14 @@ MEM_MAX_SCALE = 2750
 LIMIT_DOCKERS_IN_GRAPH = -10
 
 _PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/graphs"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-3/graphs"
 _COMMON_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
 
 _OSM_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/osm"
 _PISHAHANG_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/pishahang"
 
-TOP_OSM_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/osm"
-TOP_PISHAHANG_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/pishahang"
+TOP_OSM_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-3/osm"
+TOP_PISHAHANG_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-3/pishahang"
 
 CHILD_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/child"
 PARENT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/parent"
@@ -1756,7 +1756,7 @@ if TOP_LIFECYCLE_GRAPH:
     osm_cpu_lifecycle_files = [y for x in os.walk(TOP_OSM_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
     pishahang_cpu_lifecycle_files = [y for x in os.walk(TOP_PISHAHANG_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
 
-    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    fig, axs = plt.subplots(3, figsize=(12, 10), sharex=True, sharey=True)
     _count = 0
 
     for _cpu_lifecycle_file in sorted(osm_cpu_lifecycle_files):
@@ -1777,7 +1777,7 @@ if TOP_LIFECYCLE_GRAPH:
         # plt.show()
 
         axs[_count].plot(df['time'], df['total_cpu'])
-        axs[_count].set_title(_docker, fontsize=15)
+        axs[_count].set_title(_docker, fontsize=25)
 
         # axs[0].set_xticks(index)
         axs[_count].set_ylim([0, 100])
@@ -1786,10 +1786,11 @@ if TOP_LIFECYCLE_GRAPH:
        
         _count += 1
 
-    fig.suptitle('OSM - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+    fig.suptitle('OSM - CPU Usage - Lifecycle Graphs Top 3\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
 
-    axs[4].get_xaxis().set_visible(True)
-    axs[4].set_xlabel('Time series', fontsize=20)
+    axs[2].get_xaxis().set_visible(True)
+    axs[2].set_xlabel('\nTime series', fontsize=20)
+    axs[2].tick_params(axis='x', labelsize=15)
 
     fig.add_subplot(111, frameon=False)
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
@@ -1799,7 +1800,7 @@ if TOP_LIFECYCLE_GRAPH:
     # plt.xlabel('Time', fontsize=20)
 
     plt.subplots_adjust(hspace=0.3)
-    plt.savefig('{}/OSM-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/OSM-TOP-3-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
     plt.close()
 
     # ######################################
@@ -1807,7 +1808,7 @@ if TOP_LIFECYCLE_GRAPH:
     # ######################################
 
 
-    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    fig, axs = plt.subplots(3, figsize=(12, 10), sharex=True, sharey=True)
     _count = 0
 
     for _cpu_lifecycle_file in sorted(pishahang_cpu_lifecycle_files):
@@ -1828,7 +1829,7 @@ if TOP_LIFECYCLE_GRAPH:
         # plt.show()
 
         axs[_count].plot(df['time'], df['total_cpu'])
-        axs[_count].set_title(_docker, fontsize=15)
+        axs[_count].set_title(_docker, fontsize=25)
 
         # axs[0].set_xticks(index)
         axs[_count].set_ylim([0, 100])
@@ -1837,10 +1838,11 @@ if TOP_LIFECYCLE_GRAPH:
        
         _count += 1
 
-    fig.suptitle('Pishahang - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+    fig.suptitle('Pishahang - CPU Usage - Lifecycle Graphs Top 3\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
 
-    axs[4].get_xaxis().set_visible(True)
-    axs[4].set_xlabel('Time series', fontsize=20)
+    axs[2].get_xaxis().set_visible(True)
+    axs[2].set_xlabel('\nTime series', fontsize=20)
+    axs[2].tick_params(axis='x', labelsize=15)
 
     fig.add_subplot(111, frameon=False)
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
@@ -1850,7 +1852,7 @@ if TOP_LIFECYCLE_GRAPH:
     # plt.xlabel('Time', fontsize=20)
 
     plt.subplots_adjust(hspace=0.3)
-    plt.savefig('{}/Pishahang-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/Pishahang-TOP-3-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
     plt.close()
 
 
@@ -1862,7 +1864,7 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
     child_cpu_lifecycle_files = [y for x in os.walk(CHILD_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
     parent_cpu_lifecycle_files = [y for x in os.walk(PARENT_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
 
-    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    fig, axs = plt.subplots(3, figsize=(12, 10), sharex=True, sharey=True)
     _count = 0
 
     for _cpu_lifecycle_file in sorted(child_cpu_lifecycle_files):
@@ -1883,7 +1885,7 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
         # plt.show()
 
         axs[_count].plot(df['time'], df['total_cpu'])
-        axs[_count].set_title(_docker, fontsize=15)
+        axs[_count].set_title(_docker, fontsize=25)
 
         # axs[0].set_xticks(index)
         axs[_count].set_ylim([0, 100])
@@ -1892,10 +1894,12 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
        
         _count += 1
 
-    fig.suptitle('Child - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+    fig.suptitle('Child - CPU Usage - Lifecycle Graphs Top 3\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
 
-    axs[4].get_xaxis().set_visible(True)
-    axs[4].set_xlabel('Time series', fontsize=20)
+    axs[2].get_xaxis().set_visible(True)
+    axs[2].set_xlabel('\nTime series', fontsize=20)
+
+    axs[2].tick_params(axis='x', labelsize=15)
 
     fig.add_subplot(111, frameon=False)
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
@@ -1905,15 +1909,15 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
     # plt.xlabel('Time', fontsize=20)
 
     plt.subplots_adjust(hspace=0.3)
-    plt.savefig('{}/Child-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/Child-TOP-3-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
     plt.close()
 
     # ######################################
-    # For Pishahang 
+    # For Parent 
     # ######################################
 
 
-    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    fig, axs = plt.subplots(3, figsize=(12, 10), sharex=True, sharey=True)
     _count = 0
 
     for _cpu_lifecycle_file in sorted(parent_cpu_lifecycle_files):
@@ -1934,7 +1938,7 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
         # plt.show()
 
         axs[_count].plot(df['time'], df['total_cpu'])
-        axs[_count].set_title(_docker, fontsize=15)
+        axs[_count].set_title(_docker, fontsize=25)
 
         # axs[0].set_xticks(index)
         axs[_count].set_ylim([0, 100])
@@ -1943,11 +1947,13 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
        
         _count += 1
 
-    fig.suptitle('Parent - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+    fig.suptitle('Parent - CPU Usage - Lifecycle Graphs Top 3\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
 
-    axs[4].get_xaxis().set_visible(True)
-    axs[4].set_xlabel('Time series', fontsize=20)
+    axs[2].get_xaxis().set_visible(True)
+    axs[2].set_xlabel('\nTime series', fontsize=20)
 
+    axs[2].tick_params(axis='x', labelsize=15)
+    
     fig.add_subplot(111, frameon=False)
     plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     plt.grid(False)
@@ -1956,7 +1962,7 @@ if TOP_SCALABILITY_LIFECYCLE_GRAPH:
     # plt.xlabel('Time', fontsize=20)
 
     plt.subplots_adjust(hspace=0.3)
-    plt.savefig('{}/Parent-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.savefig('{}/Parent-TOP-3-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
     plt.close()
 
 

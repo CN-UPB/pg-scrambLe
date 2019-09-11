@@ -4,11 +4,11 @@ import json
 USERNAME = "admin"
 PASSWORD = "admin"
 
-DEL_NSD = False
-DEL_VNFD = False
-DEL_INSTANCES = False
+DEL_NSD = True
+DEL_VNFD = True
+DEL_INSTANCES = True
 
-HOST_URL = "vm-hadik3r-05.cs.uni-paderborn.de"
+HOST_URL = "manodemo3.cs.upb.de"
 
 osm_nsd = wrappers.OSMClient.Nsd(HOST_URL)
 osm_auth = wrappers.OSMClient.Auth(HOST_URL)
