@@ -36,8 +36,11 @@ SYSTEM_LOAD_BAR = False
 SYSTEM_RAM_BAR = False
 
 # one-on-one graphs
-ONE_ON_ONE_SYSTEM_BAR = True
-ONE_ON_ONE_OTHER_BAR = True
+ONE_ON_ONE_SYSTEM_BAR = False
+ONE_ON_ONE_OTHER_BAR = False
+
+TOP_LIFECYCLE_GRAPH = False
+TOP_SCALABILITY_LIFECYCLE_GRAPH = True
 
 SUCCESS_RATIO_LINE = False
 END_TO_END_TIME_BAR = False
@@ -49,13 +52,21 @@ MEM_MAX_SCALE = 2750
 LIMIT_DOCKERS_IN_GRAPH = -10
 
 _PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
-_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker/cases_system_graphs/graphs"
+_OUT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/graphs"
 _COMMON_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Comparison-VM-Docker"
+
+_OSM_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/osm"
+_PISHAHANG_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/pishahang"
+
+TOP_OSM_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/osm"
+TOP_PISHAHANG_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Lifecycle-Graphs-Top-5/pishahang"
+
+CHILD_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/child"
+PARENT_PATH = "/home/ashwin/Documents/MSc/pg-scramble/pg-scramble/experiments/results/Common Results/FinalDemo/Scalability-Evaluation/parent"
+
 
 _SUCCESS_RATIO_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
 _I_E2E_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
-_OSM_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/OSM Results/data_csv"
-_PISHAHANG_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/Common Results/data_csv/Pishahang Results/data_csv"
 _LIFECYCLE_PATH = "/home/bhargavi/Documents/PG-SCRAMBLE/pg-scrambLe/experiments/results/test"
 
 
@@ -1295,8 +1306,6 @@ if SYSTEM_RAM_BAR:
 # Success ratio Line Chart 
 ##############################################
 
-
-
 if SUCCESS_RATIO_LINE:
     for _success_ratio_file in success_ratio_file:
         print(Path(_success_ratio_file).parent.name)
@@ -1346,8 +1355,6 @@ if SUCCESS_RATIO_LINE:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 
         plt.savefig('{}/{}.png'.format(_OUT_PATH, _docker) ,bbox_inches='tight',dpi=100)
-
-
 
 ##############################################
 # Dockers grouped
@@ -1645,7 +1652,6 @@ if END_TO_END_TIME_BAR:
     plt.savefig('{}/{}-ubuntu-E2E.png'.format(_OUT_PATH, _title) ,bbox_inches='tight',dpi=100)
     plt.close()
 
-
 #########################################
 # Individual E2E
 #########################################
@@ -1691,7 +1697,6 @@ if I_END_TO_END_TIME_BAR:
 #########################################
 # Life cycle graphs
 #########################################
-
 
 if LIFECYCLE_GRAPH:
     for _cpu_lifecycle_file in cpu_lifecycle_file:
@@ -1743,6 +1748,216 @@ if LIFECYCLE_GRAPH:
 
         plt.savefig('{}/{}.png'.format(_OUT_PATH, _docker) ,bbox_inches='tight',dpi=100)
 
+#########################################
+# Top Life cycle graphs
+#########################################
+
+if TOP_LIFECYCLE_GRAPH:
+    osm_cpu_lifecycle_files = [y for x in os.walk(TOP_OSM_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
+    pishahang_cpu_lifecycle_files = [y for x in os.walk(TOP_PISHAHANG_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
+
+    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    _count = 0
+
+    for _cpu_lifecycle_file in sorted(osm_cpu_lifecycle_files):
+        _docker = Path(_cpu_lifecycle_file).name
+        _docker = _docker.split(".")[1]
+        print(_docker)
+
+        df = pd.read_csv(_cpu_lifecycle_file)
+        df['total_cpu'] =  df['user'] + df['system']
+
+        # df.plot()
+        # df['total_cpu'].plot()
+
+        df['time'] = pd.to_datetime(df['time'],format= '%Y-%m-%d %H:%M:%S' ).dt.time
+        df['total_cpu'] = df['total_cpu'].ewm(span =3).mean()
+        # df['total_cpu'].ewm(span =5).mean().plot()
+        # plt.plot(df['time'], df['total_cpu'])
+        # plt.show()
+
+        axs[_count].plot(df['time'], df['total_cpu'])
+        axs[_count].set_title(_docker, fontsize=15)
+
+        # axs[0].set_xticks(index)
+        axs[_count].set_ylim([0, 100])
+        axs[_count].get_xaxis().set_visible(False)
+        # axs[0].set_ylabel('CPU Usage (%)', fontsize=12)
+       
+        _count += 1
+
+    fig.suptitle('OSM - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+
+    axs[4].get_xaxis().set_visible(True)
+    axs[4].set_xlabel('Time series', fontsize=20)
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('Time', fontsize=20)
+
+    plt.subplots_adjust(hspace=0.3)
+    plt.savefig('{}/OSM-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+    # ######################################
+    # For Pishahang 
+    # ######################################
+
+
+    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    _count = 0
+
+    for _cpu_lifecycle_file in sorted(pishahang_cpu_lifecycle_files):
+        _docker = Path(_cpu_lifecycle_file).name
+        _docker = _docker.split(".")[1]
+        print(_docker)
+
+        df = pd.read_csv(_cpu_lifecycle_file)
+        df['total_cpu'] =  df['user'] + df['system']
+
+        # df.plot()
+        # df['total_cpu'].plot()
+
+        df['time'] = pd.to_datetime(df['time'],format= '%Y-%m-%d %H:%M:%S' ).dt.time
+        df['total_cpu'] = df['total_cpu'].ewm(span =3).mean()
+        # df['total_cpu'].ewm(span =5).mean().plot()
+        # plt.plot(df['time'], df['total_cpu'])
+        # plt.show()
+
+        axs[_count].plot(df['time'], df['total_cpu'])
+        axs[_count].set_title(_docker, fontsize=15)
+
+        # axs[0].set_xticks(index)
+        axs[_count].set_ylim([0, 100])
+        axs[_count].get_xaxis().set_visible(False)
+        # axs[0].set_ylabel('CPU Usage (%)', fontsize=12)
+       
+        _count += 1
+
+    fig.suptitle('Pishahang - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+
+    axs[4].get_xaxis().set_visible(True)
+    axs[4].set_xlabel('Time series', fontsize=20)
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('Time', fontsize=20)
+
+    plt.subplots_adjust(hspace=0.3)
+    plt.savefig('{}/Pishahang-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+
+#########################################
+# Scalability Life cycle graphs
+#########################################
+
+if TOP_SCALABILITY_LIFECYCLE_GRAPH:
+    child_cpu_lifecycle_files = [y for x in os.walk(CHILD_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
+    parent_cpu_lifecycle_files = [y for x in os.walk(PARENT_PATH) for y in glob(os.path.join(x[0], '*-cpu.csv'))]
+
+    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    _count = 0
+
+    for _cpu_lifecycle_file in sorted(child_cpu_lifecycle_files):
+        _docker = Path(_cpu_lifecycle_file).name
+        _docker = _docker.split(".")[1]
+        print(_docker)
+
+        df = pd.read_csv(_cpu_lifecycle_file)
+        df['total_cpu'] =  df['user'] + df['system']
+
+        # df.plot()
+        # df['total_cpu'].plot()
+
+        df['time'] = pd.to_datetime(df['time'],format= '%Y-%m-%d %H:%M:%S' ).dt.time
+        df['total_cpu'] = df['total_cpu'].ewm(span =3).mean()
+        # df['total_cpu'].ewm(span =5).mean().plot()
+        # plt.plot(df['time'], df['total_cpu'])
+        # plt.show()
+
+        axs[_count].plot(df['time'], df['total_cpu'])
+        axs[_count].set_title(_docker, fontsize=15)
+
+        # axs[0].set_xticks(index)
+        axs[_count].set_ylim([0, 100])
+        axs[_count].get_xaxis().set_visible(False)
+        # axs[0].set_ylabel('CPU Usage (%)', fontsize=12)
+       
+        _count += 1
+
+    fig.suptitle('Child - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+
+    axs[4].get_xaxis().set_visible(True)
+    axs[4].set_xlabel('Time series', fontsize=20)
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('Time', fontsize=20)
+
+    plt.subplots_adjust(hspace=0.3)
+    plt.savefig('{}/Child-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
+
+    # ######################################
+    # For Pishahang 
+    # ######################################
+
+
+    fig, axs = plt.subplots(5, figsize=(12, 10), sharex=True, sharey=True)
+    _count = 0
+
+    for _cpu_lifecycle_file in sorted(parent_cpu_lifecycle_files):
+        _docker = Path(_cpu_lifecycle_file).name
+        _docker = _docker.split(".")[1]
+        print(_docker)
+
+        df = pd.read_csv(_cpu_lifecycle_file)
+        df['total_cpu'] =  df['user'] + df['system']
+
+        # df.plot()
+        # df['total_cpu'].plot()
+
+        df['time'] = pd.to_datetime(df['time'],format= '%Y-%m-%d %H:%M:%S' ).dt.time
+        df['total_cpu'] = df['total_cpu'].ewm(span =3).mean()
+        # df['total_cpu'].ewm(span =5).mean().plot()
+        # plt.plot(df['time'], df['total_cpu'])
+        # plt.show()
+
+        axs[_count].plot(df['time'], df['total_cpu'])
+        axs[_count].set_title(_docker, fontsize=15)
+
+        # axs[0].set_xticks(index)
+        axs[_count].set_ylim([0, 100])
+        axs[_count].get_xaxis().set_visible(False)
+        # axs[0].set_ylabel('CPU Usage (%)', fontsize=12)
+       
+        _count += 1
+
+    fig.suptitle('Parent - CPU Usage - Lifecycle Graphs Top 5\n({} - {})'.format(df["time"].iloc[-1], df["time"].iloc[0]), y=1.01, fontsize=25)
+
+    axs[4].get_xaxis().set_visible(True)
+    axs[4].set_xlabel('Time series', fontsize=20)
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    plt.grid(False)
+
+    plt.ylabel('CPU Usage (%)\n', fontsize=20)
+    # plt.xlabel('Time', fontsize=20)
+
+    plt.subplots_adjust(hspace=0.3)
+    plt.savefig('{}/Parent-TOP-5-Lifecycle.png'.format(_OUT_PATH) ,bbox_inches='tight',dpi=100)
+    plt.close()
 
 
 
@@ -1751,7 +1966,9 @@ if LIFECYCLE_GRAPH:
 
 
 #########################################
+#########################################
 # END
+#########################################
 #########################################
 
 
