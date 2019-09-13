@@ -1,0 +1,129 @@
+\chapter{MANO Scalability}
+\label{ch:Scalability}
+
+\section{Introduction}
+
+
+Scalability in the recent times has become one of the most important factors of the cloud environment. In this paper we discuss scalability, provide an insight about the effects of scaling and investigate some scaling approaches that could be incorporated to scale NFV management and network orchestration (MANO) system.
+
+\subsection{Definition of scaling}
+`Scalability' is defined in different ways in various academic work. Some of the definitions are listed below.
+\begin{itemize}	 
+	
+	\item "The ability of a particular system to fit a problem as the scope of that problem increases (number of elements or objects, growing volumes of work and/or being susceptible to enlargement)." \cite{furht_handbook_2010}
+	
+	\item "Scalability of service is a desirable property of a service which provides an ability to handle growing amounts of service loads without suffering significant degradation in relevant quality attributes. The scalability enhanced by scalability assuring schemes such as adding various resources should be proportional to the cost to apply the schemes." \cite{lee_software_2010}
+	
+	\item "Scalability is the ability of an application to be scaled up to meet demand through replication and distribution of requests across a pool or farm of servers." \cite{chieu_scalability_2011}
+	
+	\item "A system is said to be scalable if it can handle the addition of users and resources without suffering a noticeable loss of performance or increase in administrative complexity" \cite{noauthor_scale_nodate}
+	
+\end{itemize}
+
+\subsection{Why does a MANO need scaling?}
+\paragraph{}
+In recent years, distributed systems have gained an increase in the number of users and resources. Scaling such a system is an important aspect when large user requests have to be served without compromising system performance or increase in administrative complexity. In terms of MANO, when there are a large number Network Service(NS) instantiation of various network functions, they need to be instantiated considering all the relevant metrics of the system.
+
+\paragraph{System load:}
+In a distributed system, the system load is the large amount of data that is to be managed by network services increasing the total number of requests for service.
+The load on a MANO can be defined in terms of it's load on NFV Orchestrator (NFVO) to process large number of tasks like on-boarding, instantiation and monitoring of VNFs. The NFVO of a MANO receives monitoring information which also increases the load on NFVO triggering it to scale the network service across multiple MANOs in a distributed system \cite{soenen2017optimising}.
+
+
+\subsection{Metrics to assess a scalable system}
+\label{Metrics}
+In this section, a few metrics that are important in terms of a MANO server are introduced.
+
+\begin{itemize}
+	\item \textbf{Speedup} Speedup measures how the  rate of doing work increases with the number of processors, compared to one processor, and has an ideal linear speedup value. \cite{jogalekar_evaluating_2000}
+	\item  \textbf{Response time}: Service response time of a MANO is a time period from when a service invocation message is arrived to a MANO on the provider side to when a response for the invocation is returned to the service consumer.
+	\item \textbf {Throughput}: It is a metric which measures the efficiency of a MANO to handle service invocations within a given time.
+	\item \textbf{Cost}: High scalability under high service loads is an expensive affair. There is always some additional cost involved in planning a scalability strategy.
+	\item \textbf{Performance}: MANO should be able to handle the growing amount of service loads. Scalability should take into account MANOs' ability to manage high service loads without deteriorating Qos.
+	\item \textbf{Fault tolerance}: This refers to the ability of a MANO to continue operating without interruption when it's components fail
+\end{itemize}
+
+
+\paragraph{Lifecycle Management \& service provisioning:} To provision a network service, the NFVO of a MANO's functionality include instantiation, global resource management scaling in/out , event correlation and termination of services. These functionalities form the lifecycle of NS. With the increase in instantiation of NS over a distributed network, the lifecycle management of each service is a overhead, hence increasing the provision time. This can be better handled when the MANO can be scaled out. To manage services with a closer proximity of geographical region, MANOs could be scaled in.
+
+\section{Effects of scaling}
+
+Scaling affects the system properties in many ways, this chapter discusses some of the effects of scaling.
+
+\subsection{Availability}
+Availability describes how often a service can be used over a defined period of time. Scalability approaches such as service replication increases the availability of a system.
+
+\paragraph{How to estimate the availability of a system?}
+
+Most service outages are the result of misbehaving equipment. These outages can be prolonged by misdiagnosis of the problem and other mistakes in responding to the outage in question. Determining expected availability as stated in \cite{reese_cloud_nodate} involves two variables:
+
+\begin{enumerate}
+	
+	
+	\item  The likelihood that one will encounter a failure in the system during the measurement period.
+	
+	\item  How much downtime is expected in the event the system fails.The mathematical formulation of the availability of a component is: 
+\end{enumerate}
+\begin{equation}
+a = (p - (c*d))/p
+\end{equation}
+where a = expected availability\\
+c = the \% of likelihood that there is a server loss in a given period\\
+d = expected downtime from the loss of the server\\
+p = the measurement period\\
+
+\subsection{Reliability}
+
+Reliability is often related to availability, but it’s a slightly different concept. Specifically,reliability refers to how well one can trust a system to protect data integrity and execute its transactions \cite{reese_cloud_nodate}.
+
+The cloud presents a few issues outside the scope of the application code that can impact a system’s reliability. Within the cloud, the most significant of these issues is how persistent data is managed. In particular, any time one loses a server, loss or corruption of data becomes a concern.
+
+\subsection{Heterogeneity}
+\paragraph{}Heterogeneity refers to the state of being diverse. The scaling in a distributed system is also affected by the heterogeneity of systems involved. The administrative dimension of the scaling constitutes to the problem regarding heterogeneity focusing of both hardware and also software required, to deliver the services efficiently. One of the solutions to such a problem is coherence. In a coherence system, the different administrative systems have a common interface \cite{ord1994scale}.
+
+
+
+\paragraph{Administration in a MANO framework:}
+The administrative domain in an NFV architectural framework is majorly divided into Infrastructure domain and Tenant domain. Infrastructure domains are defined based on the criteria like type of resource such as networking, compute and storage in traditional data center environments, by geographical locations or by organization The tenant domains are defined based on the criteria like by the type of network service, etc. In a MANO, multiple infrastructure domains may co-exist, providing infrastructure to a single or multiple tenant domain. The VNFs and Network Services reside in the tenant domain which consumes resources from one or more infrastructure domains \cite{peinetwork}.
+
+\paragraph{Multi-MANO interworking:}
+To achieve a better provisioning of network services in a multiple MANO system, two or more Service Platforms (SPs) cooperate or one orchestrator leverages on the NFV interface on the other orchestrator to instantiate functions, services. The infrastructure domain of a MANO is segmented to accommodate the demands of separate organization hence deploying a hierarchy of service platforms that need to collaborate in order to deploy NFV end-to-end services. The interaction between the two MANOs is achieved by mapping the services and infrastructure domains of the MANO. 
+
+\paragraph{}In a hierarchical placement of the two MANO service platforms, it either supports complete outsourcing of a network service for deployment in a lower service platform or split the service deployment across two MANO SPs. Hence, the NFVO of the upper MANO constitutes a resource orchestrator (RO) along with network service orchestrator (NSO) to facilitate the services.
+
+
+
+\paragraph{}According to \cite{de2018network}, for a network service to support across multiple administrative domains, they require coordination and synchronization between multiple involved infrastructure domains which are performed by one or more orchestrators. The ETSI approaches for multiple administrative domains are depicted in the figure below.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\linewidth]{"figures/ETSI approaches"}
+	\caption{ETSI approaches for multiple administrative domains. Adapted from \cite{de2018network}}
+	\label{fig:etsi-approaches}
+\end{figure}
+
+
+\paragraph{}In the above figure 3.1, (a) refers to a approach in which the orchestrator is split into two components (NSO and RO), (b) refers to a approach with multiple orchestrators and a new reference point: Umbrella NFVO and (c) refers to a approach that introduces hierarchy and the new reference point Or-Or.
+
+\section{Hierarchical Orchestration}
+
+
+
+\section{Experiments}
+
+\subsection{Idea}  
+\subsection{Testbest setip and technologies used}
+\subsection{What results are recorded} 
+\subsection{Scaling plugin implementation}   
+\subsection{Parameters and KPIs} 
+\subsection{Steps for the automated experiment run} 
+\subsection{Initial Results} 
+\subsection{Benchmarking Suite} 
+\subsection{Final experimental results} 
+\subsection{Analysis of all graphs and MANOs} 
+\subsection{Load districbution with scaling plugin} 
+\subsection{Summary of issues of the experiment} 
+\subsection{Inference/ Results from the experiment} 
+\subsection{Future scope for scalability} 
+      
+    
+  
