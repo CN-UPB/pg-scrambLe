@@ -60,35 +60,5 @@ Once the Splitting is done, create file is responsible for creating YAML files d
 \subsection{challenges}
 \subsection{Future scope of this work package}
 
-\section{Adaptor}
-Python MANO Wrappers (PMW) is a uniform python wrapper library for various implementations of NFV Management and Network Orchestration (MANO) REST APIs. PMW is intended to ease the communication between python and MANO by providing a unified, convenient and standards oriented access to MANO API.
-
-To achieve this, PMW follows the conventions from the ETSI GS NFV-SOL 005 (SOL005) RESTful protocols specification. This makes it easy to follow and the developers can use similar processes when communicating with a variety of MANO implementations.\\
-
-PMW is easy to use and well documented. Code usage examples are available along with the detailed documentation at the following link \url{https://python-mano-wrappers.readthedocs.io/en/adaptor/}. \\
-
-PMW in scramble helps in inter communication of different instances of MANO, thereby creating opportunity for more advanced feature set, for example, hierarchical scaling. Operations such as on-boarding of NSD and VNFD, instantiation and termination of NS can be performed with ease.
-
-\subsection{Architecture \& Work flow}
-Standards based approach is a fundamental design principle behind PMW's design. A Common interface template is defined in compliance with SOL005 which contains the blueprint for all the methods mentioned in the standards. These methods are divided into different sections as per SOL005 into the following:
-
-\begin{itemize}
-	\item \textbf{auth: }Authorization API
-	\item \textbf{nsd: }NSD Management API
-	\item \textbf{nsfm: }NS Fault Management API
-	\item \textbf{nslcm: }Lifecycle Management API
-	\item \textbf{nspm: }NS Performance Management API
-	\item \textbf{vnfpkgm: }VNF Package Management API
-\end{itemize} 
-
-In the figure \ref{fig:wrapperarch}, different sections of PMW are visualized. As part of the scramble project, support for Open Source MANO (OSM) and Sonata is developed. This is represented by the dotted lines to OSM and Sonata modules. These modules are based on the common interface and implement the methods it has defined.
-
-\subsection{usage}
-
-+ code snippets and explanations
-
-
-\subsection{Installation}
-\subsection{challenges}
-\subsection{Future scope of this work package}
+\include{adaptor-arch}
 
