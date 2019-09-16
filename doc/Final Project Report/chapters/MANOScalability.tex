@@ -55,15 +55,63 @@ The load on a MANO can be defined in terms of it's load on NFV Orchestrator (NFV
 \todo[inline]{OSM Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}
 
 \subsubsection{CPU}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/osm/cirros_case1_180-CPU}
+	\caption{OSM CPU}
+	\label{fig:cirroscase1180-cpu}
+\end{figure}
+
 \subsubsection{Memory}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/osm/cirros_case1_180-MEM}
+	\caption{OSM MEM}
+	\label{fig:cirroscase1180-mem}
+\end{figure}
+
 \subsubsection{Lifecycle}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Lifecycle-Graphs-Top-3/OSM-TOP-3-Lifecycle}
+	\caption{OSM LS}
+	\label{fig:osm-top-3-lifecycle}
+\end{figure}
+
 
 \subsection{Pishahang Results}
 \todo[inline]{Pishahang Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}
 
 \subsubsection{CPU}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-CPU}
+	\caption{Pishahang CPU}
+	\label{fig:cirroscase1180-cpu}
+\end{figure}
+
 \subsubsection{Memory}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-MEM}
+	\caption{Pishahang MEM}
+	\label{fig:cirroscase1180-mem}
+\end{figure}
+
+
 \subsubsection{Lifecycle}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Lifecycle-Graphs-Top-3/Pishahang-TOP-3-Lifecycle}
+	\caption{Pish LS}
+	\label{fig:pishahang-top-3-lifecycle}
+\end{figure}
 
 \subsection{Summary of issues of the experiment}
 \todo[inline]{Blockers: VIM support issues, openstack not stable, k8 not supported in OSM. Why 180. RPM issues}
@@ -89,7 +137,58 @@ The load on a MANO can be defined in terms of it's load on NFV Orchestrator (NFV
 \todo[inline]{Explain results acquired from MANO benchmarking tool}
 
 \subsubsection{Comparison of different network services} 
+
+Comparison of different network services
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Docker-Grouped-Cases/osm/osm_lcm-Mean-CPU-Cases}
+	\caption{}
+	\label{fig:osmlcm-mean-cpu-cases}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Docker-Grouped-Cases/osm/osm_ro-Mean-CPU-Cases}
+	\caption{}
+	\label{fig:osmro-mean-cpu-cases}
+\end{figure}
+
+
 \subsubsection{Container vs VM Orchestration} 
+
+Container vs VM Orchestration
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Comparison-VM-Docker/System_metrics_comparison}
+	\caption{}
+	\label{fig:systemmetricscomparison}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Comparison-VM-Docker/Time_comparison}
+	\caption{}
+	\label{fig:timecomparison}
+\end{figure}
+
+
 \subsubsection{Scaling Plugin Evaluation}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Child-TOP-3-Lifecycle}
+	\caption{Child scaling}
+	\label{fig:child-top-3-lifecycle}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Parent-TOP-3-Lifecycle}
+	\caption{Parent Scaling}
+	\label{fig:parent-top-3-lifecycle}
+\end{figure}
+
 
 \subsection{Future scope}
