@@ -1,14 +1,13 @@
 \contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Add content}{25}{section*.14}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ In this section, only talk about the 180 experiment that gave te horizontal graphs}{26}{section*.15}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Here, talk about the idea behind running the experiment and getting to know the docker containers that took the most resources}{26}{section*.16}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain about the machine configuration used to run the experiments, what OS, how many servers and what VIMs where installed, what is the configuration and how python-mano-wrappers were used to send the requests. }{26}{section*.17}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Basically explain the whole experiment setup that was used to conduct the experiment.}{26}{section*.18}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ OSM Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}{27}{section*.19}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Pishahang Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}{28}{section*.23}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Blockers: VIM support issues, openstack not stable, k8 not supported in OSM. Why 180. RPM issues}{28}{section*.27}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ about identifying the top dockers, some more info about the lifecycle graphs}{28}{section*.28}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ High level explanation}{29}{section*.29}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain tools and other techs used}{29}{section*.30}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain the variable parameters and possible KPIs from the experiments}{29}{section*.31}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ A walkthrough of the experiment runner}{30}{section*.32}
-\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain results acquired from MANO benchmarking tool}{30}{section*.33}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ In this section, only talk about the 180 experiment that gave te horizontal graphs}{28}{section*.15}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Here, talk about the idea behind running the experiment and getting to know the docker containers that took the most resources}{28}{section*.16}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain about the machine configuration used to run the experiments, what OS, how many servers and what VIMs where installed, what is the configuration and how python-mano-wrappers were used to send the requests. }{28}{section*.17}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Basically explain the whole experiment setup that was used to conduct the experiment.}{28}{section*.18}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ OSM Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}{29}{section*.19}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Pishahang Just like you did in the presentation, explain the functionalities of the top 5 dockers and why they are taking}{31}{section*.23}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Blockers: VIM support issues, openstack not stable, k8 not supported in OSM. Why 180. RPM issues}{33}{section*.27}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ about identifying the top dockers, some more info about the lifecycle graphs}{33}{section*.28}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain tools and other techs used}{34}{section*.29}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain the variable parameters and possible KPIs from the experiments}{34}{section*.30}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ A walkthrough of the experiment runner}{34}{section*.31}
+\contentsline {todo}{\color@fb@x {}{black}{}{orange}{\leavevmode {\color {orange}o}}\ Explain results acquired from MANO benchmarking tool}{34}{section*.32}
