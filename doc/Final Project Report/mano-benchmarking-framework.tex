@@ -14,14 +14,40 @@ MBF is designed for ease of use and low barrier to entry for developers. We expl
 	\item{\textbf{python-mano-wrappers}} is used to provide access to REST APIs of MANOs from python.
 	\item{\textbf{Docker}} is used to containerize MBF, thus making it easy to distribute and portable.
 	\item{\textbf{Matplotlib}} is the graphing library for MBF due to its flexibility and ease of use.
-	\item{\textbf{Flask}} as a small python server that can be used to provide additional interactions with the experiment runner.
+	\item{\textbf{Flask}} as a python server that can be used to provide additional interactions with the experiment runner.
 
 \end{itemize}
 
- 
 
 \subsection{Parameters and KPIs} 
-\todo[inline]{Explain the variable parameters and possible KPIs from the experiments}
+
+\subsubsection{Parameters}
+
+MBF has experiment parameters that can be altered. The following paramenters are supported
+
+\begin{itemize}
+	\item{\textbf{Descriptors}} NSDs and VNFDs can be changed. a list of NSDs/VNFDs is also supported. When a list of descriptors are provided, the experiment will be run for each of the descriptors.
+	\item{\textbf{Number of instances}} Total number of instantiation requests to be sent to the MANO.
+	\item{\textbf{Number of runs}} number of re-runs of the same experiment to be run. This is performed to measure the variance in results.
+	\item{\textbf{Requests per minute (RPM)}} The rate at which the instantiation requests are sent to the MANO
+	\item{\textbf{Observation Time}} The observation time after the instantiation requests are sent. This can be used to collect metrics post instantiation to observe how MANO behaves in the monitoring phase.
+	\item{\textbf{Inter-experiment Delay}} is the time between experiment runs. This is altered to give enough time for the VIM to terminate and cleanup instances from the previous experiment runs if any.
+	\item{\textbf{Skip experiment on error}} if set to true, the current run is skipped due to a failed instance on the VIM.
+
+\end{itemize}
+
+\subsection{Key Performance Indicators}
+
+MBF stores resource utilization metrics during the experiment and generates graphs to visualize the results. However, these are only examples and the further possibilities are supported by the framework. The metrics are stored as CSV files.
+
+\begin{itemize}
+	\item{\textbf{CPU}} Overall system CPU usage is recorded as well as the individual docker micro service CPU usage metrics are stored.
+	\item{\textbf{Memory}} Overall system memory usage along with the individual docker micro service memory usage is stored.
+	\item{\textbf{System Load}} The 1m, 5m and 15m moving averages of system load values provided by the linux kernel is stored.
+	\item{\textbf{Status Tracking}} The status of all instances are stored by polling the VIM every 5 seconds over the experiment lifetime. This enables to track the status change over time.
+	\item{\textbf{End-to-end Deployment Time}} is the time elapsed to deploy all the instances on the VIM.
+	\item{\textbf{Individual Deployment Time}} is the time taken by each instance for deployment. This is also split into time taken by MANO and VIM.
+\end{itemize}
 
 \subsection{Steps for the automated experiment run} 
 \todo[inline]{A walkthrough of the experiment runner}
