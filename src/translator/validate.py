@@ -404,14 +404,6 @@ class validator():
 
             return backtrace
 
-    """
-    Tests the format of OSM VNFD and NSD descriptors
-    """
-    __author__ = "Alfonso Tierno, Guillermo Calvino"
-    __date__ = "2018-04-16"
-    __version__ = "0.0.1"
-    version_date = "Apr 2018"
-
 
     def remove_prefix(self,desc, prefix):
         """
