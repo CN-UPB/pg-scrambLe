@@ -47,10 +47,10 @@ USERNAME = "sonata"
 PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
 
-IMAGES = ["cirros"]
+IMAGES = ["cirros", "ubuntu"]
 INSTANCES = [90]
 CASES = [1]
-RUNS = 4
+RUNS = 3
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
 

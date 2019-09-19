@@ -48,7 +48,7 @@ PASSWORD = "1234"
 HOST_URL = "sonatamano.cs.upb.de"
 HOST_URL_2 = "serverdemo1.cs.upb.de"
 
-IMAGES = ["cirros"]
+IMAGES = ["cirros", "ubuntu"]
 INSTANCES = [90]
 CASES = [1]
 RUNS = 3

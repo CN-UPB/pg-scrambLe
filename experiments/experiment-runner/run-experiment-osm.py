@@ -28,7 +28,7 @@ DOCKER_EXCLUDE = ['experiment-runner']
 
 IDLE_SLEEP = 1
 NS_TERMINATION_SLEEP = 30
-REQUESTS_PER_MINUTE = 60
+REQUESTS_PER_MINUTE = 30
 INTER_EXPERIMENT_SLEEP = 300
 # NO_INSTANCES = 1
 
@@ -37,15 +37,15 @@ PASSWORD = "admin"
 HOST_URL = "osmmano.cs.upb.de"
 VIMACCOUNTID = "a94aa0af-e03b-4a8c-8208-a6fb5cc223ea"
 
-AUTH_URL = "http://131.234.29.168/identity/v3"
+AUTH_URL = "http://127.0.0.1/identity/v3"
 OS_USERNAME = "demo"
 OS_PASSWORD = "123"
 OS_PROJECT = "demo"
 
 IMAGES = ["cirros", "ubuntu"]
-INSTANCES = [15, 90, 180]
-CASES = [1, 2, 3]
-RUNS = 5
+INSTANCES = [90]
+CASES = [1]
+RUNS = 3
 
 IS_EXPERIMENT_VNF_INSTANCES_BASED = True
 SKIP_EXPERIMENT_IF_ERRORS = True
