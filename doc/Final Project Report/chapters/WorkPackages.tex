@@ -195,9 +195,14 @@ Translator engine currently doesnot support the following:
 \subsection{Future scope of this work package}
 
 \section{Splitter}
-Communication between MANO frameworks and Scramble happens through plug-ins. Plug-ins will have some random logic to generate a multiple set of Network Functions into which a Network Service needs to be divided. The multiple set of NFs is then forwarded to Gateway micro-service along with the NS file which just receives the request and forward it to the Main-Engine. The Main Engine acts as an interface to all three utilities including Splitter. Main engine is responsible for interoperability and communication between all utilities. All three utilities are containerized using docker for easy distribution and scaling. Once the Splitter receives the request for splitting along with the parameters it splits the NSD into sub NSDs.
+Splitter helps in splitting a Network Service (NS) into multiple sub Network services which can be deployed and instantiated individually on Internet Service Providers (ISPs) located over a vast geographical region spanning multiple domains and are orchestrated by different MANO frameworks. Splitter calls Service Descriptor Transltor if there is a need to translate the NS if it is to be deployed on a different MANO framework.
+
+In this work package, a Service Descriptor Splitter (SDS) is implemented which splits the NSD of a network service. SDS takes
+NSD as an input that contains all the information elements which can be extracted to generate separate NSDs. In the proposed approach, the service graph is extracted from the input NSD
+and is split into subgraphs that result in a separate NSD which includes a set of elements such as VNFs, Virtual Links (VLs), forwarding graphs of VNFs etc, according to the specific MANO
+framework.
 \subsection{Architecture \& Work flow}
-Before actual splitting of NSD, Splitter first validates if the the multiple set it received is valid or not. Following things are validated by the splitter.
+Service Descriptor Splitter consists of following functional items which 
 \begin{itemize}
 	\item The total number of NFs mentioned in all the set matches the number of NFs defined in the NSD.
 	\item There are no invalid NFs in the sets received.
@@ -220,12 +225,81 @@ Once the Splitting is done, create file is responsible for creating YAML files d
 	\caption{Scramble Architecture}
 	\label{fig:splitter}
 \end{figure}
-\subsection{usage}
 
-+ code snippets and explanations
 
-\subsection{challenges}
-\subsection{Future scope of this work package}
+\subsection{Usage}
+
+SDS is implemented as a micro-service which can be used independently from Translator or Wrapper by making a post call to the SDS. Following code snippet describes how to call SDS using POST call.
+
+\begin{lstlisting}[caption=POST call to SDS, label=lis:postSDS]
+
+splitter_url=http://$HOST:8003/Main_splitter/split
+
+# Body: descriptor contains NSD, vnfid_set contains set of VNF ids
+nsd = { 'descriptor' : descriptor, 'sets': vnfid_set}
+
+LOG.info("Calling Scramble Splitter..." )
+response  = requests.post(splitter_url,
+                          data=json.dumps(nsd_to_split))
+
+print(response)
+
+\end{lstlisting}
+
+Following are some of the important functions which helps SDS in splitting the NSD with respective code snippet.
+
+\subsubsection{Basic Python classes for NSD Schema}
+\subsubsection{Splitting} "splitsonata" calls the splitting function one by one to split the list of objects created out of NSD. Following code snippet shows the sequence of function calls.
+
+\begin{lstlisting}[caption=Sequence of function calls, label=lis:functioncalls]
+
+    def split_sonata(self):
+        if self.validate() is not False:
+            self.create_new_function_sets()
+            self.set_connection_point_refs_for_virtual_functions()
+            self.split_network_function()
+            self.set_connection_points()
+            self.split_virtual_links()
+            self.split_forwarding_path()
+            self.set_general_information()
+            return self.create_files()
+        else:
+            print("Validation Failed!!")
+
+\end{lstlisting}
+
+\subsubsection{Validate} Validate method validates the request coming from the MANOs. For example, if MANO is requesting a NSD to be split into three parts but the original NSD contains just two VNFs then the SDS will throw validation error.
+
+\begin{lstlisting}[caption=Splitting Request Validation, label=lis:validation]
+
+    def validate(self):
+        size = 0
+        list_network_function = []
+        for network_function_set in self.network_function_sets:
+            size = size + len(network_function_set)
+            for network_function in network_function_set:
+                list_network_function.append(network_function)
+
+        if size != len(self.utilityFunctions.list_nf):
+            return False
+        if len(list_network_function) != len(set(list_network_function)):
+            return False
+
+\end{lstlisting}
+
+\subsubsection{Split Network Functions}
+\todo[inline]{Content to be added}
+\subsubsection{Split Forwarding Graph}
+
+\todo[inline]{Content to be added}
+\subsection{Challenges}
+The NSD schema of Pishahang and OSM contains a lot of elements. However the challenge we faced was choosing which elements to include for splitting. We tackled it by including mandatory elements and few optional elements from the schema which were present in the input NSD.
+\subsection{Future scope of Service Descriptor Splitter}
+SDS can currently split NSD of Pishahang and OSM. SDS is built in such a way that it can be implemented for MANO frameworks as well. To implement SDS for a new MANO framework one can refer the implementation of either Pishahang or OSM. First step would be to create basic python classes from the NSD schema of the MANO framework then writing the utility functions to pull the information from the NSD file and store it in the objects of the basic python classes. Lastly writing splitting functions to actually split the list of objects in two or more parts.
+
+Also, the current implementation considers all mandatory elements and a few optional elements from a NSD schema for splitting which can be extended to include other fields (Provided they are present in the input NSD for splitting).
+
+Current implementation of SDS can split a forwarding graph of a NSD (Pishahang) with just three VNFs. Splitting of a forwarding graph is implemented by keeping future implementation for more than three VNFs in mind (Refer Splitting of Forwarding graph section)
 
 \include{adaptor-arch}
 
