@@ -178,6 +178,8 @@ def toOsm(received_file):
 
 \subsubsection{validator}
 
+The validator validates the descriptors presented for translation. It differentiates between OSM, Pishahang and Sonata descriptors and also between NSD's and VNFD's. The sonata descriptor validation is mainly based on schema, implemented using python library jsonschema.draft4validator, this library helps by proving the complete path of the error which comes very handy while debugging. The Validation for OSM is slightly complex than that compared to sonata validator, OSM validator can be divided into two parts. the first part validates the descriptors using schema with the same setup as that of sonata and the second part uses python object class for validation, this is done to replicate the validation method used by OSM hence to make sure that any descriptor that is validated by translator will be accepted by OSM.
+
 \subsection{challenges}
 
 \subsection{Future scope of this work package}
