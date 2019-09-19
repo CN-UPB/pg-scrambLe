@@ -21,8 +21,173 @@ Scramble plug-in installed within the parent MANO forwards the network descripto
 
 \subsection{Architecture \& Work flow}
 \subsection{usage}
+The Translator engine consists of the following modules:
+\begin{enumerate}
+	\item descriptorReader
+	\item descriptorWriter
+	\item utilities
+	\item translator
+	\item validator
+	
+\end{enumerate}
 
-+ code snippets and explanations
+\subsubsection{descriptorReader}
+
+This module is responsible to read a json/dictionary input (NSD/VNFD) and iterate over the keys and return a generator of an object to the calling program. This generator can be transformed to any python data structure for ease of use and navigation. 
+
+The input to this module is a json or dictionary object.
+
+\begin{lstlisting}[language=Python]
+from descriptorReader import read_dict
+
+pishahang = pishahang_descriptor ## the descriptor as a json or dict object
+
+### reading a dict/ json content into a pandas dataframe
+reader = read_dict()
+
+pishahang_dataset = pd.DataFrame(
+reader.dict_parser(pishahang,'root', 1, '0|preroot|0'), 
+columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
+
+
+pishahang_dataset.sort_values(ascending=True, by=['level', 'parent_key'],inplace=True)
+pishahang_dataset.fillna('NULL', inplace=True)
+pishahang_dataset.reset_index(drop=True,inplace=True)
+
+\end{lstlisting}
+\subsubsection{descriptorWriter}
+
+This module is responsible to read a python pandas Dataframe input and output a nested json/dictionary maintaining the nested structure in the dictionary.
+
+\begin{lstlisting}[language=Python]
+from descriptorWriter import write_dict
+
+### writing from a pandas dataframe to a dict/json object
+writer = write_dict()
+pishahang_descriptor = writer.translate(pishahang_dataset.sort_values(by='lineage'))
+
+\end{lstlisting}
+
+\subsubsection{utilities}
+
+This module is responsible for transforming the keys and map the corresponding values between sonata and osm descriptors. The module includes the 4 functions for translating between sonata and OSM descriptors. 
+\begin{enumerate}
+	\item translate\_to\_osm\_nsd()
+	\item translate\_to\_osm\_vnfd()
+	\item translate\_to\_sonata\_nsd()
+	\item translate\_to\_sonata\_vnfd()
+\end{enumerate}
+
+\subsubsection{translator}
+
+This is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
+
+This following function translates OSM descriptor to sonata.
+\begin{lstlisting}[language=Python]
+import pymongo
+from validate import validator
+from utilities import setup
+
+def toSonata(received_file):
+
+	client = pymongo.MongoClient("mongodb://mongo:27017")
+	setup_obj = setup(client)
+	validate_obj = validator()
+	
+	if 'vnfd:vnfd-catalog' in received_file:
+	
+	## mongoDB document object to store the translated vnfd
+	doc = setup_obj.db_descriptors["translated_vnfd"]
+	
+	## getting a translated sonata vnfd
+	translated = setup_obj.translate_to_sonata_vnfd(received_file)
+	
+	## validating the translated descriptor which returns a "True"/ "False" string
+	check = validate_obj.sonata_vnfd_validate(translated)
+	
+	if check == "True":
+	## insert into mongoDB as a Document
+	temp = doc.insert_one(translated)
+	translated_ref = temp.inserted_id
+	
+	elif 'nsd:nsd-catalog' in received_file:
+	
+	## mongoDB document object to store the translated nsd
+	doc = setup_obj.db_descriptors["translated_nsd"]
+	
+	## getting a translated sonata nsd
+	translated = setup_obj.translate_to_sonata_nsd(received_file)
+	
+	## validating the translated descriptor which returns a "True"/ "False" string
+	check = validate_obj.sonata_nsd_validate(translated)
+	
+	if check == "True"
+	## insert into mongoDB as a Document
+	temp = doc.insert_one(translated)
+	translated_ref = temp.inserted_id
+	
+	return {"descriptor":translated ,"VALIDATE STATUS" :check}
+\end{lstlisting}
+
+The following function translates sonata descriptor to OSM.
+\begin{lstlisting}[language=Python]
+import pymongo
+from validate import validator
+from utilities import setup
+
+def toOsm(received_file):
+
+	client = pymongo.MongoClient("mongodb://mongo:27017")
+	setup_obj = setup(client)
+	validate_obj = validator()
+	
+	if 'network_functions' in received_file:
+	
+	## mongoDB document object to store the translated nsd
+	doc = setup_obj.db_descriptors["translated_nsd"]
+	
+	## getting a translated osm nsd
+	translated = setup_obj.translate_to_osm_nsd(received_file)
+	
+	## validating the translated descriptor which returns a "True"/ "False" string
+	check= validate_obj.osm_validator(translated)
+	
+	if check == "True":
+	## insert into mongoDB as a Document
+	temp = doc.insert_one(translated)
+	translated_ref = temp.inserted_id
+	
+	elif 'virtual_deployment_units' in received_file:
+	
+	## mongoDB document object to store the translated vnfd
+	doc = setup_obj.db_descriptors["translated_vnfd"]
+	
+	## getting a translated osm vnfd
+	translated = setup_obj.translate_to_osm_vnfd(received_file)
+	
+	## validating the translated vnfd which returns a "True"/ "False" string
+	check= validate_obj.osm_validator(translated)
+	
+	if check == "True":
+	## insert into mongoDB as a Document
+	temp = doc.insert_one(translated)
+	translated_ref = temp.inserted_id
+	
+	return {"descriptor":translated ,"VALIDATE STATUS" :check}
+\end{lstlisting}
+
+\subsubsection{validator}
+
+\subsection{challenges}
+
+\subsection{Future scope of this work package}
+
+Translator engine currently doesnot support the following:
+\begin{enumerate}
+	\item Forwarding Graph
+	\item Juju charms in OSM
+	\item Monitoring Parameters
+\end{enumerate}
 
 \subsection{challenges}
 \subsection{Future scope of this work package}
