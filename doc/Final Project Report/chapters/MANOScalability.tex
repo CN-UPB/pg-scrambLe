@@ -38,10 +38,8 @@ The load on a MANO can be defined in terms of it's load on NFV Orchestrator (NFV
 
 
 \section{Experiments}
-\todo[inline]{In this section, only talk about the 180 experiment that gave te horizontal graphs}
+One other task under the MANO scalability investigation was to observe the resource utilization in OSM and Pishahang. To do this we used our own python-mano wrappers to instantiate multiple requests at a time. The next step was to decide on the number of service requests to instantiate. We could simply instantiate any number (like 1,000 or 5000) of service requests but we had to make sure all those requests get successfully instantiated. For this, the infrastructure was the only crucial factor. We used a 16 core virtual machine for 
 
-\subsection{Idea}
-\todo[inline]{Here, talk about the idea behind running the experiment and getting to know the docker containers that took the most resources}
 
 \subsection{Testbed}
 \todo[inline]{Explain about the machine configuration used to run the experiments, what OS, how many servers and what VIMs where installed, what is the configuration and how python-mano-wrappers were used to send the requests. }
