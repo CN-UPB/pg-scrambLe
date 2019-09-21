@@ -13,7 +13,7 @@
 \DeclareOption{german}{\germantrue}
 
 \ProcessOptions
-\LoadClass[a4paper, 11pt, twoside, openany]{book}
+\LoadClass[a4paper, 11pt, oneside, openany]{book}
 \ifgerman
 	\RequirePackage[ngerman]{babel}
 \else
