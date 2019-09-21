@@ -15,12 +15,12 @@ Scramble plug-in installed within the parent MANO forwards the network descripto
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{"figures/Service Descriptor Translator"}
-	\caption{}
+	\caption{Transltor}
 	\label{fig:service-descriptor-translator}
 \end{figure}
 
 \subsection{Architecture \& Work flow}
-\subsection{usage}
+\subsection{Usage}
 The Translator engine consists of the following modules:
 \begin{enumerate}
 	\item descriptorReader
@@ -82,7 +82,7 @@ This module is responsible for transforming the keys and map the corresponding v
 
 This is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
 
-This following function translates OSM descriptor to sonata.
+This following function translates OSM descriptor to Pishahang.
 \begin{lstlisting}[language=Python]
 import pymongo
 from validate import validator
@@ -129,7 +129,9 @@ def toSonata(received_file):
 	return {"descriptor":translated ,"VALIDATE STATUS" :check}
 \end{lstlisting}
 
-The following function translates sonata descriptor to OSM.
+\pagebreak
+
+The following function translates Pishahang descriptor to OSM.
 \begin{lstlisting}[language=Python]
 import pymongo
 from validate import validator
@@ -180,7 +182,7 @@ def toOsm(received_file):
 
 The validator validates the descriptors presented for translation. It differentiates between OSM, Pishahang and Sonata descriptors and also between NSD's and VNFD's. The sonata descriptor validation is mainly based on schema, implemented using python library jsonschema.draft4validator, this library helps by proving the complete path of the error which comes very handy while debugging. The Validation for OSM is slightly complex than that compared to sonata validator, OSM validator can be divided into two parts. the first part validates the descriptors using schema with the same setup as that of sonata and the second part uses python object class for validation, this is done to replicate the validation method used by OSM hence to make sure that any descriptor that is validated by translator will be accepted by OSM.
 
-\subsection{challenges}
+\subsection{Challenges}
 
 \subsection{Future scope of this work package}
 
@@ -191,8 +193,8 @@ Translator engine currently doesnot support the following:
 	\item Monitoring Parameters
 \end{enumerate}
 
-\subsection{challenges}
-\subsection{Future scope of this work package}
+
+\newpage
 
 \section{Splitter}
 Splitter helps in splitting a Network Service (NS) into multiple sub Network services which can be deployed and instantiated individually on Internet Service Providers (ISPs) located over a vast geographical region spanning multiple domains and are orchestrated by different MANO frameworks. Splitter calls Service Descriptor Transltor if there is a need to translate the NS if it is to be deployed on a different MANO framework.
@@ -219,12 +221,6 @@ After validation the actual splitting starts. We have created classes for differ
 
 Once the Splitting is done, create file is responsible for creating YAML files depending on the number of sub NSDs created. These files are saved in the file system which can be downloaded or moved forward to the adopter for deployment purpose. Following figure \ref{fig:splitter} graphically represents the splitting architecture.
 
-\begin{figure} [h]
-	\centering
-	\includegraphics[width=0.5\linewidth]{figures/splitter}
-	\caption{Scramble Architecture}
-	\label{fig:splitter}
-\end{figure}
 
 
 \subsection{Usage}

@@ -4,14 +4,12 @@
 \label{manoframeworks}
 In this section, a few MANO frameworks and their NSD schemata are listed(list of a few parameters and their description). Among several frameworks, the plan is to select a few and set them up locally, deploy network services and support them in the project. This list is subjected to future additions or removals.
 
-\subsection{SONATA}
+\subsection{Pishahang}
 \label{SecSONATA}
-SONATA is one of the NSO research projects which targets two crucial technological challenges in the foreseeable future of 5G networks as follows\cite{SONATA}.
-\begin{itemize}
-    \item Flexible programmability
-    \item Deployment optimization of software networks for complex services /applications.
-\end{itemize}
-SONATA complies with the ETSI NFV-MANO reference architecture. Following tables lists the important parameters of NSD \cite{SONATASchemaDocumentation}.
+Pishahang is a framework consolidated from state-of-the-art NFV and Cloud management and orchestration tools and technologies. Pishahang is a framework for jointly managing and orchestrating virtual network functions and cloud-based microservices. 
+
+Pishahang deploys, manages and orchestrates complex services by consolidating and extending current Cloud and NFV tools and technologies \cite{kouchaksaraei2018pishahang}.
+
 \subsubsection{Network Service Descriptor Section}
     \begin{table}[h]
     \centering
@@ -31,9 +29,10 @@ SONATA complies with the ETSI NFV-MANO reference architecture. Following tables 
          Description & It's an optional parameter, provides an arbitrary description of the network service. \\
          \hline
     \end{tabular}
-    \caption{SONATA: Network Service Descriptor Section}
+    \caption{Pishahang: Network Service Descriptor Section}
     \label{tab:SONATA_general_section}
 \end{table}
+\pagebreak
 \subsubsection{Network Functions Section}
     \begin{table}[h]
     \centering
@@ -55,7 +54,7 @@ SONATA complies with the ETSI NFV-MANO reference architecture. Following tables 
          Vnf\_description & It's an optional parameter, a human-readable description of the VNF\\
          \hline
     \end{tabular}
-    \caption{SONATA: Network Functions Section}
+    \caption{Pishahang: Network Functions Section}
     \label{tab:SONATA_NF_section}
  \end{table}
 
@@ -89,8 +88,6 @@ OSM is an open source management and orchestration stack in compliant with ETSI 
  \end{table}
 
 
-
-\newpage
 \section{Virtualized Infrastructure Manager (VIM)}
 VIM is one of the three functional blocks specified in the Network Functions Virtualization Management and Orchestration (NFV-MANO) architecture. VIM is responsible for controlling and managing the NFV Infrastructure (NFVI), by provisioning and optimizing the allocation of physical resources to the virtual resources in the NFVI. Performance and error monitoring is also a key role of the VIM. Popular VIMs are discussed in the following sections.
 
