@@ -14,7 +14,7 @@ Scramble plug-in installed within the parent MANO forwards the network descripto
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\linewidth]{"figures/Service Descriptor Translator"}
+	\includegraphics[width=0.8\linewidth]{"figures/Translator"}
 	\caption{Transltor}
 	\label{fig:service-descriptor-translator}
 \end{figure}
@@ -193,6 +193,18 @@ Translator engine currently doesnot support the following:
 	\item Monitoring Parameters
 \end{enumerate}
 
+\subsubsection{Juju charms in OSM}
+MANOs provide programmable and flexible management and orchestration of VNFs. OSM provides this flexibility through juju charms and Pishahang provides this through SSM/FSM (a container based solution). Because of these technological differences, direct translation between juju charms in OSM, and SSM (Service Specific Manager) and FSM (Function Specific Manager) in Pishahang is not possible. 
+
+As an alternative, it is possible to add charms functionality to Pishahang so that a descriptor containing juju charms can be deployed in both Pishahang and OSM with direct translation. This can be achieved by adding or modifying below things in Pishahang.
+\begin{enumerate}
+	\item Modify packaging and unpackaging techniques in Pishahang to accept charm package along with descriptors
+	\item Add additional keys in descriptors to mention charm name, actions and vnf index similar to OSM
+	\item Update Pishahang installation code to install juju and charm programs and tools
+	\item Create an interface to execute actions on VNFs
+	\item Create new container or component to perform actions on specified VNFs
+	\item Manage removal or deletion of charms after life cycle of Network Service 
+\end{enumerate} 
 
 \newpage
 
