@@ -28,10 +28,13 @@ We explain the choice of tools that are used in MBF in the following list.
 
 \subsubsection{Parameters}
 
-MBF has experiment parameters that can be altered. The following paramenters are supported
+MBF has experiment parameters that can be altered. 
+The following paramenters are supported
 
 \begin{itemize}
-	\item{\textbf{Descriptors}} NSDs and VNFDs can be changed. a list of NSDs/VNFDs is also supported. When a list of descriptors are provided, the experiment will be run for each of the descriptors.
+	\item{\textbf{Descriptors}} NSDs and VNFDs can be changed. 
+	a list of NSDs/VNFDs is also supported. 
+	When a list of descriptors are provided, the experiment will be run for each of the descriptors.
 	\item{\textbf{Number of instances}} Total number of instantiation requests to be sent to the MANO.
 	\item{\textbf{Number of runs}} number of re-runs of the same experiment to be run. 
 	This is performed to measure the variance in results.
@@ -112,13 +115,14 @@ As an example, the figures \ref{fig:osmlcm-mean-cpu-cases} and \ref{fig:osmro-me
 	\label{fig:osmlcm-mean-cpu-cases}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.6\linewidth]{figures/scalability_graphs/Docker-Grouped-Cases/osm/osm_ro-Mean-CPU-Cases}
 	\caption{CPU usage of OSM microservice RO}
 	\label{fig:osmro-mean-cpu-cases}
 \end{figure}
 
+\pagebreak
 
 \subsubsection{Container vs VM Orchestration} 
 
@@ -145,27 +149,45 @@ The time taken to deploy similar VNFs is significantly less for containers, whic
 	\label{fig:systemmetricscomparison}
 \end{figure}
 
+\pagebreak
 
 \subsubsection{Scaling Plugin Evaluation}
 
-\todo[inline]{To be filled along with the scalability plugin docs}
+We utilized MBF to evaluate our Scaling Plugin discussed in the section \ref{scalingplugin}. 
+The Parent Pishahang instance is running the scaling plugin in debug mode, which can be used to mock system load values. 
+We added a REST call to the MBF flask server to mock the system load values in the scaling plugin.\\
 
-Child MANO lifecycle graph \ref{fig:child-top-3-lifecycle}. 
-Parent MANO lifecycle graph \ref{fig:parent-top-3-lifecycle}. 
+The experiment was designed to instantiate 90 instances of  cirros docker containers on Pishahang. 
+After sending 30 instantiation requests, the experiment script alters the \textit{5m} system load to greater than 0.7, which triggers Rule 1 from the SLP rule set \ref{list:splrules}. 
+Thus, creating a new child Pishahang instance. 
+However, in the debug mode, for the scope of this experiment, we had a child instance already instantiated from start.\\
 
-\begin{figure}[h]
+After instantiating 45 instances, the script mocks the \textit{15m} system load value to greater than 0.7, which triggers Rule 2 from the SLP rule set \ref{list:splrules}. 
+Thus, parent instance will now redirect any further service requests (i.e., 46th instantiation requests on-wards) to the child Pishahang instance.
+
+We use the overall lifecycle data collected by MBF to visualize the CPU usage over time of the top 3 microservices (based on CPU usage).\\
+
+The experiments ran from 11:17:02 to 11:28:23. 
+Initially the microservices on the parent instance took all the load, as it can be seen from the figure \ref{fig:parent-top-3-lifecycle}. 
+At about the half way mark, the requests are redirected to the child instance. 
+The load distributed to the child instance can be seen in the figure \ref{fig:child-top-3-lifecycle}. 
+
+
+\begin{figure}
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Child-TOP-3-Lifecycle}
-	\caption{Child scaling}
-	\label{fig:child-top-3-lifecycle}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Parent-TOP-3-Lifecycle}
-	\caption{Parent Scaling}
+	\includegraphics[width=0.65\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Parent-TOP-3-Lifecycle}
+	\caption{Parent MANO instance lifecycle graph}
 	\label{fig:parent-top-3-lifecycle}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.65\linewidth]{figures/scalability_graphs/Scalability-Evaluation/Child-TOP-3-Lifecycle}
+	\caption{Child MANO instance lifecycle graph}
+	\label{fig:child-top-3-lifecycle}
+\end{figure}
+
+
 
 \subsection{Future scope}
+\todo[inline]{TODO: scope of MBF}
