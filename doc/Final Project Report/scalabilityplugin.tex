@@ -67,7 +67,7 @@ We designed a basic function descriptor and service descriptor in the schema sup
 
 \subsubsection*{MANO Image}
 
-A Virtual Machine (VM) image with MANO pre-installed is used along with the service descriptors to spawn new instances of MANO. As a proof of concept, we have created images with OSM and pishahang. However, the pishahang image that was created was unstable and has unexpected behavior. These images are first created locally and later uploaded to the VIM where the instances will be created. In our tests we used OpenStack as our VIM.
+A Virtual Machine (VM) image with MANO pre-installed is used along with the service descriptors to spawn new instances of MANO. As a proof of concept, we have created images with OSM and pishahang. However, the pishahang image that was created was unstable and has unexpected behavior. These images are first created locally and later uploaded to the VIM where the instances will be created. In our tests we used OpenStack as the VIM.
 
 \begin{figure}[h]
 	\centering
@@ -79,6 +79,10 @@ A Virtual Machine (VM) image with MANO pre-installed is used along with the serv
 
 \subsection{Workflow}
 
+\subsubsection{SLM with SLP}
+
+The workflow of how the SLM and SLP interacts is shown in the figure \ref{fig:slpslmworkflow}. At first, an instantiation request comes into the parent mano instance and this is first seen at SLM. SLM will then request SLP for the current system load status. If the parent MANO is loaded, SLP will reply with the details of the child MANO instance, which will then be used by SLM to redirect the incoming request by on-boarding and instantiating the network service on the child instance. If the parent MANO is not loaded, then, SLM will continue its normal flow to deploy the network service
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.8\linewidth]{figures/SLPSLMWorkflow}
@@ -86,6 +90,9 @@ A Virtual Machine (VM) image with MANO pre-installed is used along with the serv
 	\label{fig:slpslmworkflow}
 \end{figure}
 
+\subsubsection{Scaling Plugin Workflow}
+
+In the figure \ref{fig:splworkflow}, we visualize the rules set of SLP from the List \ref{list:splrules}. SLP is always in the monitoring loop and takes actions according to the system load and the rules set. 
 
 \begin{figure}[h]
 	\centering
