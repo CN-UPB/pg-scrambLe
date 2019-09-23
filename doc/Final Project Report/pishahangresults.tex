@@ -1,10 +1,10 @@
 \subsection{Pishahang Results}
-The \ref{fig:pishcirroscase1180-cpu} \ref{fig:pishcirroscase1180-mem} and \ref{fig:pishahang-top-3-lifecycle} shows the CPU utilization, memory utilization and CPU utilization through out the life cycle of Pishahang dockers during the experiment respectively. Let us consider the important dockers in each case and list their functionalities to realize why they have consumed maximum CPU.
+The figures \ref{fig:pishcirroscase1180-cpu} \ref{fig:pishcirroscase1180-mem} and \ref{fig:pishahang-top-3-lifecycle} shows the CPU utilization, memory utilization and CPU utilization through out the life cycle of Pishahang dockers during the experiment respectively. Let us consider the important dockers in each case and list their functionalities to realize why they have consumed maximum CPU.
 
 
 \subsubsection{CPU}
 
-The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 6 Pishahang dockers are:
+The figure \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 6 Pishahang dockers are:
 
 \begin{itemize}
 	\item \textbf{son-sp-infrabstract:} This docker plays the role of an abstraction layer between the MANO framework and the underlying virtualised infrastructure. It exposes the interfaces to manage services and the VNF instances of all of these 180 instances by reserving resources for their service deployment. It also receives monitoring information about the infrastructure status. Hence, it occupies much of the CPU.
@@ -41,13 +41,13 @@ The load on all of the other microservices in Pishahang service platform is dist
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-CPU}
+	\includegraphics[width=1\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-CPU}
 	\caption{Pishahang CPU}
 	\label{fig:pishcirroscase1180-cpu}
 \end{figure}
 \pagebreak
 \subsubsection{Memory Utilization}
-The first 5 Pishahang dockers in memory utilization graph \ref{fig:pishcirroscase1180-mem} are:
+The first 5 Pishahang dockers in memory utilization graph  from figure \ref{fig:pishcirroscase1180-mem} are:
 
 \begin{itemize}
 	\item \textbf{son-keyclock:} This docker service provides access management and identity management of these micro services.
@@ -65,7 +65,7 @@ The first 5 Pishahang dockers in memory utilization graph \ref{fig:pishcirroscas
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-MEM}
+	\includegraphics[width=1\linewidth]{../figures/scalability_graphs/Horizontal-Docker-Graphs/pishahang/cirros_case1_180-MEM}
 	\caption{Pishahang MEM}
 	\label{fig:pishcirroscase1180-mem}
 \end{figure}
@@ -73,14 +73,14 @@ The first 5 Pishahang dockers in memory utilization graph \ref{fig:pishcirroscas
 
 \subsubsection{Lifecycle}
 
-We now have the life cycle graphs of the entire experiment. The \ref{fig:pishahang-top-3-lifecycle} shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes.
+We now have the life cycle graphs of the entire experiment. The figure \ref{fig:pishahang-top-3-lifecycle} shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes.
 
-Initially, the metrics of docker containers are recorded for one minute, which can be visualized in \ref{fig:pishahang-top-3-lifecycle} with almost no significant change in the CPU occupancy. The Pishahang infrastructure was reserved for all the 180 instances and with termination requests over the time, the CPU usage was reduced like before. This is observed by the graph of son-sp-infrabstract docker. The graph also depicts the CPU occupancy of other top docker services throughout the experiment.
+Initially, the metrics of docker containers are recorded for one minute, which is visualized in  the figure \ref{fig:pishahang-top-3-lifecycle} with almost no significant change in the CPU occupancy. The Pishahang infrastructure was reserved for all the 180 instances and with termination requests over the time, the CPU usage was reduced like before. This is observed by the graph of son-sp-infrabstract docker. The graph also depicts the CPU occupancy of other top docker services throughout the experiment.
 
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/scalability_graphs/Lifecycle-Graphs-Top-3/Pishahang-TOP-3-Lifecycle}
+	\includegraphics[width=1\linewidth]{figures/scalability_graphs/Lifecycle-Graphs-Top-3/Pishahang-TOP-3-Lifecycle}
 	\caption{Pish LS}
 	\label{fig:pishahang-top-3-lifecycle}
 \end{figure}
