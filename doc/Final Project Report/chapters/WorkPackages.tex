@@ -209,26 +209,17 @@ As an alternative, it is possible to add charms functionality to Pishahang so th
 \newpage
 
 \section{Splitter}
-Splitter helps in splitting a Network Service (NS) into multiple sub Network services which can be deployed and instantiated individually on Internet Service Providers (ISPs) located over a vast geographical region spanning multiple domains and are orchestrated by different MANO frameworks. Splitter calls Service Descriptor Transltor if there is a need to translate the NS if it is to be deployed on a different MANO framework.
-
-In this work package, a Service Descriptor Splitter (SDS) is implemented which splits the NSD of a network service. SDS takes
-NSD as an input that contains all the information elements which can be extracted to generate separate NSDs. In the proposed approach, the service graph is extracted from the input NSD
-and is split into subgraphs that result in a separate NSD which includes a set of elements such as VNFs, Virtual Links (VLs), forwarding graphs of VNFs etc, according to the specific MANO
-framework.
-\subsection{Architecture \& Work flow}
-Service Descriptor Splitter consists of following functional items which 
-\begin{itemize}
-	\item The total number of NFs mentioned in all the set matches the number of NFs defined in the NSD.
-	\item There are no invalid NFs in the sets received.
-\end{itemize}
-
-After validation the actual splitting starts. We have created classes for different sections of a NSD which encapsulate all the attributes and its values into a single unit which makes it very easy to process. Once the objects are set they are passed to different splitting functions based on there type. We have two different processing units for OSM and SONATA. Following are some functions responsible for splitting the NSD.
+Figure \ref{fig:splitter} graphically represents the splitting architecture of SDS. SDS can split either OSM NSD or Pishahang NSD. Python base classes are used for different sections of a NSD which encapsulate all the attributes and its values into a single unit which makes it very easy to process. Once the objects are set they are passed to different splitting functions based on there type. We have two different processing units for OSM and SONATA. Following are some functions responsible for splitting the NSD.
 
 \begin{itemize}
-	\item \textbf{Set General information: }This function copies all the general information from the main NSD to the sub NSDs. Information includes Vendor, author, Version, Descripton etc.
-	\item \textbf{Split Network Functions: }This function splits the Network functions from NSD to sub sets according to the request parameter received. 
+	\item \textbf{Validate: }Validation of the incoming request from MANO for splitting happens is done before actual splitting. Validation checks if the request has correct VNF ids. It also checks if the list of VNFs specified in the request is matching with the list of VNFs in the original NSD file.
+	\item \textbf{Set connection point reference for virtual functions:}After validation, as per the incoming request multiple set of empty NSD objects are created. This step updates the empty NSD objects with connection points. These connection points are either of type “external” or “management”. Each sub NSD will have its own connection points just like its parent NSD.
+	\item \textbf{Split Network Functions: }After creating connection points for each sub NSDs, VNF objects are set in the updated NSD objects as per the request from MANO. Each set of VNFs from the request is set in each of the NSD objects. 
+	\item \textbf{Set Connection Points: }
 	\item \textbf{Split Virtual Links: }When a NSD is splitted into different parts, its topology changes. Change in topology results in changing of Virtual Links. For example if A, B and C are three Nfs and we are splitting them in such a way so that A and B remain in one NSD and C in separate NSD. A virtual link between B and C now does not make sense. So this link should be broken down and B’s output should be connected to the external end point which was connected to C’s input earlier. This function splits these kind of Virtual Links.
 	\item \textbf{Split Forwarding Graph: }As explained in the above section, once the topology changes, the respective Forwarding graph also changes. Split forwarding graph pulls out the set of connection points and newly created virtual links and sets them in the sub NSDs.
+	\item \textbf{Set General Information: }
+	\item \textbf{Create Sub-NSDs: }
 \end{itemize} 
 
 Once the Splitting is done, create file is responsible for creating YAML files depending on the number of sub NSDs created. These files are saved in the file system which can be downloaded or moved forward to the adopter for deployment purpose. Following figure \ref{fig:splitter} graphically represents the splitting architecture.
@@ -296,7 +287,28 @@ Following are some of the important functions which helps SDS in splitting the N
 \end{lstlisting}
 
 \subsubsection{Split Network Functions}
-\todo[inline]{Content to be added}
+This function updates the sub NSDs with set of network functions and there properties provided in the request.
+
+\begin{lstlisting}[caption=Network Function Splitting, label=lis:NFSplitting]
+
+    def split_network_function(self):
+
+        for network_function_set in self.network_function_sets:
+
+            sub_nsd = SonataSchema.NSD("", "", "", "", "", "", [], [], [], [])
+
+            network_function_list = []
+
+            for network_function in network_function_set:
+
+                network_function_list.append(self.get_network_function_object(network_function))
+
+                sub_nsd.networkFunctions = network_function_list
+
+            self.NSDs.append(sub_nsd)
+
+\end{lstlisting}
+
 \subsubsection{Split Forwarding Graph}
 
 \todo[inline]{Content to be added}
