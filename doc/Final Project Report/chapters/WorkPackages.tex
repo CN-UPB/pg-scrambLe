@@ -40,16 +40,29 @@ The translator engine reads a json formatted descriptor and first converts it in
 The Translator engine consists of the following modules:
 \begin{enumerate}
 	\item descriptorReader
+	\subitem class: read\_dict
 	\item descriptorWriter
+	\subitem class: write\_dict
 	\item utilities
+	\subitem class: setup
+	\subitem class: transformation
+	\subitem class: insert\_into\_db
 	\item translator
+	\subitem class: TranslatorService
 	\item validator
 	
 \end{enumerate}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\linewidth]{"figures/class_diagram_translator"}
+	\caption{Translator class diagram}
+	\label{fig:class-diagram-translator}
+\end{figure}
+
 \subsubsection{descriptorReader}
 
-This module is responsible to read a json/dictionary input (NSD/VNFD) and iterate over the keys and return a generator of an object to the calling program. This generator can be transformed to any python data structure for ease of use and navigation. 
+The class \textit{read\_dict} is responsible to read a json/dictionary input (NSD/VNFD) and iterate over the keys and return a generator of an object to the calling program. This generator can be transformed to any python data structure for ease of use and navigation. 
 
 The input to this module is a json or dictionary object.
 
@@ -73,7 +86,7 @@ pishahang_dataset.reset_index(drop=True,inplace=True)
 \end{lstlisting}
 \subsubsection{descriptorWriter}
 
-This module is responsible to read a python pandas Dataframe input and output a nested json/dictionary maintaining the nested structure in the dictionary.
+The class \textit{write\_dict} is responsible to read a python pandas Dataframe input and output a nested json/dictionary maintaining the nested structure in the dictionary.
 
 \begin{lstlisting}[language=Python,caption=writer to write a translated DataFrame into a json, label=lis:descriptorWriter]
 from descriptorWriter import write_dict
@@ -86,7 +99,7 @@ pishahang_descriptor = writer.translate(pishahang_dataset.sort_values(by='lineag
 
 \subsubsection{utilities}
 
-This module is responsible for transforming the keys and map the corresponding values between sonata and osm descriptors. The module includes the 4 functions for translating between sonata and OSM descriptors. 
+The class \textit{setup} is responsible for transforming the keys and map the corresponding values between sonata and osm descriptors. The class includes 4 functions for translating between sonata and OSM descriptors. 
 \begin{enumerate}
 	\item translate\_to\_osm\_nsd()
 	\item translate\_to\_osm\_vnfd()
@@ -94,9 +107,11 @@ This module is responsible for transforming the keys and map the corresponding v
 	\item translate\_to\_sonata\_vnfd()
 \end{enumerate}
 
+The class \textit{transformation} acts as a helper class for the task of transforming the dataframe between sonata and OSM structures. 
+
 \subsubsection{translator}
 
-This is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
+The class \textit{TranslatorService} is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
 
 This following function translates OSM descriptor to Pishahang.
 \begin{lstlisting}[language=Python,caption= Translating OSM descriptor to Pishahang, label=lis:toSOnata]
