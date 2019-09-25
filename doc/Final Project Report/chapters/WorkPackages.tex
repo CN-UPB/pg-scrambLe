@@ -529,3 +529,26 @@ content = {'nsd': NSD,
 else:
 {...} ## unchanged
 \end{lstlisting}
+
+\section{Installation of Pishahang with Scramble}
+
+In order to use and exploit the functionalities of all the workpackages of scramble described above, additional steps needs to be executed after a clean installation of Pishahang. The steps are listed below in the script.
+\begin{lstlisting}[caption= install Pishahang with scramble, label=lis:Pishahang_scramble]
+sudo apt-get install -y software-properties-common
+sudo apt-add-repository -y ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install -y ansible
+sudo apt-get install -y git
+git clone --single-branch --branch scramble-pishahang https://github.com/CN-UPB/pg-scrambLe.git
+cd pg-scrambLe/phishahang/Pishahang-master/son-install
+
+git checkout install-pishahang
+mkdir ~/.ssh
+echo sonata | tee ~/.ssh/.vault_pass
+
+ansible-playbook utils/deploy/sp.yml -e "target=localhost public_ip=<<ip-address>>" -v
+
+cd pg-scrambLe
+sudo ./run_scramble.sh
+
+\end{lstlisting}
