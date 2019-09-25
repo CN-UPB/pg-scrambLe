@@ -6,9 +6,6 @@
 In a hierarchical architecture involving different MANOs, there is a need of conversion of network descriptors to schemas of respective MANO. Service Descriptor Translator (SDT) serves the purpose of translating network descriptors, namely NSDs and VNFDs from schema of SONATA Pishahang to that of OSM and vice versa.
 \paragraph{}
 In a scenario, where a parent MANO, say Pishahang decides to deploy one of the network services in its lower hierarchy MANO, say OSM, the NSD and VNFD(s) need to be converted to the descriptor schema of OSM. In such an event, the Scramble plugin calls the translator service and sends the descriptors to the SDT, where the translation of the descriptors takes place and the translated descriptors are sent to Adaptor utility for deployment in appropriate MANO. Figure \ref{fig:service-descriptor-translator} gives a high level view of Translator.
-\paragraph{}
-Scramble plug-in, installed within the parent MANO, forwards the network descriptors with service request to Scramble Main-Engine. Main-Engine checks the service request and sends the network descriptors to Translator along with the information of destination schema. On receiving the network descriptors, SDT translates the same to requested schema and calls the validator function to validate the translated network descriptors. Once validation is complete, the translated descriptors will be sent to Adaptor for deployment. 
-
 
 \begin{figure}
 	\centering
@@ -18,13 +15,13 @@ Scramble plug-in, installed within the parent MANO, forwards the network descrip
 \end{figure}
 
 \subsection{Architecture \& Work flow}
-The translator engine reads a json formatted descriptor and first converts it into a pandas \textit{DataFrame}. The \textit{DataFrame} is constructed to have the following columns.
+The translator engine reads a json formatted descriptor and first converts it into a pandas \textit{DataFrame}. The \textit{DataFrame} object is constructed to have the following columns.
 
 \begin{table}[H]
 	\begin{center}
 		\caption{Descriptor represented DataFrame.}
 		\label{tab:table1}
-		\begin{tabular}{l|l} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+		\begin{tabular}{l|l} 
 			\textbf{Columns} & \textbf{Description} \\
 			\hline
 			\textbf{parent\_level} & It stores immediate parent key's depth-level \\ 
@@ -32,12 +29,23 @@ The translator engine reads a json formatted descriptor and first converts it in
 			\textbf{level} & It stores current key's depth-level \\
 			\textbf{key} & It stores current key \\
 			\textbf{value} & It stores current key's value \\
-			\textbf{lineage} & It stores current key's entire lineage from the root depth-level \\  
+			\textbf{lineage} & \makecell[l]{It stores current key's entire lineage from the root depth-level.\\ It is useful to store the nested information} \\  
 		\end{tabular}
 	\end{center}
 \end{table}
+
+The \textit{setup} and \textit{transformation} classes of the translator engine carries out all the transformation, needed to translate between OSM and Pishahang descriptors, on the \textit{DataFrame} object. Once all the transformation are over, the resulting \textit{DataFrame} is then converted again into a json (refer Figure  \ref{fig:sequence-diagram-translator}).
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/translator_seq_diag"}
+	\caption{Translator sequence diagram}
+	\label{fig:sequence-diagram-translator}
+\end{figure}
+
+
 \subsection{Usage}
-The Translator engine consists of the following modules:
+The Translator engine consists of the following modules (refer Figure  \ref{fig:class-diagram-translator}):
 \begin{enumerate}
 	\item descriptorReader
 	\subitem class: read\_dict
@@ -53,15 +61,16 @@ The Translator engine consists of the following modules:
 	
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\linewidth]{"figures/class_diagram_translator"}
+	\includegraphics[width=1\linewidth]{"figures/class_diagram_translator"}
 	\caption{Translator class diagram}
 	\label{fig:class-diagram-translator}
 \end{figure}
 
-\subsubsection{descriptorReader}
 
+
+\subsubsection{descriptorReader}
 The class \textit{read\_dict} is responsible to read a json/dictionary input (NSD/VNFD) and iterate over the keys and return a generator of an object to the calling program. This generator can be transformed to any python data structure for ease of use and navigation. 
 
 The input to this module is a json or dictionary object.
@@ -113,96 +122,67 @@ The class \textit{transformation} acts as a helper class for the task of transfo
 
 The class \textit{TranslatorService} is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
 
-This following function translates OSM descriptor to Pishahang.
-\begin{lstlisting}[language=Python,caption= Translating OSM descriptor to Pishahang, label=lis:toSOnata]
+This following function translates OSM descriptor to Pishahang and vise-versa.
+\begin{lstlisting}[language=Python,caption= Translating descriptor between Pishahang and OSM, label=lis:toSOnata]
 import pymongo
 from validate import validator
 from utilities import setup
 
-def toSonata(received_file):
 
-client = pymongo.MongoClient("mongodb://mongo:27017")
-setup_obj = setup(client)
-validate_obj = validator()
+class TranslatorService():
+
+def __init__(self,client = pymongo.MongoClient("mongodb://mongo:27017")):
+self.setup_obj = setup(client)
+self.validate_obj = validator()
+
+
+def toSonata(self,received_file):
 
 if 'vnfd:vnfd-catalog' in received_file:
 
-## mongoDB document object to store the translated vnfd
-doc = setup_obj.db_descriptors["translated_vnfd"]
+doc = self.setup_obj.db_descriptors["translated_vnfd"]
+translated = self.setup_obj.translate_to_sonata_vnfd(received_file)
 
-## getting a translated sonata vnfd
-translated = setup_obj.translate_to_sonata_vnfd(received_file)
-
-## validating the translated descriptor which returns a "True"/ "False" string
-check = validate_obj.sonata_vnfd_validate(translated)
+check = self.validate_obj.sonata_vnfd_validate(translated)
 
 if check == "True":
-## insert into mongoDB as a Document
 temp = doc.insert_one(translated)
 translated_ref = temp.inserted_id
 
 elif 'nsd:nsd-catalog' in received_file:
 
-## mongoDB document object to store the translated nsd
-doc = setup_obj.db_descriptors["translated_nsd"]
+doc = self.setup_obj.db_descriptors["translated_nsd"]
+translated = self.setup_obj.translate_to_sonata_nsd(received_file)
 
-## getting a translated sonata nsd
-translated = setup_obj.translate_to_sonata_nsd(received_file)
+check = self.validate_obj.sonata_nsd_validate(translated)
 
-## validating the translated descriptor which returns a "True"/ "False" string
-check = validate_obj.sonata_nsd_validate(translated)
-
-if check == "True"
-## insert into mongoDB as a Document
+if check == "True":
 temp = doc.insert_one(translated)
 translated_ref = temp.inserted_id
 
 return {"descriptor":translated ,"VALIDATE STATUS" :check}
-\end{lstlisting}
 
-\pagebreak
-
-The following function translates Pishahang descriptor to OSM.
-\begin{lstlisting}[language=Python,caption=Translating Pishahang descriptor to OSM, label=lis:toOSM]
-import pymongo
-from validate import validator
-from utilities import setup
-
-def toOsm(received_file):
-
-client = pymongo.MongoClient("mongodb://mongo:27017")
-setup_obj = setup(client)
-validate_obj = validator()
+def toOsm(self,received_file):
 
 if 'network_functions' in received_file:
 
-## mongoDB document object to store the translated nsd
-doc = setup_obj.db_descriptors["translated_nsd"]
+doc = self.setup_obj.db_descriptors["translated_nsd"]
+translated = self.setup_obj.translate_to_osm_nsd(received_file)
 
-## getting a translated osm nsd
-translated = setup_obj.translate_to_osm_nsd(received_file)
-
-## validating the translated descriptor which returns a "True"/ "False" string
-check= validate_obj.osm_validator(translated)
+check= self.validate_obj.osm_validator(translated)
 
 if check == "True":
-## insert into mongoDB as a Document
 temp = doc.insert_one(translated)
 translated_ref = temp.inserted_id
 
 elif 'virtual_deployment_units' in received_file:
 
-## mongoDB document object to store the translated vnfd
-doc = setup_obj.db_descriptors["translated_vnfd"]
+doc = self.setup_obj.db_descriptors["translated_vnfd"]
+translated = self.setup_obj.translate_to_osm_vnfd(received_file)
 
-## getting a translated osm vnfd
-translated = setup_obj.translate_to_osm_vnfd(received_file)
-
-## validating the translated vnfd which returns a "True"/ "False" string
-check= validate_obj.osm_validator(translated)
+check= self.validate_obj.osm_validator(translated)
 
 if check == "True":
-## insert into mongoDB as a Document
 temp = doc.insert_one(translated)
 translated_ref = temp.inserted_id
 
@@ -226,7 +206,7 @@ Translator engine currently doesnot support the following:
 \end{enumerate}
 
 \subsubsection{Forwarding Graph}
-Although translation of forwarding graphs between OSM and  Pishahang has been implemented, we could not verify the translation as the forwarding graph logic is not currently feasible in both MANOs.
+Although translation of forwarding graphs between OSM and  Pishahang has been implemented, we could not verify the translation as the forwarding graph logic was not currently feasible during our implementation period in both OSM and Pishahang.
 
 \subsubsection{Juju charms in OSM}
 MANOs provide programmable and flexible management and orchestration of VNFs. OSM provides this flexibility through juju charms and Pishahang provides this through SSM/FSM (a container based solution). Because of these technological differences, direct translation between juju charms in OSM, and SSM (Service Specific Manager) and FSM (Function Specific Manager) in Pishahang is not possible. 
@@ -243,7 +223,7 @@ As an alternative, it is possible to add charms functionality to Pishahang so th
 
 
 \subsubsection{Monitoring Parameters}
-Translation could be extended to include the monitoring parameters as well. However verifying monitoring parameters were currently not feasible in OSM, so we sidelined for future scope.
+Translation could be extended to include the monitoring parameters as well. However verifying monitoring parameters were not feasible in OSM during our implementation period, so we sidelined for future scope.
 
 \newpage
 
@@ -390,7 +370,7 @@ This function sends the gatekeeper a payload which consists of a token "\textit{
 
 The gatekeeper also ensures the payload contains this additional package when it creates a new instantiation request and informs the SLM. 
 
-\begin{lstlisting}[caption=create instantiation request in gatekeeper, label=lis:request.rb]
+\begin{lstlisting}[caption=create instantiation request in gatekeeper(request.rb), label=lis:request.rb]
 
 post '/requests/?' do
 log_msg = MODULE + '::POST /requests'
@@ -406,9 +386,6 @@ user_data = params.delete 'user_data' if params['user_data']
 
 begin
 {...} ## unchanged
-start_request['egresses'] = egresses
-start_request['ingresses'] = ingresses
-start_request['user_data'] = user_data
 
 if params['scramble'] == true
 start_request['scramble'] = true 
@@ -421,14 +398,21 @@ end
 
 \end{lstlisting}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/scramble_seq_diag"}
+	\caption{Integration sequence diagram}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
 \subsection{\textbf{SLM\_mapping\_scramble}}
 
 This member function, together with four other helper functions, is responsible for treating requests routed for translation, splitting and sending the descriptor for instantiating in other MANOs. The 4 other helper functions used by it are as follows:
-\begin{table}[h!]
+\begin{table}[H]
 	\begin{center}
 		\caption{Helper functions.}
 		\label{tab:table2}
-		\begin{tabular}{l|l} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+		\begin{tabular}{l|l} 
 			\textbf{Functions} & \textbf{Description} \\
 			\hline\\
 			\textbf{get\_network\_functions} & \makecell[l]{It gets the network function names and ids from \\ the service descriptor.} \\\\
