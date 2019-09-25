@@ -549,6 +549,6 @@ echo sonata | tee ~/.ssh/.vault_pass
 ansible-playbook utils/deploy/sp.yml -e "target=localhost public_ip=<<ip-address>>" -v
 
 cd pg-scrambLe
-sudo ./run_scramble.sh
+sudo ./run_scramble.sh <<ip-address>>
 
 \end{lstlisting}
