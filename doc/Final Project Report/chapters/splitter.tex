@@ -49,8 +49,6 @@ Figure \ref{fig:osmschemaclassdiagram}, \ref{fig:osmsplitterclassdiagram}, \ref{
 	\label{fig:splittersequencediagram}
 \end{figure}
 
-Once the Splitting is done, create file is responsible for creating YAML files depending on the number of sub NSDs created. These files are saved in the file system which can be downloaded or moved forward to the adopter for deployment purpose. Following figure \ref{fig:splitter} graphically represents the splitting architecture.
-
 
 
 \subsection{Usage}
@@ -179,9 +177,66 @@ self.NSDs.append(sub_nsd)
 
 \end{lstlisting}
 
-\subsubsection{Split Forwarding Graph}
+\subsubsection{Split Forwarding Graph} \label{fgsplitting}
+The current implementation of splitter can successfully split a NSD with three or less VNFs.To maintain the topology of the main NSD, the graph has to consider the virtual links between VNFs present in the main NSD. The main challenge in splitting a forwarding graph is to maintain the topology. In case of four or more VNFs, the possible scenarios for splitting increases which increases the complexity of splitter. It can be achieved by maintaining a mapping of original one to one virtual links while processing the virtual links and then creating new virtual link set based on the request from MANO. Example, consider three VNFs, A, B and C. Packet is supposed to flow from A to B to C. After splitting, the sequence of packet flow should not be altered. If there is a request from MANO to split the NSD into two parts with [A, C] and [B], then to insure the topology is not changed, the NSD has to be splitted into three NSDs instead of two. In reference to the above example and following code snippet, normal scenario refers to when the request from MANO is to split it in such a way which does not result in creation of new virtual links which are not there in the original NSD. 
 
-\todo[inline]{Content to be added}
+\begin{lstlisting}[caption=Forwarding Graph Splitting, label=lis:FGSplitting]
+
+"""
+    Method splits the forwarding path.
+    """
+    def split_forwarding_path(self):
+        for i in range(len(self.NSDs)):
+            nsd_fg = self.NSDs[i]
+            del self.processed_connection_point_path[:]
+            for fg in self.utilityFunctions.list_forwarding_graphs:
+                
+                fg_inner = SonataSchema.ForwardingGraphs(fg.fg_id, fg.number_of_endpoints,
+                                               len(self.set_constituent_virtual_links(nsd_fg, fg)), self.network_function_sets[i],
+                                               self.set_constituent_virtual_links(nsd_fg, fg), [])
+                for path in fg.network_forwarding_path:
+                    if self.number_of_connection_paths(self.set_constituent_virtual_links(nsd_fg, fg)) > 1:
+                        for j in range(self.number_of_connection_paths(self.set_constituent_virtual_links(nsd_fg, fg))):
+                            path_inner = SonataSchema.NetworkForwardingPaths(path.fp_id + "_" + str(j), path.policy, [])
+                            x = 0
+                            for cp in path.connection_points:
+                                if self.connection_point_already_processed(cp.connection_point_ref) is False:
+                                    found = 0
+                                    if cp.connection_point_ref in self.get_connection_point_refs(nsd_fg.networkFunctions):
+                                        x = x + 1
+                                        point = SonataSchema.ConnectionPointsGraph(cp.connection_point_ref, x)
+                                        path_inner.connection_points.append(point)
+                                        found = 1
+                                        self.processed_connection_point_path.append([cp.connection_point_ref, 1])
+                                    else:
+                                        for connection_point in nsd_fg.connectionPoints:
+                                            if cp.connection_point_ref == connection_point._id:
+                                                x = x + 1
+                                                point = SonataSchema.ConnectionPointsGraph(cp.connection_point_ref, x)
+                                                path_inner.connection_points.append(point)
+                                                found = 1
+                                                self.processed_connection_point_path.append([cp.connection_point_ref, 1])
+                                    if found == 0:
+                                        string = cp.connection_point_ref.split(":")
+                                        if string[1] == "input":
+                                            x = x + 1
+                                            point = SonataSchema.ConnectionPointsGraph("output", x)
+                                            path_inner.connection_points.append(point)
+                                            self.processed_connection_point_path.append([cp.connection_point_ref, 1])
+                                            break
+                                        if string[1] == "output":
+                                            x = 1
+                                            point = SonataSchema.ConnectionPointsGraph("input", x)
+                                            path_inner.connection_points.append(point)
+                                            self.processed_connection_point_path.append([cp.connection_point_ref, 1])
+                            fg_inner.network_forwarding_path.append(path_inner)
+                    else:
+                        fg_inner.network_forwarding_path.append(self.normal_case(path, nsd_fg))
+                nsd_fg.forwardingGraphs.append(fg_inner)
+            self.NSDs[i] = nsd_fg
+
+\end{lstlisting}
+
 \subsection{Challenges}
 The NSD schema of Pishahang and OSM contains a lot of elements. However the challenge we faced was choosing which elements to include for splitting. We tackled it by including mandatory elements and few optional elements from the schema which were present in the input NSD.
 \subsection{Future scope of Service Descriptor Splitter}
@@ -189,4 +244,4 @@ SDS can currently split NSD of Pishahang and OSM. SDS is built in such a way tha
 
 Also, the current implementation considers all mandatory elements and a few optional elements from a NSD schema for splitting which can be extended to include other fields (Provided they are present in the input NSD for splitting).
 
-Current implementation of SDS can split a forwarding graph of a NSD (Pishahang) with just three VNFs. Splitting of a forwarding graph is implemented by keeping future implementation for more than three VNFs in mind (Refer Splitting of Forwarding graph section)
+Current implementation of SDS can split a forwarding graph of a NSD (Pishahang) with just three VNFs. Splitting of a forwarding graph is implemented by keeping future implementation for more than three VNFs in mind. (\ref{fgsplitting})
