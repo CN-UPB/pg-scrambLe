@@ -1,0 +1,89 @@
+\newpage
+\section{Scaling Plugin}
+\subsection{Pishahang}
+
+\begin{lstlisting}[language=yaml,caption=Pishahang MANO instance NSD,label=pishmanonsd]
+---
+descriptor_version: '1.0'
+vendor: pg-scramble
+name: Pishahang-Service
+version: '1.0'
+author: pg-scramble
+description: 'Pishahang Instance'
+network_functions:
+    -
+        vnf_id: pishahang-instance
+        vnf_vendor: pg-scramble
+        vnf_name: pishahang-instance
+        vnf_version: '1.0'
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=yaml,caption=Pishahang MANO instance VNFD,label=pishmanovnfd]
+---
+descriptor_version: vnfd-schema-01
+description: 'Pishahang Instance'
+name: pishahang-instance
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+    -
+        id: pishahang-instance
+        description: 'Pishahang Instance'
+        vm_image: pishahang-instance
+        vm_image_format: qcow2
+        resource_requirements:
+            cpu: {vcpus: 2}
+            memory: {size: 1, size_unit: GB}
+            storage: {size: 1, size_unit: GB}
+        connection_points:
+            - {id: eth0, interface: ipv4, type: external}
+
+# Image name on openstack should be "pg-scramble_pishahang-instance_1.0_pishahang-instance"
+
+
+\end{lstlisting}
+
+\subsection{OSM}
+
+\begin{lstlisting}[language=yaml,caption=OSM MANO instance NSD,label=osmmanonsd]
+---
+descriptor_version: '1.0'
+vendor: pg-scramble
+name: OSM-Service
+version: '1.0'
+author: pg-scramble
+description: 'OSM Instance'
+network_functions:
+    -
+        vnf_id: osm-instance
+        vnf_vendor: pg-scramble
+        vnf_name: osm-instance
+        vnf_version: '1.0'
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=yaml,caption=OSM MANO instance VNFD,label=osmmanovnfd]
+---
+descriptor_version: vnfd-schema-01
+description: 'OSM Instance'
+name: osm-instance
+vendor: pg-scramble
+version: '1.0'
+author: pg-scramble
+virtual_deployment_units:
+    -
+        id: osm-instance
+        description: 'OSM Instance'
+        vm_image: osm-instance
+        vm_image_format: qcow2
+        resource_requirements:
+            cpu: {vcpus: 2}
+            memory: {size: 1, size_unit: GB}
+            storage: {size: 1, size_unit: GB}
+        connection_points:
+            - {id: eth0, interface: ipv4, type: external}
+
+# Image name on openstack should be "pg-scramble_osm-instance_1.0_osm-instance"
+\end{lstlisting}

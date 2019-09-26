@@ -18,8 +18,8 @@ Operations such as on-boarding of NSD and VNFD, instantiation and termination of
 
 \subsection{Architecture \& Work flow}
 Standards based approach is a fundamental design principle behind PMW's design. 
-A Common interface template is defined in compliance with SOL005 which contains the blueprint for all the methods mentioned in the standards. 
-These methods are divided into different sections as per SOL005 into the following:
+A Common interface template is defined in compliance with ETSI SOL005 which contains the blueprint for all the methods mentioned in the standards. 
+These methods are divided into different sections as per ETSI SOL005 into the following:
 
 \begin{itemize}
 	\item \textbf{auth: }Authorization API
@@ -30,17 +30,24 @@ These methods are divided into different sections as per SOL005 into the followi
 	\item \textbf{vnfpkgm: }VNF Package Management API
 \end{itemize} 
 
-In the figure \ref{fig:wrapperarch}, different sections of PMW are visualized. 
-As part of the scramble project, support for Open Source MANO (OSM) and Sonata was implemented based on the common interface. 
-This is represented by the dotted lines to OSM and Sonata modules. 
-These modules are based on the common interface and implement the methods it has defined. 
+In the figure \ref{fig:wrapperarch}, a high level architecture of PWM is shown. 
+As part of the scramble project, support for Open Source MANO (OSM), Sonata and Pishahang are implemented based on the common interface provided by PWM. 
 Wrappers also support additional functionalities of Pishahang, which is an extension of Sonata. 
+
+In the figures \ref{fig:osmclassdiagram} and \ref{fig:pishahangclassdiagram}, the class diagram of OSM, Sonata and Pishahang PWM implementation is shown respectively. Note the additional "Admin" functionalities supported by PWM for both OSM and Sonata, these are individual non-standard APIs of the respective MANOs. In the figure \ref{fig:pishahangclassdiagram}, support for Pishahang specific APIs are also implemented along with the database APIs which are part of pg-scramble.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{figures/WrapperArch}
-	\caption{PWM Common interfaces}
+	\caption{PWM high level architecture}
 	\label{fig:wrapperarch}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\linewidth]{figures/common_interface_class_diagram}
+	\caption{CommonInterface Abstract Base Classes defined in PWM}
+	\label{fig:commonclassdiagram}
 \end{figure}
 
 \begin{figure}
@@ -53,8 +60,8 @@ Wrappers also support additional functionalities of Pishahang, which is an exten
 \begin{figure}
 	\centering
 	\includegraphics[width=1\linewidth]{figures/pishahang_class_diagram}
-	\caption{Pishahang Wrappers implemented based on the CommonInterface base classes}
-	\label{fig:osmclassdiagram}
+	\caption{Sonata and Pishahang Wrappers implemented based on the CommonInterface base classes}
+	\label{fig:pishahangclassdiagram}
 \end{figure}
 
 

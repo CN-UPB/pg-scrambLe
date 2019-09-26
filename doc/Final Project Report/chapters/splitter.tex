@@ -1,7 +1,7 @@
 \section{Splitter}
 Splitter helps in splitting a Network Service (NS) into multiple sub Network services which can be deployed and instantiated individually on Internet Service Providers (ISPs) located over a vast geographical region spanning multiple domains and are orchestrated by different MANO frameworks. Splitter calls Service Descriptor Transltor if there is a need to translate the NS if it is to be deployed on a different MANO framework. In this work package, a Service Descriptor Splitter (SDS) is implemented which splits the NSD of a network service. SDS takes NSD as an input that contains all the information elements which can be extracted to generate separate NSDs. In the proposed approach, the service graph is extracted from the input NSD and is split into subgraphs that result in a separate NSD which includes a set of elements such as VNFs, Virtual Links (VLs), forwarding graphs of VNFs etc, according to the specific MANO framework.
 
-\subsection{Architecture & Work flow}
+\subsection{Architecture and Work flow}
 
 Figure \ref{fig:osmschemaclassdiagram}, \ref{fig:osmsplitterclassdiagram}, \ref{fig:pishahangschemaclassdiagram} and \ref{fig:pishahangsplitterclassdiagram} represents class diagrams of OSM and Pishahang. Python base classes are used for different sections of a NSD which encapsulate all the attributes and its values into a single unit which makes it very easy to process. Once the objects are set they are passed to different splitting functions based on there type. We have two different processing units for OSM and SONATA. Figure \ref{fig:splittersequencediagram} shows the sequence diagram of Pishahang splitter. Following are some functions responsible for splitting the NSD.
 
