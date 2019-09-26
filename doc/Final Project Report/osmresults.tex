@@ -82,10 +82,10 @@ The first 5 OSM dockers in memory utilization graph are:
 
 \subsubsection{Lifecycle}
 
-We now have the life cycle graphs of the entire experiment. This shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes.
+We now have the life cycle graphs of the entire experiment. This shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes. We capture idle metrics for about a minute and then the service requests starts getting instantiated at 30 RPM.
 
 We can observe that the ro module of OSM got continuous requests over the time and at the end all the termination requests came at once. Also LCM , mon modules continously processed the requests. mon module retrieved metric information continuously and the same trend
-remains throughout the experiment.
+remains throughout the experiment. Once all the instances are successfully instantiated, the termination requests are executed. 
 
 \begin{figure}[h]
 	\centering
