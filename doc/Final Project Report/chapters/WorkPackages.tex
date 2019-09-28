@@ -44,7 +44,7 @@ The \textit{setup} and \textit{transformation} classes of the translator engine 
 \end{figure}
 
 
-\subsection{Usage}
+\subsection{Modules}
 The Translator engine consists of the following modules (refer Figure  \ref{fig:class-diagram-translator}):
 \begin{enumerate}
 	\item descriptorReader
@@ -191,14 +191,183 @@ return {"descriptor":translated ,"VALIDATE STATUS" :check}
 
 \subsubsection{validator}
 
-The validator validates the descriptors presented for translation. It differentiates between OSM, Pishahang and Sonata descriptors and also between NSD's and VNFD's. The sonata descriptor validation is mainly based on schema, implemented using python library jsonschema.draft4validator, this library helps by proving the complete path of the error which comes very handy while debugging. The Validation for OSM is slightly complex than that compared to sonata validator, OSM validator can be divided into two parts. the first part validates the descriptors using schema with the same setup as that of sonata and the second part uses python object class for validation, this is done to replicate the validation method used by OSM hence to make sure that any descriptor that is validated by translator will be accepted by OSM.
+The validator validates the descriptors presented for translation. The simplest form of validation of the descriptors begins with validating the syntax of the given descriptors, implemented using python library called \textit{jsonschema.draft4validator}, this library compares the given descriptor with corresponding schema provided and if errors are found then the error and the path of the error is printed. This error path is handy and is important, as a typical descriptor has many keys with identical names.
+
+The following function validates the syntax of provided and translated OSM and Sonata descriptors with its corresponding schemas.
+
+\begin{lstlisting} [language=Python,caption= Validating Sonata, Pishahang and OSM descriptors (Both NSD and VNFD's), label=lis:toSOnata]
+	
+	from __future__ import print_function
+	import json
+	import sys
+	from osmdata import vnfd as vnfd_catalog
+	from osmdata import nsd as nsd_catalog
+	from pyangbind.lib.serialise import pybindJSONDecoder
+	import os
+	import logging
+	import uuid
+	from jsonschema import *
+	import networkx as nx
+	import errno
+	import yaml
+	import event
+	from storage import DescriptorStorage
+	from until import read_descriptor_files, list_files, strip_root, build_descriptor_id
+	import pprint
+	import time
+	
+	log = logging.getLogger(__name__)
+	evtlog = event.get_logger('validator.events')
+	storage = DescriptorStorage()
+	
+	class validator():
+	
+	def osm_validator(self,descriptor):
+	if 'nsd:nsd-catalog' in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"osm-schema-nsd.json") as f:
+	schema = json.load(f)
+	v = Draft4Validator(schema, format_checker=FormatChecker())
+	lastidx = 0
+	for idx, err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx, pprint.pformat(err.path)))
+	self.osm_dep_validator(descriptor_to_validate)
+	if lastidx == 0:
+	return True
+	
+	elif 'vnfd:vnfd-catalog' in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"osm-vnfd-schema.json") as f:
+	schema = json.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	self.osm_dep_validator(descriptor_to_validate)
+	if lastidx == 0:
+	return True
+	else:
+	print("This is not a valid OSM descriptor")
+	
+	
+	def sonata_nsd_validate(self,descriptor, vnfd = None):
+	if 'network_functions' and "descriptor_version" in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"nsd-Pishahang.yml") as f:
+	schema = yaml.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	if lastidx == 0:
+	return True
+	
+	elif "network_functions" in descriptor:
+	service = storage.create_service(descriptor)
+	if not service:
+	evtlog.log("Invalid service descriptor",
+	"Failed to read the service descriptor of file '{}'"
+	.format(descriptor),
+	descriptor,
+	'evt_service_invalid_descriptor')
+	return
+	self.validate_service_syntax(descriptor)
+	if not vnfd:
+	print("service integrity is not validated as there is no vnfd")
+	elif vnfd != {}:
+	self.validate_service_integrity(service, vnfd)
+	return True
+	else:
+	print("This is not a valid sonata or Pishahang descriptor")
+	
+	
+	def sonata_vnfd_validate(self,descriptor):
+	if "virtual_deployment_units" and "descriptor_version" in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"vnfd-pishahang.yml") as f:
+	schema = yaml.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	if lastidx == 0:
+	return True
+	elif "virtual_deployment_units" in descriptor:
+	func = storage.create_function(descriptor)
+	if not func:
+	evtlog.log("Invalid function descriptor",
+	"Couldn't store VNF of file '{0}'".format(descriptor),
+	descriptor,
+	'evt_function_invalid_descriptor')
+	return
+	
+	self.validate_function_syntax(descriptor)
+	self.validate_function_integrity(func)
+	self.validate_function_topology(func)
+	return True
+	else:
+	print("This is not a valid sonata or Pishahang descriptor")
+\end{lstlisting} 
+
+ The next stage of validation is checking the semantics of the descriptors, for Sonata this is achieved by validating the Integrity of the given descriptors.
+ \begin{enumerate}
+ 	\item Integrity Validation: For validation of integrity of a NSD the corresponding VNFD's are required, which then checks the connection points and virtual links in NSD and VNFD's. If there is a correlations between the connection points and virtual links in NSD and VNFD's then the validation holds true.
+ 	
+ 	\begin{enumerate}
+ 		\item The Function def \textit{sonata_nsd_validate(self,descriptor, vnfd = None)}, accepts NSD and its corresponding zero or more VNFD's. If one or more VNFD's are provided the the integrity and topology validation occurs else just the syntax is checked.  
+ 	\end{enumerate}
+ 	   
+ \end{enumerate}
+ 
+ For checking the semantics of the OSM descriptors, python object class which is generated from the .Yang files provided by OSM. The provided descriptors are then passed as parameters to this python object class with the help of python library called \textit{pybindJSONDecoder.load_ietf_json()}. The resulting output will be true if successfully validated else the error in the descriptor is given.
+ 
+ \begin{enumerate}
+ 	\item In the class \textit{def osm_validator(self,descriptor)}, the descriptor in the form of python dictionary is taken as input and syntax is checked first, later the descriptor is passed to class "osm_dep_validator(descriptor_to_validate)" to check semantics.
+ 	
+ 	\item in class \textit{osm_dep_validator(descriptor_to_validate)}, \textit{pybindJSONDecoder.load_ietf_json(data, None, None, obj=mynsd)} is used where data is the given descriptor, obj is the Python object class in file osmdata.
+ \end{enumerate}
+
+And thus a descriptor which is validated true is not only error free but also will be for sure accepted by Sonata, Pishahang and OSM as a valid descriptor. 
 
 \subsection{Challenges}
-The initial challenges faced while designing the translator was mapping the "\textit{required}" keys between OSM and Pishahang descriptors. Figuring out the common functionalities of the respective "\textit{required}" keys in OSM and Pishahang was the priority and a mapping was created. The other "\textit{optional}" keys which were exclusive for each MANOs were also identified and sidelined for future scope.
+\begin{enumerate}
+	\item The initial challenges faced while designing the translator was mapping the "\textit{required}" keys between OSM and Pishahang descriptors. Figuring out the common functionalities of the respective "\textit{required}" keys in OSM and Pishahang was the priority and a mapping was created. The other "\textit{optional}" keys which were exclusive for each MANOs were also identified and sidelined for future work.
+	\item The challenging part for the development of validator was for OSM. Currently available validator for OSM, is a package developed based on python object code and the problem is that only the error is printed. For example: if a error is found in key "ID", then the error message would be "invalid ID" and a typical descriptor contains multiple "ID" keys and it would be hard to find where exactly the error lies. Hence using various Python libraries a Json schema for OSM was developed with which not just the error but the exact path of the error is also given. 
+\end{enumerate}
 
-\subsection{Future scope of this work package}
+\subsection{Usage}
 
-Translator engine currently doesnot support the following:
+The class \textit{TranslatorService} takes input of two simple requirements.
+\begin{enumerate}
+	\item The first input is a descriptor in the form of json file or a python dictionary. The descriptor can be Pishahang or OSM.
+	\item The second input is a parameter to let the translator know how the translation should take place. The parameters are
+	  \begin{enumerate}
+	  	\item \textit{osm_to_sonata} for translation of OSM descriptor to Pishahang.
+	  	\item \textit{sonata_to_OSM} for translation of Pishahang descriptor to OSM.
+	  \end{enumerate}
+\end{enumerate}
+
+The output will be a valid translated descriptor in the form of python dictionary.
+
+\subsection{Future Work directions of this work package}	
+
+Translator engine currently does not support the following:
 \begin{enumerate}
 	\item Forwarding Graph
 	\item Juju charms in OSM
@@ -419,6 +588,8 @@ else:
 {...} ## unchanged
 \end{lstlisting}
 
+
+
 \section{Installation of Pishahang with Scramble}
 
 In order to use and exploit the functionalities of all the workpackages of scramble described above, additional steps needs to be executed after a clean installation of Pishahang. The steps are listed below in the script.
@@ -441,3 +612,47 @@ cd pg-scrambLe
 sudo ./run_scramble.sh <<ip-address>>
 
 \end{lstlisting}
+
+\section{Scramble GUI for Pishahang}
+The scramble-gui is integrated with both pishahang-gui and in pishahang-BSS developed with Angular-js for front end and mangodb deployed using python for back-end., enabling users to enter the details of child-mano's and also select the desired mano's to instantiate a service.
+
+With Scramble-pishahang GUI the users can enter details of child-mano's as shown in images below.
+
+Step 1: Select \textit{MANO Settings} and then \textit{Add Mano}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-1"}
+	\caption{Scramble_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Step 2: Enter Mano details, The required mano details are 
+\begin{enumerate}
+	\item Mano Name: The name is take so that the user can easily differentiate between mano's and can be any name desired by user.
+	\item URL: Is the URL to access the Mano
+	\item Username and Password: Is the credentials required to access the mano.
+	\item Mano Vendor: Is a choice between OSM and Pishahang to recognize the type of child-mano added.   
+\end{enumerate}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-2"}
+	\caption{Scramble_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Once the mano details are entered and the list of mano's added are displayed.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-3"}
+	\caption{Scramble_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Once the child-mano's are added, in the pishahang-bss the added mano's are listed. The user can select the mano's in which the service can be instantiated and also if user does not need to instantiate the service in child mano, he can instantiate the service just in the parent mano as shown below.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-bss"}
+	\caption{Scramble_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+  
