@@ -239,7 +239,7 @@ The current implementation of splitter can successfully split a NSD with three o
 
 \subsection{Challenges}
 The NSD schema of Pishahang and OSM contains a lot of elements. However the challenge we faced was choosing which elements to include for splitting. We tackled it by including mandatory elements and few optional elements from the schema which were present in the input NSD.
-\subsection{Future scope of Service Descriptor Splitter}
+\subsection{Future work}
 SDS can currently split NSD of Pishahang and OSM. SDS is built in such a way that it can be implemented for new MANO frameworks as well. To implement SDS for a new MANO framework one can refer the implementation of either Pishahang or OSM. First step would be to create basic python classes from the NSD schema of the MANO framework then writing the utility functions to pull the information from the NSD file and store it in the objects of the basic python classes. Lastly writing splitting functions to actually split the list of objects in two or more parts.
 
 Also, the current implementation considers all mandatory elements and a few optional elements from a NSD schema for splitting which can be extended to include other fields (Provided they are present in the input NSD for splitting).
