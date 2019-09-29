@@ -197,15 +197,25 @@ The load distributed to the child instance can be seen in the figure \ref{fig:ch
 
 \section{Discussions}
 
-In this section, we discuss the 
+In this section, we discuss the inferences drawn from all the experiments conducted on OSM and Pishahang.
 
 \subsubsection{RPM and success ratio}
+The success ratio and RPM are inversely proportional. We observed that when the service requests sent at 30 RPM were all successfully  instantiated in VIM where as not all requests sent at 60 RPM got successfully instantiated. There were failures either due to errors in VIM() or errors in MANO(). Hence higher the RPM, lower the success ratio and vice versa. 
 \subsubsection{NSDs with different number of VNFDs}
+We designed three different NSDs. The three  basically differed in the number of VNFDs they had. If one NSD had one VNFD, the second NSD had three VNFDs and the third one had five VNFDs. They were all instantiated in such a way that the number of instantiations remained the same irrespective of the number of VNFDs. For example, if the first NS that has one VNFD was instantiated 15 times, the second NSD was instantiated five times because it has 3 VNFDs. The third NS was instantiated three times as it has 5 VNFDS, so that all the three NSDs end up having 15 instantiations. Similarly, we also had 90 and 180 instantiations. We observed that NSDs with more number of VNFDs consumed more CPU than the ones with lesser number of VNFDs
+
 \subsubsection{Different VNFs}
+
+For our experiment, we considered two different types of VNF images. One was a very basic cirros image and the other was an ubuntu cloud image. We conducted the similar experiments using both the images. The result was that the maximum number of instantiations that was successful with cirros was found to be 180 where as with ubuntu image, we could have 60 as the maximum number of instantiates. This was due to more space consumed by ubuntu VNF and the VIM was unable to instantiate all 180 ubuntu VNF images unlike cirros VNF images.
+
+
 \subsubsection{Container v/s VM}
+Pishahang was erroneous with openstack. Since Pishahang provides support for container orchestration, we used kuberenetes. OSM supports VM orchestration, so openstack was used for OSM. The main comparison between container and VM orchestrations is as follows
 \begin{itemize}
-	\item Time distribution
-	\item System metrics
+	\item \textbf{\textit{Time distribution:}}
+	The time taken by the OSM and openstack to instantiate the service requests was much higher than the time taken by Pishahang and kubernetes. The end-to-end deployment time of the requests were a lot more in VM orchestration when compared to container orchestration.
+
+	
 \end{itemize}
 \subsection{Understanding OSM lifecycle graphs}
 
