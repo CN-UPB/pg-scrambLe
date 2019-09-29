@@ -26,7 +26,7 @@ Features of the scaling manager are discussed briefly in this section.
 
 SPL needs to continuously monitor the system resource utilization and take scaling decisions based on that. We are using the \textit{average system load} values given by the linux kernel for taking the scaling decisions. System load is the number of processes which are being executed by the CPU or in waiting state. The linux kernel provides 3 average values of system load calculated over a period of 1, 5 and 15 minutes. \\
 
-As a proof of concept, SPL uses \textit{5m} and \textit{15m} moving averages as a heuristic for scaling decisions. \textit{1m} average is not considered to avoid taking decisions on a short lived spike in system load. SPL has the following simple rule set listed below, note that the configurable threshold value is used to take relevant actions. For simplicity, we consider "0.7" as the threshold value as it is generally used in the wild by system administrators. 
+As a proof of concept, SPL uses \textit{5m} and \textit{15m} moving averages as a heuristic for scaling decisions. \textit{1m} average is not considered to avoid taking decisions on a short lived spike in system load. SPL has the following simple rule set listed below, note that the configurable threshold value is used to take relevant actions. For simplicity, we consider "0.7" as the threshold value as it is generally used in the wild by system administrators. Some informal discussions about this are available here \footnote{https://support.itrsgroup.com/hc/en-us/articles/360020251273-check-load-thresholds} \footnote{https://medium.com/devops-process-and-tools/how-to-measure-cpu-load-v-cpu-percentage-and-examples-da6057e39111}.
 
 \begin{enumeratelist}
 

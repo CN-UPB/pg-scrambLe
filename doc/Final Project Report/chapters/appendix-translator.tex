@@ -1,2 +1,134 @@
 \newpage
-\section{Translator?}
+\section{Translator}
+\subsection{Validation}
+\label{tvalidation}
+
+\begin{lstlisting}[language=Python,caption="Validating Sonata Pishahang and OSM descriptors (Both NSD and VNFD's)", label=lis:toSOnata]
+	
+	from __future__ import print_function
+	import json
+	import sys
+	from osmdata import vnfd as vnfd_catalog
+	from osmdata import nsd as nsd_catalog
+	from pyangbind.lib.serialise import pybindJSONDecoder
+	import os
+	import logging
+	import uuid
+	from jsonschema import *
+	import networkx as nx
+	import errno
+	import yaml
+	import event
+	from storage import DescriptorStorage
+	from until import read_descriptor_files, list_files, strip_root, build_descriptor_id
+	import pprint
+	import time
+	
+	log = logging.getLogger(__name__)
+	evtlog = event.get_logger('validator.events')
+	storage = DescriptorStorage()
+	
+	class validator():
+	
+	def osm_validator(self,descriptor):
+	if 'nsd:nsd-catalog' in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"osm-schema-nsd.json") as f:
+	schema = json.load(f)
+	v = Draft4Validator(schema, format_checker=FormatChecker())
+	lastidx = 0
+	for idx, err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx, pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx, pprint.pformat(err.path)))
+	self.osm_dep_validator(descriptor_to_validate)
+	if lastidx == 0:
+	return True
+	
+	elif 'vnfd:vnfd-catalog' in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"osm-vnfd-schema.json") as f:
+	schema = json.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	self.osm_dep_validator(descriptor_to_validate)
+	if lastidx == 0:
+	return True
+	else:
+	print("This is not a valid OSM descriptor")
+	
+	
+	def sonata_nsd_validate(self,descriptor, vnfd = None):
+	if 'network_functions' and "descriptor_version" in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"nsd-Pishahang.yml") as f:
+	schema = yaml.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate), 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	if lastidx == 0:
+	return True
+	
+	elif "network_functions" in descriptor:
+	service = storage.create_service(descriptor)
+	if not service:
+	evtlog.log("Invalid service descriptor",
+	"Failed to read the service descriptor of file '{}'"
+	.format(descriptor),
+	descriptor,
+	'evt_service_invalid_descriptor')
+	return
+	self.validate_service_syntax(descriptor)
+	if not vnfd:
+	print("service integrity is not validated as there is no vnfd")
+	elif vnfd != {}:
+	self.validate_service_integrity(service, vnfd)
+	return True
+	else:
+	print("This is not a valid sonata or Pishahang descriptor")
+	
+	
+	def sonata_vnfd_validate(self,descriptor):
+	if "virtual_deployment_units" and "descriptor_version" in descriptor:
+	descriptor_to_validate = descriptor
+	with open(r"vnfd-pishahang.yml") as f:
+	schema = yaml.load(f)
+	v = Draft4Validator(schema , format_checker=FormatChecker())
+	lastidx = 0
+	for idx , err in enumerate(v.iter_errors(descriptor_to_validate) , 1):
+	lastidx = idx
+	if idx == 1:
+	print("\tSCHEMA ERRORS:")
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err)))
+	print("\t{0}. {1}\n".format(idx , pprint.pformat(err.path)))
+	if lastidx == 0:
+	return True
+	elif "virtual_deployment_units" in descriptor:
+	func = storage.create_function(descriptor)
+	if not func:
+	evtlog.log("Invalid function descriptor",
+	"Couldn't store VNF of file '{0}'".format(descriptor),
+	descriptor,
+	'evt_function_invalid_descriptor')
+	return
+	
+	self.validate_function_syntax(descriptor)
+	self.validate_function_integrity(func)
+	self.validate_function_topology(func)
+	return True
+	else:
+	print("This is not a valid sonata or Pishahang descriptor")
+\end{lstlisting} 
