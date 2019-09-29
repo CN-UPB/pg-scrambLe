@@ -1,0 +1,1873 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="1200" height="726" onload="init(evt)" viewBox="0 0 1200 726" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Flame graph stack visualization. See https://github.com/brendangregg/FlameGraph for latest version, and http://www.brendangregg.com/flamegraphs.html for examples. -->
+<!-- NOTES:  -->
+<defs>
+	<linearGradient id="background" y1="0" y2="1" x1="0" x2="0" >
+		<stop stop-color="#eeeeee" offset="5%" />
+		<stop stop-color="#eeeeb0" offset="95%" />
+	</linearGradient>
+</defs>
+<style type="text/css">
+	text { font-family:Verdana; font-size:12px; fill:rgb(0,0,0); }
+	#search { opacity:0.1; cursor:pointer; }
+	#search:hover, #search.show { opacity:1; }
+	#subtitle { text-anchor:middle; font-color:rgb(160,160,160); }
+	#title { text-anchor:middle; font-size:17px}
+	#unzoom { cursor:pointer; }
+	#frames > *:hover { stroke:black; stroke-width:0.5; cursor:pointer; }
+	.hide { display:none; }
+	.parent { opacity:0.5; }
+</style>
+<script type="text/ecmascript">
+<![CDATA[
+	"use strict";
+	var details, searchbtn, unzoombtn, matchedtxt, svg, searching;
+	function init(evt) {
+		details = document.getElementById("details").firstChild;
+		searchbtn = document.getElementById("search");
+		unzoombtn = document.getElementById("unzoom");
+		matchedtxt = document.getElementById("matched");
+		svg = document.getElementsByTagName("svg")[0];
+		searching = 0;
+	}
+
+	window.addEventListener("click", function(e) {
+		var target = find_group(e.target);
+		if (target) {
+			if (target.nodeName == "a") {
+				if (e.ctrlKey === false) return;
+				e.preventDefault();
+			}
+			if (target.classList.contains("parent")) unzoom();
+			zoom(target);
+		}
+		else if (e.target.id == "unzoom") unzoom();
+		else if (e.target.id == "search") search_prompt();
+	}, false)
+
+	// mouse-over for info
+	// show
+	window.addEventListener("mouseover", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = "Function: " + g_to_text(target);
+	}, false)
+
+	// clear
+	window.addEventListener("mouseout", function(e) {
+		var target = find_group(e.target);
+		if (target) details.nodeValue = ' ';
+	}, false)
+
+	// ctrl-F for search
+	window.addEventListener("keydown",function (e) {
+		if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+			e.preventDefault();
+			search_prompt();
+		}
+	}, false)
+
+	// functions
+	function find_child(node, selector) {
+		var children = node.querySelectorAll(selector);
+		if (children.length) return children[0];
+		return;
+	}
+	function find_group(node) {
+		var parent = node.parentElement;
+		if (!parent) return;
+		if (parent.id == "frames") return node;
+		return find_group(parent);
+	}
+	function orig_save(e, attr, val) {
+		if (e.attributes["_orig_" + attr] != undefined) return;
+		if (e.attributes[attr] == undefined) return;
+		if (val == undefined) val = e.attributes[attr].value;
+		e.setAttribute("_orig_" + attr, val);
+	}
+	function orig_load(e, attr) {
+		if (e.attributes["_orig_"+attr] == undefined) return;
+		e.attributes[attr].value = e.attributes["_orig_" + attr].value;
+		e.removeAttribute("_orig_"+attr);
+	}
+	function g_to_text(e) {
+		var text = find_child(e, "title").firstChild.nodeValue;
+		return (text)
+	}
+	function g_to_func(e) {
+		var func = g_to_text(e);
+		// if there's any manipulation we want to do to the function
+		// name before it's searched, do it here before returning.
+		return (func);
+	}
+	function update_text(e) {
+		var r = find_child(e, "rect");
+		var t = find_child(e, "text");
+		var w = parseFloat(r.attributes.width.value) -3;
+		var txt = find_child(e, "title").textContent.replace(/\([^(]*\)$/,"");
+		t.attributes.x.value = parseFloat(r.attributes.x.value) + 3;
+
+		// Smaller than this size won't fit anything
+		if (w < 2 * 12 * 0.59) {
+			t.textContent = "";
+			return;
+		}
+
+		t.textContent = txt;
+		// Fit in full text width
+		if (/^ *$/.test(txt) || t.getSubStringLength(0, txt.length) < w)
+			return;
+
+		for (var x = txt.length - 2; x > 0; x--) {
+			if (t.getSubStringLength(0, x + 2) <= w) {
+				t.textContent = txt.substring(0, x) + "..";
+				return;
+			}
+		}
+		t.textContent = "";
+	}
+
+	// zoom
+	function zoom_reset(e) {
+		if (e.attributes != undefined) {
+			orig_load(e, "x");
+			orig_load(e, "width");
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_reset(c[i]);
+		}
+	}
+	function zoom_child(e, x, ratio) {
+		if (e.attributes != undefined) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = (parseFloat(e.attributes.x.value) - x - 10) * ratio + 10;
+				if (e.tagName == "text")
+					e.attributes.x.value = find_child(e.parentNode, "rect[x]").attributes.x.value + 3;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseFloat(e.attributes.width.value) * ratio;
+			}
+		}
+
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_child(c[i], x - 10, ratio);
+		}
+	}
+	function zoom_parent(e) {
+		if (e.attributes) {
+			if (e.attributes.x != undefined) {
+				orig_save(e, "x");
+				e.attributes.x.value = 10;
+			}
+			if (e.attributes.width != undefined) {
+				orig_save(e, "width");
+				e.attributes.width.value = parseInt(svg.width.baseVal.value) - (10 * 2);
+			}
+		}
+		if (e.childNodes == undefined) return;
+		for (var i = 0, c = e.childNodes; i < c.length; i++) {
+			zoom_parent(c[i]);
+		}
+	}
+	function zoom(node) {
+		var attr = find_child(node, "rect").attributes;
+		var width = parseFloat(attr.width.value);
+		var xmin = parseFloat(attr.x.value);
+		var xmax = parseFloat(xmin + width);
+		var ymin = parseFloat(attr.y.value);
+		var ratio = (svg.width.baseVal.value - 2 * 10) / width;
+
+		// XXX: Workaround for JavaScript float issues (fix me)
+		var fudge = 0.0001;
+
+		unzoombtn.classList.remove("hide");
+
+		var el = document.getElementById("frames").children;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var a = find_child(e, "rect").attributes;
+			var ex = parseFloat(a.x.value);
+			var ew = parseFloat(a.width.value);
+			var upstack;
+			// Is it an ancestor
+			if (0 == 0) {
+				upstack = parseFloat(a.y.value) > ymin;
+			} else {
+				upstack = parseFloat(a.y.value) < ymin;
+			}
+			if (upstack) {
+				// Direct ancestor
+				if (ex <= xmin && (ex+ew+fudge) >= xmax) {
+					e.classList.add("parent");
+					zoom_parent(e);
+					update_text(e);
+				}
+				// not in current path
+				else
+					e.classList.add("hide");
+			}
+			// Children maybe
+			else {
+				// no common path
+				if (ex < xmin || ex + fudge >= xmax) {
+					e.classList.add("hide");
+				}
+				else {
+					zoom_child(e, xmin, ratio);
+					update_text(e);
+				}
+			}
+		}
+	}
+	function unzoom() {
+		unzoombtn.classList.add("hide");
+		var el = document.getElementById("frames").children;
+		for(var i = 0; i < el.length; i++) {
+			el[i].classList.remove("parent");
+			el[i].classList.remove("hide");
+			zoom_reset(el[i]);
+			update_text(el[i]);
+		}
+	}
+
+	// search
+	function reset_search() {
+		var el = document.querySelectorAll("#frames rect");
+		for (var i = 0; i < el.length; i++) {
+			orig_load(el[i], "fill")
+		}
+	}
+	function search_prompt() {
+		if (!searching) {
+			var term = prompt("Enter a search term (regexp " +
+			    "allowed, eg: ^ext4_)", "");
+			if (term != null) {
+				search(term)
+			}
+		} else {
+			reset_search();
+			searching = 0;
+			searchbtn.classList.remove("show");
+			searchbtn.firstChild.nodeValue = "Search"
+			matchedtxt.classList.add("hide");
+			matchedtxt.firstChild.nodeValue = ""
+		}
+	}
+	function search(term) {
+		var re = new RegExp(term);
+		var el = document.getElementById("frames").children;
+		var matches = new Object();
+		var maxwidth = 0;
+		for (var i = 0; i < el.length; i++) {
+			var e = el[i];
+			var func = g_to_func(e);
+			var rect = find_child(e, "rect");
+			if (func == null || rect == null)
+				continue;
+
+			// Save max width. Only works as we have a root frame
+			var w = parseFloat(rect.attributes.width.value);
+			if (w > maxwidth)
+				maxwidth = w;
+
+			if (func.match(re)) {
+				// highlight
+				var x = parseFloat(rect.attributes.x.value);
+				orig_save(rect, "fill");
+				rect.attributes.fill.value = "rgb(230,0,230)";
+
+				// remember matches
+				if (matches[x] == undefined) {
+					matches[x] = w;
+				} else {
+					if (w > matches[x]) {
+						// overwrite with parent
+						matches[x] = w;
+					}
+				}
+				searching = 1;
+			}
+		}
+		if (!searching)
+			return;
+
+		searchbtn.classList.add("show");
+		searchbtn.firstChild.nodeValue = "Reset Search";
+
+		// calculate percent matched, excluding vertical overlap
+		var count = 0;
+		var lastx = -1;
+		var lastw = 0;
+		var keys = Array();
+		for (k in matches) {
+			if (matches.hasOwnProperty(k))
+				keys.push(k);
+		}
+		// sort the matched frames by their x location
+		// ascending, then width descending
+		keys.sort(function(a, b){
+			return a - b;
+		});
+		// Step through frames saving only the biggest bottom-up frames
+		// thanks to the sort order. This relies on the tree property
+		// where children are always smaller than their parents.
+		var fudge = 0.0001;	// JavaScript floating point
+		for (var k in keys) {
+			var x = parseFloat(keys[k]);
+			var w = matches[keys[k]];
+			if (x >= lastx + lastw - fudge) {
+				count += w;
+				lastx = x;
+				lastw = w;
+			}
+		}
+		// display matched percent
+		matchedtxt.classList.remove("hide");
+		var pct = 100 * count / maxwidth;
+		if (pct != 100) pct = pct.toFixed(1)
+		matchedtxt.firstChild.nodeValue = "Matched: " + pct + "%";
+	}
+]]>
+</script>
+<rect x="0.0" y="0" width="1200.0" height="726.0" fill="url(#background)"  />
+<text id="title" x="600.00" y="24" >Flame Graph</text>
+<text id="details" x="10.00" y="709" > </text>
+<text id="unzoom" x="10.00" y="24" class="hide">Reset Zoom</text>
+<text id="search" x="1090.00" y="24" >Search</text>
+<text id="matched" x="1090.00" y="709" > </text>
+<g id="frames">
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_document:55 (1,330 samples, 2.54%)</title><rect x="1156.0" y="421" width="30.0" height="15.0" fill="rgb(232,82,8)" rx="2" ry="2" />
+<text  x="1158.97" y="431.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:133 (458 samples, 0.88%)</title><rect x="1175.6" y="261" width="10.4" height="15.0" fill="rgb(213,122,18)" rx="2" ry="2" />
+<text  x="1178.62" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:111 (5 samples, 0.01%)</title><rect x="1159.9" y="261" width="0.1" height="15.0" fill="rgb(222,139,10)" rx="2" ry="2" />
+<text  x="1162.87" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:132 (5 samples, 0.01%)</title><rect x="1150.7" y="453" width="0.1" height="15.0" fill="rgb(217,223,9)" rx="2" ry="2" />
+<text  x="1153.71" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1305 (26 samples, 0.05%)</title><rect x="1170.9" y="213" width="0.6" height="15.0" fill="rgb(249,190,50)" rx="2" ry="2" />
+<text  x="1173.91" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py:send:477 (10 samples, 0.02%)</title><rect x="1153.9" y="453" width="0.2" height="15.0" fill="rgb(229,26,40)" rx="2" ry="2" />
+<text  x="1156.91" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_stream_start:130 (5 samples, 0.01%)</title><rect x="1155.8" y="405" width="0.1" height="15.0" fill="rgb(239,200,0)" rx="2" ry="2" />
+<text  x="1158.77" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update_retryable:851 (5 samples, 0.01%)</title><rect x="1187.7" y="469" width="0.1" height="15.0" fill="rgb(205,192,36)" rx="2" ry="2" />
+<text  x="1190.65" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (5 samples, 0.01%)</title><rect x="1165.4" y="261" width="0.1" height="15.0" fill="rgb(227,89,8)" rx="2" ry="2" />
+<text  x="1168.42" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1149 (146 samples, 0.28%)</title><rect x="1166.8" y="197" width="3.3" height="15.0" fill="rgb(238,190,46)" rx="2" ry="2" />
+<text  x="1169.82" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:110 (26 samples, 0.05%)</title><rect x="1160.9" y="357" width="0.6" height="15.0" fill="rgb(228,21,39)" rx="2" ry="2" />
+<text  x="1163.93" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:451 (17 samples, 0.03%)</title><rect x="1160.2" y="341" width="0.3" height="15.0" fill="rgb(212,161,20)" rx="2" ry="2" />
+<text  x="1163.17" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_sequence:116 (5 samples, 0.01%)</title><rect x="1187.0" y="405" width="0.1" height="15.0" fill="rgb(240,190,21)" rx="2" ry="2" />
+<text  x="1190.02" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:156 (5 samples, 0.01%)</title><rect x="1156.8" y="325" width="0.1" height="15.0" fill="rgb(227,87,18)" rx="2" ry="2" />
+<text  x="1159.83" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update:817 (7 samples, 0.01%)</title><rect x="1187.3" y="389" width="0.1" height="15.0" fill="rgb(235,107,24)" rx="2" ry="2" />
+<text  x="1190.29" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain_spaces:1334 (7 samples, 0.01%)</title><rect x="1185.3" y="69" width="0.1" height="15.0" fill="rgb(214,227,16)" rx="2" ry="2" />
+<text  x="1188.26" y="79.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:449 (295 samples, 0.56%)</title><rect x="1165.6" y="277" width="6.6" height="15.0" fill="rgb(247,199,2)" rx="2" ry="2" />
+<text  x="1168.58" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:112 (5 samples, 0.01%)</title><rect x="1169.2" y="165" width="0.2" height="15.0" fill="rgb(223,133,54)" rx="2" ry="2" />
+<text  x="1172.24" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:_call_connection_lost:608 (18 samples, 0.03%)</title><rect x="1149.4" y="565" width="0.4" height="15.0" fill="rgb(235,54,32)" rx="2" ry="2" />
+<text  x="1152.42" y="575.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/client.py:send:417 (16 samples, 0.03%)</title><rect x="1150.6" y="533" width="0.4" height="15.0" fill="rgb(242,204,46)" rx="2" ry="2" />
+<text  x="1153.64" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/protocol.py:send_headers:669 (16 samples, 0.03%)</title><rect x="1154.5" y="437" width="0.3" height="15.0" fill="rgb(254,206,21)" rx="2" ry="2" />
+<text  x="1157.48" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (8 samples, 0.02%)</title><rect x="1161.2" y="277" width="0.2" height="15.0" fill="rgb(244,141,33)" rx="2" ry="2" />
+<text  x="1164.25" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1186 (5 samples, 0.01%)</title><rect x="1166.1" y="181" width="0.1" height="15.0" fill="rgb(249,66,40)" rx="2" ry="2" />
+<text  x="1169.12" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:stale_possible_simple_keys:283 (8 samples, 0.02%)</title><rect x="1173.5" y="181" width="0.2" height="15.0" fill="rgb(227,175,0)" rx="2" ry="2" />
+<text  x="1176.55" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/struct.py:decode:49 (23 samples, 0.04%)</title><rect x="1188.2" y="501" width="0.5" height="15.0" fill="rgb(205,154,30)" rx="2" ry="2" />
+<text  x="1191.19" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:104 (11 samples, 0.02%)</title><rect x="1178.4" y="101" width="0.3" height="15.0" fill="rgb(217,41,16)" rx="2" ry="2" />
+<text  x="1181.42" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:stale_possible_simple_keys:283 (5 samples, 0.01%)</title><rect x="1175.7" y="165" width="0.2" height="15.0" fill="rgb(215,75,52)" rx="2" ry="2" />
+<text  x="1178.74" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/connector.py:_create_connection:575 (28 samples, 0.05%)</title><rect x="1153.3" y="437" width="0.6" height="15.0" fill="rgb(251,176,13)" rx="2" ry="2" />
+<text  x="1156.26" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (10 samples, 0.02%)</title><rect x="1173.2" y="277" width="0.2" height="15.0" fill="rgb(224,20,21)" rx="2" ry="2" />
+<text  x="1176.21" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:92 (6 samples, 0.01%)</title><rect x="1160.6" y="357" width="0.1" height="15.0" fill="rgb(251,196,27)" rx="2" ry="2" />
+<text  x="1163.59" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/threading.py:_bootstrap:882 (45,752 samples, 87.50%)</title><rect x="10.0" y="661" width="1032.5" height="15.0" fill="rgb(235,32,0)" rx="2" ry="2" />
+<text  x="13.00" y="671.5" >/usr/lib/python3.5/threading.py:_bootstrap:882</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/futures.py:_copy_future_state:408 (5 samples, 0.01%)</title><rect x="1149.2" y="549" width="0.2" height="15.0" fill="rgb(214,203,50)" rx="2" ry="2" />
+<text  x="1152.24" y="559.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/streams.py:write:294 (14 samples, 0.03%)</title><rect x="1154.5" y="421" width="0.3" height="15.0" fill="rgb(216,91,49)" rx="2" ry="2" />
+<text  x="1157.52" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (8 samples, 0.02%)</title><rect x="1183.0" y="149" width="0.1" height="15.0" fill="rgb(239,71,3)" rx="2" ry="2" />
+<text  x="1185.96" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:177 (5 samples, 0.01%)</title><rect x="1188.4" y="341" width="0.1" height="15.0" fill="rgb(253,31,41)" rx="2" ry="2" />
+<text  x="1191.42" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (16 samples, 0.03%)</title><rect x="1181.4" y="213" width="0.4" height="15.0" fill="rgb(210,180,1)" rx="2" ry="2" />
+<text  x="1184.42" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (9 samples, 0.02%)</title><rect x="1181.2" y="245" width="0.2" height="15.0" fill="rgb(220,229,28)" rx="2" ry="2" />
+<text  x="1184.22" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/__init__.py:load:70 (7 samples, 0.01%)</title><rect x="1155.3" y="469" width="0.2" height="15.0" fill="rgb(239,1,37)" rx="2" ry="2" />
+<text  x="1158.31" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_node:335 (8 samples, 0.02%)</title><rect x="1164.6" y="261" width="0.2" height="15.0" fill="rgb(248,96,26)" rx="2" ry="2" />
+<text  x="1167.61" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_document_content:210 (19 samples, 0.04%)</title><rect x="1156.0" y="373" width="0.4" height="15.0" fill="rgb(220,25,16)" rx="2" ry="2" />
+<text  x="1158.97" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:104 (9 samples, 0.02%)</title><rect x="1168.5" y="165" width="0.2" height="15.0" fill="rgb(234,209,39)" rx="2" ry="2" />
+<text  x="1171.47" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1186 (35 samples, 0.07%)</title><rect x="1167.0" y="181" width="0.8" height="15.0" fill="rgb(209,22,0)" rx="2" ry="2" />
+<text  x="1170.03" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1305 (5 samples, 0.01%)</title><rect x="1157.6" y="293" width="0.2" height="15.0" fill="rgb(227,202,3)" rx="2" ry="2" />
+<text  x="1160.64" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1148 (16 samples, 0.03%)</title><rect x="1176.3" y="133" width="0.4" height="15.0" fill="rgb(253,52,22)" rx="2" ry="2" />
+<text  x="1179.32" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/conn.py:send:208 (7 samples, 0.01%)</title><rect x="1150.8" y="517" width="0.2" height="15.0" fill="rgb(230,168,34)" rx="2" ry="2" />
+<text  x="1153.82" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:449 (55 samples, 0.11%)</title><rect x="1158.9" y="341" width="1.3" height="15.0" fill="rgb(207,134,49)" rx="2" ry="2" />
+<text  x="1161.92" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:get_single_data:35 (1,342 samples, 2.57%)</title><rect x="1155.8" y="453" width="30.3" height="15.0" fill="rgb(243,133,1)" rx="2" ry="2" />
+<text  x="1158.77" y="463.5" >/u..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/connector.py:connect:307 (28 samples, 0.05%)</title><rect x="1153.3" y="453" width="0.6" height="15.0" fill="rgb(254,8,41)" rx="2" ry="2" />
+<text  x="1156.26" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:132 (5 samples, 0.01%)</title><rect x="1150.7" y="389" width="0.1" height="15.0" fill="rgb(253,58,19)" rx="2" ry="2" />
+<text  x="1153.71" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/tasks.py:_step:239 (1,701 samples, 3.25%)</title><rect x="1151.4" y="549" width="38.4" height="15.0" fill="rgb(211,145,45)" rx="2" ry="2" />
+<text  x="1154.41" y="559.5" >/us..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm_utils.py:update_db_2:170 (10 samples, 0.02%)</title><rect x="1187.2" y="501" width="0.2" height="15.0" fill="rgb(210,156,41)" rx="2" ry="2" />
+<text  x="1190.22" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/struct.py:_encode_self:42 (6 samples, 0.01%)</title><rect x="1150.7" y="485" width="0.1" height="15.0" fill="rgb(222,143,52)" rx="2" ry="2" />
+<text  x="1153.69" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (17 samples, 0.03%)</title><rect x="1156.0" y="357" width="0.4" height="15.0" fill="rgb(228,212,15)" rx="2" ry="2" />
+<text  x="1159.01" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:need_more_tokens:149 (5 samples, 0.01%)</title><rect x="1175.7" y="181" width="0.2" height="15.0" fill="rgb(244,173,18)" rx="2" ry="2" />
+<text  x="1178.74" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/client.py:bootstrap:187 (10 samples, 0.02%)</title><rect x="1152.4" y="485" width="0.2" height="15.0" fill="rgb(221,7,49)" rx="2" ry="2" />
+<text  x="1155.36" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:update_one:995 (7 samples, 0.01%)</title><rect x="1151.9" y="485" width="0.2" height="15.0" fill="rgb(254,101,42)" rx="2" ry="2" />
+<text  x="1154.93" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:create_connection:682 (9 samples, 0.02%)</title><rect x="1153.6" y="421" width="0.2" height="15.0" fill="rgb(245,160,48)" rx="2" ry="2" />
+<text  x="1156.62" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1286 (10 samples, 0.02%)</title><rect x="1170.4" y="213" width="0.2" height="15.0" fill="rgb(215,95,23)" rx="2" ry="2" />
+<text  x="1173.41" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:821 (8 samples, 0.02%)</title><rect x="1187.4" y="533" width="0.2" height="15.0" fill="rgb(224,174,1)" rx="2" ry="2" />
+<text  x="1190.45" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:84 (1,082 samples, 2.07%)</title><rect x="1161.6" y="341" width="24.4" height="15.0" fill="rgb(220,99,18)" rx="2" ry="2" />
+<text  x="1164.57" y="351.5" >/..</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:run_in_executor:556 (6 samples, 0.01%)</title><rect x="1153.4" y="373" width="0.1" height="15.0" fill="rgb(222,82,36)" rx="2" ry="2" />
+<text  x="1156.35" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_object:86 (7 samples, 0.01%)</title><rect x="1186.4" y="373" width="0.2" height="15.0" fill="rgb(210,79,36)" rx="2" ry="2" />
+<text  x="1189.41" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_flow_sequence_first_entry:474 (7 samples, 0.01%)</title><rect x="1161.0" y="325" width="0.1" height="15.0" fill="rgb(246,10,53)" rx="2" ry="2" />
+<text  x="1163.96" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/events.py:_run:125 (1,812 samples, 3.47%)</title><rect x="1149.1" y="581" width="40.9" height="15.0" fill="rgb(236,74,37)" rx="2" ry="2" />
+<text  x="1152.11" y="591.5" >/us..</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/concurrent/futures/thread.py:run:59 (9 samples, 0.02%)</title><rect x="10.0" y="597" width="0.2" height="15.0" fill="rgb(230,49,23)" rx="2" ry="2" />
+<text  x="13.05" y="607.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (26 samples, 0.05%)</title><rect x="1174.5" y="181" width="0.6" height="15.0" fill="rgb(237,155,23)" rx="2" ry="2" />
+<text  x="1177.47" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/streams.py:write:294 (7 samples, 0.01%)</title><rect x="1150.8" y="501" width="0.2" height="15.0" fill="rgb(207,225,16)" rx="2" ry="2" />
+<text  x="1153.82" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/conn.py:_handle_frame:298 (25 samples, 0.05%)</title><rect x="1188.1" y="517" width="0.6" height="15.0" fill="rgb(222,162,40)" rx="2" ry="2" />
+<text  x="1191.15" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:220 (19 samples, 0.04%)</title><rect x="1173.9" y="197" width="0.5" height="15.0" fill="rgb(243,8,36)" rx="2" ry="2" />
+<text  x="1176.93" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_breaks:1259 (5 samples, 0.01%)</title><rect x="1169.8" y="165" width="0.1" height="15.0" fill="rgb(219,46,34)" rx="2" ry="2" />
+<text  x="1172.82" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:220 (15 samples, 0.03%)</title><rect x="1162.4" y="261" width="0.3" height="15.0" fill="rgb(228,107,5)" rx="2" ry="2" />
+<text  x="1165.38" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (7 samples, 0.01%)</title><rect x="1156.2" y="325" width="0.2" height="15.0" fill="rgb(248,5,35)" rx="2" ry="2" />
+<text  x="1159.24" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:sock_connect:401 (7 samples, 0.01%)</title><rect x="1153.6" y="405" width="0.2" height="15.0" fill="rgb(218,1,6)" rx="2" ry="2" />
+<text  x="1156.64" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/concurrent/futures/thread.py:run:55 (20 samples, 0.04%)</title><rect x="747.0" y="597" width="0.4" height="15.0" fill="rgb(229,14,30)" rx="2" ry="2" />
+<text  x="749.96" y="607.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (58 samples, 0.11%)</title><rect x="1173.8" y="213" width="1.3" height="15.0" fill="rgb(250,40,48)" rx="2" ry="2" />
+<text  x="1176.75" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/client.py:_md_synchronizer:207 (8 samples, 0.02%)</title><rect x="1187.8" y="533" width="0.2" height="15.0" fill="rgb(223,67,15)" rx="2" ry="2" />
+<text  x="1190.83" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/tasks.py:_step:239 (32 samples, 0.06%)</title><rect x="1150.5" y="565" width="0.7" height="15.0" fill="rgb(248,137,7)" rx="2" ry="2" />
+<text  x="1153.46" y="575.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_spaces:1231 (7 samples, 0.01%)</title><rect x="1166.6" y="181" width="0.2" height="15.0" fill="rgb(228,55,53)" rx="2" ry="2" />
+<text  x="1169.62" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1307 (25 samples, 0.05%)</title><rect x="1171.6" y="213" width="0.5" height="15.0" fill="rgb(234,180,25)" rx="2" ry="2" />
+<text  x="1174.56" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_node:292 (6 samples, 0.01%)</title><rect x="1164.3" y="261" width="0.1" height="15.0" fill="rgb(221,164,50)" rx="2" ry="2" />
+<text  x="1167.30" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:_run_once:1312 (1,813 samples, 3.47%)</title><rect x="1149.1" y="597" width="40.9" height="15.0" fill="rgb(214,139,15)" rx="2" ry="2" />
+<text  x="1152.09" y="607.5" >/us..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm_utils.py:update_db_2:170 (7 samples, 0.01%)</title><rect x="1151.9" y="517" width="0.2" height="15.0" fill="rgb(237,119,14)" rx="2" ry="2" />
+<text  x="1154.93" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:get_single_node:31 (5 samples, 0.01%)</title><rect x="1155.8" y="437" width="0.1" height="15.0" fill="rgb(210,33,33)" rx="2" ry="2" />
+<text  x="1158.77" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/threading.py:wait:293 (32,645 samples, 62.43%)</title><rect x="10.2" y="581" width="736.8" height="15.0" fill="rgb(226,46,1)" rx="2" ry="2" />
+<text  x="13.25" y="591.5" >/usr/lib/python3.5/threading.py:wait:293</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:call_later:462 (7 samples, 0.01%)</title><rect x="1187.4" y="501" width="0.2" height="15.0" fill="rgb(230,136,48)" rx="2" ry="2" />
+<text  x="1190.45" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:244 (14 samples, 0.03%)</title><rect x="1166.0" y="245" width="0.3" height="15.0" fill="rgb(208,103,28)" rx="2" ry="2" />
+<text  x="1168.99" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1305 (14 samples, 0.03%)</title><rect x="1163.4" y="229" width="0.3" height="15.0" fill="rgb(216,42,48)" rx="2" ry="2" />
+<text  x="1166.42" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1217 (13 samples, 0.02%)</title><rect x="1184.3" y="53" width="0.3" height="15.0" fill="rgb(234,187,41)" rx="2" ry="2" />
+<text  x="1187.27" y="63.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1148 (21 samples, 0.04%)</title><rect x="1166.3" y="197" width="0.5" height="15.0" fill="rgb(205,198,18)" rx="2" ry="2" />
+<text  x="1169.35" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_yaml_str:388 (7 samples, 0.01%)</title><rect x="1186.4" y="357" width="0.2" height="15.0" fill="rgb(253,29,18)" rx="2" ry="2" />
+<text  x="1189.41" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:get_mark:117 (6 samples, 0.01%)</title><rect x="1174.0" y="165" width="0.1" height="15.0" fill="rgb(209,187,49)" rx="2" ry="2" />
+<text  x="1176.98" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/consumer/fetcher.py:_get_actions_per_node:400 (5 samples, 0.01%)</title><rect x="1188.9" y="517" width="0.1" height="15.0" fill="rgb(232,63,23)" rx="2" ry="2" />
+<text  x="1191.87" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_node:335 (5 samples, 0.01%)</title><rect x="1172.7" y="245" width="0.1" height="15.0" fill="rgb(221,179,27)" rx="2" ry="2" />
+<text  x="1175.74" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_mapping:125 (18 samples, 0.03%)</title><rect x="1186.3" y="389" width="0.4" height="15.0" fill="rgb(251,46,45)" rx="2" ry="2" />
+<text  x="1189.25" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (244 samples, 0.47%)</title><rect x="1175.6" y="229" width="5.6" height="15.0" fill="rgb(214,7,22)" rx="2" ry="2" />
+<text  x="1178.65" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:_read_ready:669 (9 samples, 0.02%)</title><rect x="1150.0" y="565" width="0.2" height="15.0" fill="rgb(253,42,47)" rx="2" ry="2" />
+<text  x="1153.01" y="575.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/conn.py:send:205 (6 samples, 0.01%)</title><rect x="1150.7" y="517" width="0.1" height="15.0" fill="rgb(221,127,34)" rx="2" ry="2" />
+<text  x="1153.69" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (86 samples, 0.16%)</title><rect x="1170.3" y="229" width="1.9" height="15.0" fill="rgb(239,34,51)" rx="2" ry="2" />
+<text  x="1173.25" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:peek:89 (15 samples, 0.03%)</title><rect x="1177.4" y="101" width="0.3" height="15.0" fill="rgb(243,113,25)" rx="2" ry="2" />
+<text  x="1180.38" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (15 samples, 0.03%)</title><rect x="1175.1" y="213" width="0.3" height="15.0" fill="rgb(237,2,52)" rx="2" ry="2" />
+<text  x="1178.08" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (20 samples, 0.04%)</title><rect x="1180.4" y="165" width="0.5" height="15.0" fill="rgb(248,109,25)" rx="2" ry="2" />
+<text  x="1183.43" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:1081 (7 samples, 0.01%)</title><rect x="1151.9" y="533" width="0.2" height="15.0" fill="rgb(231,93,35)" rx="2" ry="2" />
+<text  x="1154.93" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_double:652 (170 samples, 0.33%)</title><rect x="1166.3" y="229" width="3.8" height="15.0" fill="rgb(237,37,28)" rx="2" ry="2" />
+<text  x="1169.30" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:write:700 (7 samples, 0.01%)</title><rect x="1150.8" y="485" width="0.2" height="15.0" fill="rgb(214,219,30)" rx="2" ry="2" />
+<text  x="1153.82" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm_utils.py:update_db_2:170 (6 samples, 0.01%)</title><rect x="1187.6" y="517" width="0.2" height="15.0" fill="rgb(237,82,3)" rx="2" ry="2" />
+<text  x="1190.63" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1149 (46 samples, 0.09%)</title><rect x="1183.5" y="69" width="1.1" height="15.0" fill="rgb(225,136,3)" rx="2" ry="2" />
+<text  x="1186.52" y="79.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/msgkafka.py:aiowrite:102 (7 samples, 0.01%)</title><rect x="1152.6" y="517" width="0.1" height="15.0" fill="rgb(236,179,30)" rx="2" ry="2" />
+<text  x="1155.58" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:82 (1,113 samples, 2.13%)</title><rect x="1160.9" y="373" width="25.1" height="15.0" fill="rgb(232,145,33)" rx="2" ry="2" />
+<text  x="1163.87" y="383.5" >/..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:432 (8 samples, 0.02%)</title><rect x="1183.0" y="165" width="0.1" height="15.0" fill="rgb(210,39,50)" rx="2" ry="2" />
+<text  x="1185.96" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/dbmongo.py:set_one:338 (7 samples, 0.01%)</title><rect x="1151.9" y="501" width="0.2" height="15.0" fill="rgb(245,62,41)" rx="2" ry="2" />
+<text  x="1154.93" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (11 samples, 0.02%)</title><rect x="1160.6" y="373" width="0.2" height="15.0" fill="rgb(225,36,49)" rx="2" ry="2" />
+<text  x="1163.59" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (6 samples, 0.01%)</title><rect x="1156.7" y="341" width="0.1" height="15.0" fill="rgb(234,217,0)" rx="2" ry="2" />
+<text  x="1159.69" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update:847 (7 samples, 0.01%)</title><rect x="1187.3" y="405" width="0.1" height="15.0" fill="rgb(219,22,52)" rx="2" ry="2" />
+<text  x="1190.29" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1217 (13 samples, 0.02%)</title><rect x="1169.8" y="181" width="0.3" height="15.0" fill="rgb(209,66,7)" rx="2" ry="2" />
+<text  x="1172.82" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:82 (200 samples, 0.38%)</title><rect x="1181.4" y="245" width="4.5" height="15.0" fill="rgb(223,208,38)" rx="2" ry="2" />
+<text  x="1184.42" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1304 (6 samples, 0.01%)</title><rect x="1163.3" y="229" width="0.1" height="15.0" fill="rgb(222,202,54)" rx="2" ry="2" />
+<text  x="1166.28" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (288 samples, 0.55%)</title><rect x="1165.7" y="261" width="6.5" height="15.0" fill="rgb(221,221,42)" rx="2" ry="2" />
+<text  x="1168.69" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/concurrent/futures/thread.py:_worker:66 (24 samples, 0.05%)</title><rect x="747.0" y="613" width="0.5" height="15.0" fill="rgb(225,182,29)" rx="2" ry="2" />
+<text  x="749.96" y="623.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:84 (184 samples, 0.35%)</title><rect x="1181.8" y="213" width="4.1" height="15.0" fill="rgb(214,141,7)" rx="2" ry="2" />
+<text  x="1184.79" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (7 samples, 0.01%)</title><rect x="1175.7" y="197" width="0.2" height="15.0" fill="rgb(210,60,27)" rx="2" ry="2" />
+<text  x="1178.71" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:64 (339 samples, 0.65%)</title><rect x="1165.2" y="309" width="7.7" height="15.0" fill="rgb(228,73,26)" rx="2" ry="2" />
+<text  x="1168.22" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_scalar:164 (6 samples, 0.01%)</title><rect x="1186.4" y="341" width="0.2" height="15.0" fill="rgb(232,179,15)" rx="2" ry="2" />
+<text  x="1189.43" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:_ensure_resolved:161 (9 samples, 0.02%)</title><rect x="1153.3" y="405" width="0.2" height="15.0" fill="rgb(245,229,15)" rx="2" ry="2" />
+<text  x="1156.28" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py:_retryable_write:1248 (8 samples, 0.02%)</title><rect x="1187.3" y="437" width="0.1" height="15.0" fill="rgb(235,214,6)" rx="2" ry="2" />
+<text  x="1190.27" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:174 (5 samples, 0.01%)</title><rect x="1188.3" y="341" width="0.1" height="15.0" fill="rgb(225,206,28)" rx="2" ry="2" />
+<text  x="1191.31" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (17 samples, 0.03%)</title><rect x="1158.0" y="341" width="0.4" height="15.0" fill="rgb(226,131,16)" rx="2" ry="2" />
+<text  x="1161.02" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/__init__.py:load:72 (1,403 samples, 2.68%)</title><rect x="1155.5" y="469" width="31.6" height="15.0" fill="rgb(240,40,25)" rx="2" ry="2" />
+<text  x="1158.47" y="479.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (95 samples, 0.18%)</title><rect x="1183.3" y="133" width="2.1" height="15.0" fill="rgb(225,91,21)" rx="2" ry="2" />
+<text  x="1186.30" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:428 (48 samples, 0.09%)</title><rect x="1181.8" y="165" width="1.1" height="15.0" fill="rgb(221,15,41)" rx="2" ry="2" />
+<text  x="1184.81" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:451 (13 samples, 0.02%)</title><rect x="1185.5" y="149" width="0.3" height="15.0" fill="rgb(230,34,21)" rx="2" ry="2" />
+<text  x="1188.46" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (85 samples, 0.16%)</title><rect x="1161.9" y="277" width="2.0" height="15.0" fill="rgb(213,188,50)" rx="2" ry="2" />
+<text  x="1164.95" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:127 (144 samples, 0.28%)</title><rect x="1161.6" y="325" width="3.2" height="15.0" fill="rgb(213,209,45)" rx="2" ry="2" />
+<text  x="1164.57" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (27 samples, 0.05%)</title><rect x="1172.3" y="261" width="0.6" height="15.0" fill="rgb(211,35,43)" rx="2" ry="2" />
+<text  x="1175.26" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:encode:132 (5 samples, 0.01%)</title><rect x="1150.7" y="405" width="0.1" height="15.0" fill="rgb(213,19,38)" rx="2" ry="2" />
+<text  x="1153.71" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/socket.py:_real_close:401 (18 samples, 0.03%)</title><rect x="1149.4" y="533" width="0.4" height="15.0" fill="rgb(214,200,50)" rx="2" ry="2" />
+<text  x="1152.42" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:447 (7 samples, 0.01%)</title><rect x="1165.4" y="277" width="0.2" height="15.0" fill="rgb(243,107,7)" rx="2" ry="2" />
+<text  x="1168.40" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/queue.py:get:164 (32,645 samples, 62.43%)</title><rect x="10.2" y="597" width="736.8" height="15.0" fill="rgb(216,50,50)" rx="2" ry="2" />
+<text  x="13.25" y="607.5" >/usr/lib/python3.5/queue.py:get:164</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain_spaces:1325 (5 samples, 0.01%)</title><rect x="1171.7" y="197" width="0.1" height="15.0" fill="rgb(229,100,14)" rx="2" ry="2" />
+<text  x="1174.68" y="207.5" ></text>
+</g>
+<g >
+<title>all (52,288 samples, 100%)</title><rect x="10.0" y="677" width="1180.0" height="15.0" fill="rgb(211,52,13)" rx="2" ry="2" />
+<text  x="13.00" y="687.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/__init__.py:load:72 (9 samples, 0.02%)</title><rect x="1151.7" y="501" width="0.2" height="15.0" fill="rgb(222,27,5)" rx="2" ry="2" />
+<text  x="1154.73" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (113 samples, 0.22%)</title><rect x="1183.2" y="165" width="2.6" height="15.0" fill="rgb(247,210,17)" rx="2" ry="2" />
+<text  x="1186.21" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update_retryable:851 (8 samples, 0.02%)</title><rect x="1187.3" y="453" width="0.1" height="15.0" fill="rgb(219,24,50)" rx="2" ry="2" />
+<text  x="1190.27" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/futures.py:set_result:332 (5 samples, 0.01%)</title><rect x="1149.2" y="533" width="0.2" height="15.0" fill="rgb(228,227,37)" rx="2" ry="2" />
+<text  x="1152.24" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:220 (5 samples, 0.01%)</title><rect x="1156.1" y="341" width="0.1" height="15.0" fill="rgb(238,188,32)" rx="2" ry="2" />
+<text  x="1159.08" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (59 samples, 0.11%)</title><rect x="1181.8" y="181" width="1.3" height="15.0" fill="rgb(244,221,17)" rx="2" ry="2" />
+<text  x="1184.81" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:103 (11 samples, 0.02%)</title><rect x="1178.2" y="101" width="0.2" height="15.0" fill="rgb(232,61,47)" rx="2" ry="2" />
+<text  x="1181.17" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (37 samples, 0.07%)</title><rect x="1184.6" y="117" width="0.8" height="15.0" fill="rgb(249,134,11)" rx="2" ry="2" />
+<text  x="1187.61" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (8 samples, 0.02%)</title><rect x="1185.8" y="181" width="0.1" height="15.0" fill="rgb(254,182,12)" rx="2" ry="2" />
+<text  x="1188.76" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (12 samples, 0.02%)</title><rect x="1185.5" y="133" width="0.3" height="15.0" fill="rgb(217,31,9)" rx="2" ry="2" />
+<text  x="1188.49" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_double:652 (188 samples, 0.36%)</title><rect x="1176.2" y="165" width="4.2" height="15.0" fill="rgb(239,187,29)" rx="2" ry="2" />
+<text  x="1179.17" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ROclient.py:_parse_yaml:192 (1,410 samples, 2.70%)</title><rect x="1155.3" y="485" width="31.8" height="15.0" fill="rgb(237,93,29)" rx="2" ry="2" />
+<text  x="1158.31" y="495.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1217 (17 samples, 0.03%)</title><rect x="1180.0" y="117" width="0.4" height="15.0" fill="rgb(250,8,7)" rx="2" ry="2" />
+<text  x="1183.00" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:105 (13 samples, 0.02%)</title><rect x="1178.7" y="101" width="0.3" height="15.0" fill="rgb(234,20,24)" rx="2" ry="2" />
+<text  x="1181.67" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (222 samples, 0.42%)</title><rect x="1175.9" y="197" width="5.0" height="15.0" fill="rgb(207,228,9)" rx="2" ry="2" />
+<text  x="1178.87" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (46 samples, 0.09%)</title><rect x="1156.8" y="341" width="1.1" height="15.0" fill="rgb(242,226,51)" rx="2" ry="2" />
+<text  x="1159.83" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_indentless_sequence_entry:406 (9 samples, 0.02%)</title><rect x="1181.5" y="197" width="0.2" height="15.0" fill="rgb(240,141,11)" rx="2" ry="2" />
+<text  x="1184.51" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1189 (7 samples, 0.01%)</title><rect x="1167.9" y="181" width="0.1" height="15.0" fill="rgb(208,153,39)" rx="2" ry="2" />
+<text  x="1170.86" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py:_retryable_write:1248 (7 samples, 0.01%)</title><rect x="1151.9" y="453" width="0.2" height="15.0" fill="rgb(220,198,28)" rx="2" ry="2" />
+<text  x="1154.93" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/futures.py:_set_state:427 (6 samples, 0.01%)</title><rect x="1149.2" y="565" width="0.2" height="15.0" fill="rgb(245,0,6)" rx="2" ry="2" />
+<text  x="1152.22" y="575.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (20 samples, 0.04%)</title><rect x="1182.4" y="117" width="0.5" height="15.0" fill="rgb(217,163,7)" rx="2" ry="2" />
+<text  x="1185.44" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:133 (920 samples, 1.76%)</title><rect x="1165.2" y="325" width="20.8" height="15.0" fill="rgb(253,43,44)" rx="2" ry="2" />
+<text  x="1168.20" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (6 samples, 0.01%)</title><rect x="1164.3" y="245" width="0.1" height="15.0" fill="rgb(252,228,31)" rx="2" ry="2" />
+<text  x="1167.30" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:run_forever:345 (6,536 samples, 12.50%)</title><rect x="1042.5" y="613" width="147.5" height="15.0" fill="rgb(211,24,8)" rx="2" ry="2" />
+<text  x="1045.50" y="623.5" >/usr/lib/python3.5..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1305 (7 samples, 0.01%)</title><rect x="1180.6" y="149" width="0.2" height="15.0" fill="rgb(249,108,13)" rx="2" ry="2" />
+<text  x="1183.63" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:812 (10 samples, 0.02%)</title><rect x="1187.2" y="533" width="0.2" height="15.0" fill="rgb(245,22,9)" rx="2" ry="2" />
+<text  x="1190.22" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (9 samples, 0.02%)</title><rect x="1161.2" y="293" width="0.2" height="15.0" fill="rgb(216,144,19)" rx="2" ry="2" />
+<text  x="1164.23" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (36 samples, 0.07%)</title><rect x="1184.6" y="101" width="0.8" height="15.0" fill="rgb(227,64,40)" rx="2" ry="2" />
+<text  x="1187.63" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:94 (6 samples, 0.01%)</title><rect x="1173.1" y="293" width="0.1" height="15.0" fill="rgb(221,208,17)" rx="2" ry="2" />
+<text  x="1176.07" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_spaces:1231 (6 samples, 0.01%)</title><rect x="1176.4" y="117" width="0.2" height="15.0" fill="rgb(213,127,32)" rx="2" ry="2" />
+<text  x="1179.44" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_document_content:215 (6 samples, 0.01%)</title><rect x="1156.4" y="373" width="0.1" height="15.0" fill="rgb(229,96,38)" rx="2" ry="2" />
+<text  x="1159.40" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:103 (12 samples, 0.02%)</title><rect x="1168.2" y="165" width="0.3" height="15.0" fill="rgb(253,225,48)" rx="2" ry="2" />
+<text  x="1171.20" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:668 (5 samples, 0.01%)</title><rect x="1157.2" y="309" width="0.1" height="15.0" fill="rgb(207,54,34)" rx="2" ry="2" />
+<text  x="1160.23" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_value:595 (5 samples, 0.01%)</title><rect x="1174.2" y="181" width="0.1" height="15.0" fill="rgb(249,63,21)" rx="2" ry="2" />
+<text  x="1177.16" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py:send:478 (31 samples, 0.06%)</title><rect x="1154.1" y="453" width="0.7" height="15.0" fill="rgb(232,195,42)" rx="2" ry="2" />
+<text  x="1157.14" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/socket.py:close:407 (18 samples, 0.03%)</title><rect x="1149.4" y="549" width="0.4" height="15.0" fill="rgb(250,12,49)" rx="2" ry="2" />
+<text  x="1152.42" y="559.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (9 samples, 0.02%)</title><rect x="1173.5" y="213" width="0.3" height="15.0" fill="rgb(207,46,50)" rx="2" ry="2" />
+<text  x="1176.55" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:428 (52 samples, 0.10%)</title><rect x="1156.7" y="357" width="1.2" height="15.0" fill="rgb(239,95,38)" rx="2" ry="2" />
+<text  x="1159.69" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (22 samples, 0.04%)</title><rect x="1182.4" y="133" width="0.5" height="15.0" fill="rgb(247,64,33)" rx="2" ry="2" />
+<text  x="1185.39" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client.py:_request:178 (7 samples, 0.01%)</title><rect x="1154.9" y="469" width="0.1" height="15.0" fill="rgb(213,5,27)" rx="2" ry="2" />
+<text  x="1157.86" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:_run_once:1276 (4,706 samples, 9.00%)</title><rect x="1042.6" y="597" width="106.2" height="15.0" fill="rgb(207,19,38)" rx="2" ry="2" />
+<text  x="1045.64" y="607.5" >/usr/lib/pyth..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:111 (184 samples, 0.35%)</title><rect x="1181.8" y="229" width="4.1" height="15.0" fill="rgb(253,205,23)" rx="2" ry="2" />
+<text  x="1184.79" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_flow_scalar:663 (13 samples, 0.02%)</title><rect x="1166.0" y="213" width="0.3" height="15.0" fill="rgb(253,2,47)" rx="2" ry="2" />
+<text  x="1169.01" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:92 (6 samples, 0.01%)</title><rect x="1181.2" y="229" width="0.2" height="15.0" fill="rgb(207,127,33)" rx="2" ry="2" />
+<text  x="1184.24" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:111 (9 samples, 0.02%)</title><rect x="1179.1" y="101" width="0.2" height="15.0" fill="rgb(212,105,10)" rx="2" ry="2" />
+<text  x="1182.15" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:111 (5 samples, 0.01%)</title><rect x="1171.3" y="197" width="0.1" height="15.0" fill="rgb(251,49,9)" rx="2" ry="2" />
+<text  x="1174.34" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_mapping:204 (32 samples, 0.06%)</title><rect x="1186.3" y="405" width="0.7" height="15.0" fill="rgb(217,160,27)" rx="2" ry="2" />
+<text  x="1189.25" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (80 samples, 0.15%)</title><rect x="1156.6" y="373" width="1.8" height="15.0" fill="rgb(238,205,9)" rx="2" ry="2" />
+<text  x="1159.60" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/concurrent/futures/thread.py:_worker:64 (32,656 samples, 62.45%)</title><rect x="10.0" y="613" width="737.0" height="15.0" fill="rgb(241,222,48)" rx="2" ry="2" />
+<text  x="13.00" y="623.5" >/usr/lib/python3.5/concurrent/futures/thread.py:_worker:64</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/tasks.py:_wakeup:307 (1,711 samples, 3.27%)</title><rect x="1151.3" y="565" width="38.6" height="15.0" fill="rgb(243,99,36)" rx="2" ry="2" />
+<text  x="1154.32" y="575.5" >/us..</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/streams.py:feed_data:419 (5 samples, 0.01%)</title><rect x="1150.0" y="533" width="0.1" height="15.0" fill="rgb(244,221,50)" rx="2" ry="2" />
+<text  x="1153.03" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client.py:_request:172 (7 samples, 0.01%)</title><rect x="1153.1" y="469" width="0.1" height="15.0" fill="rgb(230,175,44)" rx="2" ry="2" />
+<text  x="1156.08" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (40 samples, 0.08%)</title><rect x="1159.2" y="293" width="0.9" height="15.0" fill="rgb(228,17,52)" rx="2" ry="2" />
+<text  x="1162.24" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:668 (6 samples, 0.01%)</title><rect x="1162.7" y="245" width="0.2" height="15.0" fill="rgb(213,216,36)" rx="2" ry="2" />
+<text  x="1165.74" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ROclient.py:show:682 (1,517 samples, 2.90%)</title><rect x="1152.9" y="517" width="34.2" height="15.0" fill="rgb(230,182,5)" rx="2" ry="2" />
+<text  x="1155.90" y="527.5" >/u..</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:create_connection:639 (9 samples, 0.02%)</title><rect x="1153.3" y="421" width="0.2" height="15.0" fill="rgb(246,200,6)" rx="2" ry="2" />
+<text  x="1156.28" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1186 (40 samples, 0.08%)</title><rect x="1176.8" y="117" width="0.9" height="15.0" fill="rgb(254,75,26)" rx="2" ry="2" />
+<text  x="1179.84" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (52 samples, 0.10%)</title><rect x="1159.0" y="325" width="1.1" height="15.0" fill="rgb(235,186,13)" rx="2" ry="2" />
+<text  x="1161.97" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:flatten_mapping:171 (6 samples, 0.01%)</title><rect x="1186.1" y="389" width="0.2" height="15.0" fill="rgb(237,144,38)" rx="2" ry="2" />
+<text  x="1189.12" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (26 samples, 0.05%)</title><rect x="1160.9" y="341" width="0.6" height="15.0" fill="rgb(241,106,27)" rx="2" ry="2" />
+<text  x="1163.93" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:get_mark:117 (5 samples, 0.01%)</title><rect x="1174.2" y="165" width="0.1" height="15.0" fill="rgb(221,122,42)" rx="2" ry="2" />
+<text  x="1177.16" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:64 (113 samples, 0.22%)</title><rect x="1183.2" y="181" width="2.6" height="15.0" fill="rgb(214,10,33)" rx="2" ry="2" />
+<text  x="1186.21" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/consumer/fetcher.py:_fetch_requests_routine:347 (8 samples, 0.02%)</title><rect x="1188.9" y="533" width="0.2" height="15.0" fill="rgb(210,206,51)" rx="2" ry="2" />
+<text  x="1191.87" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/tasks.py:sleep:514 (7 samples, 0.01%)</title><rect x="1187.4" y="517" width="0.2" height="15.0" fill="rgb(232,138,21)" rx="2" ry="2" />
+<text  x="1190.45" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py:_retry_with_session:1201 (7 samples, 0.01%)</title><rect x="1187.3" y="421" width="0.1" height="15.0" fill="rgb(231,174,28)" rx="2" ry="2" />
+<text  x="1190.29" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/threading.py:_bootstrap_inner:914 (45,752 samples, 87.50%)</title><rect x="10.0" y="645" width="1032.5" height="15.0" fill="rgb(228,62,10)" rx="2" ry="2" />
+<text  x="13.00" y="655.5" >/usr/lib/python3.5/threading.py:_bootstrap_inner:914</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:129 (7 samples, 0.01%)</title><rect x="1175.5" y="261" width="0.1" height="15.0" fill="rgb(222,214,38)" rx="2" ry="2" />
+<text  x="1178.47" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_indentless_sequence_entry:406 (11 samples, 0.02%)</title><rect x="1161.2" y="325" width="0.2" height="15.0" fill="rgb(209,172,18)" rx="2" ry="2" />
+<text  x="1164.18" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:129 (17 samples, 0.03%)</title><rect x="1164.8" y="325" width="0.4" height="15.0" fill="rgb(224,53,29)" rx="2" ry="2" />
+<text  x="1167.81" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client.py:_request:176 (43 samples, 0.08%)</title><rect x="1153.9" y="469" width="1.0" height="15.0" fill="rgb(206,59,45)" rx="2" ry="2" />
+<text  x="1156.89" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:829 (6 samples, 0.01%)</title><rect x="1187.6" y="533" width="0.2" height="15.0" fill="rgb(209,131,18)" rx="2" ry="2" />
+<text  x="1190.63" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:64 (25 samples, 0.05%)</title><rect x="1156.0" y="405" width="0.5" height="15.0" fill="rgb(246,223,15)" rx="2" ry="2" />
+<text  x="1158.97" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/__init__.py:safe_dump:216 (5 samples, 0.01%)</title><rect x="1152.6" y="501" width="0.1" height="15.0" fill="rgb(248,145,6)" rx="2" ry="2" />
+<text  x="1155.63" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:111 (555 samples, 1.06%)</title><rect x="1173.4" y="293" width="12.6" height="15.0" fill="rgb(229,120,32)" rx="2" ry="2" />
+<text  x="1176.44" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:_read_ready:662 (7 samples, 0.01%)</title><rect x="1149.9" y="565" width="0.1" height="15.0" fill="rgb(211,157,16)" rx="2" ry="2" />
+<text  x="1152.85" y="575.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:get_single_node:36 (1,333 samples, 2.55%)</title><rect x="1156.0" y="437" width="30.1" height="15.0" fill="rgb(249,76,16)" rx="2" ry="2" />
+<text  x="1158.97" y="447.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node:265 (6 samples, 0.01%)</title><rect x="1156.4" y="357" width="0.1" height="15.0" fill="rgb(244,86,29)" rx="2" ry="2" />
+<text  x="1159.40" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client_reqrep.py:__init__:87 (5 samples, 0.01%)</title><rect x="1153.1" y="453" width="0.1" height="15.0" fill="rgb(224,113,33)" rx="2" ry="2" />
+<text  x="1156.10" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:177 (15 samples, 0.03%)</title><rect x="1188.3" y="389" width="0.3" height="15.0" fill="rgb(244,65,42)" rx="2" ry="2" />
+<text  x="1191.28" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:451 (28 samples, 0.05%)</title><rect x="1172.2" y="277" width="0.7" height="15.0" fill="rgb(230,45,12)" rx="2" ry="2" />
+<text  x="1175.24" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:encode:132 (5 samples, 0.01%)</title><rect x="1150.7" y="469" width="0.1" height="15.0" fill="rgb(237,222,3)" rx="2" ry="2" />
+<text  x="1153.71" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:449 (230 samples, 0.44%)</title><rect x="1175.7" y="213" width="5.2" height="15.0" fill="rgb(206,223,6)" rx="2" ry="2" />
+<text  x="1178.71" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1307 (21 samples, 0.04%)</title><rect x="1185.0" y="85" width="0.4" height="15.0" fill="rgb(230,150,38)" rx="2" ry="2" />
+<text  x="1187.97" y="95.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_flow_scalar:663 (169 samples, 0.32%)</title><rect x="1166.3" y="213" width="3.8" height="15.0" fill="rgb(219,75,10)" rx="2" ry="2" />
+<text  x="1169.33" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:156 (6 samples, 0.01%)</title><rect x="1175.9" y="181" width="0.1" height="15.0" fill="rgb(240,150,37)" rx="2" ry="2" />
+<text  x="1178.87" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/consumer/fetcher.py:_proc_fetch_request:464 (19 samples, 0.04%)</title><rect x="1150.6" y="549" width="0.5" height="15.0" fill="rgb(223,62,24)" rx="2" ry="2" />
+<text  x="1153.64" y="559.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/mongo_client.py:_retry_with_session:1201 (5 samples, 0.01%)</title><rect x="1152.0" y="437" width="0.1" height="15.0" fill="rgb(233,163,10)" rx="2" ry="2" />
+<text  x="1154.97" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (9 samples, 0.02%)</title><rect x="1156.2" y="341" width="0.2" height="15.0" fill="rgb(223,214,16)" rx="2" ry="2" />
+<text  x="1159.19" y="351.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (21 samples, 0.04%)</title><rect x="1180.4" y="181" width="0.5" height="15.0" fill="rgb(231,179,44)" rx="2" ry="2" />
+<text  x="1183.41" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1286 (5 samples, 0.01%)</title><rect x="1174.5" y="165" width="0.1" height="15.0" fill="rgb(233,116,52)" rx="2" ry="2" />
+<text  x="1177.50" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_to_next_token:778 (6 samples, 0.01%)</title><rect x="1162.0" y="245" width="0.2" height="15.0" fill="rgb(233,160,47)" rx="2" ry="2" />
+<text  x="1165.02" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:save_possible_simple_key:306 (5 samples, 0.01%)</title><rect x="1162.8" y="229" width="0.1" height="15.0" fill="rgb(245,122,18)" rx="2" ry="2" />
+<text  x="1165.76" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:156 (7 samples, 0.01%)</title><rect x="1165.7" y="245" width="0.2" height="15.0" fill="rgb(210,163,40)" rx="2" ry="2" />
+<text  x="1168.69" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:need_more_tokens:149 (9 samples, 0.02%)</title><rect x="1173.5" y="197" width="0.3" height="15.0" fill="rgb(244,106,38)" rx="2" ry="2" />
+<text  x="1176.55" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (29 samples, 0.06%)</title><rect x="1157.2" y="325" width="0.7" height="15.0" fill="rgb(245,1,1)" rx="2" ry="2" />
+<text  x="1160.21" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (23 samples, 0.04%)</title><rect x="1157.3" y="309" width="0.6" height="15.0" fill="rgb(207,81,41)" rx="2" ry="2" />
+<text  x="1160.35" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1305 (18 samples, 0.03%)</title><rect x="1159.6" y="277" width="0.4" height="15.0" fill="rgb(223,34,36)" rx="2" ry="2" />
+<text  x="1162.58" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:update_one:995 (5 samples, 0.01%)</title><rect x="1187.7" y="485" width="0.1" height="15.0" fill="rgb(246,194,11)" rx="2" ry="2" />
+<text  x="1190.65" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ROclient.py:_get_item:459 (87 samples, 0.17%)</title><rect x="1153.1" y="501" width="1.9" height="15.0" fill="rgb(210,156,6)" rx="2" ry="2" />
+<text  x="1156.08" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:248 (188 samples, 0.36%)</title><rect x="1176.2" y="181" width="4.2" height="15.0" fill="rgb(253,145,22)" rx="2" ry="2" />
+<text  x="1179.17" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm.py:&lt;module&gt;:542 (6,536 samples, 12.50%)</title><rect x="1042.5" y="661" width="147.5" height="15.0" fill="rgb(214,55,26)" rx="2" ry="2" />
+<text  x="1045.50" y="671.5" >/usr/lib/python3/d..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/consumer/fetcher.py:_fetch_requests_routine:370 (10 samples, 0.02%)</title><rect x="1189.1" y="533" width="0.3" height="15.0" fill="rgb(218,183,49)" rx="2" ry="2" />
+<text  x="1192.14" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:92 (7 samples, 0.01%)</title><rect x="1172.9" y="293" width="0.2" height="15.0" fill="rgb(249,184,29)" rx="2" ry="2" />
+<text  x="1175.92" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:84 (554 samples, 1.06%)</title><rect x="1173.5" y="277" width="12.5" height="15.0" fill="rgb(211,25,0)" rx="2" ry="2" />
+<text  x="1176.46" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:run_until_complete:375 (6,536 samples, 12.50%)</title><rect x="1042.5" y="629" width="147.5" height="15.0" fill="rgb(232,200,42)" rx="2" ry="2" />
+<text  x="1045.50" y="639.5" >/usr/lib/python3.5..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (30 samples, 0.06%)</title><rect x="1174.4" y="197" width="0.7" height="15.0" fill="rgb(244,77,43)" rx="2" ry="2" />
+<text  x="1177.38" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:428 (68 samples, 0.13%)</title><rect x="1173.5" y="229" width="1.6" height="15.0" fill="rgb(206,146,54)" rx="2" ry="2" />
+<text  x="1176.53" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain_spaces:1334 (7 samples, 0.01%)</title><rect x="1171.9" y="197" width="0.2" height="15.0" fill="rgb(205,6,30)" rx="2" ry="2" />
+<text  x="1174.95" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:105 (6 samples, 0.01%)</title><rect x="1171.1" y="197" width="0.1" height="15.0" fill="rgb(216,100,42)" rx="2" ry="2" />
+<text  x="1174.09" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (335 samples, 0.64%)</title><rect x="1165.3" y="293" width="7.6" height="15.0" fill="rgb(215,82,10)" rx="2" ry="2" />
+<text  x="1168.31" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:177 (20 samples, 0.04%)</title><rect x="1188.2" y="469" width="0.5" height="15.0" fill="rgb(217,63,49)" rx="2" ry="2" />
+<text  x="1191.24" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:need_more_tokens:149 (5 samples, 0.01%)</title><rect x="1164.3" y="229" width="0.1" height="15.0" fill="rgb(217,210,17)" rx="2" ry="2" />
+<text  x="1167.32" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:64 (245 samples, 0.47%)</title><rect x="1175.6" y="245" width="5.6" height="15.0" fill="rgb(230,49,9)" rx="2" ry="2" />
+<text  x="1178.62" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/protocol.py:send_headers:664 (5 samples, 0.01%)</title><rect x="1154.3" y="437" width="0.1" height="15.0" fill="rgb(210,21,38)" rx="2" ry="2" />
+<text  x="1157.30" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1197 (7 samples, 0.01%)</title><rect x="1179.6" y="117" width="0.1" height="15.0" fill="rgb(212,164,49)" rx="2" ry="2" />
+<text  x="1182.55" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:get_single_data:35 (6 samples, 0.01%)</title><rect x="1151.7" y="485" width="0.2" height="15.0" fill="rgb(217,59,36)" rx="2" ry="2" />
+<text  x="1154.73" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/base_events.py:getaddrinfo:593 (8 samples, 0.02%)</title><rect x="1153.3" y="389" width="0.2" height="15.0" fill="rgb(209,2,28)" rx="2" ry="2" />
+<text  x="1156.31" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:ns_update_vnfr:591 (10 samples, 0.02%)</title><rect x="1187.2" y="517" width="0.2" height="15.0" fill="rgb(219,84,25)" rx="2" ry="2" />
+<text  x="1190.22" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/producer/producer.py:start:236 (16 samples, 0.03%)</title><rect x="1152.2" y="501" width="0.4" height="15.0" fill="rgb(248,25,27)" rx="2" ry="2" />
+<text  x="1155.22" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_value:593 (6 samples, 0.01%)</title><rect x="1174.0" y="181" width="0.1" height="15.0" fill="rgb(254,86,41)" rx="2" ry="2" />
+<text  x="1176.98" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_single:649 (14 samples, 0.03%)</title><rect x="1166.0" y="229" width="0.3" height="15.0" fill="rgb(225,168,28)" rx="2" ry="2" />
+<text  x="1168.99" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/dbmongo.py:set_one:338 (6 samples, 0.01%)</title><rect x="1187.6" y="501" width="0.2" height="15.0" fill="rgb(230,173,15)" rx="2" ry="2" />
+<text  x="1190.63" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1190 (11 samples, 0.02%)</title><rect x="1183.9" y="53" width="0.3" height="15.0" fill="rgb(225,80,54)" rx="2" ry="2" />
+<text  x="1186.91" y="63.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:133 (1,208 samples, 2.31%)</title><rect x="1158.7" y="389" width="27.3" height="15.0" fill="rgb(249,58,28)" rx="2" ry="2" />
+<text  x="1161.72" y="399.5" >/..</text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:_sock_connect:407 (5 samples, 0.01%)</title><rect x="1153.6" y="389" width="0.2" height="15.0" fill="rgb(212,138,51)" rx="2" ry="2" />
+<text  x="1156.64" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1186 (9 samples, 0.02%)</title><rect x="1183.6" y="53" width="0.2" height="15.0" fill="rgb(253,204,30)" rx="2" ry="2" />
+<text  x="1186.59" y="63.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:220 (7 samples, 0.01%)</title><rect x="1182.2" y="133" width="0.1" height="15.0" fill="rgb(230,23,36)" rx="2" ry="2" />
+<text  x="1185.17" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:127 (80 samples, 0.15%)</title><rect x="1156.6" y="389" width="1.8" height="15.0" fill="rgb(231,179,21)" rx="2" ry="2" />
+<text  x="1159.60" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:110 (10 samples, 0.02%)</title><rect x="1173.2" y="293" width="0.2" height="15.0" fill="rgb(215,50,49)" rx="2" ry="2" />
+<text  x="1176.21" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:170 (5 samples, 0.01%)</title><rect x="1150.7" y="421" width="0.1" height="15.0" fill="rgb(212,132,35)" rx="2" ry="2" />
+<text  x="1153.71" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_breaks:1260 (12 samples, 0.02%)</title><rect x="1180.1" y="101" width="0.3" height="15.0" fill="rgb(245,74,33)" rx="2" ry="2" />
+<text  x="1183.09" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:111 (1,084 samples, 2.07%)</title><rect x="1161.5" y="357" width="24.5" height="15.0" fill="rgb(236,203,41)" rx="2" ry="2" />
+<text  x="1164.52" y="367.5" >/..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:802 (1,520 samples, 2.91%)</title><rect x="1152.9" y="533" width="34.3" height="15.0" fill="rgb(209,135,41)" rx="2" ry="2" />
+<text  x="1155.85" y="543.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:get_single_data:37 (48 samples, 0.09%)</title><rect x="1186.1" y="453" width="1.0" height="15.0" fill="rgb(223,99,52)" rx="2" ry="2" />
+<text  x="1189.05" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:update_one:995 (8 samples, 0.02%)</title><rect x="1187.3" y="469" width="0.1" height="15.0" fill="rgb(232,162,42)" rx="2" ry="2" />
+<text  x="1190.27" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1189 (9 samples, 0.02%)</title><rect x="1177.8" y="117" width="0.2" height="15.0" fill="rgb(244,214,48)" rx="2" ry="2" />
+<text  x="1180.81" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1286 (8 samples, 0.02%)</title><rect x="1159.3" y="277" width="0.2" height="15.0" fill="rgb(247,50,30)" rx="2" ry="2" />
+<text  x="1162.29" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (41 samples, 0.08%)</title><rect x="1159.2" y="309" width="0.9" height="15.0" fill="rgb(211,73,34)" rx="2" ry="2" />
+<text  x="1162.22" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1307 (6 samples, 0.01%)</title><rect x="1160.0" y="277" width="0.1" height="15.0" fill="rgb(207,145,7)" rx="2" ry="2" />
+<text  x="1162.99" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (45 samples, 0.09%)</title><rect x="1181.9" y="149" width="1.0" height="15.0" fill="rgb(241,87,18)" rx="2" ry="2" />
+<text  x="1184.88" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1149 (7 samples, 0.01%)</title><rect x="1166.1" y="197" width="0.2" height="15.0" fill="rgb(242,141,47)" rx="2" ry="2" />
+<text  x="1169.12" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_indentless_sequence_entry:408 (5 samples, 0.01%)</title><rect x="1173.3" y="261" width="0.1" height="15.0" fill="rgb(221,74,8)" rx="2" ry="2" />
+<text  x="1176.30" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:133 (121 samples, 0.23%)</title><rect x="1183.2" y="197" width="2.7" height="15.0" fill="rgb(235,222,50)" rx="2" ry="2" />
+<text  x="1186.21" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:248 (54 samples, 0.10%)</title><rect x="1183.4" y="117" width="1.2" height="15.0" fill="rgb(238,101,44)" rx="2" ry="2" />
+<text  x="1186.39" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:get_event:118 (5 samples, 0.01%)</title><rect x="1155.8" y="421" width="0.1" height="15.0" fill="rgb(240,64,51)" rx="2" ry="2" />
+<text  x="1158.77" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1311 (7 samples, 0.01%)</title><rect x="1174.9" y="165" width="0.2" height="15.0" fill="rgb(215,60,10)" rx="2" ry="2" />
+<text  x="1177.90" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:430 (5 samples, 0.01%)</title><rect x="1157.9" y="357" width="0.1" height="15.0" fill="rgb(249,55,24)" rx="2" ry="2" />
+<text  x="1160.91" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (25 samples, 0.05%)</title><rect x="1156.0" y="389" width="0.5" height="15.0" fill="rgb(240,112,12)" rx="2" ry="2" />
+<text  x="1158.97" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:peek:89 (14 samples, 0.03%)</title><rect x="1167.5" y="165" width="0.3" height="15.0" fill="rgb(218,219,21)" rx="2" ry="2" />
+<text  x="1170.50" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/concurrent/futures/_base.py:set_result:494 (6 samples, 0.01%)</title><rect x="10.0" y="581" width="0.2" height="15.0" fill="rgb(253,104,33)" rx="2" ry="2" />
+<text  x="13.05" y="591.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/streams.py:data_received:253 (5 samples, 0.01%)</title><rect x="1150.0" y="549" width="0.1" height="15.0" fill="rgb(246,16,8)" rx="2" ry="2" />
+<text  x="1153.03" y="559.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:84 (1,305 samples, 2.50%)</title><rect x="1156.5" y="405" width="29.5" height="15.0" fill="rgb(227,43,34)" rx="2" ry="2" />
+<text  x="1159.53" y="415.5" >/u..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/msgkafka.py:aiowrite:101 (16 samples, 0.03%)</title><rect x="1152.2" y="517" width="0.4" height="15.0" fill="rgb(236,224,37)" rx="2" ry="2" />
+<text  x="1155.22" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:127 (89 samples, 0.17%)</title><rect x="1173.5" y="261" width="2.0" height="15.0" fill="rgb(251,13,48)" rx="2" ry="2" />
+<text  x="1176.46" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_spaces:1228 (6 samples, 0.01%)</title><rect x="1166.4" y="181" width="0.1" height="15.0" fill="rgb(229,107,45)" rx="2" ry="2" />
+<text  x="1169.39" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (7 samples, 0.01%)</title><rect x="1161.8" y="277" width="0.1" height="15.0" fill="rgb(245,48,38)" rx="2" ry="2" />
+<text  x="1164.79" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/dbmongo.py:set_one:338 (8 samples, 0.02%)</title><rect x="1187.3" y="485" width="0.1" height="15.0" fill="rgb(215,210,36)" rx="2" ry="2" />
+<text  x="1190.27" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar:1149 (164 samples, 0.31%)</title><rect x="1176.7" y="133" width="3.7" height="15.0" fill="rgb(212,73,4)" rx="2" ry="2" />
+<text  x="1179.69" y="143.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node:265 (5 samples, 0.01%)</title><rect x="1173.3" y="245" width="0.1" height="15.0" fill="rgb(215,2,22)" rx="2" ry="2" />
+<text  x="1176.30" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/periodic_executor.py:_run:128 (13,071 samples, 25.00%)</title><rect x="747.5" y="613" width="295.0" height="15.0" fill="rgb(228,168,21)" rx="2" ry="2" />
+<text  x="750.52" y="623.5" >/usr/local/lib/python3.5/dist-packages/..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:encode:170 (5 samples, 0.01%)</title><rect x="1150.7" y="437" width="0.1" height="15.0" fill="rgb(213,103,6)" rx="2" ry="2" />
+<text  x="1153.71" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_yaml_seq:393 (5 samples, 0.01%)</title><rect x="1187.0" y="421" width="0.1" height="15.0" fill="rgb(240,32,1)" rx="2" ry="2" />
+<text  x="1190.02" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (88 samples, 0.17%)</title><rect x="1173.5" y="245" width="2.0" height="15.0" fill="rgb(239,224,32)" rx="2" ry="2" />
+<text  x="1176.48" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client.py:__aenter__:504 (86 samples, 0.16%)</title><rect x="1153.1" y="485" width="1.9" height="15.0" fill="rgb(212,23,35)" rx="2" ry="2" />
+<text  x="1156.08" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/socket.py:getaddrinfo:732 (20 samples, 0.04%)</title><rect x="747.0" y="581" width="0.4" height="15.0" fill="rgb(212,204,28)" rx="2" ry="2" />
+<text  x="749.96" y="591.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (5 samples, 0.01%)</title><rect x="1161.0" y="293" width="0.1" height="15.0" fill="rgb(236,123,25)" rx="2" ry="2" />
+<text  x="1164.00" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/util.py:__call__:159 (6 samples, 0.01%)</title><rect x="1150.7" y="501" width="0.1" height="15.0" fill="rgb(247,196,10)" rx="2" ry="2" />
+<text  x="1153.69" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_plain:676 (44 samples, 0.08%)</title><rect x="1162.9" y="245" width="1.0" height="15.0" fill="rgb(243,205,10)" rx="2" ry="2" />
+<text  x="1165.87" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/selectors.py:select:441 (4,699 samples, 8.99%)</title><rect x="1042.7" y="581" width="106.0" height="15.0" fill="rgb(225,137,29)" rx="2" ry="2" />
+<text  x="1045.68" y="591.5" >/usr/lib/pyt..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain_spaces:1332 (5 samples, 0.01%)</title><rect x="1185.1" y="69" width="0.1" height="15.0" fill="rgb(211,112,19)" rx="2" ry="2" />
+<text  x="1188.10" y="79.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_flow_scalar:663 (54 samples, 0.10%)</title><rect x="1183.4" y="85" width="1.2" height="15.0" fill="rgb(210,49,19)" rx="2" ry="2" />
+<text  x="1186.39" y="95.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (76 samples, 0.15%)</title><rect x="1158.8" y="357" width="1.7" height="15.0" fill="rgb(219,67,22)" rx="2" ry="2" />
+<text  x="1161.83" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:92 (8 samples, 0.02%)</title><rect x="1158.5" y="357" width="0.2" height="15.0" fill="rgb(230,121,16)" rx="2" ry="2" />
+<text  x="1161.47" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1190 (59 samples, 0.11%)</title><rect x="1168.0" y="181" width="1.4" height="15.0" fill="rgb(241,139,11)" rx="2" ry="2" />
+<text  x="1171.02" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:64 (78 samples, 0.15%)</title><rect x="1158.8" y="373" width="1.7" height="15.0" fill="rgb(235,141,36)" rx="2" ry="2" />
+<text  x="1161.79" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:136 (15 samples, 0.03%)</title><rect x="1188.3" y="373" width="0.3" height="15.0" fill="rgb(250,150,41)" rx="2" ry="2" />
+<text  x="1191.28" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (10 samples, 0.02%)</title><rect x="1180.9" y="197" width="0.3" height="15.0" fill="rgb(242,101,39)" rx="2" ry="2" />
+<text  x="1183.93" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:156 (8 samples, 0.02%)</title><rect x="1162.0" y="261" width="0.2" height="15.0" fill="rgb(227,188,43)" rx="2" ry="2" />
+<text  x="1164.97" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:432 (15 samples, 0.03%)</title><rect x="1175.1" y="229" width="0.3" height="15.0" fill="rgb(243,141,22)" rx="2" ry="2" />
+<text  x="1178.08" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (31 samples, 0.06%)</title><rect x="1164.1" y="277" width="0.7" height="15.0" fill="rgb(214,41,0)" rx="2" ry="2" />
+<text  x="1167.09" y="287.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (10 samples, 0.02%)</title><rect x="1161.2" y="309" width="0.2" height="15.0" fill="rgb(219,126,45)" rx="2" ry="2" />
+<text  x="1164.20" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:428 (94 samples, 0.18%)</title><rect x="1161.8" y="293" width="2.1" height="15.0" fill="rgb(236,131,19)" rx="2" ry="2" />
+<text  x="1164.79" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:432 (31 samples, 0.06%)</title><rect x="1164.1" y="293" width="0.7" height="15.0" fill="rgb(212,183,31)" rx="2" ry="2" />
+<text  x="1167.09" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/tasks.py:wait:347 (7 samples, 0.01%)</title><rect x="1189.2" y="517" width="0.2" height="15.0" fill="rgb(205,207,25)" rx="2" ry="2" />
+<text  x="1192.21" y="527.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/aiohttp/client.py:_request:174 (29 samples, 0.06%)</title><rect x="1153.2" y="469" width="0.7" height="15.0" fill="rgb(237,71,27)" rx="2" ry="2" />
+<text  x="1156.24" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:430 (5 samples, 0.01%)</title><rect x="1164.0" y="293" width="0.1" height="15.0" fill="rgb(223,195,54)" rx="2" ry="2" />
+<text  x="1166.98" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update:847 (5 samples, 0.01%)</title><rect x="1152.0" y="421" width="0.1" height="15.0" fill="rgb(241,189,30)" rx="2" ry="2" />
+<text  x="1154.97" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ROclient.py:_get_item:460 (7 samples, 0.01%)</title><rect x="1155.0" y="501" width="0.2" height="15.0" fill="rgb(226,222,19)" rx="2" ry="2" />
+<text  x="1158.04" y="511.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_double:652 (54 samples, 0.10%)</title><rect x="1183.4" y="101" width="1.2" height="15.0" fill="rgb(225,44,50)" rx="2" ry="2" />
+<text  x="1186.39" y="111.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/pool.py:command:579 (5 samples, 0.01%)</title><rect x="1187.3" y="373" width="0.1" height="15.0" fill="rgb(242,25,49)" rx="2" ry="2" />
+<text  x="1190.34" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_node_or_indentless_sequence:271 (16 samples, 0.03%)</title><rect x="1160.2" y="325" width="0.3" height="15.0" fill="rgb(225,111,39)" rx="2" ry="2" />
+<text  x="1163.19" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:need_more_tokens:149 (5 samples, 0.01%)</title><rect x="1161.8" y="261" width="0.1" height="15.0" fill="rgb(222,83,51)" rx="2" ry="2" />
+<text  x="1164.84" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:177 (15 samples, 0.03%)</title><rect x="1188.3" y="405" width="0.3" height="15.0" fill="rgb(225,135,38)" rx="2" ry="2" />
+<text  x="1191.28" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ns.py:instantiate:1090 (27 samples, 0.05%)</title><rect x="1152.2" y="533" width="0.6" height="15.0" fill="rgb(235,21,26)" rx="2" ry="2" />
+<text  x="1155.18" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:177 (20 samples, 0.04%)</title><rect x="1188.2" y="453" width="0.5" height="15.0" fill="rgb(222,0,12)" rx="2" ry="2" />
+<text  x="1191.24" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_flow_scalar:663 (188 samples, 0.36%)</title><rect x="1176.2" y="149" width="4.2" height="15.0" fill="rgb(226,17,4)" rx="2" ry="2" />
+<text  x="1179.17" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/loader.py:__init__:34 (6 samples, 0.01%)</title><rect x="1155.3" y="453" width="0.1" height="15.0" fill="rgb(239,37,23)" rx="2" ry="2" />
+<text  x="1158.31" y="463.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:129 (14 samples, 0.03%)</title><rect x="1158.4" y="389" width="0.3" height="15.0" fill="rgb(223,6,7)" rx="2" ry="2" />
+<text  x="1161.41" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/conn.py:_read:273 (33 samples, 0.06%)</title><rect x="1188.1" y="533" width="0.7" height="15.0" fill="rgb(247,13,29)" rx="2" ry="2" />
+<text  x="1191.08" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:248 (170 samples, 0.33%)</title><rect x="1166.3" y="245" width="3.8" height="15.0" fill="rgb(215,108,12)" rx="2" ry="2" />
+<text  x="1169.30" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_key:432 (17 samples, 0.03%)</title><rect x="1158.0" y="357" width="0.4" height="15.0" fill="rgb(229,124,43)" rx="2" ry="2" />
+<text  x="1161.02" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_breaks:1260 (8 samples, 0.02%)</title><rect x="1169.9" y="165" width="0.2" height="15.0" fill="rgb(230,100,5)" rx="2" ry="2" />
+<text  x="1172.94" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/aiokafka/producer/producer.py:_send_produce_req:441 (5 samples, 0.01%)</title><rect x="1189.7" y="533" width="0.1" height="15.0" fill="rgb(221,73,49)" rx="2" ry="2" />
+<text  x="1192.68" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1286 (6 samples, 0.01%)</title><rect x="1163.0" y="229" width="0.1" height="15.0" fill="rgb(252,87,38)" rx="2" ry="2" />
+<text  x="1165.99" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:decode:136 (20 samples, 0.04%)</title><rect x="1188.2" y="437" width="0.5" height="15.0" fill="rgb(221,14,10)" rx="2" ry="2" />
+<text  x="1191.24" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1190 (62 samples, 0.12%)</title><rect x="1178.0" y="117" width="1.4" height="15.0" fill="rgb(210,69,5)" rx="2" ry="2" />
+<text  x="1181.02" y="127.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_yaml_map:398 (40 samples, 0.08%)</title><rect x="1186.1" y="421" width="0.9" height="15.0" fill="rgb(230,133,53)" rx="2" ry="2" />
+<text  x="1189.07" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_scalar_node:94 (6 samples, 0.01%)</title><rect x="1165.1" y="293" width="0.1" height="15.0" fill="rgb(225,151,42)" rx="2" ry="2" />
+<text  x="1168.06" y="303.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_sequence_node:110 (16 samples, 0.03%)</title><rect x="1181.4" y="229" width="0.4" height="15.0" fill="rgb(215,107,51)" rx="2" ry="2" />
+<text  x="1184.42" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_plain:1288 (5 samples, 0.01%)</title><rect x="1163.1" y="229" width="0.1" height="15.0" fill="rgb(211,42,46)" rx="2" ry="2" />
+<text  x="1166.12" y="239.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/struct.py:&lt;listcomp&gt;:49 (20 samples, 0.04%)</title><rect x="1188.2" y="485" width="0.5" height="15.0" fill="rgb(252,159,11)" rx="2" ry="2" />
+<text  x="1191.24" y="495.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:105 (12 samples, 0.02%)</title><rect x="1168.7" y="165" width="0.2" height="15.0" fill="rgb(205,46,4)" rx="2" ry="2" />
+<text  x="1171.67" y="175.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_mapping:203 (8 samples, 0.02%)</title><rect x="1186.1" y="405" width="0.2" height="15.0" fill="rgb(253,175,39)" rx="2" ry="2" />
+<text  x="1189.07" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (10 samples, 0.02%)</title><rect x="1158.5" y="373" width="0.2" height="15.0" fill="rgb(239,198,47)" rx="2" ry="2" />
+<text  x="1161.47" y="383.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:449 (97 samples, 0.19%)</title><rect x="1183.3" y="149" width="2.2" height="15.0" fill="rgb(214,89,34)" rx="2" ry="2" />
+<text  x="1186.27" y="159.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_mapping:129 (7 samples, 0.01%)</title><rect x="1186.8" y="389" width="0.2" height="15.0" fill="rgb(224,194,12)" rx="2" ry="2" />
+<text  x="1189.80" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/asyncio/selector_events.py:write:700 (14 samples, 0.03%)</title><rect x="1154.5" y="405" width="0.3" height="15.0" fill="rgb(213,8,25)" rx="2" ry="2" />
+<text  x="1157.52" y="415.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_breaks:1260 (9 samples, 0.02%)</title><rect x="1184.4" y="37" width="0.2" height="15.0" fill="rgb(214,97,26)" rx="2" ry="2" />
+<text  x="1187.36" y="47.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:104 (5 samples, 0.01%)</title><rect x="1159.6" y="261" width="0.1" height="15.0" fill="rgb(235,37,21)" rx="2" ry="2" />
+<text  x="1162.58" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_document:46 (47 samples, 0.09%)</title><rect x="1186.1" y="437" width="1.0" height="15.0" fill="rgb(236,181,35)" rx="2" ry="2" />
+<text  x="1189.07" y="447.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:115 (5 samples, 0.01%)</title><rect x="1165.6" y="261" width="0.1" height="15.0" fill="rgb(220,25,30)" rx="2" ry="2" />
+<text  x="1168.58" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:check_token:116 (6 samples, 0.01%)</title><rect x="1181.6" y="181" width="0.1" height="15.0" fill="rgb(246,188,18)" rx="2" ry="2" />
+<text  x="1184.56" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:136 (20 samples, 0.04%)</title><rect x="1188.2" y="421" width="0.5" height="15.0" fill="rgb(239,107,1)" rx="2" ry="2" />
+<text  x="1191.24" y="431.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:scan_flow_scalar_non_spaces:1216 (6 samples, 0.01%)</title><rect x="1169.7" y="181" width="0.1" height="15.0" fill="rgb(233,129,40)" rx="2" ry="2" />
+<text  x="1172.69" y="191.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_block_mapping_value:451 (10 samples, 0.02%)</title><rect x="1180.9" y="213" width="0.3" height="15.0" fill="rgb(248,220,40)" rx="2" ry="2" />
+<text  x="1183.93" y="223.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3.5/threading.py:run:862 (45,752 samples, 87.50%)</title><rect x="10.0" y="629" width="1032.5" height="15.0" fill="rgb(229,101,23)" rx="2" ry="2" />
+<text  x="13.00" y="639.5" >/usr/lib/python3.5/threading.py:run:862</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm.py:kafka_read:401 (15 samples, 0.03%)</title><rect x="1151.6" y="533" width="0.3" height="15.0" fill="rgb(240,87,43)" rx="2" ry="2" />
+<text  x="1154.59" y="543.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/lcm.py:start:427 (6,536 samples, 12.50%)</title><rect x="1042.5" y="645" width="147.5" height="15.0" fill="rgb(224,197,36)" rx="2" ry="2" />
+<text  x="1045.50" y="655.5" >/usr/lib/python3/d..</text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_lcm/ROclient.py:_get_item:465 (1,410 samples, 2.70%)</title><rect x="1155.3" y="501" width="31.8" height="15.0" fill="rgb(221,92,41)" rx="2" ry="2" />
+<text  x="1158.31" y="511.5" >/u..</text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:220 (8 samples, 0.02%)</title><rect x="1157.0" y="325" width="0.2" height="15.0" fill="rgb(220,51,48)" rx="2" ry="2" />
+<text  x="1160.01" y="335.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/kafka/protocol/types.py:&lt;listcomp&gt;:136 (15 samples, 0.03%)</title><rect x="1188.3" y="357" width="0.3" height="15.0" fill="rgb(215,210,18)" rx="2" ry="2" />
+<text  x="1191.28" y="367.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:82 (565 samples, 1.08%)</title><rect x="1173.2" y="309" width="12.8" height="15.0" fill="rgb(230,116,22)" rx="2" ry="2" />
+<text  x="1176.21" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/constructor.py:construct_mapping:126 (6 samples, 0.01%)</title><rect x="1186.7" y="389" width="0.1" height="15.0" fill="rgb(218,95,41)" rx="2" ry="2" />
+<text  x="1189.66" y="399.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/pymongo/collection.py:_update_retryable:851 (7 samples, 0.01%)</title><rect x="1151.9" y="469" width="0.2" height="15.0" fill="rgb(237,117,46)" rx="2" ry="2" />
+<text  x="1154.93" y="479.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/reader.py:forward:105 (6 samples, 0.01%)</title><rect x="1159.7" y="261" width="0.1" height="15.0" fill="rgb(246,47,29)" rx="2" ry="2" />
+<text  x="1162.69" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (13 samples, 0.02%)</title><rect x="1172.9" y="309" width="0.3" height="15.0" fill="rgb(237,154,11)" rx="2" ry="2" />
+<text  x="1175.92" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (51 samples, 0.10%)</title><rect x="1162.7" y="261" width="1.2" height="15.0" fill="rgb(211,175,13)" rx="2" ry="2" />
+<text  x="1165.72" y="271.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:check_event:98 (137 samples, 0.26%)</title><rect x="1161.7" y="309" width="3.1" height="15.0" fill="rgb(227,164,24)" rx="2" ry="2" />
+<text  x="1164.70" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/parser.py:parse_flow_sequence_entry:477 (6 samples, 0.01%)</title><rect x="1161.0" y="309" width="0.1" height="15.0" fill="rgb(247,6,35)" rx="2" ry="2" />
+<text  x="1163.98" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_node:80 (12 samples, 0.02%)</title><rect x="1164.9" y="309" width="0.3" height="15.0" fill="rgb(227,184,12)" rx="2" ry="2" />
+<text  x="1167.93" y="319.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/scanner.py:fetch_more_tokens:252 (88 samples, 0.17%)</title><rect x="1170.2" y="245" width="2.0" height="15.0" fill="rgb(220,189,45)" rx="2" ry="2" />
+<text  x="1173.21" y="255.5" ></text>
+</g>
+<g >
+<title>/usr/local/lib/python3.5/dist-packages/yaml/composer.py:compose_mapping_node:127 (60 samples, 0.11%)</title><rect x="1181.8" y="197" width="1.3" height="15.0" fill="rgb(251,158,43)" rx="2" ry="2" />
+<text  x="1184.79" y="207.5" ></text>
+</g>
+<g >
+<title>/usr/lib/python3/dist-packages/osm_common/msgkafka.py:aioread:133 (15 samples, 0.03%)</title><rect x="1151.6" y="517" width="0.3" height="15.0" fill="rgb(234,156,13)" rx="2" ry="2" />
+<text  x="1154.59" y="527.5" ></text>
+</g>
+</g>
+</svg>
