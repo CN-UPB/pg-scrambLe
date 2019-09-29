@@ -1,18 +1,12 @@
-\chapter{Work Packages}
+\chapter{Scramble Services Implementation}
 \label{ch:WP}
 
 \section{Translator}
 \paragraph{}
 In a hierarchical architecture involving different MANOs, there is a need of conversion of network descriptors to schemas of respective MANO. Service Descriptor Translator (SDT) serves the purpose of translating network descriptors, namely NSDs and VNFDs from schema of SONATA Pishahang to that of OSM and vice versa.
 \paragraph{}
-In a scenario, where a parent MANO, say Pishahang decides to deploy one of the network services in its lower hierarchy MANO, say OSM, the NSD and VNFD(s) need to be converted to the descriptor schema of OSM. In such an event, the Scramble plugin calls the translator service and sends the descriptors to the SDT, where the translation of the descriptors takes place and the translated descriptors are sent to Adaptor utility for deployment in appropriate MANO. Figure \ref{fig:service-descriptor-translator} gives a high level view of Translator.
+In a scenario, where a parent MANO, say Pishahang decides to deploy one of the network services in its lower hierarchy MANO, say OSM, the NSD and VNFD(s) need to be converted to the descriptor schema of OSM. In such an event, the Scramble plugin calls the translator service and sends the descriptors to the SDT, where the translation of the descriptors takes place and the translated descriptors are sent to Adaptor utility for deployment in appropriate MANO. 
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.8\linewidth]{"figures/Translator"}
-	\caption{Translator}
-	\label{fig:service-descriptor-translator}
-\end{figure}
 
 \subsection{Architecture \& Work flow}
 The translator engine reads a json formatted descriptor and first converts it into a pandas \textit{DataFrame}. The \textit{DataFrame} object is constructed to have the following columns.
