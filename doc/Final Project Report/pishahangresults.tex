@@ -7,7 +7,7 @@ The figures \ref{fig:pishcirroscase1180-cpu} \ref{fig:pishcirroscase1180-mem} an
 The figure \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 6 Pishahang dockers are:
 
 \begin{itemize}
-	\item \textbf{son-sp-infrabstract:} This docker plays the role of an abstraction layer between the MANO framework and the underlying virtualised infrastructure. It exposes the interfaces to manage services and the VNF instances of all of these 180 instances by reserving resources for their service deployment. It also receives monitoring information about the infrastructure status. Hence, it occupies much of the CPU.
+	\item \textbf{son-sp-infrabstract:} This docker plays the role of an abstraction layer between the MANO framework and the underlying virtualization infrastructure. It exposes the interfaces to manage services and the VNF instances of all of these 180 instances by reserving resources for their service deployment. It also receives monitoring information about the infrastructure status. Hence, it occupies much of the CPU.
 	\item \textbf{sevicelifecyclemanagement:} This is responsible for orchestrating the entire lifecycle of every service that is being deployed with Pishahang service platform. The lifecycle operations of NS include
 	
 	\begin{itemize}
@@ -26,7 +26,7 @@ The figure \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 6 Pisha
 The load on all of the other microservices in Pishahang service platform is distributed and the difference between their mean usage is negligible. Hence, the order of all other microservices can be insignificant.
 
 	
-	\item \textbf{specificmanageregistry:} The role of this docker is to manage lifecycle of FSM (function-specific manager) and SSM(service-specific manager). Lifecycle operations of FSM and SSM include instantiation, registeration, updation and termination. ex: to obtain onboarding SSM request from SLM.
+	\item \textbf{specificmanageregistry:} The role of this docker is to manage lifecycle of FSM (function-specific manager) and SSM(service-specific manager). Lifecycle operations of FSM and SSM include instantiation, registration, updation and termination. ex: to obtain onboarding SSM request from SLM.
 	\item \textbf{cloudservicelifecyclemanagement:}This docker is responsible for lifecycle management of cloud network services on kubernates.
 	\item \textbf{functionallifecyclemanagement:}  This docker manages the lifecycle events of each VNF in these 180 network instances. 
 
@@ -52,14 +52,14 @@ The first 5 Pishahang dockers in memory utilization graph  from figure \ref{fig:
 \begin{itemize}
 	\item \textbf{son-keyclock:} This docker service provides access management and identity management of these micro services.
 	\item \textbf{son-monitor-influxdb:} This monitoring plugin records metrics on the internal runtime and service performance and writes it to database.
-	\item \textbf{son-sp-infrabstract:}  This docker plays the role of an abstraction layer between the MANO framework and the underlying virtualised infrastructure. It exposes the interfaces to manage services and the VNF instances of all of these 180 instances by reserving resources for their service deployment. It also receives monitoring information about the infrastructure status. Hence, it occupies much of the memory.
+	\item \textbf{son-sp-infrabstract:}  This docker plays the role of an abstraction layer between the MANO framework and the underlying virtualization infrastructure. It exposes the interfaces to manage services and the VNF instances of all of these 180 instances by reserving resources for their service deployment. It also receives monitoring information about the infrastructure status. Hence, it occupies much of the memory.
 	
 	\item \textbf{WIM adaptor:} The role of this microservice is to provide connectivity over the physical network. The WIM adaptor acts as a north-bound interface to the higher layers,T eg., NFVO to provide connectivity services between NFVI-POPs or to physical network functions. This also invokes the underlying NFVI network southbound interfaces, whether they are network controllers or NFs, to construct the service within the domain.
 	
 	\item \textbf{son-gtksrv:} This is Pishahang's gatekeeper service management micro-service.
 	
 \end{itemize}
- The most important inference from \ref{fig:cirroscase1180-mem} and \ref{fig:pishcirroscase1180-mem} is that, the memory utilisation by Pishahang is much lighter than OSM for the top docker services.
+ The most important inference from \ref{fig:cirroscase1180-mem} and \ref{fig:pishcirroscase1180-mem} is that, the memory utilization by Pishahang is much lighter than OSM for the top docker services.
 
 
 

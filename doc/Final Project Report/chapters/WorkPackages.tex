@@ -274,7 +274,7 @@ Translation could be extended to include the monitoring parameters as well. Howe
 
 Service Life-cycle Management(SLM) component of Pishahang carries out the main task of orchestration. As a result it was all the more relevant to add one more aspect to it for integrating and handling Scramble components.
 
-The main class of SLM, \textit{ServiceLifecycleManager}, contains a list of member functions for carrying out the entire orchestration. One of the many member functions, \textit{SLM\_mapping}, is responsible for handling the descriptors payload and creating a mapping of network funtions to the available VIMs. Keeping the original flow of SLM intact, we extended the main class to include a new member function (\textit{SLM\_mapping\_scramble}) to handle request addressed for mapping the network functions to the available MANOs.
+The main class of SLM, \textit{ServiceLifecycleManager}, contains a list of member functions for carrying out the entire orchestration. One of the many member functions, \textit{SLM\_mapping}, is responsible for handling the descriptors payload and creating a mapping of network functions to the available VIMs. Keeping the original flow of SLM intact, we extended the main class to include a new member function (\textit{SLM\_mapping\_scramble}) to handle request addressed for mapping the network functions to the available MANOs.
 
 When a request to instantiate the network service from the BSS (son-bss) is made, the gatekeeper (son-gkeeper) gets the request payload from BSS and creates a instantiation request to hand it over to SLM. For differentiating the instantiation request between a "\textit{normal}" call and a "\textit{scramble}" call, we added a "\textit{scramble}" button in BSS. 
 
@@ -294,7 +294,7 @@ return defer.promise;
 
 \end{lstlisting}
 
-This function sends the gatekeeper a payload which consists of a token "\textit{scramble}", which set to true, and a list of mano details.
+This function sends the gatekeeper a payload which consists of a token "\textit{scramble}", which set to true, and a list of MANO details.
 
 The gatekeeper also ensures the payload contains this additional package when it creates a new instantiation request and informs the SLM. 
 
@@ -462,7 +462,7 @@ else:
 
 \section{Installation of Pishahang with Scramble}
 
-In order to use and exploit the functionalities of all the workpackages of scramble described above, additional steps needs to be executed after a clean installation of Pishahang. The steps are listed below in the script.
+In order to use and exploit the functionalities of all the work packages of scramble described above, additional steps needs to be executed after a clean installation of Pishahang. The steps are listed below in the script.
 \begin{lstlisting}[caption= install Pishahang with scramble, label=lis:Pishahang_scramble]
 sudo apt-get install -y software-properties-common
 sudo apt-add-repository -y ppa:ansible/ansible
@@ -484,11 +484,11 @@ sudo ./run_scramble.sh <<ip-address>>
 \end{lstlisting}
 
 \section{Scramble GUI for Pishahang}
-The scramble-gui is integrated with both pishahang-gui and in pishahang-BSS developed with Angular-js for front end and mangodb deployed using python for back-end., enabling users to enter the details of child-mano's and also select the desired mano's to instantiate a service.
+The scramble-gui is integrated with both pishahang-gui and in pishahang-BSS developed with Angular-js for front end and mangodb deployed using python for back-end., enabling users to enter the details of child-MANO's and also select the desired MANO's to instantiate a service.
 
-With Scramble-pishahang GUI the users can enter details of child-mano's as shown in images below.
+With Scramble-pishahang GUI the users can enter details of child-MANO's as shown in images below.
 
-Step 1: Select \textit{MANO Settings} and then \textit{Add Mano}
+Step 1: Select \textit{MANO Settings} and then \textit{Add MANO}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\linewidth]{"figures/son-gui-step-1"}
@@ -496,12 +496,12 @@ Step 1: Select \textit{MANO Settings} and then \textit{Add Mano}
 	\label{fig:sequence-diagram-scramble}
 \end{figure}
 
-Step 2: Enter Mano details, The required mano details are 
+Step 2: Enter MANO details, The required MANO details are 
 \begin{enumerate}
-	\item Mano Name: The name is take so that the user can easily differentiate between mano's and can be any name desired by user.
-	\item URL: Is the URL to access the Mano
-	\item Username and Password: Is the credentials required to access the mano.
-	\item Mano Vendor: Is a choice between OSM and Pishahang to recognize the type of child-mano added.   
+	\item MANO Name: The name is take so that the user can easily differentiate between MANO's and can be any name desired by user.
+	\item URL: Is the URL to access the MANO
+	\item Username and Password: Is the credentials required to access the MANO
+	\item MANO Vendor: Is a choice between OSM and Pishahang to recognize the type of child-mano added.   
 \end{enumerate}
 \begin{figure}[H]
 	\centering
@@ -510,7 +510,7 @@ Step 2: Enter Mano details, The required mano details are
 	\label{fig:sequence-diagram-scramble}
 \end{figure}
 
-Once the mano details are entered and the list of mano's added are displayed.
+Once the MANO details are entered and the list of MANO's added are displayed.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\linewidth]{"figures/son-gui-step-3"}
@@ -518,7 +518,7 @@ Once the mano details are entered and the list of mano's added are displayed.
 	\label{fig:sequence-diagram-scramble}
 \end{figure}
 
-Once the child-mano's are added, in the pishahang-bss the added mano's are listed. The user can select the mano's in which the service can be instantiated and also if user does not need to instantiate the service in child mano, he can instantiate the service just in the parent mano as shown below.
+Once the child-MANO's are added, in the pishahang-bss the added MANO's are listed. The user can select the MANO's in which the service can be instantiated and also if user does not need to instantiate the service in child MANO, he can instantiate the service just in the parent MANO as shown below.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=1\linewidth]{"figures/son-bss"}

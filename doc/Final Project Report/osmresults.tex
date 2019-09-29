@@ -1,5 +1,5 @@
 \subsection{OSM Results}
-The \ref{fig:cirroscase1180-cpu}, \ref{fig:cirroscase1180-mem} and \ref{fig:osm-top-3-lifecycle} shows the CPU utilization, memory utilization and CPU utilization throught the life cycle of the experiment respectively. Let us consider the important dockers in each case and list their functionalities to realize why they have consumed maximum CPU.
+The \ref{fig:cirroscase1180-cpu}, \ref{fig:cirroscase1180-mem} and \ref{fig:osm-top-3-lifecycle} shows the CPU utilization, memory utilization and CPU utilization through out the life cycle of the experiment respectively. Let us consider the important dockers in each case and list their functionalities to realize why they have consumed maximum CPU.
 
 \subsubsection{CPU utilization}
 
@@ -7,7 +7,7 @@ The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 5 OSM dockers 
 
 \begin{itemize}
 	\item \textbf{osm\_ro:} This is the Resource Orchestrator for OSM. 
-	The resource orchestrator is responsible for co-ordinating resource allocation across multiple geo-distributed VIM types.
+	The resource orchestrator is responsible for co-coordinating resource allocation across multiple geo-distributed VIM types.
 	It is responsible in processing the resource-allocation requirements of the VNF as per parts of the VNFD and driving the VIM to allocate appropriate compute, network, and storage resources for the deployment of VNFs with their interconnection. 
 	
 	\item \textbf{osm\_lcm:} This is the Life Cycle Management module for OSM. 
@@ -22,7 +22,7 @@ The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 5 OSM dockers 
 		Create, delete, query, and update of VNFFGs associated to a Network Service.
 		5) Terminate Network Services
 		
-		\item \textit{VNF LCM operations:} 1) Instantiate VNF (create a VNF using the VNF on-boarding artefacts)
+		\item \textit{VNF LCM operations:} 1) Instantiate VNF (create a VNF using the VNF on-boarding artifacts)
 		2) Scale VNF (increase or reduce the capacity of the VNF).
 		3) Update and/or Upgrade VNF (support VNF software and/or configuration changes of various complexity).
 		4) Terminate VNF (release VNF-associated NFVI resources and return it to NFVI resource pool)
@@ -31,12 +31,12 @@ The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 5 OSM dockers 
 	
 	
 	\item \textbf{osm\_mon:} This is the monitoring module for OSM. 
-	The main task of this docker is to retreive metrics from VIM. 
+	The main task of this docker is to retrieve metrics from VIM. 
 	It keeps polling VIM every 30 seconds. 
 	
 	\item \textbf{osm\_ro\_db:} This is called RO database module.
 	RO module in OSM maintains its own database called ro-db. (RO module is usually edited to enable or disable this particular module)
-	This module takes care of database related operations. According to the osm/ro.git, ro-db stores different IDs like vnfd id ,osm id, tenant id, vim id etc. There is something called scenario. ro db stores these scenarios and scenario ID and then a scenario gets executed when the scenario id matches with the right tenant id, osm id and vnfd id. 
+	This module takes care of database related operations. According to the OSM/ro.git, ro-db stores different IDs like vnfd id ,osm id, tenant id, vim id etc. There is something called scenario. ro db stores these scenarios and scenario ID and then a scenario gets executed when the scenario id matches with the right tenant id, osm id and vnfd id. 
 	It stores vim actions, wim actions and they are processed sequentially. 
 	
 	\item \textbf{osm\_nbi:} North Bound Interface of OSM. Restful server that follows ETSI SOL005 interface.
@@ -84,7 +84,7 @@ The first 5 OSM dockers in memory utilization graph are:
 
 We now have the life cycle graphs of the entire experiment. This shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes. We capture idle metrics for about a minute and then the service requests starts getting instantiated at 30 RPM.
 
-We can observe that the ro module of OSM got continuous requests over the time and at the end all the termination requests came at once. Also LCM , mon modules continously processed the requests. mon module retrieved metric information continuously and the same trend
+We can observe that the ro module of OSM got continuous requests over the time and at the end all the termination requests came at once. Also LCM , mon modules continuously processed the requests. mon module retrieved metric information continuously and the same trend
 remains throughout the experiment. Once all the instances are successfully instantiated, the termination requests are executed. 
 
 \begin{figure}[h]

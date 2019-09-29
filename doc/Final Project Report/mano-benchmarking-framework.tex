@@ -1,9 +1,6 @@
 \section{MANO Benchmarking Framework} 
 
-\subsection{Introduction}
-
-MANO Benchmarking Framework (MBF) is a result of a small script that was used to run the experiments discussed in the previous sections. 
-The idea of MBF is to provide MANO developers with a generic framework for running experiments on MANO. 
+MANO Benchmarking Framework (MBF) is a result of a small script that was used to run the experiments discussed in the previous sections. The idea of MBF is to provide MANO developers with a generic framework for running experiments on MANO.
 MBF mainly provides the following 1) Easy interfacing with MANO instances by using python-mano-wrappers, 2) Ability to run experiments with different service descriptors, 3) Collection of performance metrics in convenient data format and 4) Flexible graphing mechanism of the collected data. 
 
 
@@ -29,7 +26,7 @@ We explain the choice of tools that are used in MBF in the following list.
 \subsubsection{Parameters}
 
 MBF has experiment parameters that can be altered. 
-The following paramenters are supported
+The following parameters are supported
 
 \begin{itemize}
 	\item{\textbf{Descriptors}} NSDs and VNFDs can be changed. 
@@ -56,7 +53,7 @@ The metrics are stored as CSV files.
 \begin{itemize}
 	\item{\textbf{CPU}} Overall system CPU usage is recorded as well as the individual docker micro service CPU usage metrics are stored.
 	\item{\textbf{Memory}} Overall system memory usage along with the individual docker micro service memory usage is stored.
-	\item{\textbf{System Load}} The 1m, 5m and 15m moving averages of system load values provided by the linux kernel is stored.
+	\item{\textbf{System Load}} The 1m, 5m and 15m moving averages of system load values provided by the Linux kernel is stored.
 	\item{\textbf{Status Tracking}} The status of all instances are stored by polling the VIM every 5 seconds over the experiment lifetime. 
 	This enables to track the status change over time.
 	\item{\textbf{End-to-end Deployment Time}} is the time elapsed to deploy all the instances on the VIM.
@@ -75,8 +72,8 @@ The following instruction is to run an experiment with 90 instances on OSM using
 	\item Change experiment variables in the relevant scripts for respective MANOs
 	\begin{itemize}
 		\item \textbf{OSM} -- \textit{run-experiment-osm.py}
-		\item \textbf{Sonata (Pishahang)}  -- \textit{run-experiment-sonata.py}
-		\item \textbf{Sonata Container Orchestration (Pishahang)} -- \textit{run-experiment-sonata-k8}
+		\item \textbf{Sonata and Pishahang}  -- \textit{run-experiment-sonata.py}
+		\item \textbf{Pishahang Container Orchestration} -- \textit{run-experiment-sonata-k8}
 	\end{itemize}
 	
 	\item Run the relevant script from inside the container. 
@@ -102,7 +99,7 @@ However, in-depth analysis of what the metrics and graphs mean are out of scope 
 
 We compared the performance metrics of different NSDs/VNFDs and visualized it. 
 For this, we provided 6 different network service descriptors to the experiment runner. 
-First 3 NS consisted of a cirros image as a VNF with 1, 3 and 5 VNFs per NSD and the other 3 NS consisted of an ubuntu image as a VNF with 1, 3 and 5 VNFs per NSD.\\
+First 3 NS consisted of a cirros image as a VNF with 1, 3 and 5 VNFs per NSD and the other 3 NS consisted of an Ubuntu image as a VNF with 1, 3 and 5 VNFs per NSD.\\
 
 The experiment stores the KPIs listed in the previous section, along with the graphs visualizing the differences. 
 This graph is produced for each micro-service showing the resource utilization of each NS under different number of instantiations. 
@@ -196,9 +193,9 @@ In this section, we discuss the observations and inferences drawn from all the e
 
 \subsubsection{Requests per minute (RPM)}
 
-We observed that the number of successful instantiation of network services and RPM are inversely proportional. For this, we instantiated 90 cirros instances at various RPMs and compared the successful instantiations of VNFs. We carried out this experiment on OSM as the support for VM orchestration is only a proof of concept in Pishahang and we could not instantiate more than 10 instances at once.
+We observed that the number of successful instantiation of network services and RPM are inversely proportional. For this, we instantiated 90 cirros instances at various RPMs and compared the successful instantiations of VNFs. We carried out this experiment on OSM as the support for VM orchestration is only a proof of concept in Pishahang and we could not instantiate more than 10 instances at once. \\
 
-We saw that when the service requests are sent at 30, 60 and 120 RPMs all the VNFs were successfully instantiated in VIM. But, when the requests where sent at 240 RPMs, we saw on average, 67 successful instantiations, 5 resulted in build errors on the VIM and the remaining requests were lost at the MANO side due to timeouts and internal server errors. 
+We saw that when the service requests are sent at 30, 60 and 120 RPMs all the VNFs were successfully instantiated in VIM. But, when the requests where sent at 240 RPMs, we saw on average, 67 successful instantiations, 5 resulted in build errors on the VIM and the remaining requests were lost at the MANO side due to timeouts and internal server errors. \\ 
 
 An interesting observation here is the end-to-end deployment times of various RPMs, i.e, the time taken between the start of instantiation requests and all the instances getting successfully instantiated. We see from the table below that the end-to-end time actually increased with RPM. Even though the requests from the MANO are sent faster, VIM is taking much longer to actually process the requests. \\
 
@@ -220,7 +217,7 @@ For example, if the first NS that has one VNF is instantiated 15 times, the seco
 The third NS is instantiated three times as it has 5 VNFS, so that all the three NS will result in 15 VNF instantiations on the VIM. 
 Similarly, we also had 90 and 180 instantiations.\\
 
-We observed that NS with more number of VNFs consumed more CPU than the ones with lesser number of VNFs. The image type (ciros or ubuntu) does not make a difference on the resource utilization on the MANO but it does have an effect on the VIM side due to the more physical resources required by the ubuntu image.
+We observed that NS with more number of VNFs consumed more CPU than the ones with lesser number of VNFs. The image type (cirros or Ubuntu) does not make a difference on the resource utilization on the MANO but it does have an effect on the VIM side due to the more physical resources required by the Ubuntu image. \\
 
 Results of the top 2 CPU consuming microservices for OSM are shown in the figure \ref{fig:osmro-mean-cpu-cases} and \ref{fig:osmlcm-mean-cpu-cases}. Results of top 2 CPU consuming microservices for Pishahang are shown in the figure \ref{fig:pishson-mean-cpu-cases} and \ref{fig:pishslm-mean-cpu-cases}
 
@@ -241,15 +238,15 @@ Results of the top 2 CPU consuming microservices for OSM are shown in the figure
 
 \subsubsection{Container v/s VM}
 
-We wanted to compare the resource utilization of two MANO frameworks for orchestration of similar NS. But, Pishahang's support for VM orchestration is unstable. Hence, we were not able to successfully instantiate more than a few (i,e. about 10) NS continously. It was out of scope of our work to look into the issue and fix them. However, Pishahang has a stable support for container orchestration. We thus decided to compare containers and VMs. The results are discussed in the section \ref{vmvscontainer}.
+We wanted to compare the resource utilization of two MANO frameworks for orchestration of similar NS. But, Pishahang's support for VM orchestration is unstable. Hence, we were not able to successfully instantiate more than a few (i,e. about 10) NS continuously. It was out of scope of our work to look into the issue and fix them. However, Pishahang has a stable support for container orchestration. We thus decided to compare containers and VMs. The results are discussed in the section \ref{vmvscontainer}.
 	
 \subsection{Understanding OSM lifecycle graphs}
 
-The figure \ref{fig:osm-top-3-lifecycle-90} shows the lifecycle graphs of the experiment for instantiating 90 instances of the basic cirros NS at 30 RPM. As discussed in the previous sections, the top 3 microservices in terms of CPU usage are RO, LCM and MON respectively. 
+The figure \ref{fig:osm-top-3-lifecycle-90} shows the lifecycle graphs of the experiment for instantiating 90 instances of the basic cirros NS at 30 RPM. As discussed in the previous sections, the top 3 microservices in terms of CPU usage are RO, LCM and MON respectively.\\
 
-To further understand the uneven peaks and the general trend of RO and LCM graphs, we used a performance profiling tool called Pyflame\footnote{https://github.com/uber/pyflame}. It takes snapshots of the Python call stack to profile a program without modifying its source code. We used Pyflame on the RO and LCM python processes running inside their respective docker containers and started our experiment. We captured flame graphs every 30 seconds and analysed the frequency distribution of the function calls in these containers. This will give us a better understanding of the functionality that is taking the CPU resource.
+To further understand the uneven peaks and the general trend of RO and LCM graphs, we used a performance profiling tool called Pyflame\footnote{https://github.com/uber/pyflame}. It takes snapshots of the Python call stack to profile a program without modifying its source code. We used Pyflame on the RO and LCM python processes running inside their respective docker containers and started our experiment. We captured flame graphs every 30 seconds and analysed the frequency distribution of the function calls in these containers. This will give us a better understanding of the functionality that is taking the CPU resource. \\
 
-We identified the major funtion calls of RO and LCM by analysing the flame graphs. We looked into the source code to understand the functionality and the list containing the references is given below.
+We identified the major function calls of RO and LCM by analyzing the flame graphs. We looked into the source code to understand the functionality and the list containing the references is given below.
 
 \begin{itemize}
 \item \textbf{RO Functions}
@@ -276,13 +273,13 @@ We identified the major funtion calls of RO and LCM by analysing the flame graph
 
 \end{itemize}
 
-We plotted the frequency distribution of these functions over experiment time, the resulting graph can be seen in the figure \ref{fig:osm-frequency-dist}. The instantiation requests were coming into OSM until \textit{9:32:54}, by looking at the figure \ref{fig:osm-top-3-lifecycle-90} and \ref{fig:osm-frequency-dist} it can be seen that all the 4 RO funcitons listed above were active during this period causing the spikes. It is similar in the LCM graph, the \texttt{instantiate} and \texttt{terminate}  functions took the most CPU and the spikes that are seen every 120 seconds in the LCM graph is caused by the \texttt{kafka\_ping} function, which is used to keep the connection to the message broker active. 
+We plotted the frequency distribution of these functions over experiment time, the resulting graph can be seen in the figure \ref{fig:osm-frequency-dist}. The instantiation requests are coming into OSM until \textit{9:32:54}, by looking at the figure \ref{fig:osm-top-3-lifecycle-90} and \ref{fig:osm-frequency-dist} it can be seen that all the 4 RO functions listed above are active during this period causing the spikes. It is similar in the LCM graph, the \texttt{instantiate} and \texttt{terminate}  functions took the most CPU and the spikes that are seen every 120 seconds in the LCM graph is caused by the \texttt{kafka\_ping} function, which is used to keep the connection to the message broker active. 
 
 When the requests stop coming in, i,e. from \textit{9:32:54}, RO gradually processes all the remaining instantiation tasks and this can be seen from the graphs. 
 
-At \textit{9:38:59}, the termination requests start coming into OSM and a spike in RO and LCM can be seen from the graphs.
+At \textit{9:38:59}, the termination requests start coming into OSM and a spike in RO and LCM can be seen from the graphs.\\
 
-MON on the other hand is responsible for continuously monitoring the health of VNFs from the VIMs. We did not profile the MON processes in this experiment.
+The MON microservice however, is responsible for continuously monitoring the health of VNFs from the VIMs. We did not profile the MON processes in this experiment.
 
 \begin{figure}[h]
 \centering
