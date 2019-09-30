@@ -1,0 +1,100 @@
+\chapter{Technologies}
+\label{ch:Technologies}
+\section{MANO Frameworks}
+\label{manoframeworks}
+In this section, a few MANO frameworks and their NSD schemata are listed(list of a few parameters and their description). Among several frameworks, the plan is to select a few and set them up locally, deploy network services and support them in the project. This list is subjected to future additions or removals.
+
+\subsection{Pishahang}
+\label{SecSONATA}
+Pishahang is a framework consolidated from state-of-the-art NFV and Cloud management and orchestration tools and technologies. Pishahang is a framework for jointly managing and orchestrating virtual network functions and cloud-based microservices. 
+
+Pishahang deploys, manages and orchestrates complex services by consolidating and extending current Cloud and NFV tools and technologies \cite{kouchaksaraei2018pishahang}.
+
+\subsubsection{Network Service Descriptor Section}
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         Vendor & Identifies the network service uniquely across all network service vendors. \\
+         \hline
+         Name & Name of the network service without its version. \\
+         \hline
+         Version & Names the version of the NSD. \\
+         \hline
+         Author & It's an optional parameter. It describes the author of NSD \\
+         \hline
+         Description & It's an optional parameter, provides an arbitrary description of the network service. \\
+         \hline
+    \end{tabular}
+    \caption{Pishahang: Network Service Descriptor Section}
+    \label{tab:SONATA_general_section}
+\end{table}
+\pagebreak
+\subsubsection{Network Functions Section}
+    \begin{table}[h]
+    \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         network\_functions & Contains all the VNFs that are handled by the network service. \\
+         \hline
+         Vnf\_id & Represents a unique identifier within the scope of the NSD \\
+         \hline
+         Vnf\_vendor & As part of the primary key, the vendor parameter identifies the VNF Descriptor \\
+         \hline
+         Vnf\_name & As part of the primary key, the name parameter identifies the VNF Descriptor \\
+         \hline
+         Vnf\_version & As part of the primary key, the version parameter identifies the VNF Descriptor\\
+         \hline
+         Vnf\_description & It's an optional parameter, a human-readable description of the VNF\\
+         \hline
+    \end{tabular}
+    \caption{Pishahang: Network Functions Section}
+    \label{tab:SONATA_NF_section}
+ \end{table}
+
+\subsection{Open Source MANO(OSM)}
+\label{SecOSM}
+OSM is an open source management and orchestration stack in compliant with ETSI NFV information models. OSM architecture splits between resource orchestrators and service orchestrators \cite{de2018network}. Table \ref{tab:OSM_nsd} lists the parameters of NSD schema. \cite{OSMSchemaDocumentation}
+    \begin{table}[h]
+        \centering
+    \begin{tabular}{ |p{4cm}|p{10cm}|}
+        \hline
+        \textbf{Parameter} & \textbf{Description} \\
+        \hline
+         
+         id &   Identifier for the NSD \\
+         \hline
+         name & NSD name \\
+         \hline
+         Short-name &   Short name which appears on the UI \\
+         \hline
+         vendor &   Vendor of the NSD \\
+         \hline
+         logo & File path for the vendor specific logo. For example, icons/mylogo.png. The logo should be a part of the network service. \\
+         \hline
+         description &  Description of the NSD \\
+         \hline
+         version &  Version of the NSD \\
+         \hline
+    \end{tabular}
+        \caption{OSM: Network Service Descriptor}
+    \label{tab:OSM_nsd}
+ \end{table}
+
+
+\section{Virtualized Infrastructure Manager (VIM)}
+VIM is one of the three functional blocks specified in the Network Functions Virtualization Management and Orchestration (NFV-MANO) architecture. VIM is responsible for controlling and managing the NFV Infrastructure (NFVI), by provisioning and optimizing the allocation of physical resources to the virtual resources in the NFVI. Performance and error monitoring is also a key role of the VIM. Popular VIMs are discussed in the following sections.
+
+\subsection{OpenStack}
+\label{SecOpenStack}
+OpenStack\footnote{https://www.openstack.org/} is a community-driven open source cloud resource management platform. Compute, storage, and networking resources in a data center can be provisioned using Application Program Interfaces (APIs) or web dashboard provided by OpenStack component, for instance, NOVA is a component which can provide access to compute resources, such as virtual machines and containers. Network management is enabled by NEUTRON component which handles the creation and management of a virtual networking infrastructure like switches and routers. SWIFT component provides a storage system. By making use of many such components, OpenStack can deliver complex services by utilizing an underlying pool of resources.
+
+\subsection{Kubernetes}
+\label{SecKubernetes}
+Kubernetes\footnote{https://kubernetes.io/} (K8s) is an open-source platform for automation and management of containerized services, it manages computing, networking, and storage infrastructure. Kubernetes was initially developed by Google and now under Cloud Native Computing Foundation. Kubernetes Architecture consists of (1) Master server components -- it is the control plane of the cluster and act as the gateway for  administrators (2) Node Server Components -- servers which are performing work by using containers that are called nodes, they communicate with the master component for instructions to run the workload assigned to them. Kubernetes provides comprehensive APIs which are used to communicate between the components and with the external user.

@@ -1,0 +1,65 @@
+\newpage
+\section{Splitter}
+\label{psplitter}
+\subsection{Pishahang}
+\begin{table}[htbp] \cite{SONATASchemaDocumentation}
+	\begin{center}
+		\caption{Schema Parameters of Pishahang Considered for Splitting}
+		\label{tab:table1}
+		\begin{tabular}{|l|p{0.8\linewidth}|}
+			\textbf{Parameter} & \textbf{Description}\\
+			
+			\hline
+			\textbf{descriptor\_version} & The version of the description definition used to describe the network descriptor. \\ 
+			\textbf{vendor } & The vendor id allows to identify a VNF descriptor uniquely across all function descriptor vendors.  \\
+			\textbf{name} & The name of the network service description. \\
+			\textbf{version} & The version of the service descriptor. \\
+			\textbf{author} & The person or organization that created the NS descriptor. \\
+			\textbf{description} & A longer description of the network service. \\
+			\textbf{networkFunctions} & The VNFs (their descriptors), that are part of this network service. \\
+			\textbf{connectionPoints} & The connection points of the overall NS, that connects the NS to the external world. \\
+			\textbf{virtualLinks} & One to One link between two VNFs. \\
+			\textbf{forwardingGraphs} & The forwarding graph describing the topology of the network. \\
+		\end{tabular}
+	\end{center}
+\end{table}
+\pagebreak
+\subsection{OSM}
+\label{osplitter}
+\begin{table}[htbp] \cite{OSMSchemaDocumentation}
+	\begin{center}
+		\caption{Schema Parameters of OSM Considered for Splitting}
+		\label{tab:table2}
+			\begin{tabular}{|l|p{0.7\linewidth}|}
+			\textbf{Parameter} & \textbf{Description} \\
+			\hline
+			\textbf{\_id} & Identifier for the NSD. \\ 
+			\textbf{name} & NSD name. \\
+			\textbf{short\_name} & Short name to appear as label on the UI. \\
+			\textbf{description} & Description of the NSD. \\
+			\textbf{vendor} & Vendor of the NSD. \\
+			\textbf{version} & Version of the NSD. \\
+			\textbf{connection\_point} & List for external connection points.
+Each NS has one or more external connection
+points. As the name implies that external
+connection points are used for connecting
+the NS to other NS or to external networks.
+Each NS exposes these connection points to
+the orchestrator. The orchestrator can
+construct network service chains by
+connecting the connection points between
+different NS. \\
+			\textbf{logo} & File path for the vendor specific logo. \\
+			\textbf{ConstituentVnfd} & List of VNFDs that are part of this
+network service. \\
+			\textbf{scaling \_group \_descriptor} & scaling group descriptor within this network service.
+The scaling group defines a group of VNFs,
+and the ratio of VNFs in the network service
+that is used as target for scaling action. \\
+			\textbf{vnffgd} & List of VNF Forwarding Graph Descriptors (VNFFGD). \\
+			\textbf{vld} & Virtual Link Descriptor. \\
+			\textbf{ip \_profiles} & List of IP Profiles.
+  IP Profile describes the IP characteristics for the Virtual-Link. \\
+		\end{tabular}
+	\end{center}
+\end{table}

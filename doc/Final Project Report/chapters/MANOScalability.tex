@@ -1,0 +1,65 @@
+\chapter{MANO Scalability}
+\label{ch:Scalability}
+
+In this chapter we discuss the two directions we explored to investigate MANO orchestrator scalability. First, we discuss the scalability plugin that was added to pishahang. The scalability plugin adds 3 main functionalities to pishahang, 1) spawn new child instances of pishahang by allocating new physical resources, 2) Redirecting requests from parent MANO to the child instances and 3) managing the state of child instances. Second, we discuss the experiments conducted on OSM and Pishahang to understand the resource utilization. We also propose a more generic framework to characterize and analyze MANO under load.
+
+\include{scalabilityplugin}
+
+
+
+\section{Experiments}
+One other task under the MANO scalability investigation was to observe the resource utilization in OSM and Pishahang. To do this we used our own python-mano wrappers to instantiate multiple requests at a time. The next step was to decide on the number of service requests to instantiate. We could simply instantiate any number (like 1,000 or 5000) of service requests but we had to make sure all those requests get successfully instantiated. For this, the infrastructure was the only crucial factor. We used a 16 core virtual machine for installing VIM (Openstack). The recommended ratio of physical CPU to virtual CPU is 1:16, we have 16, thus 16 x 16 = 256 cores \footnote{https://docs.openstack.org/arch-design/design-compute/design-compute-overcommit.html}. Hence we first assigned 1 CPU to one service request.\\
+
+We instantiated 256 service requests on OSM. They were not successfully instantiated. Next, we came up with another parameter called Requests Per Minute(RPM). The first attempt was setting the RPM to be 60 and instantiating 256 service requests. This run was not successful. The next run was 250 service requests at 60 RPM. The requests failed to get instantiated. The third run was 200 instances at 30 RPM, which was also a failure. The idea was to find the right combination of number of service requests and RPM. Finally 180 requests at 30 RPM was found to be suitable for our experiment. This trial and error was done in OSM. Once we got the appropriate requests-RPM combination, the experiment was conducted both in OSM and Pishahang.\\
+
+Next, we had to decide which VNF image to use for our experiment. We used a basic cirros VNF, we instantiated 180 such service requests. We designed their NSDs to have a single VNFD. 
+
+Apart from this, we also wanted to capture the CPU utilization throughout the experiment. We call this lifecycle graphs. The lifecycle of the experiment involves on-boarding, instantiating and terminating network services. This was conducted both on OSM and Pishahang.  
+
+
+\subsection{Testbed}
+
+This subsection describes the experimental setup that was required for observing resource utilization in scalability analysis.
+\subsubsection{Infrastructure}
+
+We used 5 servers, two were installed with OSM and pishahang. The other two were installed with two OpenStack versions and the remaining was installed with kubernetes. OSM was connected to one OpenStack Pishahang was connected to kubernetes and OpenStack The servers had the following machine configuration:
+\begin{itemize}
+	\item \textbf{OSM (server 1)\\} Intel(R) Xeon(R) CPU E5-2695 v3 @ 2.30GHz with 8 core CPU and 64 GB memory
+	
+	\item \textbf{Pishahang (server 2)\\} Intel(R) Xeon(R) CPU E5-2695 v3 @ 2.30GHz with 8 core CPU and 64 GB memory
+	\textbf{\item Openstack (server 3)\\} Intel(R) Xeon(R) CPU E5-2695 v3 @ 2.30GHz with 16 core CPU and 128 GB memory
+	
+	\item \textbf{Openstack (server 4)\\} Intel(R) Xeon(R) CPU E5-2695 v3 @ 2.30GHz with 16 core CPU and 128 GB memory
+	
+	\item \textbf{Kubernetes (server 5)\\}  Intel(R) Xeon(R) CPU E5-2695 v3 @ 2.30GHz with 16 core CPU and 100 GB memory
+	
+
+
+\end{itemize}
+
+\subsubsection{Experiment script}
+
+We used a python script to instantiate 180 requests of a cirros image continuously at 30 RPM with the help of python-mano-wrappers. Once all the requests were instantiated, we once again used the wrappers to send the termination requests all at once. We conducted the same experiment three times i.e we had three runs of this experiment to see the variance. This experiment was conducted both on OSM and pishahang.The results of the experiment is discussed in the following sections.
+
+
+\include{osmresults}
+
+\include{pishahangresults}
+
+
+\subsection{Limitations of the experiment}
+
+\begin{itemize}
+	\item The VM in which we installed the VIM(OpenStack) was supposed to use a configuration with only a 16 core CPU. 
+	
+	\item Unlike for cirros image, there were issues with successfully instantiating 90 and 180 service requests of Ubuntu image despite multiple runs because Ubuntu image occupied more memory than the cirros image
+	
+	\item Pishahang doesn't have stable support for VM orchestration.
+	
+	\item No service function chaining or forwarding graph support in MANO frameworks yet
+	
+\end{itemize}
+
+
+
+\include{mano-benchmarking-framework}

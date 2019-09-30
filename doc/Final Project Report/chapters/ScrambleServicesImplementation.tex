@@ -1,0 +1,523 @@
+\chapter{Scramble Services Implementation}
+\label{ch:WP}
+
+\section{Translator}
+\paragraph{}
+In a hierarchical architecture involving different MANOs, there is a need of conversion of network descriptors to schemas of respective MANO. Service Descriptor Translator (SDT) serves the purpose of translating network descriptors, namely NSDs and VNFDs from schema of SONATA Pishahang to that of OSM and vice versa.
+\paragraph{}
+In a scenario, where a parent MANO, say Pishahang decides to deploy one of the network services in its lower hierarchy MANO, say OSM, the NSD and VNFD(s) need to be converted to the descriptor schema of OSM. In such an event, the Scramble plugin calls the translator service and sends the descriptors to the SDT, where the translation of the descriptors takes place and the translated descriptors are sent to Adaptor utility for deployment in appropriate MANO. 
+
+
+\subsection{Architecture \& Work flow}
+The translator engine reads a json formatted descriptor and first converts it into a pandas \textit{DataFrame}. The \textit{DataFrame} object is constructed to have the following columns.
+
+\begin{table}[H]
+	\begin{center}
+		\caption{Descriptor represented DataFrame.}
+		\label{tab:table1}
+		\begin{tabular}{l|l} 
+			\textbf{Columns} & \textbf{Description} \\
+			\hline
+			\textbf{parent\_level} & It stores immediate parent key's depth-level \\ 
+			\textbf{parent\_key} & It stores immediate parent key  \\
+			\textbf{level} & It stores current key's depth-level \\
+			\textbf{key} & It stores current key \\
+			\textbf{value} & It stores current key's value \\
+			\textbf{lineage} & \makecell[l]{It stores current key's entire lineage from the root depth-level.\\ It is useful to store the nested information} \\  
+		\end{tabular}
+	\end{center}
+\end{table}
+
+The \textit{setup} and \textit{transformation} classes of the translator engine carries out all the transformation, needed to translate between OSM and Pishahang descriptors, on the \textit{DataFrame} object. Once all the transformation are over, the resulting \textit{DataFrame} is then converted again into a json (refer Figure  \ref{fig:sequence-diagram-translator}).
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/translator_seq_diag"}
+	\caption{Translator sequence diagram}
+	\label{fig:sequence-diagram-translator}
+\end{figure}
+
+
+\subsection{Modules}
+The Translator engine consists of the following modules (refer Figure  \ref{fig:class-diagram-translator}):
+\begin{enumerate}
+	\item descriptorReader
+	\subitem class: read\_dict
+	\item descriptorWriter
+	\subitem class: write\_dict
+	\item utilities
+	\subitem class: setup
+	\subitem class: transformation
+	\subitem class: insert\_into\_db
+	\item translator
+	\subitem class: TranslatorService
+	\item validator
+	
+\end{enumerate}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/class_diagram_translator"}
+	\caption{Translator class diagram}
+	\label{fig:class-diagram-translator}
+\end{figure}
+
+
+
+\subsubsection{descriptorReader}
+The class \textit{read\_dict} is responsible to read a json/dictionary input (NSD/VNFD) and iterate over the keys and return a generator of an object to the calling program. This generator can be transformed to any python data structure for ease of use and navigation. 
+
+The input to this module is a json or dictionary object.
+
+\begin{lstlisting}[language=Python,caption=reader to read a json into a DataFrame, label=lis:descriptorReader]
+from descriptorReader import read_dict
+
+pishahang = pishahang_descriptor ## the descriptor as a json or dict object
+
+### reading a dict/ json content into a pandas dataframe
+reader = read_dict()
+
+pishahang_dataset = pd.DataFrame(
+reader.dict_parser(pishahang,'root', 1, '0|preroot|0'), 
+columns=['parent_level', 'parent_key', 'level', 'key', 'value', 'lineage'])
+
+
+pishahang_dataset.sort_values(ascending=True, by=['level', 'parent_key'],inplace=True)
+pishahang_dataset.fillna('NULL', inplace=True)
+pishahang_dataset.reset_index(drop=True,inplace=True)
+
+\end{lstlisting}
+\subsubsection{descriptorWriter}
+
+The class \textit{write\_dict} is responsible to read a python pandas Dataframe input and output a nested json/dictionary maintaining the nested structure in the dictionary.
+
+\begin{lstlisting}[language=Python,caption=writer to write a translated DataFrame into a json, label=lis:descriptorWriter]
+from descriptorWriter import write_dict
+
+### writing from a pandas dataframe to a dict/json object
+writer = write_dict()
+pishahang_descriptor = writer.translate(pishahang_dataset.sort_values(by='lineage'))
+
+\end{lstlisting}
+
+\subsubsection{utilities}
+
+The class \textit{setup} is responsible for transforming the keys and map the corresponding values between sonata and osm descriptors. The class includes 4 functions for translating between sonata and OSM descriptors. 
+\begin{enumerate}
+	\item translate\_to\_osm\_nsd()
+	\item translate\_to\_osm\_vnfd()
+	\item translate\_to\_sonata\_nsd()
+	\item translate\_to\_sonata\_vnfd()
+\end{enumerate}
+
+The class \textit{transformation} acts as a helper class for the task of transforming the dataframe between sonata and OSM structures. 
+
+\subsubsection{translator}
+
+The class \textit{TranslatorService} is the interface where the actual translation request comes in. After a tranlsation request is received along with a descriptor, it calls the above modules translate and validate the descriptors (NSD/VNFD).
+
+This following function translates OSM descriptor to Pishahang and vise-versa.
+\begin{lstlisting}[language=Python,caption= Translating descriptor between Pishahang and OSM, label=lis:toSOnata]
+import pymongo
+from validate import validator
+from utilities import setup
+
+
+class TranslatorService():
+
+def __init__(self,client = pymongo.MongoClient("mongodb://mongo:27017")):
+self.setup_obj = setup(client)
+self.validate_obj = validator()
+
+
+def toSonata(self,received_file):
+
+if 'vnfd:vnfd-catalog' in received_file:
+
+doc = self.setup_obj.db_descriptors["translated_vnfd"]
+translated = self.setup_obj.translate_to_sonata_vnfd(received_file)
+
+check = self.validate_obj.sonata_vnfd_validate(translated)
+
+if check == "True":
+temp = doc.insert_one(translated)
+translated_ref = temp.inserted_id
+
+elif 'nsd:nsd-catalog' in received_file:
+
+doc = self.setup_obj.db_descriptors["translated_nsd"]
+translated = self.setup_obj.translate_to_sonata_nsd(received_file)
+
+check = self.validate_obj.sonata_nsd_validate(translated)
+
+if check == "True":
+temp = doc.insert_one(translated)
+translated_ref = temp.inserted_id
+
+return {"descriptor":translated ,"VALIDATE STATUS" :check}
+
+def toOsm(self,received_file):
+
+if 'network_functions' in received_file:
+
+doc = self.setup_obj.db_descriptors["translated_nsd"]
+translated = self.setup_obj.translate_to_osm_nsd(received_file)
+
+check= self.validate_obj.osm_validator(translated)
+
+if check == "True":
+temp = doc.insert_one(translated)
+translated_ref = temp.inserted_id
+
+elif 'virtual_deployment_units' in received_file:
+
+doc = self.setup_obj.db_descriptors["translated_vnfd"]
+translated = self.setup_obj.translate_to_osm_vnfd(received_file)
+
+check= self.validate_obj.osm_validator(translated)
+
+if check == "True":
+temp = doc.insert_one(translated)
+translated_ref = temp.inserted_id
+
+return {"descriptor":translated ,"VALIDATE STATUS" :check}
+\end{lstlisting}
+
+\subsubsection{validator}
+
+The validator validates the descriptors presented for translation. The simplest form of validation of the descriptors begins with validating the syntax of the given descriptors, implemented using python library called \textit{jsonschema.draft4validator}, this library compares the given descriptor with corresponding schema provided and if errors are found then the error and the path of the error is printed. This error path is handy and is important, as a typical descriptor has many keys with identical names.
+
+The function in appendix \ref{tvalidation} validates the syntax of provided and translated OSM and Sonata descriptors with its corresponding schemas.
+
+ The next stage of validation is checking the semantics of the descriptors, for Sonata this is achieved by validating the Integrity of the given descriptors.
+ \begin{enumerate}
+ 	\item Integrity Validation: For validation of integrity of a NSD the corresponding VNFD's are required, which then checks the connection points and virtual links in NSD and VNFD's. If there is a correlations between the connection points and virtual links in NSD and VNFD's then the validation holds true.
+ 	
+ 	\begin{enumerate}
+ 		\item The Function def \textit{sonata\_nsd\_validate(self,descriptor, vnfd = None)}, accepts NSD and its corresponding zero or more VNFD's. If one or more VNFD's are provided the the integrity and topology validation occurs else just the syntax is checked.  
+ 	\end{enumerate}
+ 	   
+ \end{enumerate}
+ 
+ For checking the semantics of the OSM descriptors, python object class which is generated from the .Yang files provided by OSM. The provided descriptors are then passed as parameters to this python object class with the help of python library called \textit{pybindJSONDecoder.load\_ietf\_json()}. The resulting output will be true if successfully validated else the error in the descriptor is given.
+ 
+ \begin{enumerate}
+ 	\item In the class \textit{def osm\_validator(self,descriptor)}, the descriptor in the form of python dictionary is taken as input and syntax is checked first, later the descriptor is passed to class "osm\_dep\_validator(descriptor\_to\_validate)" to check semantics.
+ 	
+ 	\item in class \textit{osm\_dep\_validator(descriptor\_to\_validate)}, \textit{pybindJSONDecoder.load\_ietf\_json(data, None, None, obj=mynsd)} is used where data is the given descriptor, obj is the Python object class in file osmdata.
+ \end{enumerate}
+
+And thus a descriptor which is validated true is not only error free but also will be for sure accepted by Sonata, Pishahang and OSM as a valid descriptor. 
+
+
+\subsection{Challenges}
+\begin{enumerate}
+	\item The initial challenges faced while designing the translator was mapping the "\textit{required}" keys between OSM and Pishahang descriptors. Figuring out the common functionalities of the respective "\textit{required}" keys in OSM and Pishahang was the priority and a mapping was created. The other "\textit{optional}" keys which were exclusive for each MANOs were also identified and sidelined for future work.
+	\item The challenging part for the development of validator was for OSM. Currently available validator for OSM, is a package developed based on python object code and the problem is that only the error is printed. For example: if a error is found in key "ID", then the error message would be "invalid ID" and a typical descriptor contains multiple "ID" keys and it would be hard to find where exactly the error lies. Hence using various Python libraries a Json schema for OSM was developed with which not just the error but the exact path of the error is also given. 
+\end{enumerate}
+
+\subsection{Usage}
+
+The class \textit{TranslatorService} takes input of two simple requirements.
+\begin{enumerate}
+	\item The first input is a descriptor in the form of json file or a python dictionary. The descriptor can be Pishahang or OSM.
+	\item The second input is a parameter to let the translator know how the translation should take place. The parameters are
+	  \begin{enumerate}
+	  	\item \textit{osm\_to\_sonata} for translation of OSM descriptor to Pishahang.
+	  	\item \textit{sonata\_to\_OSM} for translation of Pishahang descriptor to OSM.
+	  \end{enumerate}
+\end{enumerate}
+
+The output will be a valid translated descriptor in the form of python dictionary.
+
+\subsection{Future Work}	
+
+Translator engine currently does not support the following:
+\begin{enumerate}
+	\item Forwarding Graph
+	\item Juju charms in OSM
+	\item Monitoring Parameters
+\end{enumerate}
+
+\subsubsection{Forwarding Graph}
+Although translation of forwarding graphs between OSM and  Pishahang has been implemented, we could not verify the translation as the forwarding graph logic was not currently feasible during our implementation period in both OSM and Pishahang.
+
+\subsubsection{Juju charms in OSM}
+MANOs provide programmable and flexible management and orchestration of VNFs. OSM provides this flexibility through juju charms and Pishahang provides this through SSM/FSM (a container based solution). Because of these technological differences, direct translation between juju charms in OSM, and SSM (Service Specific Manager) and FSM (Function Specific Manager) in Pishahang is not possible. 
+
+As an alternative, it is possible to add charms functionality to Pishahang so that a descriptor containing juju charms can be deployed in both Pishahang and OSM with direct translation. This can be achieved by adding or modifying below things in Pishahang.
+\begin{enumerate}
+	\item Modify packaging and unpackaging techniques in Pishahang to accept charm package along with descriptors
+	\item Add additional keys in descriptors to mention charm name, actions and vnf index similar to OSM
+	\item Update Pishahang installation code to install juju and charm programs and tools
+	\item Create an interface to execute actions on VNFs
+	\item Create new container or component to perform actions on specified VNFs
+	\item Manage removal or deletion of charms after life cycle of Network Service 
+\end{enumerate} 
+
+
+\subsubsection{Monitoring Parameters}
+Translation could be extended to include the monitoring parameters as well. However verifying monitoring parameters were not feasible in OSM during our implementation period, so we sidelined for future scope.
+
+\newpage
+
+\include{chapters/splitter}
+
+\include{adaptor-arch}
+
+\section{Pishahang-Scramble Integration}
+
+Service Life-cycle Management(SLM) component of Pishahang carries out the main task of orchestration. As a result it was all the more relevant to add one more aspect to it for integrating and handling Scramble components.
+
+The main class of SLM, \textit{ServiceLifecycleManager}, contains a list of member functions for carrying out the entire orchestration. One of the many member functions, \textit{SLM\_mapping}, is responsible for handling the descriptors payload and creating a mapping of network functions to the available VIMs. Keeping the original flow of SLM intact, we extended the main class to include a new member function (\textit{SLM\_mapping\_scramble}) to handle request addressed for mapping the network functions to the available MANOs.
+
+When a request to instantiate the network service from the BSS (son-bss) is made, the gatekeeper (son-gkeeper) gets the request payload from BSS and creates a instantiation request to hand it over to SLM. For differentiating the instantiation request between a "\textit{normal}" call and a "\textit{scramble}" call, we added a "\textit{scramble}" button in BSS. 
+
+\begin{lstlisting}[caption=BSS instantiateScramble function, label=lis:BSSscramble]
+instantiateScramble:function(id, ingresses, egresses, ENV, selectedmanos, manodetails){				
+var defer=$q.defer();
+
+{...} ## unchanged
+
+var data={"service_uuid":id, "ingresses": ingresses, "egresses": egresses, "scramble":true, "selectedmanos":selectedmanos, "manoips":manodetails};
+$http.post(ENV.apiEndpoint+"/requests",data)
+.then(function successCallback(result){defer.resolve(result)})
+.catch(function errorCallback(error){defer.reject(error)});
+
+return defer.promise;
+},
+
+\end{lstlisting}
+
+This function sends the gatekeeper a payload which consists of a token "\textit{scramble}", which set to true, and a list of MANO details.
+
+The gatekeeper also ensures the payload contains this additional package when it creates a new instantiation request and informs the SLM. 
+
+\begin{lstlisting}[caption=create instantiation request in gatekeeper(request.rb), label=lis:request.rb]
+
+post '/requests/?' do
+log_msg = MODULE + '::POST /requests'
+original_body = request.body.read
+logger.debug(log_msg) {"entered with original_body=#{original_body}"}
+params = JSON.parse(original_body, quirks_mode: true)
+logger.debug(log_msg) {"with params=#{params}"}
+
+# we're not storing egresses or ingresses
+egresses = params.delete 'egresses' if params['egresses']
+ingresses = params.delete 'ingresses' if params['ingresses']
+user_data = params.delete 'user_data' if params['user_data']
+
+begin
+{...} ## unchanged
+
+if params['scramble'] == true
+start_request['scramble'] = true 
+start_request['selectedmanos'] = params['selectedmanos']
+start_request['manoips'] = params['manoips']
+
+end
+{...} ## unchanged
+end
+
+\end{lstlisting}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/scramble_seq_diag"}
+	\caption{Integration sequence diagram}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+\subsection{SLM\_mapping\_scramble}
+
+This member function, together with four other helper functions, is responsible for treating requests routed for translation, splitting and sending the descriptor for instantiating in other MANOs. The 4 other helper functions used by it are as follows:
+\begin{table}[H]
+	\begin{center}
+		\caption{Helper functions.}
+		\label{tab:table2}
+		\begin{tabular}{l|l} 
+			\textbf{Functions} & \textbf{Description} \\
+			\hline\\
+			\textbf{get\_network\_functions} & \makecell[l]{It gets the network function names and ids from \\ the service descriptor.} \\\\
+			\textbf{random\_combination} & \makecell[l]{It maps different network functions to different \\ MANOs in random combination.}  \\\\
+			\textbf{send\_to\_osm} & \makecell[l]{This function sends one part of the splitted \\ service descriptor and its network functions to \\OSM Mano instance.} \\\\
+			\textbf{send\_to\_pishahang} & \makecell[l]{This function sends one part of the splitted \\ service descriptor and its network functions to \\ PISHAHANG Mano instance.}\\\\
+			\textbf{inform\_gk\_instantiation\_scramble} & \makecell[l]{This function is used to inform the gatekeeper to \\ create a dummy NSR in the only case when none \\ of the network functions, of the original NSD, are \\ instantiated by this SLM. This way the instantiation \\ request is not rolledback}
+		\end{tabular}
+	\end{center}
+\end{table}
+
+This function is created by extending the original \textbf{SLM\_mapping} function to include the logic to map each network functions to a MANO and then send and instantiate them in their mapped MANOs:
+
+\begin{lstlisting}[language=Python,caption=Extended \textbf{SLM\_mapping\_scramble} function, label=lis:SLM_scramble]
+def SLM_mapping_scramble(self, serv_id):
+"""
+This method is used if the SLM is responsible for the placement.
+:param serv_id: The instance uuid of the service
+"""
+corr_id = str(uuid.uuid4())
+self.services[serv_id]['act_corr_id'] = corr_id
+
+LOG.info("Service " + serv_id + ": Calculating the placement ")
+topology = self.services[serv_id]['infrastructure']['topology']
+
+## getting all manos information from payload
+mano_dict = self.services[serv_id]['payload']['selectedmanos']
+mano_details = self.services[serv_id]['payload']['manoips']
+mano_list = []
+
+## creating a list of selected manos and its corresponding details
+for key, val in mano_dict.items():
+for manos in mano_details:
+if manos['name']==key and val == True:
+mano_list.append(manos)
+
+## original flow with scramble portion added
+if 'nsd' in self.services[serv_id]['service']:
+
+descriptor = self.services[serv_id]['service']['nsd']
+functions = self.services[serv_id]['function']
+original_nsd_uuid = descriptor['uuid']
+
+##----------------------------------------------------------------##
+##----------------------SCRAMBLE PART-----------------------------##
+##----------------------------------------------------------------##
+
+# create a set of vnfs for different MANO frameworks through random logic
+# Number of splits is by default 2 except if the number of MANOs and number of VNFs are equal.
+
+function_list = self.get_network_functions(descriptor)
+rndm_sets = self.random_combination(function_list, mano_list)
+
+if(len(rndm_sets) > 1): # if there are more than 1 MANOs, SCRAMBLE-splitter is called to split the NSD
+vnfid_set = [sets[0] for sets in rndm_sets]# vnf-ids of sets 1 and 2
+
+# send the random vnf split to SCRAMBLE Splitter and get back sub NSDs for each split.
+splitter_url = os.environ['splitter_url'] 
+nsd_to_split = { 'descriptor' : descriptor, 'sets': vnfid_set}
+
+response  = requests.post(splitter_url,
+data=json.dumps(nsd_to_split))
+
+nsds_splitted = json.loads(response.text) # get back 2 sets of sub-nsds
+
+else:
+
+nsds_splitted = {"message" : [descriptor]}
+
+
+# logic to check which vnf is to be send to which MANO
+
+function_pish = [] # list to store vnfs for MAIN_PISHAHANG
+main_pish_nsd = {} # string to store nsd for MAIN_PISHAHANG
+
+for i,sets in enumerate(rndm_sets):
+
+if sets[2][0]['type'] == 'MAIN_PISHAHANG':
+
+main_pish_nsd = nsds_splitted['message'][i]
+
+for vnf in functions:
+if(vnf['vnfd']['name'] in sets[1]):
+function_pish.append(vnf)
+
+
+elif sets[2][0]['type'] == 'PISHAHANG':
+
+self.send_to_pishahang(serv_id, sets, functions, nsds_splitted['message'][i])
+
+elif sets[2][0]['type'] == 'OSM':
+
+self.send_to_osm(serv_id, sets, functions, nsds_splitted['message'][i])             
+
+# remove the vnfs which are sent to other MANO from self.services[serv_id]['function']
+NSD = main_pish_nsd
+functions = function_pish
+NSD['uuid'] = original_nsd_uuid
+
+self.services[serv_id]['service']['nsd'] = NSD
+self.services[serv_id]['function'] = functions
+
+if(functions == []):
+
+## put up a dummy nsr when there is no network functions is available for this mano. So as to keep the unique UUID of this instantiation request in ledger instead of forced rollback.
+
+self.inform_gk_instantiation_scramble(serv_id)
+
+else:
+content = {'nsd': NSD,
+'functions': functions,
+'topology': topology,
+'serv_id': serv_id} 
+else:
+{...} ## unchanged
+\end{lstlisting}
+
+
+
+\section{Installation of Pishahang with Scramble}
+
+In order to use and exploit the functionalities of all the work packages of scramble described above, additional steps needs to be executed after a clean installation of Pishahang. The steps are listed below in the script.
+\begin{lstlisting}[caption= install Pishahang with scramble, label=lis:Pishahang_scramble]
+sudo apt-get install -y software-properties-common
+sudo apt-add-repository -y ppa:ansible/ansible
+sudo apt-get update
+sudo apt-get install -y ansible
+sudo apt-get install -y git
+git clone --single-branch --branch scramble-pishahang https://github.com/CN-UPB/pg-scrambLe.git
+cd pg-scrambLe/phishahang/Pishahang-master/son-install
+
+git checkout install-pishahang
+mkdir ~/.ssh
+echo sonata | tee ~/.ssh/.vault_pass
+
+ansible-playbook utils/deploy/sp.yml -e "target=localhost public_ip=<<ip-address>>" -v
+
+cd pg-scrambLe
+sudo ./run_scramble.sh <<ip-address>>
+
+\end{lstlisting}
+
+\section{Scramble GUI for Pishahang}
+The scramble-gui is integrated with both pishahang-gui and in pishahang-BSS developed with Angular-js for front end and mangodb deployed using python for back-end., enabling users to enter the details of child-MANO's and also select the desired MANO's to instantiate a service.
+
+With Scramble-pishahang GUI the users can enter details of child-MANO's as shown in images below.
+
+Step 1: Select \textit{MANO Settings} and then \textit{Add MANO}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-1"}
+	\caption{Scramble\_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Step 2: Enter MANO details, The required MANO details are 
+\begin{enumerate}
+	\item MANO Name: The name is take so that the user can easily differentiate between MANO's and can be any name desired by user.
+	\item URL: Is the URL to access the MANO
+	\item Username and Password: Is the credentials required to access the MANO
+	\item MANO Vendor: Is a choice between OSM and Pishahang to recognize the type of child-mano added.   
+\end{enumerate}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-2"}
+	\caption{Scramble\_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Once the MANO details are entered and the list of MANO's added are displayed.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-gui-step-3"}
+	\caption{Scramble\_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+
+Once the child-MANO's are added, in the pishahang-bss the added MANO's are listed. The user can select the MANO's in which the service can be instantiated and also if user does not need to instantiate the service in child MANO, he can instantiate the service just in the parent MANO as shown below.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{"figures/son-bss"}
+	\caption{Scramble\_pishahang GUI}
+	\label{fig:sequence-diagram-scramble}
+\end{figure}
+  
