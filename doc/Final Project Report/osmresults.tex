@@ -19,12 +19,12 @@ The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 5 OSM dockers 
 		2) Instantiate Network Service
 		3) Scale Network Service
 		4) Update Network Service by supporting Network Service configuration changes
-		Create, delete, query, and update of VNFFGs associated to a Network Service.
+		Create, delete, query, and update of VNFFGs associated to a Network Service
 		5) Terminate Network Services
 		
 		\item \textit{VNF LCM operations:} 1) Instantiate VNF (create a VNF using the VNF on-boarding artifacts)
-		2) Scale VNF (increase or reduce the capacity of the VNF).
-		3) Update and/or Upgrade VNF (support VNF software and/or configuration changes of various complexity).
+		2) Scale VNF (increase or reduce the capacity of the VNF)
+		3) Update and/or Upgrade VNF (support VNF software and/or configuration changes of various complexity)
 		4) Terminate VNF (release VNF-associated NFVI resources and return it to NFVI resource pool)
 	\end{itemize}
 	
@@ -36,8 +36,8 @@ The \ref{fig:cirroscase1180-cpu} shows CPU utilization. The first 5 OSM dockers 
 	
 	\item \textbf{osm\_ro\_db:} This is called RO database module.
 	RO module in OSM maintains its own database called ro-db. (RO module is usually edited to enable or disable this particular module)
-	This module takes care of database related operations. According to the OSM/ro.git, ro-db stores different IDs like vnfd id ,osm id, tenant id, vim id etc. There is something called scenario. ro db stores these scenarios and scenario ID and then a scenario gets executed when the scenario id matches with the right tenant id, osm id and vnfd id. 
-	It stores vim actions, wim actions and they are processed sequentially. 
+	This module takes care of database related operations. According to the OSM/ro.git, ro\_db stores different IDs like vnfd ID ,osm ID, tenant ID, vim ID etc. Also, there is something called scenario(action/instruction). ro\_db stores these scenarios and scenario ID. A scenario gets executed when the scenario ID matches with the right tenant ID, osm ID and vnfd ID. 
+	It also stores vim actions, wim actions and they are processed sequentially. 
 	
 	\item \textbf{osm\_nbi:} North Bound Interface of OSM. Restful server that follows ETSI SOL005 interface.
 	It is the unique entry point for all the interactions with the OSS/UI system.
@@ -80,7 +80,7 @@ The first 5 OSM dockers in memory utilization graph are:
 \end{figure}
 
 
-\subsubsection{Lifecycle}
+\subsubsection{CPU usage during the lifecycle of this experiment}
 
 We now have the life cycle graphs of the entire experiment. This shows the distribution of the CPU usage among the top 3 dockers throughout the experiment. The experiment lasted for about 10 minutes. We capture idle metrics for about a minute and then the service requests starts getting instantiated at 30 RPM.
 
